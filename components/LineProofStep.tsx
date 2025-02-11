@@ -12,7 +12,7 @@ export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumbe
   const isInFocus = lineInFocus == props.uuid;
   return (
     <div
-      className={cn("flex justify-between gap-8 text-lg/10 text-slate-800 cursor-pointer px-[-1rem]", isInFocus ? "text-highlight" : "")}
+      className={cn("flex justify-between gap-8 text-lg/10 text-slate-800 cursor-pointer px-[-1rem]", isInFocus ? "text-highlight underline" : "")}
       onMouseOver={() => setLineInFocus(props.uuid)}
       onMouseLeave={() => removeFocusFromLine(props.uuid)}
     >

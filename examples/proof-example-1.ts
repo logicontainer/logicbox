@@ -38,6 +38,44 @@ export default {
           }
         },
         {
+          "stepType": "box",
+          "uuid": "124124124sdfs",
+          "proof": [
+            {
+              "stepType": "line",
+              "uuid": "124a718924sdfsdf7",
+              "formula": "p and r",
+              "latexFormula": "p \\land q",
+              "justification": {
+                "rule": "assumption",
+                "refs": []
+              }
+            },
+            {
+              "stepType": "line",
+              "uuid": "dfsafdfsfsdfsdf",
+              "formula": "p to r",
+              "latexFormula": "p \\rightarrow q",
+              "justification": {
+                "rule": "and_elim_2",
+                "refs": []
+              }
+            },
+            {
+              "stepType": "line",
+              "uuid": "awfjkl123r19sdfsdfs",
+              "formula": "p",
+              "latexFormula": "p",
+              "justification": {
+                "rule": "and_elim_1",
+                "refs": [
+                  "124a718924sdfsdf7"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "stepType": "line",
           "uuid": "awfjkl123r19s",
           "formula": "p",
@@ -59,7 +97,9 @@ export default {
       "justification": {
         "rule": "implies-intro",
         "refs": [
-          "124124124"
+          "124124124",
+          "awfjkl123r19s",
+          "124124124sdfs"
         ]
       }
     }

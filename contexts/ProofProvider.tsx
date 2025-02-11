@@ -10,13 +10,15 @@ interface ProofContextProps {
   lineInFocus: string | null,
   setLineInFocus: (uuid: string) => unknown,
   removeFocusFromLine: (uuid: string) => unknown
+  setStringProof: (proof: string) => unknown
 }
 // Context Setup
 const ProofContext = React.createContext<ProofContextProps>({
   proof: [],
   lineInFocus: null,
   setLineInFocus: () => { },
-  removeFocusFromLine: () => { }
+  removeFocusFromLine: () => { },
+  setStringProof: () => { }
 });
 
 export function useProof () {
@@ -29,6 +31,9 @@ export function useProof () {
 
 export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
   const [proof, setProof] = useState(proofExample1.proof);
+  const setStringProof = (stringProof: string) => {
+    setProof(JSON.parse(stringProof))
+  }
   const [lineInFocus, setLineInFocus] = useState<string | null>(null);
   const removeFocusFromLine = (uuid: string) => {
     if (lineInFocus == uuid) {
@@ -36,7 +41,7 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     }
   }
   return (
-    <ProofContext.Provider value={{ proof, lineInFocus, setLineInFocus, removeFocusFromLine }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, setStringProof, setLineInFocus, removeFocusFromLine }}>
       {children}
     </ProofContext.Provider>
   );

@@ -8,7 +8,7 @@ export function LineNumber ({ line }: { line: LineNumberLine }) {
 
   return (
     <p
-      className={cn("text-sm/10 text-left text-slate-800 align-baseline cursor-pointer", isInFocus ? "text-highlight" : "")}
+      className={cn("text-sm/10 text-left text-slate-800 align-baseline cursor-pointer", isInFocus ? "text-highlight underline" : "")}
       onMouseOver={() => setLineInFocus(line.uuid)}
       onMouseLeave={() => removeFocusFromLine(line.uuid)}
     >
