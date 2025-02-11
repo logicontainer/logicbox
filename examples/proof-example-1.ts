@@ -29,6 +29,16 @@ export default {
         },
         {
           "stepType": "line",
+          "uuid": "dfsafdfsf",
+          "formula": "p and r",
+          "latexFormula": "p \\land q",
+          "justification": {
+            "rule": "assumption",
+            "refs": []
+          }
+        },
+        {
+          "stepType": "line",
           "uuid": "awfjkl123r19s",
           "formula": "p",
           "latexFormula": "p",

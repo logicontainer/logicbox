@@ -1,3 +1,4 @@
+import { LineNumber } from "./LineNumber";
 import { LineNumberLine } from "@/types/types";
 
 export function LineNumbers ({ lines }: { lines: LineNumberLine[] }) {
@@ -5,8 +6,10 @@ export function LineNumbers ({ lines }: { lines: LineNumberLine[] }) {
 
   return (
     <div className="flex-col items-start">
-      {lines.filter((line) => !line.isBox).map((line) =>
-        <p key={line.uuid} className="text-sm/10 text-left text-slate-800 align-baseline">{line.lineNumber}.</p>)}
+      {lines.filter((line) => !line.isBox).map((line) => {
+        return (
+          <LineNumber key={line.uuid} line={line} />);
+      })}
     </div>
   )
 }

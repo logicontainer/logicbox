@@ -7,10 +7,16 @@ import proofExample1 from "@/examples/proof-example-1";
 
 interface ProofContextProps {
   proof: ProofStep[];
+  lineInFocus: string | null,
+  setLineInFocus: (uuid: string) => unknown,
+  removeFocusFromLine: (uuid: string) => unknown
 }
 // Context Setup
 const ProofContext = React.createContext<ProofContextProps>({
-  proof: []
+  proof: [],
+  lineInFocus: null,
+  setLineInFocus: () => { },
+  removeFocusFromLine: () => { }
 });
 
 export function useProof () {
@@ -21,10 +27,16 @@ export function useProof () {
   return context;
 }
 
-export function ProofProvider ({ children }: React.PropsWithChildren<{}>) {
-  const [proof, setproof] = useState(proofExample1.proof);
+export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
+  const [proof, setProof] = useState(proofExample1.proof);
+  const [lineInFocus, setLineInFocus] = useState<string | null>(null);
+  const removeFocusFromLine = (uuid: string) => {
+    if (lineInFocus == uuid) {
+      setLineInFocus(null);
+    }
+  }
   return (
-    <ProofContext.Provider value={{ proof }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, setLineInFocus, removeFocusFromLine }}>
       {children}
     </ProofContext.Provider>
   );
