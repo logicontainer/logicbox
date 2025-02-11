@@ -1,5 +1,5 @@
 import { LineNumberLine } from "@/types/types";
-import { cn } from "@/utils/utils";
+import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 
 export function LineNumber ({ line }: { line: LineNumberLine }) {

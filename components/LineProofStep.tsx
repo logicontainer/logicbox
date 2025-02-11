@@ -4,7 +4,7 @@ import { LineNumberLine, LineProofStep as TLineProofStep } from "@/types/types";
 
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
-import { cn } from "@/utils/utils";
+import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 
 export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumberLine[] }) {
@@ -17,7 +17,8 @@ export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumbe
       onMouseLeave={() => removeFocusFromLine(props.uuid)}
     >
       <p className="shrink">
-        <InlineMath math={props.latexFormula} /></p>
+        <InlineMath math={props.latexFormula} />
+      </p>
       <Justification justification={props.justification} lines={props.lines} />
     </div>
   )

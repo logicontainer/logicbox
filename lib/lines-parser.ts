@@ -1,5 +1,5 @@
 import { BoxProofStep, LineNumberLine, ProofStep } from "@/types/types"
-function extractLineUuids (proof: ProofStep[]): LineNumberLine[] {
+function extractLineUuids (proof: ProofStep[], openedBoxes: number = 0): LineNumberLine[] {
   let lines = [] as LineNumberLine[];
   proof.forEach((proofStep: ProofStep) => {
     const newLine: LineNumberLine = { uuid: proofStep.uuid, isBox: false }
@@ -7,10 +7,11 @@ function extractLineUuids (proof: ProofStep[]): LineNumberLine[] {
       lines.push(newLine)
     } else {
       proofStep = proofStep as BoxProofStep;
-      const subProofLines = extractLineUuids(proofStep.proof)
+      openedBoxes++;
+      const subProofLines = extractLineUuids(proofStep.proof, openedBoxes)
       newLine.isBox = true;
-      newLine.boxStartLine = lines.length + 1;
-      newLine.boxEndLine = newLine.boxStartLine + subProofLines.length - 1
+      newLine.boxStartLine = lines.length + openedBoxes;
+      newLine.boxEndLine = newLine.boxStartLine + subProofLines.filter((line) => !line.isBox).length - 1;
       lines = [...lines, { ...newLine }, ...subProofLines]
     }
   })
@@ -18,11 +19,11 @@ function extractLineUuids (proof: ProofStep[]): LineNumberLine[] {
 }
 export function parseLinesFromProof (proof: ProofStep[]): LineNumberLine[] {
   const lines = extractLineUuids(proof)
-  let num = 1;
+  let lineCount = 1;
   return lines.map((line) => {
     if (line.isBox) {
       return line;
     }
-    return { ...line, lineNumber: num++ }
+    return { ...line, lineNumber: lineCount++ }
   })
 } 

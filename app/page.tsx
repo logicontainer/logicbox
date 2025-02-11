@@ -2,7 +2,7 @@
 
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
-import { parseLinesFromProof } from "@/utils/lines-parser";
+import { parseLinesFromProof } from "@/lib/lines-parser";
 import { useProof } from "@/contexts/ProofProvider";
 
 export default function Home () {
