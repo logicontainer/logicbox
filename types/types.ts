@@ -1,6 +1,11 @@
 export type Justification = {
-  rule: "premise" | "and_e_1" | "and_e_2"
+  rule: string,
   refs: string[]
+}
+export type JustificationConfig = {
+  rule: string,
+  latexRule: string,
+  numRefs: number
 }
 export type LineProofStep = {
   uuid: string,
@@ -17,3 +22,4 @@ export type BoxProofStep = {
 }
 export type ProofStep = LineProofStep | BoxProofStep;
 
+export type LineNumberLine = { uuid: string, lineNumber: number };

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import { ProofStep } from "@/types/Proof";
+import { ProofStep } from "@/types/types";
 import proofExample1 from "@/examples/proof-example-1";
 
 interface ProofContextProps {

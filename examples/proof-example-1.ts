@@ -1,4 +1,4 @@
-import { ProofStep } from "@/types/Proof";
+import { ProofStep } from "@/types/types";
 
 export default {
   "uuid": "12oshjfl2",
@@ -33,7 +33,7 @@ export default {
           "formula": "p",
           "latexFormula": "p",
           "justification": {
-            "rule": "and-elim1",
+            "rule": "and_elim_1",
             "refs": [
               "124a7189247"
             ]

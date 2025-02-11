@@ -1,9 +1,12 @@
-export function LineNumbers () {
-  const lineCount = 5
+import { LineNumberLine } from "@/types/types";
+
+export function LineNumbers ({ lines }: { lines: LineNumberLine[] }) {
+  if (!lines) return;
+
   return (
     <div className="flex-col items-start">
-      {[...Array(5)].map((e, i) =>
-        <p key={i} className="text-sm/10 text-left text-gray-800 align-baseline">{i}.</p>)}
+      {lines.map((line) =>
+        <p key={line.uuid} className="text-sm/10 text-left text-slate-800 align-baseline">{line.lineNumber}.</p>)}
     </div>
   )
 }

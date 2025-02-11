@@ -1,5 +1,5 @@
 import { Proof } from "./Proof";
-import { BoxProofStep as TBoxProofStep } from "@/types/Proof";
+import { BoxProofStep as TBoxProofStep } from "@/types/types";
 export function BoxProofStep ({ ...props }: TBoxProofStep) {
   return (<div><Proof proof={props.proof} /></div>)
 }
