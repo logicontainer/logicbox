@@ -2,7 +2,7 @@
 
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
-import { parseLinesFromProof } from "@/utils/proof-parser";
+import { parseLinesFromProof } from "@/utils/lines-parser";
 import { useProof } from "@/contexts/ProofProvider";
 
 export default function Home () {
@@ -14,7 +14,7 @@ export default function Home () {
         <div className="p-8 flex flex-col justify-between gap-4 rounded-sm">
           <div className="flex box-content gap-2">
             <LineNumbers lines={lines} />
-            < Proof proof={proofContext.proof} />
+            < Proof proof={proofContext.proof} lines={lines} />
           </div>
         </div>
       </main>

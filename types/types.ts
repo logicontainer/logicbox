@@ -22,4 +22,4 @@ export type BoxProofStep = {
 }
 export type ProofStep = LineProofStep | BoxProofStep;
 
-export type LineNumberLine = { uuid: string, lineNumber: number };
+export type LineNumberLine = { uuid: string, isBox: boolean, boxStartLine?: number, boxEndLine?: number, lineNumber?: number };

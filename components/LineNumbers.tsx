@@ -5,7 +5,7 @@ export function LineNumbers ({ lines }: { lines: LineNumberLine[] }) {
 
   return (
     <div className="flex-col items-start">
-      {lines.map((line) =>
+      {lines.filter((line) => !line.isBox).map((line) =>
         <p key={line.uuid} className="text-sm/10 text-left text-slate-800 align-baseline">{line.lineNumber}.</p>)}
     </div>
   )

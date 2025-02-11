@@ -1,4 +1,4 @@
-import { JustificationConfig, Justification as TJustification } from "@/types/types";
+import { JustificationConfig, LineNumberLine, Justification as TJustification } from "@/types/types";
 
 import { InlineMath } from "react-katex";
 
@@ -31,10 +31,18 @@ const justificationsConfig = [
 
 ] as JustificationConfig[];
 
-export function Justification ({ justification }: { justification: TJustification }) {
+export function Justification ({ justification, lines }: { justification: TJustification, lines: LineNumberLine[] }) {
   const config = justificationsConfig.find((config) => config.rule == justification.rule)
   if (!config) return;
-  const mathString = `${config.latexRule}${config.numRefs ? "\\,1,2" : ""}`
+  const refs = justification.refs.map((ref) => {
+    const referencedLine = lines.find((line) => line.uuid == ref);
+    if (referencedLine?.isBox) {
+      return `${referencedLine.boxStartLine}\\text{-}${referencedLine.boxEndLine}`
+    } else {
+      return referencedLine?.lineNumber;
+    }
+  })
+  const mathString = `${config.latexRule}${refs ? `\\,${refs.join(",")}` : ""}`
   return (
     <InlineMath math={mathString}></InlineMath>
   )

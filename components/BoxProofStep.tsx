@@ -1,5 +1,7 @@
+import { LineNumberLine, BoxProofStep as TBoxProofStep } from "@/types/types";
+
 import { Proof } from "./Proof";
-import { BoxProofStep as TBoxProofStep } from "@/types/types";
-export function BoxProofStep ({ ...props }: TBoxProofStep) {
-  return (<div><Proof proof={props.proof} /></div>)
+
+export function BoxProofStep ({ ...props }: TBoxProofStep & { lines: LineNumberLine[] }) {
+  return (<div><Proof proof={props.proof} lines={props.lines} /></div>)
 }
