@@ -1,8 +1,9 @@
 "use client";
 
+import { BoxProofStep, ProofStep } from "@/types/types";
 import React, { useState } from "react";
 
-import { ProofStep } from "@/types/types";
+import _ from "lodash";
 import proofExample1 from "@/examples/proof-example-1";
 
 interface ProofContextProps {
@@ -11,6 +12,7 @@ interface ProofContextProps {
   setLineInFocus: (uuid: string) => unknown,
   removeFocusFromLine: (uuid: string) => unknown
   setStringProof: (proof: string) => unknown
+  addLine: (proofStep: ProofStep, uuid: string, append?: boolean) => unknown
 }
 // Context Setup
 const ProofContext = React.createContext<ProofContextProps>({
@@ -18,7 +20,8 @@ const ProofContext = React.createContext<ProofContextProps>({
   lineInFocus: null,
   setLineInFocus: () => { },
   removeFocusFromLine: () => { },
-  setStringProof: () => { }
+  setStringProof: () => { },
+  addLine: (proofStep: ProofStep, uuid: string, append?: boolean) => { }
 });
 
 export function useProof () {
@@ -40,8 +43,43 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
       setLineInFocus(null);
     }
   }
+
+  const changeProofNearUuid = (
+    proof: ProofStep[],
+    uuid: string,
+    newProofStep: ProofStep,
+    actionAtIndex: (layer: ProofStep[], indexInCurrLayer: number) => void
+  ): boolean => {
+    const indexInCurrentLayer = proof.findIndex((proofStep) => proofStep.uuid == uuid);
+    if (indexInCurrentLayer != -1) {
+      actionAtIndex(proof, indexInCurrentLayer);
+      return true;
+    }
+    const boxProofSteps: BoxProofStep[] = proof.filter((proofStep) => proofStep.stepType == "box") as unknown as BoxProofStep[];
+    for (const boxProofStep of boxProofSteps) {
+      if (changeProofNearUuid(boxProofStep.proof, uuid, newProofStep, actionAtIndex)) return true;
+    }
+    return false;
+  }
+
+  const addLine = (proofStep: ProofStep, uuid: string, append: boolean = false) => {
+    setProof((prev) => {
+      const newProof = _.cloneDeep(prev);
+      const insertProofStepAtUuid = (proof: ProofStep[], indexInCurrLayer: number) => {
+        return proof.splice(indexInCurrLayer + (append ? 1 : 0), 0, proofStep);
+      }
+      changeProofNearUuid(
+        newProof,
+        uuid,
+        proofStep,
+        insertProofStepAtUuid
+      )
+      return newProof;
+    })
+  }
+
   return (
-    <ProofContext.Provider value={{ proof, lineInFocus, setStringProof, setLineInFocus, removeFocusFromLine }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, setStringProof, setLineInFocus, removeFocusFromLine, addLine }}>
       {children}
     </ProofContext.Provider>
   );

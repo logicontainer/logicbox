@@ -16,6 +16,20 @@ export default function Home () {
             <LineNumbers lines={lines} />
             <Proof proof={proofContext.proof} lines={lines} />
           </div>
+          <div>
+            <button className="border-solid border-2 border-slate-800 rounded-sm px-4" onClick={() => proofContext.addLine({
+              "stepType": "line",
+              "uuid": "new-uuid",
+              "formula": "p and r",
+              "latexFormula": "f \\land q",
+              "justification": {
+                "rule": "assumption",
+                "refs": []
+              }
+            }, "j", false)}>
+              Add line before what is initially line 8
+            </button>
+          </div>
         </div>
       </main>
       <textarea className="absolute top-full w-full p-4" value={JSON.stringify(proofContext.proof, null, 2)} onChange={(e) => proofContext.setStringProof(e.target.value)} rows={15} cols={50} />
