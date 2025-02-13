@@ -14,6 +14,11 @@ const justificationConfig = [
     numRefs: 0
   },
   {
+    rule: "copy",
+    latexRule: "\\text{copy}",
+    numRefs: 1
+  },
+  {
     rule: "and_intro",
     latexRule: "\\land i",
     numRefs: 2

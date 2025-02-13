@@ -13,7 +13,6 @@ export type LineProofStep = {
   formula: string,
   latexFormula: string,
   justification: Justification
-
 }
 export type BoxProofStep = {
   uuid: string,

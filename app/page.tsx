@@ -2,6 +2,7 @@
 
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
+import { Toolbar } from "@/components/Toolbar";
 import { parseLinesFromProof } from "@/lib/lines-parser";
 import { useProof } from "@/contexts/ProofProvider";
 
@@ -12,23 +13,10 @@ export default function Home () {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-slate-100">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="p-8 flex flex-col justify-between items-center gap-4 rounded-sm">
+          <Toolbar />
           <div className="flex box-content gap-2">
             <LineNumbers lines={lines} />
             <Proof proof={proofContext.proof} lines={lines} />
-          </div>
-          <div>
-            <button className="border-solid border-2 border-slate-800 rounded-sm px-4" onClick={() => proofContext.addLine({
-              "stepType": "line",
-              "uuid": "new-uuid",
-              "formula": "p and r",
-              "latexFormula": "f \\land q",
-              "justification": {
-                "rule": "assumption",
-                "refs": []
-              }
-            }, "j", false)}>
-              Add line before what is initially line 8
-            </button>
           </div>
         </div>
       </main>
