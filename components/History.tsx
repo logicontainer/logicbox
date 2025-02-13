@@ -9,7 +9,7 @@ export function History () {
       <ol>
         {historyContext.history.map((command, i) => {
           return (<li
-            className={cn(historyContext.now - 1 == i ? "text-red-500" : "")}
+            className={cn(historyContext.now - 1 == i ? "text-green-500" : "")}
             key={command.getCommandUuid()}>
             {command.getDescription()}
           </li>)
