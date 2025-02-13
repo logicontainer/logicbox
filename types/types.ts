@@ -1,11 +1,20 @@
-export type Justification = {
-  rule: string,
-  refs: string[]
+export type Ruleset = {
+  rulesetName: string;
+  rules: Rule[];
 }
-export type JustificationConfig = {
-  rule: string,
-  latexRule: string,
-  numRefs: number
+export type Rule = {
+  name: string,
+  numPremises: number,
+  latex: {
+    name: string,
+    premises: string[],
+    conclusion: ""
+  }
+}
+
+export type Justification = {
+  name: string,
+  refs: string[]
 }
 export type LineProofStep = {
   uuid: string,

@@ -30,7 +30,7 @@ export class AddLineCommand extends Command {
       "formula": "p and r",
       "latexFormula": this.newLineUuid.slice(0, 5),
       "justification": {
-        "rule": "assumption",
+        "name": "assumption",
         "refs": []
       },
     }, this.nearLineWithUuid, this.prepend)

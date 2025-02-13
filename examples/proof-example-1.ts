@@ -9,7 +9,7 @@ export const linesAndBox = {
       "formula": "p -> q",
       "latexFormula": "p \\rightarrow q",
       "justification": {
-        "rule": "premise",
+        "name": "premise",
         "refs": []
       }
     },
@@ -23,7 +23,7 @@ export const linesAndBox = {
           "formula": "p and r",
           "latexFormula": "p \\land q",
           "justification": {
-            "rule": "assumption",
+            "name": "assumption",
             "refs": []
           }
         },
@@ -37,7 +37,7 @@ export const linesAndBox = {
               "formula": "p and r",
               "latexFormula": "p \\land q",
               "justification": {
-                "rule": "assumption",
+                "name": "assumption",
                 "refs": []
               }
             },
@@ -47,7 +47,7 @@ export const linesAndBox = {
               "formula": "p to r",
               "latexFormula": "p \\rightarrow q",
               "justification": {
-                "rule": "and_elim_2",
+                "name": "and_elim_2",
                 "refs": []
               }
             },
@@ -57,7 +57,7 @@ export const linesAndBox = {
               "formula": "p",
               "latexFormula": "p",
               "justification": {
-                "rule": "and_elim_1",
+                "name": "and_elim_1",
                 "refs": [
                   "c"
                 ]
@@ -71,7 +71,7 @@ export const linesAndBox = {
           "formula": "p to r",
           "latexFormula": "p \\rightarrow q",
           "justification": {
-            "rule": "and_elim_2",
+            "name": "and_elim_2",
             "refs": []
           }
         },
@@ -81,7 +81,7 @@ export const linesAndBox = {
           "formula": "p",
           "latexFormula": "p",
           "justification": {
-            "rule": "and_elim_1",
+            "name": "and_elim_1",
             "refs": [
               "d"
             ]
@@ -91,14 +91,14 @@ export const linesAndBox = {
     },
     {
       "stepType": "line",
-      "uuid": "j",
-      "formula": "p and r -> q and s",
-      "latexFormula": "p \\land r \\rightarrow q \\land s",
+      "uuid": "dsfdsf",
+      "formula": "p",
+      "latexFormula": "p",
       "justification": {
-        "rule": "implies-intro",
+        "name": "implies_elim",
         "refs": [
-          "a",
-          "b"
+          "h",
+          "i",
         ]
       }
     }
@@ -114,7 +114,7 @@ export const linesOnly = {
       "formula": "p -> q",
       "latexFormula": "p \\rightarrow q",
       "justification": {
-        "rule": "premise",
+        "name": "premise",
         "refs": []
       }
     },
@@ -124,7 +124,7 @@ export const linesOnly = {
       "formula": "p and r -> q and s",
       "latexFormula": "p \\land r \\rightarrow q \\land s",
       "justification": {
-        "rule": "implies-intro",
+        "name": "implies-intro",
         "refs": [
           "124124124",
           "awfjkl123r19s",
@@ -143,7 +143,7 @@ export const biggerExample = {
       "formula": "p -> q",
       "latexFormula": "p \\rightarrow q",
       "justification": {
-        "rule": "premise",
+        "name": "premise",
         "refs": []
       }
     },
@@ -157,7 +157,7 @@ export const biggerExample = {
           "formula": "p and r",
           "latexFormula": "p \\land q",
           "justification": {
-            "rule": "assumption",
+            "name": "assumption",
             "refs": []
           }
         },
@@ -167,7 +167,7 @@ export const biggerExample = {
           "formula": "p and r",
           "latexFormula": "p \\land q",
           "justification": {
-            "rule": "assumption",
+            "name": "assumption",
             "refs": []
           }
         },
@@ -181,7 +181,7 @@ export const biggerExample = {
               "formula": "p and r",
               "latexFormula": "p \\land q",
               "justification": {
-                "rule": "assumption",
+                "name": "assumption",
                 "refs": []
               }
             },
@@ -191,7 +191,7 @@ export const biggerExample = {
               "formula": "p to r",
               "latexFormula": "p \\rightarrow q",
               "justification": {
-                "rule": "and_elim_2",
+                "name": "and_elim_2",
                 "refs": []
               }
             },
@@ -201,7 +201,7 @@ export const biggerExample = {
               "formula": "p",
               "latexFormula": "p",
               "justification": {
-                "rule": "and_elim_1",
+                "name": "and_elim_1",
                 "refs": [
                   "124a718924sdfsdf7"
                 ]
@@ -215,7 +215,7 @@ export const biggerExample = {
           "formula": "p",
           "latexFormula": "p",
           "justification": {
-            "rule": "and_elim_1",
+            "name": "and_elim_1",
             "refs": [
               "124a7189247"
             ]
@@ -233,7 +233,7 @@ export const biggerExample = {
           "formula": "p and r",
           "latexFormula": "p \\land q",
           "justification": {
-            "rule": "assumption",
+            "name": "assumption",
             "refs": []
           }
         },
@@ -243,7 +243,7 @@ export const biggerExample = {
           "formula": "p to r",
           "latexFormula": "p \\rightarrow q",
           "justification": {
-            "rule": "and_elim_2",
+            "name": "and_elim_2",
             "refs": []
           }
         },
@@ -253,7 +253,7 @@ export const biggerExample = {
           "formula": "p",
           "latexFormula": "p",
           "justification": {
-            "rule": "and_elim_1",
+            "name": "and_elim_1",
             "refs": [
               "124a718924sdfsdf7"
             ]
@@ -263,15 +263,14 @@ export const biggerExample = {
     },
     {
       "stepType": "line",
-      "uuid": "asdfkhjkl13",
-      "formula": "p and r -> q and s",
-      "latexFormula": "p \\land r \\rightarrow q \\land s",
+      "uuid": "dsfdsf",
+      "formula": "p",
+      "latexFormula": "p",
       "justification": {
-        "rule": "implies-intro",
+        "name": "implies_elim",
         "refs": [
           "124124124",
           "awfjkl123r19s",
-          "124124124sdfs"
         ]
       }
     }
