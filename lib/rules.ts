@@ -28,7 +28,7 @@ export const rulesets = [
         latex: {
           name: "\\text{premise}",
           premises: [],
-          conclusion: ""
+          conclusion: "\\phi"
         },
         numPremises: 0
       },
@@ -37,7 +37,7 @@ export const rulesets = [
         latex: {
           name: "\\text{ass.}",
           premises: [],
-          conclusion: ""
+          conclusion: "\\phi"
         },
         numPremises: 0
       },
@@ -45,8 +45,8 @@ export const rulesets = [
         name: "copy",
         latex: {
           name: "\\text{copy}",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi"],
+          conclusion: "\\phi"
         },
         numPremises: 1
       },
@@ -54,8 +54,8 @@ export const rulesets = [
         name: "and_intro",
         latex: {
           name: "\\land i",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi", "\\psi"],
+          conclusion: "\\phi \\land \\psi"
         },
         numPremises: 2
       },
@@ -63,8 +63,8 @@ export const rulesets = [
         name: "and_elim_1",
         latex: {
           name: "\\land e_1",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi \\land \\psi"],
+          conclusion: "\\phi"
         },
         numPremises: 1
       },
@@ -72,8 +72,8 @@ export const rulesets = [
         name: "and_elim_2",
         latex: {
           name: "\\land e_2",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi \\land \\psi"],
+          conclusion: "\\psi"
         },
         numPremises: 1
       },
@@ -81,8 +81,8 @@ export const rulesets = [
         name: "or_intro_1",
         latex: {
           name: "\\lor i_1",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi"],
+          conclusion: "\\phi \\land \\psi"
         },
         numPremises: 1
       },
@@ -90,8 +90,8 @@ export const rulesets = [
         name: "or_intro_2",
         latex: {
           name: "\\lor i_2",
-          premises: [],
-          conclusion: ""
+          premises: ["\\psi"],
+          conclusion: "\\phi \\land \\psi"
         },
         numPremises: 1
       },
@@ -99,8 +99,8 @@ export const rulesets = [
         name: "or_elim",
         latex: {
           name: "\\lor e",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi \\lor \\psi", "\\text{HERE SHOULD BE A BOX}", "\\text{HERE SHOULD BE A BOX}"],
+          conclusion: "\\chi"
         },
         numPremises: 3
       },
@@ -108,8 +108,8 @@ export const rulesets = [
         name: "implies_intro",
         latex: {
           name: "\\rightarrow i",
-          premises: [],
-          conclusion: ""
+          premises: ["\\text{HERE SHOULD BE A BOX}"],
+          conclusion: "\\phi \\rightarrow \\psi"
         },
         numPremises: 1
       },
@@ -126,8 +126,8 @@ export const rulesets = [
         name: "not_intro",
         latex: {
           name: "\\lnot i",
-          premises: [],
-          conclusion: ""
+          premises: ["\\text{HERE SHOULD BE A BOX}"],
+          conclusion: "\\lnot \\phi"
         },
         numPremises: 1
       },
@@ -135,8 +135,8 @@ export const rulesets = [
         name: "not_elim",
         latex: {
           name: "\\lnot e",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi", "\\lnot \\phi"],
+          conclusion: "\\bot"
         },
         numPremises: 2
       },
@@ -144,8 +144,8 @@ export const rulesets = [
         name: "bot_elim",
         latex: {
           name: "\\bot e",
-          premises: [],
-          conclusion: ""
+          premises: ["\\bot"],
+          conclusion: "\\phi"
         },
         numPremises: 1
       },
@@ -153,8 +153,8 @@ export const rulesets = [
         name: "not_not_elim",
         latex: {
           name: "\\not\\not e",
-          premises: [],
-          conclusion: ""
+          premises: ["\\lnot \\lnot \\phi"],
+          conclusion: "\\phi"
         },
         numPremises: 1
       },
@@ -162,8 +162,8 @@ export const rulesets = [
         name: "modus_tollens",
         latex: {
           name: "\\text{MT}",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi \\rightarrow \\psi", "\\lnot \\psi"],
+          conclusion: "\\lnot \\phi"
         },
         numPremises: 2
       },
@@ -171,8 +171,8 @@ export const rulesets = [
         name: "not_not_intro",
         latex: {
           name: "\\not\\not i",
-          premises: [],
-          conclusion: ""
+          premises: ["\\phi"],
+          conclusion: "\\lnot \\lnot \\phi"
         },
         numPremises: 1
       },
@@ -180,8 +180,8 @@ export const rulesets = [
         name: "proof_by_contradiction",
         latex: {
           name: "\\text{PBC}",
-          premises: [],
-          conclusion: ""
+          premises: ["\\text{HERE SHOULD BE A BOX}"],
+          conclusion: "\\phi"
         },
         numPremises: 1
       },
@@ -190,7 +190,7 @@ export const rulesets = [
         latex: {
           name: "\\text{LEM}",
           premises: [],
-          conclusion: ""
+          conclusion: "\\phi \\lor \\lnot \\phi"
         },
         numPremises: 0
       }

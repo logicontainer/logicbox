@@ -6,15 +6,17 @@ export function History () {
   return (
     <>
       <p>History:</p>
-      <ol>
-        {historyContext.history.map((command, i) => {
-          return (<li
-            className={cn(historyContext.now - 1 == i ? "text-green-500" : "")}
-            key={command.getCommandUuid()}>
-            {command.getDescription()}
-          </li>)
-        })}
-      </ol>
+      <div className="h-32 w-96 overflow-y-auto border-2">
+        <ol>
+          {historyContext.history.map((command, i) => {
+            return (<li
+              className={cn(historyContext.now - 1 == i ? "text-green-500" : "")}
+              key={command.getCommandUuid()}>
+              {command.getDescription()}
+            </li>)
+          })}
+        </ol>
+      </div>
     </>
   )
 }

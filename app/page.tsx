@@ -20,7 +20,7 @@ export default function Home () {
           <div className="flex box-content gap-2">
             <LineNumbers lines={lines} />
             <Proof proof={proofContext.proof} lines={lines} />
-            <Tooltip id={`tooltip-id-${proofContext.lineInFocus}`} place="right" render={({ content, activeAnchor }) => (
+            <Tooltip id={`tooltip-id-${proofContext.lineInFocus}`} place="right" render={({ content }) => (
               <p className="text-lg"><InlineMath math={content || ""}></InlineMath></p>
             )} >
             </Tooltip>

@@ -16,10 +16,8 @@ export function RulesDropdown () {
   )
 }
 
-
 export function RulesDropdownItem ({ rule }: { rule: Rule }) {
-  const highlight = [0]
-  const tooptipExample = createHighlightedLatexRule(rule.latex.name, rule.latex.premises, rule.latex.conclusion, highlight, false)
+  const tooptipExample = createHighlightedLatexRule(rule.latex.name, rule.latex.premises, rule.latex.conclusion, [], false)
   return (<div>
     <InlineMath math={tooptipExample} />
   </div>)

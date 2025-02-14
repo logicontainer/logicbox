@@ -8,7 +8,7 @@ export type Rule = {
   latex: {
     name: string,
     premises: string[],
-    conclusion: ""
+    conclusion: string
   }
 }
 
