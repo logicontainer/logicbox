@@ -1,4 +1,3 @@
-import { History } from "./History";
 import { UndoRedo } from "./UndoRedo";
 
 export function Toolbar () {
@@ -6,7 +5,6 @@ export function Toolbar () {
     <div className="flex gap-4">
       <div className="flex-col">
         <UndoRedo />
-        <History />
       </div>
     </div>
   )
