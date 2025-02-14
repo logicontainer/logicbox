@@ -5,6 +5,7 @@ import { LineNumberLine, LineProofStep as TLineProofStep } from "@/types/types";
 import { AddLineTooltip } from "./AddLineTooltip";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
+// import { RemoveLineTooltip } from "./RemoveLineTooltip";
 import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
@@ -22,6 +23,7 @@ export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumbe
       className={cn("flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors", isUnfocused(props.uuid) ? "text-slate-400" : "")}
       onMouseOver={() => setLineInFocus(props.uuid)}
     >
+      {/* <RemoveLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend /> */}
       <AddLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend />
       <p className="shrink">
         <InlineMath math={props.latexFormula} />

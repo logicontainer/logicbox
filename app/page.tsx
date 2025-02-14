@@ -4,7 +4,7 @@ import { AddLinePopover } from "@/components/AddLinePopover";
 import { InlineMath } from "react-katex";
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
-import { RulesDropdown } from "@/components/RulesDropdown";
+import { RemoveLinePopover } from "@/components/RemoveLinePopover";
 import { Toolbar } from "@/components/Toolbar";
 import { Tooltip } from "react-tooltip";
 import { parseLinesFromProof } from "@/lib/lines-parser";
@@ -30,11 +30,10 @@ export default function Home () {
             )} >
             </Tooltip>
             <AddLinePopover uuid={proofContext.latestLineInFocus || ""} />
+            <RemoveLinePopover uuid={proofContext.latestLineInFocus || ""} />
           </div>
-          <RulesDropdown />
         </div>
       </main>
-      {/* <textarea className="absolute top-full w-full p-4" value={JSON.stringify(proofContext.proof, null, 2)} onChange={(e) => proofContext.setStringProof(e.target.value)} rows={15} cols={50} /> */}
     </div>
   );
 }

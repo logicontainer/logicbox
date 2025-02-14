@@ -1,4 +1,5 @@
 import { ProofContextProps } from "@/contexts/ProofProvider";
+import { ProofStep } from "@/types/types";
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class Command {
@@ -88,3 +89,31 @@ export class AddBoxLineCommand extends Command {
     return `Add box line ${this.prepend ? "before" : "after"} line with uuid ${this.nearLineWithUuid}`;
   }
 }
+
+
+// export class RemoveLineCommand extends Command {
+//   private lineUuid: string;
+//   private line: ProofStep | null;
+//   constructor(uuid: string) {
+//     super();
+//     this.lineUuid = uuid
+//     this.line = null;
+//   }
+
+//   execute (proofContext: ProofContextProps): void {
+//     console.log("Execute RemoveLineCommand for line " + this.lineUuid)
+
+//     // this.line = getLineWithUuid
+//     // this.position = getPositionOfLineWithUuid // Parent id and index in children
+//     proofContext.removeLine(
+//       this.lineUuid)
+//   }
+
+//   undo (proofContext: ProofContextProps): void {
+//     console.log("Undoing RemoveLineCommand for line " + this.lineUuid)
+//     proofContext.addLine(this.line, this.position)
+//   }
+//   getDescription (): string {
+//     return `Remove line with uuid ${this.lineUuid}`;
+//   }
+// }
