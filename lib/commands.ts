@@ -1,5 +1,5 @@
 import { ProofContextProps } from "@/contexts/ProofProvider";
-import { ProofStep } from "@/types/types";
+// import { ProofStep } from "@/types/types";
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class Command {
