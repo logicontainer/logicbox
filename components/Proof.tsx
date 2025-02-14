@@ -5,9 +5,13 @@ import { LineNumberLine, BoxProofStep as TBoxProofStep, LineProofStep as TLinePr
 import { BoxProofStep } from "@/components/BoxProofStep";
 import { LineProofStep } from "@/components/LineProofStep";
 import { ProofStep } from "@/types/types";
+import { cn } from "@/lib/utils";
+import { useProof } from "@/contexts/ProofProvider";
 
-export function Proof ({ ...props }: { proof: ProofStep[], lines: LineNumberLine[] }) {
-  return <div className=" outline-2 outline outline-slate-800 text-slate-800 px-4 ">
+export function Proof ({ ...props }: { proof: ProofStep[], lines: LineNumberLine[], uuid?: string }) {
+  const { isFocused } = useProof();
+  const isInFocus = isFocused(props.uuid || "")
+  return <div className={cn("outline-2 outline outline-slate-800 text-slate-800 px-4", isInFocus ? "outline-green-400" : "")}>
     {props.proof.map((proofStep) => {
       if (proofStep.stepType == "line") {
         const lineProofStepProps = proofStep as TLineProofStep;

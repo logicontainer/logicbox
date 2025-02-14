@@ -1,7 +1,7 @@
 "use client";
 
 import { BoxProofStep, ProofStep } from "@/types/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
 import proofExample1 from "@/examples/proof-example-1";
@@ -9,6 +9,9 @@ import proofExample1 from "@/examples/proof-example-1";
 export interface ProofContextProps {
   proof: ProofStep[];
   lineInFocus: string | null,
+  latestLineInFocus: string | null,
+  isFocused: (uuid: string) => boolean,
+  isUnfocused: (uuid: string) => boolean,
   setLineInFocus: (uuid: string) => unknown,
   removeFocusFromLine: (uuid: string) => unknown
   setStringProof: (proof: string) => unknown
@@ -19,6 +22,9 @@ export interface ProofContextProps {
 const ProofContext = React.createContext<ProofContextProps>({
   proof: [],
   lineInFocus: null,
+  latestLineInFocus: null,
+  isFocused: () => false,
+  isUnfocused: () => false,
   setLineInFocus: () => { },
   removeFocusFromLine: () => { },
   setStringProof: () => { },
@@ -40,6 +46,10 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     setProof(JSON.parse(stringProof))
   }
   const [lineInFocus, setLineInFocus] = useState<string | null>(null);
+  const [latestLineInFocus, setLatestLineInFocus] = useState<string | null>(null);
+  useEffect(() => {
+    if (lineInFocus) { setLatestLineInFocus(lineInFocus) }
+  }, [lineInFocus])
   const removeFocusFromLine = (uuid: string) => {
     if (lineInFocus == uuid) {
       setLineInFocus(null);
@@ -93,8 +103,20 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     })
   }
 
+
+  const isFocused = (uuid: string) => {
+    if (!uuid) return false;
+    return uuid == lineInFocus
+  }
+
+  const isUnfocused = (uuid: string) => {
+    if (!uuid) return false;
+    if (!lineInFocus) return false;
+    return uuid != lineInFocus
+  }
+
   return (
-    <ProofContext.Provider value={{ proof, lineInFocus, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine }}>
       {children}
     </ProofContext.Provider>
   );

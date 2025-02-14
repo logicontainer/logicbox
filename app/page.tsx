@@ -1,5 +1,6 @@
 "use client";
 
+import { AddLinePopover } from "@/components/AddLinePopover";
 import { InlineMath } from "react-katex";
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
@@ -17,13 +18,18 @@ export default function Home () {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="p-8 flex flex-col justify-between items-center gap-4 rounded-sm">
           <Toolbar />
-          <div className="flex box-content gap-2">
+          <div className="flex box-content gap-2" onMouseLeave={() => {
+            proofContext.setLineInFocus("")
+            return
+          }
+          }>
             <LineNumbers lines={lines} />
             <Proof proof={proofContext.proof} lines={lines} />
             <Tooltip id={`tooltip-id-${proofContext.lineInFocus}`} place="right" render={({ content }) => (
               <p className="text-lg"><InlineMath math={content || ""}></InlineMath></p>
             )} >
             </Tooltip>
+            <AddLinePopover uuid={proofContext.latestLineInFocus || ""} />
           </div>
           <RulesDropdown />
         </div>
