@@ -278,83 +278,53 @@ export const biggerExample = {
 };
 
 
-const realExample = [{
-  "formula": "((p -> q) -> r)",
-  "justification": {
-    "ruleName": "premise",
-    "refs": []
-  },
-  "latexFormula": "p \\rightarrow q \\rightarrow r",
-  "stepType": "line",
-  "uuid": "1"
-}, {
-  "formula": "(s -> ¬p)",
-  "justification": {
-    "ruleName": "premise",
-    "refs": []
-  },
-  "latexFormula": "s \\rightarrow \\lnot p",
-  "stepType": "line",
-  "uuid": "2"
-}, {
-  "formula": "t",
-  "justification": {
-    "ruleName": "premise",
-    "refs": []
-  },
-  "latexFormula": "t",
-  "stepType": "line",
-  "uuid": "3"
-}, {
-  "formula": "((¬s ∧ t) -> q)",
-  "justification": {
-    "ruleName": "premise",
-    "refs": []
-  },
-  "latexFormula": "\\lnot s \\land t \\rightarrow q",
-  "stepType": "line",
-  "uuid": "4"
-}, {
-  "formula": "(p ∨ ¬p)",
-  "justification": {
-    "ruleName": "law_of_excluded_middle",
-    "refs": []
-  },
-  "latexFormula": "p \\lor \\lnot p",
-  "stepType": "line",
-  "uuid": "5"
-}, {
+const realExample = {
+  "uuid": "12oshjfl2",
   "proof": [{
-    "formula": "p",
+    "formula": "((p -> q) -> r)",
     "justification": {
-      "ruleName": "assumption",
+      "ruleName": "premise",
       "refs": []
     },
-    "latexFormula": "p",
+    "latexFormula": "p \\rightarrow q \\rightarrow r",
     "stepType": "line",
-    "uuid": "11"
+    "uuid": "1"
   }, {
-    "formula": "q",
+    "formula": "(s -> ¬p)",
     "justification": {
-      "ruleName": "copy",
-      "refs": ["10"]
-    },
-    "latexFormula": "q",
-    "stepType": "line",
-    "uuid": "12"
-  }],
-  "stepType": "box",
-  "uuid": "b1"
-}, {
-  "proof": [{
-    "formula": "¬p",
-    "justification": {
-      "ruleName": "assumption",
+      "ruleName": "premise",
       "refs": []
     },
-    "latexFormula": "\\lnot p",
+    "latexFormula": "s \\rightarrow \\lnot p",
     "stepType": "line",
-    "uuid": "14"
+    "uuid": "2"
+  }, {
+    "formula": "t",
+    "justification": {
+      "ruleName": "premise",
+      "refs": []
+    },
+    "latexFormula": "t",
+    "stepType": "line",
+    "uuid": "3"
+  }, {
+    "formula": "((¬s ∧ t) -> q)",
+    "justification": {
+      "ruleName": "premise",
+      "refs": []
+    },
+    "latexFormula": "\\lnot s \\land t \\rightarrow q",
+    "stepType": "line",
+    "uuid": "4"
+  }, {
+    "formula": "(p ∨ ¬p)",
+    "justification": {
+      "ruleName": "law_of_excluded_middle",
+      "refs": []
+    },
+    "latexFormula": "p \\lor \\lnot p",
+    "stepType": "line",
+    "uuid": "5"
   }, {
     "proof": [{
       "formula": "p",
@@ -364,59 +334,92 @@ const realExample = [{
       },
       "latexFormula": "p",
       "stepType": "line",
-      "uuid": "15"
-    }, {
-      "formula": "⊥",
-      "justification": {
-        "ruleName": "not_elim",
-        "refs": ["15", "14"]
-      },
-      "latexFormula": "\\bot",
-      "stepType": "line",
-      "uuid": "16"
+      "uuid": "11"
     }, {
       "formula": "q",
       "justification": {
-        "ruleName": "contradition_elim",
-        "refs": ["16"]
+        "ruleName": "copy",
+        "refs": ["10"]
       },
       "latexFormula": "q",
       "stepType": "line",
-      "uuid": "17"
+      "uuid": "12"
     }],
     "stepType": "box",
-    "uuid": "b3"
+    "uuid": "b1"
+  }, {
+    "proof": [{
+      "formula": "¬p",
+      "justification": {
+        "ruleName": "assumption",
+        "refs": []
+      },
+      "latexFormula": "\\lnot p",
+      "stepType": "line",
+      "uuid": "14"
+    }, {
+      "proof": [{
+        "formula": "p",
+        "justification": {
+          "ruleName": "assumption",
+          "refs": []
+        },
+        "latexFormula": "p",
+        "stepType": "line",
+        "uuid": "15"
+      }, {
+        "formula": "⊥",
+        "justification": {
+          "ruleName": "not_elim",
+          "refs": ["15", "14"]
+        },
+        "latexFormula": "\\bot",
+        "stepType": "line",
+        "uuid": "16"
+      }, {
+        "formula": "q",
+        "justification": {
+          "ruleName": "contradition_elim",
+          "refs": ["16"]
+        },
+        "latexFormula": "q",
+        "stepType": "line",
+        "uuid": "17"
+      }],
+      "stepType": "box",
+      "uuid": "b3"
+    }, {
+      "formula": "(p -> q)",
+      "justification": {
+        "ruleName": "implies_intro",
+        "refs": ["b3"]
+      },
+      "latexFormula": "p \\rightarrow q",
+      "stepType": "line",
+      "uuid": "18"
+    }],
+    "stepType": "box",
+    "uuid": "b4"
   }, {
     "formula": "(p -> q)",
     "justification": {
-      "ruleName": "implies_intro",
-      "refs": ["b3"]
+      "ruleName": "or_elim",
+      "refs": ["5", "b2", "b4"]
     },
     "latexFormula": "p \\rightarrow q",
     "stepType": "line",
-    "uuid": "18"
-  }],
-  "stepType": "box",
-  "uuid": "b4"
-}, {
-  "formula": "(p -> q)",
-  "justification": {
-    "ruleName": "or_elim",
-    "refs": ["5", "b2", "b4"]
-  },
-  "latexFormula": "p \\rightarrow q",
-  "stepType": "line",
-  "uuid": "19"
-}, {
-  "formula": "r",
-  "justification": {
-    "ruleName": "implies_elim",
-    "refs": ["19", "1"]
-  },
-  "latexFormula": "r",
-  "stepType": "line",
-  "uuid": "20"
-}] as Proof;
+    "uuid": "19"
+  }, {
+    "formula": "r",
+    "justification": {
+      "ruleName": "implies_elim",
+      "refs": ["19", "1"]
+    },
+    "latexFormula": "r",
+    "stepType": "line",
+    "uuid": "20"
+  }]
+} as { uuid: string, proof: Proof };
 
 
 export default realExample
