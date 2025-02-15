@@ -16,7 +16,7 @@ export function Justification ({
   onHover: (highlightedLatex: string) => void;
 }) {
   const { ruleset } = useRuleset();
-  const rule = ruleset.rules.find((rule) => rule.name == justification.name);
+  const rule = ruleset.rules.find((rule) => rule.ruleName == justification.ruleName);
   if (!rule) return;
   const refs = justification.refs.map((ref) => {
     const referencedLine = lines.find((line) => line.uuid == ref);
@@ -33,7 +33,7 @@ export function Justification ({
         onMouseOver={() =>
           onHover(
             createHighlightedLatexRule(
-              rule.latex.name,
+              rule.latex.ruleName,
               rule.latex.premises,
               rule.latex.conclusion,
               [],
@@ -42,7 +42,7 @@ export function Justification ({
           )
         }
       >
-        <InlineMath math={rule.latex.name}></InlineMath>
+        <InlineMath math={rule.latex.ruleName}></InlineMath>
       </span>
       {refs && (
         <span>
@@ -56,7 +56,7 @@ export function Justification ({
                 onMouseOver={() =>
                   onHover(
                     createHighlightedLatexRule(
-                      rule.latex.name,
+                      rule.latex.ruleName,
                       rule.latex.premises,
                       rule.latex.conclusion,
                       [i],

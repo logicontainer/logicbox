@@ -9,7 +9,7 @@ export function RulesDropdown () {
     <ul>
       {rulesetContext.ruleset.rules.map((rule) => {
         return (
-          <RulesDropdownItem key={rule.name} rule={rule} />
+          <RulesDropdownItem key={rule.ruleName} rule={rule} />
         )
       })}
     </ul>
@@ -17,7 +17,7 @@ export function RulesDropdown () {
 }
 
 export function RulesDropdownItem ({ rule }: { rule: Rule }) {
-  const tooptipExample = createHighlightedLatexRule(rule.latex.name, rule.latex.premises, rule.latex.conclusion, [], false)
+  const tooptipExample = createHighlightedLatexRule(rule.latex.ruleName, rule.latex.premises, rule.latex.conclusion, [], false)
   return (<div>
     <InlineMath math={tooptipExample} />
   </div>)

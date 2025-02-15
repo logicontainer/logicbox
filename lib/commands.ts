@@ -31,7 +31,7 @@ export class AddLineCommand extends Command {
       "formula": "p and r",
       "latexFormula": this.newLineUuid.slice(0, 5),
       "justification": {
-        "name": "assumption",
+        "ruleName": "assumption",
         "refs": []
       },
     }, this.nearLineWithUuid, this.prepend)
@@ -73,7 +73,7 @@ export class AddBoxLineCommand extends Command {
             formula: "p and r",
             latexFormula: this.newLineUuid.slice(0, 5),
             justification: {
-              "name": "assumption",
+              "ruleName": "assumption",
               "refs": []
             },
           }

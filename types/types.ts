@@ -3,17 +3,17 @@ export type Ruleset = {
   rules: Rule[];
 }
 export type Rule = {
-  name: string,
+  ruleName: string,
   numPremises: number,
   latex: {
-    name: string,
+    ruleName: string,
     premises: string[],
     conclusion: string
   }
 }
 
 export type Justification = {
-  name: string,
+  ruleName: string,
   refs: string[]
 }
 export type LineProofStep = {
@@ -26,8 +26,10 @@ export type LineProofStep = {
 export type BoxProofStep = {
   uuid: string,
   stepType: string,
-  proof: ProofStep[]
+  proof: Proof
 }
 export type ProofStep = LineProofStep | BoxProofStep;
+
+export type Proof = ProofStep[]
 
 export type LineNumberLine = { uuid: string, isBox: boolean, boxStartLine?: number, boxEndLine?: number, lineNumber?: number };

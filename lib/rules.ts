@@ -24,171 +24,171 @@ export const rulesets = [
     rulesetName: "propositional-logic",
     rules: [
       {
-        name: "premise",
+        ruleName: "premise",
         latex: {
-          name: "\\text{premise}",
+          ruleName: "\\text{premise}",
           premises: [],
           conclusion: "\\phi"
         },
         numPremises: 0
       },
       {
-        name: "assumption",
+        ruleName: "assumption",
         latex: {
-          name: "\\text{ass.}",
+          ruleName: "\\text{ass.}",
           premises: [],
           conclusion: "\\phi"
         },
         numPremises: 0
       },
       {
-        name: "copy",
+        ruleName: "copy",
         latex: {
-          name: "\\text{copy}",
+          ruleName: "\\text{copy}",
           premises: ["\\phi"],
           conclusion: "\\phi"
         },
         numPremises: 1
       },
       {
-        name: "and_intro",
+        ruleName: "and_intro",
         latex: {
-          name: "\\land i",
+          ruleName: "\\land i",
           premises: ["\\phi", "\\psi"],
           conclusion: "\\phi \\land \\psi"
         },
         numPremises: 2
       },
       {
-        name: "and_elim_1",
+        ruleName: "and_elim_1",
         latex: {
-          name: "\\land e_1",
+          ruleName: "\\land e_1",
           premises: ["\\phi \\land \\psi"],
           conclusion: "\\phi"
         },
         numPremises: 1
       },
       {
-        name: "and_elim_2",
+        ruleName: "and_elim_2",
         latex: {
-          name: "\\land e_2",
+          ruleName: "\\land e_2",
           premises: ["\\phi \\land \\psi"],
           conclusion: "\\psi"
         },
         numPremises: 1
       },
       {
-        name: "or_intro_1",
+        ruleName: "or_intro_1",
         latex: {
-          name: "\\lor i_1",
+          ruleName: "\\lor i_1",
           premises: ["\\phi"],
           conclusion: "\\phi \\land \\psi"
         },
         numPremises: 1
       },
       {
-        name: "or_intro_2",
+        ruleName: "or_intro_2",
         latex: {
-          name: "\\lor i_2",
+          ruleName: "\\lor i_2",
           premises: ["\\psi"],
           conclusion: "\\phi \\land \\psi"
         },
         numPremises: 1
       },
       {
-        name: "or_elim",
+        ruleName: "or_elim",
         latex: {
-          name: "\\lor e",
+          ruleName: "\\lor e",
           premises: ["\\phi \\lor \\psi", "\\text{HERE SHOULD BE A BOX}", "\\text{HERE SHOULD BE A BOX}"],
           conclusion: "\\chi"
         },
         numPremises: 3
       },
       {
-        name: "implies_intro",
+        ruleName: "implies_intro",
         latex: {
-          name: "\\rightarrow i",
+          ruleName: "\\rightarrow i",
           premises: ["\\text{HERE SHOULD BE A BOX}"],
           conclusion: "\\phi \\rightarrow \\psi"
         },
         numPremises: 1
       },
       {
-        name: "implies_elim",
+        ruleName: "implies_elim",
         latex: {
-          name: "\\rightarrow e",
+          ruleName: "\\rightarrow e",
           premises: ["\\phi", "\\phi \\rightarrow \\psi"],
           conclusion: "\\psi"
         },
         numPremises: 2
       },
       {
-        name: "not_intro",
+        ruleName: "not_intro",
         latex: {
-          name: "\\lnot i",
+          ruleName: "\\lnot i",
           premises: ["\\text{HERE SHOULD BE A BOX}"],
           conclusion: "\\lnot \\phi"
         },
         numPremises: 1
       },
       {
-        name: "not_elim",
+        ruleName: "not_elim",
         latex: {
-          name: "\\lnot e",
+          ruleName: "\\lnot e",
           premises: ["\\phi", "\\lnot \\phi"],
           conclusion: "\\bot"
         },
         numPremises: 2
       },
       {
-        name: "bot_elim",
+        ruleName: "bot_elim",
         latex: {
-          name: "\\bot e",
+          ruleName: "\\bot e",
           premises: ["\\bot"],
           conclusion: "\\phi"
         },
         numPremises: 1
       },
       {
-        name: "not_not_elim",
+        ruleName: "not_not_elim",
         latex: {
-          name: "\\not\\not e",
+          ruleName: "\\not\\not e",
           premises: ["\\lnot \\lnot \\phi"],
           conclusion: "\\phi"
         },
         numPremises: 1
       },
       {
-        name: "modus_tollens",
+        ruleName: "modus_tollens",
         latex: {
-          name: "\\text{MT}",
+          ruleName: "\\text{MT}",
           premises: ["\\phi \\rightarrow \\psi", "\\lnot \\psi"],
           conclusion: "\\lnot \\phi"
         },
         numPremises: 2
       },
       {
-        name: "not_not_intro",
+        ruleName: "not_not_intro",
         latex: {
-          name: "\\not\\not i",
+          ruleName: "\\not\\not i",
           premises: ["\\phi"],
           conclusion: "\\lnot \\lnot \\phi"
         },
         numPremises: 1
       },
       {
-        name: "proof_by_contradiction",
+        ruleName: "proof_by_contradiction",
         latex: {
-          name: "\\text{PBC}",
+          ruleName: "\\text{PBC}",
           premises: ["\\text{HERE SHOULD BE A BOX}"],
           conclusion: "\\phi"
         },
         numPremises: 1
       },
       {
-        name: "law_of_excluded_middle",
+        ruleName: "law_of_excluded_middle",
         latex: {
-          name: "\\text{LEM}",
+          ruleName: "\\text{LEM}",
           premises: [],
           conclusion: "\\phi \\lor \\lnot \\phi"
         },
