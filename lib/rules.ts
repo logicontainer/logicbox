@@ -152,7 +152,7 @@ export const rulesets = [
       {
         ruleName: "not_not_elim",
         latex: {
-          ruleName: "\\not\\not e",
+          ruleName: "\\lnot\\lnot e",
           premises: ["\\lnot \\lnot \\phi"],
           conclusion: "\\phi"
         },
@@ -170,7 +170,7 @@ export const rulesets = [
       {
         ruleName: "not_not_intro",
         latex: {
-          ruleName: "\\not\\not i",
+          ruleName: "\\lnot\\lnot i",
           premises: ["\\phi"],
           conclusion: "\\lnot \\lnot \\phi"
         },

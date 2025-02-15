@@ -334,19 +334,77 @@ const realExample = {
       },
       "latexFormula": "p",
       "stepType": "line",
-      "uuid": "11"
+      "uuid": "6"
+    }, {
+      "formula": "¬(¬p)",
+      "justification": {
+        "ruleName": "not_not_intro",
+        "refs": ["6"]
+      },
+      "latexFormula": "\\lnot \\lnot p",
+      "stepType": "line",
+      "uuid": "7"
+    }, {
+      "formula": "¬s",
+      "justification": {
+        "ruleName": "modus_tollens",
+        "refs": ["2", "7"]
+      },
+      "latexFormula": "\\lnot s",
+      "stepType": "line",
+      "uuid": "8"
+    }, {
+      "formula": "(¬s ∧ t)",
+      "justification": {
+        "ruleName": "and_intro",
+        "refs": ["8", "3"]
+      },
+      "latexFormula": "\\lnot s \\land t",
+      "stepType": "line",
+      "uuid": "9"
     }, {
       "formula": "q",
       "justification": {
-        "ruleName": "copy",
-        "refs": ["10"]
+        "ruleName": "implies_elim",
+        "refs": ["9", "4"]
       },
       "latexFormula": "q",
       "stepType": "line",
-      "uuid": "12"
+      "uuid": "10"
+    }, {
+      "proof": [{
+        "formula": "p",
+        "justification": {
+          "ruleName": "assumption",
+          "refs": []
+        },
+        "latexFormula": "p",
+        "stepType": "line",
+        "uuid": "11"
+      }, {
+        "formula": "q",
+        "justification": {
+          "ruleName": "copy",
+          "refs": ["10"]
+        },
+        "latexFormula": "q",
+        "stepType": "line",
+        "uuid": "12"
+      }],
+      "stepType": "box",
+      "uuid": "b1"
+    }, {
+      "formula": "(p -> q)",
+      "justification": {
+        "ruleName": "implies_intro",
+        "refs": ["b1"]
+      },
+      "latexFormula": "p \\rightarrow q",
+      "stepType": "line",
+      "uuid": "13"
     }],
     "stepType": "box",
-    "uuid": "b1"
+    "uuid": "b2"
   }, {
     "proof": [{
       "formula": "¬p",
@@ -379,7 +437,7 @@ const realExample = {
       }, {
         "formula": "q",
         "justification": {
-          "ruleName": "contradition_elim",
+          "ruleName": "bot_elim",
           "refs": ["16"]
         },
         "latexFormula": "q",
