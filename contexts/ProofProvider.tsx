@@ -1,6 +1,6 @@
 "use client";
 
-import { BoxProofStep, ProofStep } from "@/types/types";
+import { BoxProofStep, ProofStep, ProofStepDetails, ProofStepPosition } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
@@ -15,8 +15,10 @@ export interface ProofContextProps {
   setLineInFocus: (uuid: string) => unknown,
   removeFocusFromLine: (uuid: string) => unknown
   setStringProof: (proof: string) => unknown
-  addLine: (proofStep: ProofStep, uuid: string, prepend?: boolean) => unknown
+  addLine: (proofStep: ProofStep, position: ProofStepPosition) => unknown
   removeLine: (uuid: string) => unknown
+  getProofStepDetails: (uuid: string) => (ProofStepDetails & { isOnlyChildInBox: boolean }) | null
+  getNearestDeletableProofStep: (uuid: string) => { proofStepDetails: ProofStepDetails | null, cascadeCount: number }
 }
 // Context Setup
 const ProofContext = React.createContext<ProofContextProps>({
@@ -29,7 +31,9 @@ const ProofContext = React.createContext<ProofContextProps>({
   removeFocusFromLine: () => { },
   setStringProof: () => { },
   addLine: () => { },
-  removeLine: () => { }
+  removeLine: () => { },
+  getProofStepDetails: () => null,
+  getNearestDeletableProofStep: () => { return { proofStepDetails: null, cascadeCount: 0 } },
 });
 
 export function useProof () {
@@ -56,32 +60,34 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     }
   }
 
-  const changeProofNearUuid = (
+  const interactWithProofNearUuid = (
     proof: ProofStep[],
     uuid: string,
-    actionAtIndex: (layer: ProofStep[], indexInCurrLayer: number) => void
+    parentBox: BoxProofStep | null,
+    actionAtIndex: (layer: ProofStep[], indexInCurrLayer: number, parentBox: BoxProofStep | null) => void
   ): boolean => {
     const indexInCurrentLayer = proof.findIndex((proofStep) => proofStep.uuid == uuid);
     if (indexInCurrentLayer != -1) {
-      actionAtIndex(proof, indexInCurrentLayer);
+      actionAtIndex(proof, indexInCurrentLayer, parentBox);
       return true;
     }
     const boxProofSteps: BoxProofStep[] = proof.filter((proofStep) => proofStep.stepType == "box") as unknown as BoxProofStep[];
     for (const boxProofStep of boxProofSteps) {
-      if (changeProofNearUuid(boxProofStep.proof, uuid, actionAtIndex)) return true;
+      if (interactWithProofNearUuid(boxProofStep.proof, uuid, boxProofStep, actionAtIndex)) return true;
     }
     return false;
   }
 
-  const addLine = (proofStep: ProofStep, uuid: string, prepend: boolean = false) => {
+  const addLine = (proofStep: ProofStep, position: ProofStepPosition) => {
     setProof((prev) => {
       const newProof = _.cloneDeep(prev);
-      const insertProofStepAtUuid = (proof: ProofStep[], indexInCurrLayer: number) => {
-        return proof.splice(indexInCurrLayer + (prepend ? 0 : 1), 0, proofStep);
+      const insertProofStepAtUuid = (proof: ProofStep[], indexInCurrLayer: number, parentBox: BoxProofStep | null) => {
+        return proof.splice(indexInCurrLayer + (position.prepend ? 0 : 1), 0, proofStep);
       }
-      changeProofNearUuid(
+      interactWithProofNearUuid(
         newProof,
-        uuid,
+        position.nearProofStepWithUuid,
+        null,
         insertProofStepAtUuid
       )
       return newProof;
@@ -91,18 +97,18 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
   const removeLine = (uuid: string) => {
     setProof((prev) => {
       const newProof = _.cloneDeep(prev);
-      const removeProofStepAtUuid = (proof: ProofStep[], indexInCurrLayer: number) => {
+      const removeProofStepAtUuid = (proof: ProofStep[], indexInCurrLayer: number, parentBox: BoxProofStep | null) => {
         return proof.splice(indexInCurrLayer, 1);
       }
-      changeProofNearUuid(
+      interactWithProofNearUuid(
         newProof,
         uuid,
+        null,
         removeProofStepAtUuid
       )
       return newProof;
     })
   }
-
 
   const isFocused = (uuid: string) => {
     if (!uuid) return false;
@@ -115,8 +121,60 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     return uuid != lineInFocus
   }
 
+  const getProofStepDetails = (uuid: string): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
+    let proofStepDetails = {} as (ProofStepDetails & { isOnlyChildInBox: boolean }) | null
+    const extractProofStepDetails = (proof: ProofStep[], indexInCurrLayer: number, parentBox: BoxProofStep | null) => {
+      const isOnlyChildInBox = proof ? proof.length == 1 : false;
+      if (isOnlyChildInBox) {
+        proofStepDetails = {
+          proofStep: proof[0],
+          parentBoxUuid: parentBox ? parentBox.uuid : "",
+          isOnlyChildInBox: true,
+          position: {
+            prepend: false,
+            nearProofStepWithUuid: "",
+          }
+        }
+      } else {
+        proofStepDetails = {
+          proofStep: proof[indexInCurrLayer],
+          parentBoxUuid: parentBox ? parentBox.uuid : "",
+          isOnlyChildInBox: false,
+          position: {
+            prepend: indexInCurrLayer == 0,
+            nearProofStepWithUuid: indexInCurrLayer == 0 ? proof[1].uuid : proof[indexInCurrLayer - 1].uuid,
+          }
+        }
+      }
+      return proof
+    }
+    interactWithProofNearUuid(
+      proof,
+      uuid,
+      null,
+      extractProofStepDetails
+    )
+    return proofStepDetails;
+  }
+
+  const getNearestDeletableProofStep = (uuid: string): { proofStepDetails: ProofStepDetails | null, cascadeCount: number } => {
+    let cascadeCount = 0;
+    const findNearestDeletableProofStepCascade = (uuid: string) => {
+      let proofStepDetails = getProofStepDetails(uuid);
+      if (!proofStepDetails) return null;
+      if (proofStepDetails.isOnlyChildInBox) {
+        if (proofStepDetails.parentBoxUuid == null) return null;
+        cascadeCount++;
+        return findNearestDeletableProofStepCascade(proofStepDetails.parentBoxUuid);
+      }
+      return proofStepDetails;
+    }
+    const proofStepDetails = findNearestDeletableProofStepCascade(uuid);
+    return { proofStepDetails, cascadeCount };
+  }
+
   return (
-    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine, getProofStepDetails, getNearestDeletableProofStep }}>
       {children}
     </ProofContext.Provider>
   );

@@ -4,7 +4,7 @@ import { AddLinePopover } from "@/components/AddLinePopover";
 import { InlineMath } from "react-katex";
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
-import { RemoveLinePopover } from "@/components/RemoveLinePopover";
+import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import { Toolbar } from "@/components/Toolbar";
 import { Tooltip } from "react-tooltip";
 import { parseLinesFromProof } from "@/lib/lines-parser";
@@ -30,7 +30,7 @@ export default function Home () {
             )} >
             </Tooltip>
             <AddLinePopover uuid={proofContext.latestLineInFocus || ""} />
-            <RemoveLinePopover uuid={proofContext.latestLineInFocus || ""} />
+            <ProofStepContextMenu />
           </div>
         </div>
       </main>

@@ -33,3 +33,14 @@ export type ProofStep = LineProofStep | BoxProofStep;
 export type Proof = ProofStep[]
 
 export type LineNumberLine = { uuid: string, isBox: boolean, boxStartLine?: number, boxEndLine?: number, lineNumber?: number };
+
+export type ProofStepDetails = {
+  proofStep: ProofStep,
+  parentBoxUuid: string | null,
+  position: ProofStepPosition
+}
+
+export type ProofStepPosition = {
+  nearProofStepWithUuid: string,
+  prepend: boolean
+}

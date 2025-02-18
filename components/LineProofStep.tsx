@@ -5,8 +5,8 @@ import { LineNumberLine, LineProofStep as TLineProofStep } from "@/types/types";
 import { AddLineTooltip } from "./AddLineTooltip";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
-// import { RemoveLineTooltip } from "./RemoveLineTooltip";
 import { cn } from "@/lib/utils";
+import { useContextMenu } from "react-contexify";
 import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
 
@@ -18,10 +18,22 @@ export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumbe
   const handleOnHoverJustification = (highlightedLatex: string) => {
     setTooltipContent(highlightedLatex)
   }
+  const { show } = useContextMenu({
+    id: "proof-step-context-menu",
+  });
+  function handleContextMenu (event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement> | React.KeyboardEvent<HTMLElement> | KeyboardEvent) {
+    show({
+      event,
+      props: {
+        uuid: props.uuid,
+      }
+    })
+  }
   return (
     (<div
       className={cn("flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors", isUnfocused(props.uuid) ? "text-slate-400" : "")}
       onMouseOver={() => setLineInFocus(props.uuid)}
+      onContextMenuCapture={handleContextMenu}
     >
       {/* <RemoveLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend /> */}
       <AddLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend />

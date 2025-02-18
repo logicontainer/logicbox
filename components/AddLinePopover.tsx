@@ -1,4 +1,4 @@
-import { AddBoxLineCommand, AddLineCommand } from "@/lib/commands";
+import { AddBoxedLineCommand, AddLineCommand } from "@/lib/commands";
 
 import { PlusIcon } from "./PlusIcon";
 import { Tooltip } from "react-tooltip";
@@ -9,7 +9,7 @@ export function AddLinePopover ({ uuid }: { uuid: string }) {
   const historyContext = useHistory();
   const proofContext = useProof();
   const handleAddLine = (isBox: boolean = false, prepend: boolean = false) => {
-    const addLineCommand = isBox ? new AddBoxLineCommand(uuid, prepend) : new AddLineCommand(uuid, prepend);
+    const addLineCommand = isBox ? new AddBoxedLineCommand(uuid, prepend) : new AddLineCommand(uuid, prepend);
     historyContext.addToHistory(addLineCommand)
   }
   return (

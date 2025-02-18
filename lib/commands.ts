@@ -1,3 +1,5 @@
+import { ProofStep, ProofStepPosition } from "@/types/types";
+
 import { ProofContextProps } from "@/contexts/ProofProvider";
 // import { ProofStep } from "@/types/types";
 import { v4 as uuidv4 } from 'uuid';
@@ -13,18 +15,19 @@ export abstract class Command {
   abstract getDescription (): string;
 }
 export class AddLineCommand extends Command {
-  private nearLineWithUuid: string;
   private newLineUuid: string;
-  private prepend: boolean;
+  private position: ProofStepPosition;
   constructor(uuid: string, prepend: boolean = false) {
     super();
-    this.nearLineWithUuid = uuid;
     this.newLineUuid = uuidv4();
-    this.prepend = prepend;
+    this.position = {
+      nearProofStepWithUuid: uuid,
+      prepend: prepend
+    }
   }
 
   execute (proofContext: ProofContextProps): void {
-    console.log("Execute AddLineCommand near line with uuid " + this.nearLineWithUuid)
+    console.log("Execute AddLineCommand near line with uuid " + this.position.nearProofStepWithUuid)
     proofContext.addLine({
       "stepType": "line",
       "uuid": this.newLineUuid,
@@ -34,7 +37,7 @@ export class AddLineCommand extends Command {
         "ruleName": "assumption",
         "refs": []
       },
-    }, this.nearLineWithUuid, this.prepend)
+    }, this.position)
   }
 
   undo (proofContext: ProofContextProps): void {
@@ -42,26 +45,27 @@ export class AddLineCommand extends Command {
     proofContext.removeLine(this.newLineUuid)
   }
   getDescription (): string {
-    return `Add line ${this.prepend ? "before" : "after"} line with uuid ${this.nearLineWithUuid}`;
+    return `Add line ${this.position.prepend ? "before" : "after"} line with uuid ${this.position.nearProofStepWithUuid}`;
   }
 }
 
 
-export class AddBoxLineCommand extends Command {
-  private nearLineWithUuid: string;
+export class AddBoxedLineCommand extends Command {
   private newBoxUuid: string;
   private newLineUuid: string;
-  private prepend: boolean;
+  private position: ProofStepPosition;
   constructor(uuid: string, prepend: boolean = false) {
     super();
-    this.nearLineWithUuid = uuid;
     this.newBoxUuid = uuidv4();
     this.newLineUuid = uuidv4();
-    this.prepend = prepend;
+    this.position = {
+      nearProofStepWithUuid: uuid,
+      prepend: prepend
+    }
   }
 
   execute (proofContext: ProofContextProps): void {
-    console.log("Execute AddBoxLineCommand near line with uuid " + this.nearLineWithUuid)
+    console.log("Execute AddBoxLineCommand near line with uuid " + this.position.nearProofStepWithUuid)
     proofContext.addLine(
       {
         stepType: "box",
@@ -78,7 +82,7 @@ export class AddBoxLineCommand extends Command {
             },
           }
         ]
-      }, this.nearLineWithUuid, this.prepend)
+      }, this.position)
   }
 
   undo (proofContext: ProofContextProps): void {
@@ -86,34 +90,54 @@ export class AddBoxLineCommand extends Command {
     proofContext.removeLine(this.newBoxUuid)
   }
   getDescription (): string {
-    return `Add box line ${this.prepend ? "before" : "after"} line with uuid ${this.nearLineWithUuid}`;
+    return `Add box line ${this.position.prepend ? "before" : "after"} line with uuid ${this.position.nearProofStepWithUuid}`;
   }
 }
 
 
-// export class RemoveLineCommand extends Command {
-//   private lineUuid: string;
-//   private line: ProofStep | null;
-//   constructor(uuid: string) {
-//     super();
-//     this.lineUuid = uuid
-//     this.line = null;
-//   }
+export class RemoveProofStepCommand extends Command {
+  private proofStepUuid: string;
+  private proofStep: ProofStep | null;
+  private position: ProofStepPosition;
 
-//   execute (proofContext: ProofContextProps): void {
-//     console.log("Execute RemoveLineCommand for line " + this.lineUuid)
+  constructor(uuid: string) {
+    super();
+    this.proofStepUuid = uuid
+    this.proofStep = null;
+    this.position = {
+      nearProofStepWithUuid: "",
+      prepend: false
+    }
+  }
 
-//     // this.line = getLineWithUuid
-//     // this.position = getPositionOfLineWithUuid // Parent id and index in children
-//     proofContext.removeLine(
-//       this.lineUuid)
-//   }
+  execute (proofContext: ProofContextProps): void {
+    console.log("Execute RemoveProofStepCommand for line " + this.proofStepUuid)
+    const { proofStepDetails: nearestDeletableProofStep, cascadeCount } = proofContext.getNearestDeletableProofStep(this.proofStepUuid)
+    if (nearestDeletableProofStep == null) {
+      throw new Error("This line cannot be deleted because it is the only line in the proof")
+    }
+    this.proofStepUuid = nearestDeletableProofStep.proofStep.uuid
+    this.proofStep = nearestDeletableProofStep.proofStep
+    this.position = nearestDeletableProofStep.position
 
-//   undo (proofContext: ProofContextProps): void {
-//     console.log("Undoing RemoveLineCommand for line " + this.lineUuid)
-//     proofContext.addLine(this.line, this.position)
-//   }
-//   getDescription (): string {
-//     return `Remove line with uuid ${this.lineUuid}`;
-//   }
-// }
+    if (cascadeCount > 0) {
+      // TODO: Make a real dialog to confirm deletion
+      window.alert(`This action will cascade and delete ${cascadeCount} surrounding box(es) as well.`)
+    }
+
+    proofContext.removeLine(
+      this.proofStepUuid)
+  }
+
+  undo (proofContext: ProofContextProps): void {
+    console.log("Undoing RemoveProofStepCommand for line " + this.proofStepUuid)
+
+    if (this.proofStep == null) {
+      throw new Error("Cannot undo RemoveProofStepCommand without proofStep")
+    }
+    proofContext.addLine(this.proofStep, this.position)
+  }
+  getDescription (): string {
+    return `Remove line with uuid ${this.proofStepUuid}`;
+  }
+}
