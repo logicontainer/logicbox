@@ -1,6 +1,6 @@
 "use client";
 
-import { BoxProofStep, ProofStep, ProofStepDetails, ProofStepPosition } from "@/types/types";
+import { BoxProofStep, LineProofStep, ProofStep, ProofStepDetails, ProofStepPosition } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
@@ -17,6 +17,7 @@ export interface ProofContextProps {
   setStringProof: (proof: string) => unknown
   addLine: (proofStep: ProofStep, position: ProofStepPosition) => unknown
   removeLine: (uuid: string) => unknown
+  updateLine: (uuid: string, updatedLineProofStep: LineProofStep) => unknown
   getProofStepDetails: (uuid: string) => (ProofStepDetails & { isOnlyChildInBox: boolean }) | null
   getNearestDeletableProofStep: (uuid: string) => { proofStepDetails: ProofStepDetails | null, cascadeCount: number }
 }
@@ -32,6 +33,7 @@ const ProofContext = React.createContext<ProofContextProps>({
   setStringProof: () => { },
   addLine: () => { },
   removeLine: () => { },
+  updateLine: () => { },
   getProofStepDetails: () => null,
   getNearestDeletableProofStep: () => { return { proofStepDetails: null, cascadeCount: 0 } },
 });
@@ -110,6 +112,22 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     })
   }
 
+  const updateLine = (uuid: string, updatedLineProofStep: ProofStep) => {
+    setProof((prev) => {
+      const newProof = _.cloneDeep(prev);
+      const updateProofStepAtUuid = (proof: ProofStep[], indexInCurrLayer: number, parentBox: BoxProofStep | null) => {
+        proof[indexInCurrLayer] = updatedLineProofStep;
+      }
+      interactWithProofNearUuid(
+        newProof,
+        uuid,
+        null,
+        updateProofStepAtUuid
+      )
+      return newProof;
+    })
+  }
+
   const isFocused = (uuid: string) => {
     if (!uuid) return false;
     return uuid == lineInFocus
@@ -174,7 +192,7 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
   }
 
   return (
-    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine, getProofStepDetails, getNearestDeletableProofStep }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine, updateLine, getProofStepDetails, getNearestDeletableProofStep }}>
       {children}
     </ProofContext.Provider>
   );

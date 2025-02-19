@@ -1,8 +1,9 @@
 import 'react-contexify/ReactContexify.css';
 
-import { AddBoxedLineCommand, AddLineCommand, RemoveProofStepCommand } from '@/lib/commands';
+import { AddBoxedLineCommand, AddLineCommand, RemoveProofStepCommand, UpdateLineProofStepCommand } from '@/lib/commands';
 import { Item, ItemParams, Menu, Separator, Submenu } from 'react-contexify';
 
+import { LineProofStep } from '@/types/types';
 import { useHistory } from '@/contexts/HistoryProvider';
 
 const MENU_ID = 'proof-step-context-menu';
@@ -17,12 +18,26 @@ export function ProofStepContextMenu () {
     const removeLineCommand = new RemoveProofStepCommand(uuid);
     historyContext.addToHistory(removeLineCommand)
   }
+  const handleUpdateProofStep = (uuid: string, updatedLineProofStep: LineProofStep) => {
+    const updateLineCommand = new UpdateLineProofStepCommand(uuid, updatedLineProofStep);
+    historyContext.addToHistory(updateLineCommand)
+  }
 
   const handleItemClick = ({ id, props }: ItemParams) => {
     console.log("handleItemClick", id, props);
     switch (id) {
       case "edit":
         console.log("edit", props.uuid)
+        handleUpdateProofStep(props.uuid, {
+          uuid: props.uuid,
+          stepType: "line",
+          formula: "p and r",
+          latexFormula: `Id: ${props.uuid.slice(0, 5)}`,
+          justification: {
+            ruleName: "assumption",
+            refs: []
+          }
+        })
         break;
       case "line-above":
         handleAddProofStep(props.uuid, false, true)

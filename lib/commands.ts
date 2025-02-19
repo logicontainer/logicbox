@@ -1,4 +1,4 @@
-import { ProofStep, ProofStepPosition } from "@/types/types";
+import { LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
 
 import { ProofContextProps } from "@/contexts/ProofProvider";
 // import { ProofStep } from "@/types/types";
@@ -141,3 +141,56 @@ export class RemoveProofStepCommand extends Command {
     return `Remove line with uuid ${this.proofStepUuid}`;
   }
 }
+
+
+
+
+export class UpdateLineProofStepCommand extends Command {
+  private proofStepUuid: string;
+  private prevProofStep: LineProofStep | null;
+  private updatedLineProofStep: LineProofStep;
+
+
+  constructor(uuid: string, updatedLineProofStep: LineProofStep) {
+    super();
+    this.proofStepUuid = uuid
+    this.prevProofStep = null;
+    this.updatedLineProofStep = updatedLineProofStep;
+  }
+
+  execute (proofContext: ProofContextProps): void {
+    console.log("Execute UpdateProofStepCommand for line " + this.proofStepUuid)
+
+    const proofStepDetails = proofContext.getProofStepDetails(this.proofStepUuid)
+
+    if (proofStepDetails == null) {
+      throw new Error("Cannot update proof step that doesn't exist")
+    }
+
+    if (proofStepDetails.proofStep.stepType != "line") {
+      throw new Error("Cannot update proof step that is not a line")
+    }
+
+    this.prevProofStep = proofStepDetails.proofStep as LineProofStep
+
+    proofContext.updateLine(
+      this.proofStepUuid, this.updatedLineProofStep)
+  }
+
+  undo (proofContext: ProofContextProps): void {
+    console.log("Undoing UpdateProofStepCommand for line " + this.proofStepUuid)
+
+    if (this.prevProofStep == null) {
+      throw new Error("Cannot undo UpdateProofStepCommand without prevProofStep")
+    }
+
+    proofContext.updateLine(
+      this.proofStepUuid, this.prevProofStep)
+  }
+  getDescription (): string {
+    return `Remove line with uuid ${this.proofStepUuid}`;
+  }
+}
+
+
+
