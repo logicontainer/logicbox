@@ -14,9 +14,9 @@ export function createHighlightedLatexRule (
       return p;
     }
   });
-  const premiseLine = `\\begin{matrix}${premisesWithHighlights.join("&")}\\end{matrix}`;
+  const premiseLine = `\\begin{matrix}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{matrix}`;
   const conclusionLine = conclusionIsHighlighted ? `\\color{red}\\boxed{${conclusion}}` : conclusion;
-  return `\\frac{${premiseLine}}{${conclusionLine}}\\tiny{${name}}`;
+  return `\\dfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }
 
 export const rulesets = [
@@ -99,7 +99,7 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\phi \\lor \\psi", "\\text{HERE SHOULD BE A BOX}", "\\text{HERE SHOULD BE A BOX}"],
+          premises: ["\\phi \\lor \\psi", "\\text{BOX}", "\\text{BOX}"],
           conclusion: "\\chi"
         },
         numPremises: 3
@@ -108,7 +108,7 @@ export const rulesets = [
         ruleName: "implies_intro",
         latex: {
           ruleName: "\\rightarrow i",
-          premises: ["\\text{HERE SHOULD BE A BOX}"],
+          premises: ["\\text{BOX}"],
           conclusion: "\\phi \\rightarrow \\psi"
         },
         numPremises: 1
@@ -126,7 +126,7 @@ export const rulesets = [
         ruleName: "not_intro",
         latex: {
           ruleName: "\\lnot i",
-          premises: ["\\text{HERE SHOULD BE A BOX}"],
+          premises: ["\\text{BOX}"],
           conclusion: "\\lnot \\phi"
         },
         numPremises: 1
@@ -180,7 +180,7 @@ export const rulesets = [
         ruleName: "proof_by_contradiction",
         latex: {
           ruleName: "\\text{PBC}",
-          premises: ["\\text{HERE SHOULD BE A BOX}"],
+          premises: ["\\text{BOX}"],
           conclusion: "\\phi"
         },
         numPremises: 1
