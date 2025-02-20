@@ -22,6 +22,7 @@ export type LineProofStep = {
   formula: string,
   latexFormula: string,
   justification: Justification
+  formulaUnsynced?: boolean
 }
 export type BoxProofStep = {
   uuid: string,

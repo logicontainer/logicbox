@@ -17,7 +17,9 @@
     "react": "^19.0.0",
     "react-contexify": "^6.0.0",
     "react-dom": "^19.0.0",
+    "react-input-autosize": "^3.0.0",
     "react-katex": "^3.0.1",
+    "react-select": "^5.10.0",
     "react-tooltip": "^5.28.0",
     "tailwind-merge": "^3.0.1",
     "uuid": "^11.0.5"
@@ -30,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-input-autosize": "^2.2.4",
     "@types/react-katex": "^3.0.4",
     "eslint": "^9.20.0",
     "eslint-config-next": "15.1.7",

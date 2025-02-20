@@ -290,7 +290,7 @@ const realExample = {
     "stepType": "line",
     "uuid": "1"
   }, {
-    "formula": "(s -> ¬p)",
+    "formula": "(s -> not p)",
     "justification": {
       "ruleName": "premise",
       "refs": []
@@ -308,7 +308,7 @@ const realExample = {
     "stepType": "line",
     "uuid": "3"
   }, {
-    "formula": "((¬s ∧ t) -> q)",
+    "formula": "((not s and t) -> q)",
     "justification": {
       "ruleName": "premise",
       "refs": []
@@ -317,7 +317,7 @@ const realExample = {
     "stepType": "line",
     "uuid": "4"
   }, {
-    "formula": "(p ∨ ¬p)",
+    "formula": "(p or not p)",
     "justification": {
       "ruleName": "law_of_excluded_middle",
       "refs": []
@@ -336,7 +336,7 @@ const realExample = {
       "stepType": "line",
       "uuid": "6"
     }, {
-      "formula": "¬(¬p)",
+      "formula": "not(not p)",
       "justification": {
         "ruleName": "not_not_intro",
         "refs": ["6"]
@@ -345,7 +345,7 @@ const realExample = {
       "stepType": "line",
       "uuid": "7"
     }, {
-      "formula": "¬s",
+      "formula": "not s",
       "justification": {
         "ruleName": "modus_tollens",
         "refs": ["2", "7"]
@@ -354,7 +354,7 @@ const realExample = {
       "stepType": "line",
       "uuid": "8"
     }, {
-      "formula": "(¬s ∧ t)",
+      "formula": "(not s and t)",
       "justification": {
         "ruleName": "and_intro",
         "refs": ["8", "3"]
@@ -407,7 +407,7 @@ const realExample = {
     "uuid": "b2"
   }, {
     "proof": [{
-      "formula": "¬p",
+      "formula": "not p",
       "justification": {
         "ruleName": "assumption",
         "refs": []
@@ -426,7 +426,7 @@ const realExample = {
         "stepType": "line",
         "uuid": "15"
       }, {
-        "formula": "⊥",
+        "formula": "false",
         "justification": {
           "ruleName": "not_elim",
           "refs": ["15", "14"]

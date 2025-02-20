@@ -22,8 +22,6 @@ export function ProofStepContextMenu () {
   }
   const handleUpdateProofStep = (uuid: string, updatedLineProofStep: LineProofStep) => {
     proofContext.setActiveEdit(uuid)
-    const updateLineCommand = new UpdateLineProofStepCommand(uuid, updatedLineProofStep);
-    historyContext.addToHistory(updateLineCommand)
   }
 
   const handleItemClick = ({ id, props }: ItemParams) => {
