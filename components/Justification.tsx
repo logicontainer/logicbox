@@ -65,7 +65,7 @@ export function Justification ({
                   )
                 }
               >
-                <InlineMath math={`${ref}${comma}`} />
+                <InlineMath math={`${ref || "?"}${comma}`} />
               </span>
             )
           })}
