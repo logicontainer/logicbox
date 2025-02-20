@@ -11,9 +11,10 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
 
 export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumberLine[] }) {
-  const { isUnfocused, setLineInFocus, isFocused } = useProof();
+  const { setLineInFocus, isFocused, isActiveEdit, setActiveEdit, removeIsActiveEditFromLine } = useProof();
   const [tooltipContent, setTooltipContent] = useState<string>()
   const isInFocus = isFocused(props.uuid)
+  const isTheActiveEdit = isActiveEdit(props.uuid)
 
   const handleOnHoverJustification = (highlightedLatex: string) => {
     setTooltipContent(highlightedLatex)
@@ -31,8 +32,9 @@ export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumbe
   }
   return (
     (<div
-      className={cn("flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors", isUnfocused(props.uuid) ? "text-slate-400" : "")}
+      className={cn("flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors", isInFocus ? "text-blue-400" : "", isTheActiveEdit ? "bg-blue-400 text-slate-200" : "")}
       onMouseOver={() => setLineInFocus(props.uuid)}
+      onClick={() => isTheActiveEdit ? removeIsActiveEditFromLine(props.uuid) : setActiveEdit(props.uuid)}
       onContextMenuCapture={handleContextMenu}
     >
       {/* <RemoveLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend /> */}

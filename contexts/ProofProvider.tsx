@@ -12,6 +12,9 @@ export interface ProofContextProps {
   latestLineInFocus: string | null,
   isFocused: (uuid: string) => boolean,
   isUnfocused: (uuid: string) => boolean,
+  isActiveEdit: (uuid: string) => boolean,
+  removeIsActiveEditFromLine: (uuid: string) => unknown,
+  setActiveEdit: (uuid: string) => unknown,
   setLineInFocus: (uuid: string) => unknown,
   removeFocusFromLine: (uuid: string) => unknown
   setStringProof: (proof: string) => unknown
@@ -28,6 +31,9 @@ const ProofContext = React.createContext<ProofContextProps>({
   latestLineInFocus: null,
   isFocused: () => false,
   isUnfocused: () => false,
+  isActiveEdit: () => false,
+  removeIsActiveEditFromLine: () => { },
+  setActiveEdit: () => { },
   setLineInFocus: () => { },
   removeFocusFromLine: () => { },
   setStringProof: () => { },
@@ -52,6 +58,7 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     setProof(JSON.parse(stringProof))
   }
   const [lineInFocus, setLineInFocus] = useState<string | null>(null);
+  const [activeEdit, setActiveEdit] = useState<string | null>("1");
   const [latestLineInFocus, setLatestLineInFocus] = useState<string | null>(null);
   useEffect(() => {
     if (lineInFocus) { setLatestLineInFocus(lineInFocus) }
@@ -59,6 +66,11 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
   const removeFocusFromLine = (uuid: string) => {
     if (lineInFocus == uuid) {
       setLineInFocus(null);
+    }
+  }
+  const removeIsActiveEditFromLine = (uuid: string) => {
+    if (activeEdit == uuid) {
+      setActiveEdit(null);
     }
   }
 
@@ -139,6 +151,11 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     return uuid != lineInFocus
   }
 
+  const isActiveEdit = (uuid: string) => {
+    if (!uuid) return false;
+    return uuid == activeEdit;
+  }
+
   const getProofStepDetails = (uuid: string): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
     let proofStepDetails = {} as (ProofStepDetails & { isOnlyChildInBox: boolean }) | null
     const extractProofStepDetails = (proof: ProofStep[], indexInCurrLayer: number, parentBox: BoxProofStep | null) => {
@@ -192,7 +209,7 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
   }
 
   return (
-    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine, updateLine, getProofStepDetails, getNearestDeletableProofStep }}>
+    <ProofContext.Provider value={{ proof, lineInFocus, latestLineInFocus, isFocused, isUnfocused, isActiveEdit, removeIsActiveEditFromLine, setActiveEdit: setActiveEdit, setStringProof, setLineInFocus, removeFocusFromLine, addLine, removeLine, updateLine, getProofStepDetails, getNearestDeletableProofStep }}>
       {children}
     </ProofContext.Provider>
   );

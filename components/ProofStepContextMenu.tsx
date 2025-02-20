@@ -5,11 +5,13 @@ import { Item, ItemParams, Menu, Separator, Submenu } from 'react-contexify';
 
 import { LineProofStep } from '@/types/types';
 import { useHistory } from '@/contexts/HistoryProvider';
+import { useProof } from '@/contexts/ProofProvider';
 
 const MENU_ID = 'proof-step-context-menu';
 
 export function ProofStepContextMenu () {
   const historyContext = useHistory();
+  const proofContext = useProof();
   const handleAddProofStep = (uuid: string, isBox: boolean = false, prepend: boolean = false) => {
     const addLineCommand = isBox ? new AddBoxedLineCommand(uuid, prepend) : new AddLineCommand(uuid, prepend);
     historyContext.addToHistory(addLineCommand)
@@ -19,6 +21,7 @@ export function ProofStepContextMenu () {
     historyContext.addToHistory(removeLineCommand)
   }
   const handleUpdateProofStep = (uuid: string, updatedLineProofStep: LineProofStep) => {
+    proofContext.setActiveEdit(uuid)
     const updateLineCommand = new UpdateLineProofStepCommand(uuid, updatedLineProofStep);
     historyContext.addToHistory(updateLineCommand)
   }
