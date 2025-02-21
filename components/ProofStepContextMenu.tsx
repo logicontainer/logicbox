@@ -1,6 +1,6 @@
 import 'react-contexify/ReactContexify.css';
 
-import { AddBoxedLineCommand, AddLineCommand, RemoveProofStepCommand, UpdateLineProofStepCommand } from '@/lib/commands';
+import { AddBoxedLineCommand, AddLineCommand, RemoveProofStepCommand } from '@/lib/commands';
 import { Item, ItemParams, Menu, Separator, Submenu } from 'react-contexify';
 
 import { LineProofStep } from '@/types/types';
@@ -21,6 +21,7 @@ export function ProofStepContextMenu () {
     historyContext.addToHistory(removeLineCommand)
   }
   const handleUpdateProofStep = (uuid: string, updatedLineProofStep: LineProofStep) => {
+    console.log(updatedLineProofStep.uuid)
     proofContext.setActiveEdit(uuid)
   }
 

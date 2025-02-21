@@ -70,13 +70,15 @@ export function LineProofStepView ({ ...props }: TLineProofStep & { lines: LineN
 
 
 export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineNumberLine[] }) {
-  const { setLineInFocus, isFocused } = useProof();
-  const [tooltipContent, setTooltipContent] = useState<string>()
-  const isInFocus = isFocused(props.uuid)
+  const { setLineInFocus, isActiveEdit, removeIsActiveEditFromLine } = useProof();
+  const [tooltipContent] = useState<string>()
   const proofContext = useProof();
   const rulesetContext = useRuleset();
   const historyContext = useHistory();
-
+  const isTheActiveEdit = isActiveEdit(props.uuid)
+  const { show } = useContextMenu({
+    id: "proof-step-context-menu",
+  });
 
   const currLineProofStepDetails = proofContext.getProofStepDetails(props.uuid)
   if (currLineProofStepDetails?.proofStep.stepType !== "line") { return null; }
@@ -136,9 +138,6 @@ export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineN
     historyContext.addToHistory(updateLineCommand)
   }
 
-  const { show } = useContextMenu({
-    id: "proof-step-context-menu",
-  });
   function handleContextMenu (event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement> | React.KeyboardEvent<HTMLElement> | KeyboardEvent) {
     show({
       event,
@@ -158,8 +157,12 @@ export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineN
   });
   return (
     (<div
-      className={cn("flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors border-blue-400 border-2 items-stretch")}
+      className={cn("flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors items-stretch border-blue-400 border-2")}
       onMouseOver={() => setLineInFocus(props.uuid)}
+      onClick={(e) => {
+        if (e.target !== e.currentTarget) { return; }
+        return isTheActiveEdit && removeIsActiveEditFromLine(props.uuid)
+      }}
       onContextMenuCapture={handleContextMenu}
     >
       <AutosizeInput title="Enter a formula" type="text" value={props.formula} onChange={handleChangeFormula} className="text-slate-800 grow resize shrink" inputClassName="px-2" />
@@ -169,7 +172,7 @@ export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineN
         className="flex items-center gap-2 whitespace-nowrap">
         <Select value={rulesetDropdownValue} onChange={handleChangeRule} options={rulesetContext.rulesetDropdownOptions} theme={dropdownTheme} styles={{
           singleValue: (base) => ({ ...base, paddingLeft: "8px", paddingRight: "8px" }),
-          input (base, props) {
+          input (base) {
             return {
               ...base,
               paddingLeft: "8px",
@@ -180,7 +183,7 @@ export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineN
         {currLineProofStep.justification.refs.length > 0 && (
           <div className="flex gap-2">
             {currLineProofStep.justification.refs.map((ref, index) => (
-              <AutosizeInput key={index} inputClassName="bg-blue-200 text-blue-800 px-2 rounded text-sm/loose" value={ref} onChange={(e) => handleChangeRef(e, index)} />
+              <AutosizeInput key={index} inputClassName="bg-blue-200 text-blue-800 px-2 rounded text-sm/loose " value={ref} onChange={(e) => handleChangeRef(e, index)} />
             ))}
           </div>
         )}
