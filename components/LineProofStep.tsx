@@ -14,7 +14,6 @@ import { useHistory } from "@/contexts/HistoryProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumberLine[] }) {
   const { isActiveEdit } = useProof();

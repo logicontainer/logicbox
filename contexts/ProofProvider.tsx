@@ -64,7 +64,7 @@ export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
     setProof(JSON.parse(stringProof))
   }
   const [lineInFocus, setLineInFocus] = useState<string | null>(null);
-  const [activeEdit, setActiveEdit] = useState<string | null>("1");
+  const [activeEdit, setActiveEdit] = useState<string | null>(null);
   const [latestLineInFocus, setLatestLineInFocus] = useState<string | null>(null);
   useEffect(() => {
     if (lineInFocus) { setLatestLineInFocus(lineInFocus) }

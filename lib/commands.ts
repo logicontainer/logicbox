@@ -1,4 +1,5 @@
-import { LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
+import { BoxProofStep, LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
+import { InitBoxServerCommand, InitLineServerCommand, RemoveStepServerCommand, ServerCommand, UpdateLineServerCommand } from "./server-commands";
 
 import { ProofContextProps } from "@/contexts/ProofProvider";
 // import { ProofStep } from "@/types/types";
@@ -10,8 +11,8 @@ export abstract class Command {
     this.commandUuid = uuidv4();
   }
   getCommandUuid (): string { return this.commandUuid };
-  abstract execute (proofContext: ProofContextProps): void;
-  abstract undo (proofContext: ProofContextProps): void;
+  abstract execute (proofContext: ProofContextProps): ServerCommand[];
+  abstract undo (proofContext: ProofContextProps): ServerCommand[];
   abstract getDescription (): string;
 }
 export class AddLineCommand extends Command {
@@ -26,7 +27,7 @@ export class AddLineCommand extends Command {
     }
   }
 
-  execute (proofContext: ProofContextProps): void {
+  execute (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Execute AddLineCommand near line with uuid " + this.position.nearProofStepWithUuid)
     proofContext.addLine({
       "stepType": "line",
@@ -38,11 +39,18 @@ export class AddLineCommand extends Command {
         "refs": []
       },
     }, this.position)
+
+    return [
+      new InitLineServerCommand(this.newLineUuid, this.position.nearProofStepWithUuid, this.position.prepend ? "before" : "after")
+    ]
   }
 
-  undo (proofContext: ProofContextProps): void {
+  undo (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Undoing AddLineCommand near line with uuid " + this.newLineUuid)
     proofContext.removeLine(this.newLineUuid)
+    return [
+      new RemoveStepServerCommand(this.newLineUuid)
+    ]
   }
   getDescription (): string {
     return `Add line ${this.position.prepend ? "before" : "after"} line with uuid ${this.position.nearProofStepWithUuid}`;
@@ -64,7 +72,7 @@ export class AddBoxedLineCommand extends Command {
     }
   }
 
-  execute (proofContext: ProofContextProps): void {
+  execute (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Execute AddBoxLineCommand near line with uuid " + this.position.nearProofStepWithUuid)
     proofContext.addLine(
       {
@@ -83,11 +91,17 @@ export class AddBoxedLineCommand extends Command {
           }
         ]
       }, this.position)
+    return [
+      new InitBoxServerCommand(this.newBoxUuid, this.newLineUuid, this.position.nearProofStepWithUuid, this.position.prepend ? "before" : "after"),
+    ]
   }
 
-  undo (proofContext: ProofContextProps): void {
+  undo (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Undoing AddBoxLineCommand near line with uuid " + this.newBoxUuid)
     proofContext.removeLine(this.newBoxUuid)
+    return [
+      new RemoveStepServerCommand(this.newBoxUuid)
+    ]
   }
   getDescription (): string {
     return `Add box line ${this.position.prepend ? "before" : "after"} line with uuid ${this.position.nearProofStepWithUuid}`;
@@ -110,7 +124,7 @@ export class RemoveProofStepCommand extends Command {
     }
   }
 
-  execute (proofContext: ProofContextProps): void {
+  execute (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Execute RemoveProofStepCommand for line " + this.proofStepUuid)
     const { proofStepDetails: nearestDeletableProofStep, cascadeCount } = proofContext.getNearestDeletableProofStep(this.proofStepUuid)
     if (nearestDeletableProofStep == null) {
@@ -127,15 +141,33 @@ export class RemoveProofStepCommand extends Command {
 
     proofContext.removeLine(
       this.proofStepUuid)
+    return [
+      new RemoveStepServerCommand(this.proofStepUuid)
+    ]
   }
 
-  undo (proofContext: ProofContextProps): void {
+  undo (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Undoing RemoveProofStepCommand for line " + this.proofStepUuid)
 
     if (this.proofStep == null) {
       throw new Error("Cannot undo RemoveProofStepCommand without proofStep")
     }
     proofContext.addLine(this.proofStep, this.position)
+    // if (this.proofStep.stepType == "box") {
+    //   // const innerLineProofStep = (this.proofStep as BoxProofStep).proof[0] as
+    //   return [
+    //     new InitBoxServerCommand(this.proofStep.uuid, innerLineProofStep.uuid, this.position.nearProofStepWithUuid, this.position.prepend ? "before" : "after"),
+    //     new UpdateLineServerCommand(innerLineProofStep.uuid, innerLineProofStep.
+    //   ]
+    // }
+    // return [
+    //   new InitLineServerCommand(this.proofStepUuid, this.position.nearProofStepWithUuid, this.position.prepend ? "before" : "after"),
+    //   new UpdateLineServerCommand(this.proofStepUuid, this.)
+    // ]
+    return [
+      new InitLineServerCommand(this.proofStepUuid, this.position.nearProofStepWithUuid, this.position.prepend ? "before" :
+        "after") // TODO: Should be init subtree or something. This needs a lot of recursive init line and update line commands
+    ]
   }
   getDescription (): string {
     return `Remove line with uuid ${this.proofStepUuid}`;
@@ -158,7 +190,7 @@ export class UpdateLineProofStepCommand extends Command {
     this.updatedLineProofStep = updatedLineProofStep;
   }
 
-  execute (proofContext: ProofContextProps): void {
+  execute (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Execute UpdateProofStepCommand for line " + this.proofStepUuid)
 
     const proofStepDetails = proofContext.getProofStepDetails(this.proofStepUuid)
@@ -175,9 +207,13 @@ export class UpdateLineProofStepCommand extends Command {
 
     proofContext.updateLine(
       this.proofStepUuid, this.updatedLineProofStep)
+
+    return [
+      new UpdateLineServerCommand(this.proofStepUuid, this.updatedLineProofStep.formula, this.updatedLineProofStep.justification.ruleName, this.updatedLineProofStep.justification.refs)
+    ]
   }
 
-  undo (proofContext: ProofContextProps): void {
+  undo (proofContext: ProofContextProps): ServerCommand[] {
     console.log("Undoing UpdateProofStepCommand for line " + this.proofStepUuid)
 
     if (this.prevProofStep == null) {
@@ -186,6 +222,10 @@ export class UpdateLineProofStepCommand extends Command {
 
     proofContext.updateLine(
       this.proofStepUuid, this.prevProofStep)
+
+    return [
+      new UpdateLineServerCommand(this.proofStepUuid, this.prevProofStep.formula, this.prevProofStep.justification.ruleName, this.prevProofStep.justification.refs)
+    ]
   }
   getDescription (): string {
     return `Remove line with uuid ${this.proofStepUuid}`;

@@ -47,9 +47,12 @@ export type ProofStepPosition = {
 }
 
 
+type UUID = string;
+
+// Individual violation types
 type ReferencesMismatchViolation = {
   explanation: string;
-  refs: string[];
+  refs: UUID[];
 };
 
 type WrongNumberOfReferencesViolation = {
@@ -60,22 +63,22 @@ type WrongNumberOfReferencesViolation = {
 
 type ReferenceShouldBeBoxViolation = {
   explanation: string;
-  ref: string;
+  ref: UUID;
 };
 
 type ReferenceShouldBeLineViolation = {
   explanation: string;
-  ref: string;
+  ref: UUID;
 };
 
 type ReferenceDoesntMatchRuleViolation = {
   explanation: string;
-  ref: string;
+  ref: UUID;
 };
 
 type FormulaDoesntMatchReferenceViolation = {
   explanation: string;
-  ref: string;
+  ref: UUID;
 };
 
 type FormulaDoesntMatchRuleViolation = {
@@ -86,41 +89,64 @@ type MiscellaneousViolation = {
   explanation: string;
 };
 
-export type ProofStepDiagnostics =
-  ({
-    violationType: "references_mismatch";
-    violation: ReferencesMismatchViolation;
-  }
-    | {
-      violationType: "wrong_number_of_references";
-      violation: WrongNumberOfReferencesViolation;
-    }
-    | {
-      violationType: "reference_should_be_box";
-      violation: ReferenceShouldBeBoxViolation;
-    }
-    | {
-      violationType: "reference_should_be_line";
-      violation: ReferenceShouldBeLineViolation;
-    }
-    | {
-      violationType: "reference_doesnt_match_rule";
-      violation: ReferenceDoesntMatchRuleViolation;
-    }
-    | {
-      violationType: "formula_doesnt_match_reference";
-      violation: FormulaDoesntMatchReferenceViolation;
-    }
-    | {
-      violationType: "formula_doesnt_match_rule";
-      violation: FormulaDoesntMatchRuleViolation;
-    }
-    | {
-      violationType: "miscellaneousViolation";
-      violation: MiscellaneousViolation;
-    }) & { uuid: string };
+// Union type for all possible violations
+type Violation =
+  | { violationType: "references_mismatch"; violation: ReferencesMismatchViolation }
+  | { violationType: "wrong_number_of_references"; violation: WrongNumberOfReferencesViolation }
+  | { violationType: "reference_should_be_box"; violation: ReferenceShouldBeBoxViolation }
+  | { violationType: "reference_should_be_line"; violation: ReferenceShouldBeLineViolation }
+  | { violationType: "reference_doesnt_match_rule"; violation: ReferenceDoesntMatchRuleViolation }
+  | { violationType: "formula_doesnt_match_reference"; violation: FormulaDoesntMatchReferenceViolation }
+  | { violationType: "formula_doesnt_match_rule"; violation: FormulaDoesntMatchRuleViolation }
+  | { violationType: "miscellaneousViolation"; violation: MiscellaneousViolation };
 
-export type ProofDiagnostics = {
+// Diagnostic type
+export type Diagnostic = {
+  uuid: UUID;
+} & Violation;
+
+// Main response type
+export type ValidationResponse = {
   isValid: boolean;
-  diagnostics: ProofStepDiagnostics[];
+  diagnostics: Diagnostic[];
 };
+
+// Enum for placement options
+export type Placement = "before" | "after";
+
+// Command options for each command type
+type InitLineOptions = {
+  newLineUuid: UUID;
+  neighbourUuid: UUID;
+  placement: Placement;
+};
+
+type InitBoxOptions = {
+  newBoxUuid: UUID;
+  newLineUuid: UUID;
+  neighbourUuid: UUID;
+  placement: Placement;
+};
+
+type RemoveStepOptions = {
+  uuid: UUID;
+};
+
+type UpdateLineOptions = {
+  lineUuid: UUID;
+  formula: string | null;
+  rule: string | null;
+  refs: UUID[] | null;
+};
+
+// Union type for all possible commands
+export type InitLineServerCommand = { commandName: "initLine"; options: InitLineOptions };
+export type InitBoxServerCommand = { commandName: "initBox"; options: InitBoxOptions };
+export type RemoveStepServerCommand = { commandName: "removeStep"; options: RemoveStepOptions };
+export type UpdateLineServerCommand = { commandName: "updateLine"; options: UpdateLineOptions };
+
+export type ServerCommand =
+  | InitLineServerCommand
+  | InitBoxServerCommand
+  | RemoveStepServerCommand
+  | UpdateLineServerCommand;

@@ -1,10 +1,10 @@
-import { LineNumberLine, ProofStepDiagnostics } from "@/types/types";
+import { Diagnostic, LineNumberLine } from "@/types/types";
 
 import { Tooltip } from "react-tooltip";
 import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 
-export function LineNumber ({ line, proofStepDiagnostics }: { line: LineNumberLine, proofStepDiagnostics?: ProofStepDiagnostics }) {
+export function LineNumber ({ line, proofStepDiagnostics }: { line: LineNumberLine, proofStepDiagnostics?: Diagnostic }) {
   const { setLineInFocus, removeFocusFromLine, isUnfocused } = useProof();
 
 

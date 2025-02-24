@@ -1,23 +1,28 @@
 "use client";
 
-import { Proof, ProofDiagnostics } from "@/types/types";
+import { Proof, ValidationResponse } from "@/types/types";
 import React, { useState } from "react";
 
+import { ServerCommand } from "../lib/server-commands";
 import _ from "lodash";
 import proofExample1 from "@/examples/proof-example-1";
 
 export interface ServerContextProps {
   proof: Proof,
   syncingStatus: string,
-  proofDiagnostics: ProofDiagnostics,
+  proofDiagnostics: ValidationResponse,
+  serverCommands: ServerCommand[], // TODO: Remove. This is for temporary visualization purposes
   validateProof: (proof: Proof) => Promise<boolean>,
+  addCommands: (commands: ServerCommand[]) => unknown,
 }
 
 const ServerContext = React.createContext<ServerContextProps>({
   proof: [],
   proofDiagnostics: { isValid: true, diagnostics: [] },
   syncingStatus: "idle",
+  serverCommands: [], // TODO: Remove. This is for temporary visualization purposes
   validateProof: async () => false,
+  addCommands: () => { },
 })
 
 export function useServer () {
@@ -29,10 +34,11 @@ export function useServer () {
 }
 
 export function ServerProvider ({ children }: React.PropsWithChildren<object>) {
+  const [serverCommands, setServerCommands] = useState<ServerCommand[]>([]);
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
   const [syncCheckpoint, setSyncCheckpoint] = useState<number>(0);
   const [proof, setProof] = useState<Proof>(proofExample1.proof);
-  const [proofDiagnostics, setProofDiagnostics] = useState<ProofDiagnostics>({ isValid: true, diagnostics: [] });
+  const [proofDiagnostics, setProofDiagnostics] = useState<ValidationResponse>({ isValid: true, diagnostics: [] });
 
   const validateProof = async (proof: Proof): Promise<boolean> => {
     setServerSyncingStatus("syncing")
@@ -58,7 +64,7 @@ export function ServerProvider ({ children }: React.PropsWithChildren<object>) {
                 actual: 1
               }
             }]
-          } as ProofDiagnostics,
+          } as ValidationResponse,
           checkpoint: 1,
         }
         setSyncCheckpoint(serverResponse.checkpoint)
@@ -74,9 +80,21 @@ export function ServerProvider ({ children }: React.PropsWithChildren<object>) {
     }
   }
 
+  const addCommands = (serverCommands: ServerCommand[]) => {
+    setServerCommands((prev) => {
+      return [...prev, ...serverCommands]
+    })
+  }
 
   return (
-    <ServerContext.Provider value={{ proof, syncingStatus, proofDiagnostics, validateProof }}>
+    <ServerContext.Provider value={{
+      proof,
+      syncingStatus,
+      proofDiagnostics,
+      serverCommands,// TODO: Remove. This is for temporary visualization purposes
+      validateProof,
+      addCommands
+    }}>
       {children}
     </ServerContext.Provider>
   );
