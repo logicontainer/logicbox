@@ -1,13 +1,13 @@
 "use client";
 
-import { BoxProofStep, LineProofStep, ProofStep, ProofStepDetails, ProofStepPosition } from "@/types/types";
+import { BoxProofStep, LineProofStep, Proof, ProofStep, ProofStepDetails, ProofStepPosition } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
-import proofExample1 from "@/examples/proof-example-1";
+import { useServer } from "./ServerProvider";
 
 export interface ProofContextProps {
-  proof: ProofStep[];
+  proof: Proof;
   lineInFocus: string | null,
   latestLineInFocus: string | null,
   isFocused: (uuid: string) => boolean,
@@ -53,7 +53,13 @@ export function useProof () {
 }
 
 export function ProofProvider ({ children }: React.PropsWithChildren<object>) {
-  const [proof, setProof] = useState(proofExample1.proof);
+  const serverContext = useServer();
+  const [proof, setProof] = useState(serverContext.proof);
+
+  useEffect(() => {
+    setProof(serverContext.proof)
+  }, [serverContext.proof])
+
   const setStringProof = (stringProof: string) => {
     setProof(JSON.parse(stringProof))
   }

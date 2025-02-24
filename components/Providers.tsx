@@ -3,6 +3,7 @@
 import { HistoryProvider } from "@/contexts/HistoryProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
 import { RulesetProvider } from "@/contexts/RulesetProvider";
+import { ServerProvider } from "@/contexts/ServerProvider";
 
 type ProviderProps = {
   children: React.ReactNode;
@@ -10,12 +11,14 @@ type ProviderProps = {
 
 export function Providers ({ children }: ProviderProps) {
   return (
-    <RulesetProvider>
-      <ProofProvider>
-        <HistoryProvider>
-          {children}
-        </HistoryProvider>
-      </ProofProvider>
-    </RulesetProvider>
+    <ServerProvider>
+      <RulesetProvider>
+        <ProofProvider>
+          <HistoryProvider>
+            {children}
+          </HistoryProvider>
+        </ProofProvider>
+      </RulesetProvider>
+    </ServerProvider>
   );
 }

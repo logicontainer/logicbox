@@ -14,6 +14,7 @@ import { useHistory } from "@/contexts/HistoryProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export function LineProofStep ({ ...props }: TLineProofStep & { lines: LineNumberLine[] }) {
   const { isActiveEdit } = useProof();
@@ -71,7 +72,7 @@ export function LineProofStepView ({ ...props }: TLineProofStep & { lines: LineN
 
 export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineNumberLine[] }) {
   const { setLineInFocus, isActiveEdit, removeIsActiveEditFromLine } = useProof();
-  const [tooltipContent] = useState<string>()
+  const [tooltipContent] = useState<string>("")
   const proofContext = useProof();
   const rulesetContext = useRuleset();
   const historyContext = useHistory();
@@ -165,12 +166,12 @@ export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineN
       }}
       onContextMenuCapture={handleContextMenu}
     >
-      <AutosizeInput title="Enter a formula" type="text" value={props.formula} onChange={handleChangeFormula} className="text-slate-800 grow resize shrink" inputClassName="px-2" />
+      <AutosizeInput suppressHydrationWarning title="Enter a formula" type="text" value={props.formula} onChange={handleChangeFormula} className="text-slate-800 grow resize shrink" inputClassName="px-2" />
       <div data-tooltip-id={`tooltip-id-${props.uuid}`}
         data-tooltip-content={tooltipContent}
         title="Select a rule"
         className="flex items-center gap-2 whitespace-nowrap">
-        <Select value={rulesetDropdownValue} onChange={handleChangeRule} options={rulesetContext.rulesetDropdownOptions} theme={dropdownTheme} styles={{
+        <Select instanceId={props.uuid} value={rulesetDropdownValue} onChange={handleChangeRule} options={rulesetContext.rulesetDropdownOptions} theme={dropdownTheme} styles={{
           singleValue: (base) => ({ ...base, paddingLeft: "8px", paddingRight: "8px" }),
           input (base) {
             return {
@@ -183,7 +184,7 @@ export function LineProofStepEdit ({ ...props }: TLineProofStep & { lines: LineN
         {currLineProofStep.justification.refs.length > 0 && (
           <div className="flex gap-2">
             {currLineProofStep.justification.refs.map((ref, index) => (
-              <AutosizeInput key={index} inputClassName="bg-blue-200 text-blue-800 px-2 rounded text-sm/loose " value={ref} onChange={(e) => handleChangeRef(e, index)} />
+              <AutosizeInput suppressHydrationWarning key={index} inputClassName="bg-blue-200 text-blue-800 px-2 rounded text-sm/loose " value={ref} onChange={(e) => handleChangeRef(e, index)} />
             ))}
           </div>
         )}

@@ -45,3 +45,82 @@ export type ProofStepPosition = {
   nearProofStepWithUuid: string,
   prepend: boolean
 }
+
+
+type ReferencesMismatchViolation = {
+  explanation: string;
+  refs: string[];
+};
+
+type WrongNumberOfReferencesViolation = {
+  explanation: string;
+  expected: number;
+  actual: number;
+};
+
+type ReferenceShouldBeBoxViolation = {
+  explanation: string;
+  ref: string;
+};
+
+type ReferenceShouldBeLineViolation = {
+  explanation: string;
+  ref: string;
+};
+
+type ReferenceDoesntMatchRuleViolation = {
+  explanation: string;
+  ref: string;
+};
+
+type FormulaDoesntMatchReferenceViolation = {
+  explanation: string;
+  ref: string;
+};
+
+type FormulaDoesntMatchRuleViolation = {
+  explanation: string;
+};
+
+type MiscellaneousViolation = {
+  explanation: string;
+};
+
+export type ProofStepDiagnostics =
+  ({
+    violationType: "references_mismatch";
+    violation: ReferencesMismatchViolation;
+  }
+    | {
+      violationType: "wrong_number_of_references";
+      violation: WrongNumberOfReferencesViolation;
+    }
+    | {
+      violationType: "reference_should_be_box";
+      violation: ReferenceShouldBeBoxViolation;
+    }
+    | {
+      violationType: "reference_should_be_line";
+      violation: ReferenceShouldBeLineViolation;
+    }
+    | {
+      violationType: "reference_doesnt_match_rule";
+      violation: ReferenceDoesntMatchRuleViolation;
+    }
+    | {
+      violationType: "formula_doesnt_match_reference";
+      violation: FormulaDoesntMatchReferenceViolation;
+    }
+    | {
+      violationType: "formula_doesnt_match_rule";
+      violation: FormulaDoesntMatchRuleViolation;
+    }
+    | {
+      violationType: "miscellaneousViolation";
+      violation: MiscellaneousViolation;
+    }) & { uuid: string };
+
+export type ProofDiagnostics = {
+  isValid: boolean;
+  diagnostics: ProofStepDiagnostics[];
+};
