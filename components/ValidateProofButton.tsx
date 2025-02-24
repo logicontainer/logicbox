@@ -1,4 +1,3 @@
-import { useContext } from "react"
 import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
 

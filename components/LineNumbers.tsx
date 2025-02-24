@@ -1,6 +1,5 @@
 import { LineNumber } from "./LineNumber";
 import { LineNumberLine } from "@/types/types";
-import { Tooltip } from "react-tooltip";
 import { useServer } from "@/contexts/ServerProvider";
 
 export function LineNumbers ({ lines }: { lines: LineNumberLine[] }) {

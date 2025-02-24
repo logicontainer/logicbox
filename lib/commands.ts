@@ -1,5 +1,5 @@
-import { BoxProofStep, LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
 import { InitBoxServerCommand, InitLineServerCommand, RemoveStepServerCommand, ServerCommand, UpdateLineServerCommand } from "./server-commands";
+import { LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
 
 import { ProofContextProps } from "@/contexts/ProofProvider";
 // import { ProofStep } from "@/types/types";
