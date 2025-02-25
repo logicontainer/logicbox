@@ -1,11 +1,11 @@
 import { Ruleset } from "@/types/types";
 
-export function createHighlightedLatexRule (
+export function createHighlightedLatexRule(
   name: string,
   premises: string[],
   conclusion: string,
   highlightedPremises: number[] = [],
-  conclusionIsHighlighted: boolean = false
+  conclusionIsHighlighted: boolean = false,
 ): string {
   const premisesWithHighlights = premises.map((p, idx) => {
     if (highlightedPremises.includes(idx)) {
@@ -15,7 +15,9 @@ export function createHighlightedLatexRule (
     }
   });
   const premiseLine = `\\begin{matrix}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{matrix}`;
-  const conclusionLine = conclusionIsHighlighted ? `\\color{red}\\boxed{${conclusion}}` : conclusion;
+  const conclusionLine = conclusionIsHighlighted
+    ? `\\color{red}\\boxed{${conclusion}}`
+    : conclusion;
   return `\\dfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }
 
@@ -28,179 +30,181 @@ export const rulesets = [
         latex: {
           ruleName: "\\text{?}",
           premises: [],
-          conclusion: "\\text{?}"
+          conclusion: "\\text{?}",
         },
-        numPremises: 0
-      }, {
+        numPremises: 0,
+      },
+      {
         ruleName: "premise",
         latex: {
           ruleName: "\\text{premise}",
           premises: [],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 0
+        numPremises: 0,
       },
       {
         ruleName: "assumption",
         latex: {
           ruleName: "\\text{ass.}",
           premises: [],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 0
+        numPremises: 0,
       },
       {
         ruleName: "copy",
         latex: {
           ruleName: "\\text{copy}",
           premises: ["\\phi"],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "and_intro",
         latex: {
           ruleName: "\\land i",
           premises: ["\\phi", "\\psi"],
-          conclusion: "\\phi \\land \\psi"
+          conclusion: "\\phi \\land \\psi",
         },
-        numPremises: 2
+        numPremises: 2,
       },
       {
         ruleName: "and_elim_1",
         latex: {
           ruleName: "\\land e_1",
           premises: ["\\phi \\land \\psi"],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "and_elim_2",
         latex: {
           ruleName: "\\land e_2",
           premises: ["\\phi \\land \\psi"],
-          conclusion: "\\psi"
+          conclusion: "\\psi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "or_intro_1",
         latex: {
           ruleName: "\\lor i_1",
           premises: ["\\phi"],
-          conclusion: "\\phi \\land \\psi"
+          conclusion: "\\phi \\land \\psi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "or_intro_2",
         latex: {
           ruleName: "\\lor i_2",
           premises: ["\\psi"],
-          conclusion: "\\phi \\land \\psi"
+          conclusion: "\\phi \\land \\psi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
           premises: ["\\phi \\lor \\psi", "\\text{BOX}", "\\text{BOX}"],
-          conclusion: "\\chi"
+          conclusion: "\\chi",
         },
-        numPremises: 3
+        numPremises: 3,
       },
       {
         ruleName: "implies_intro",
         latex: {
           ruleName: "\\rightarrow i",
           premises: ["\\text{BOX}"],
-          conclusion: "\\phi \\rightarrow \\psi"
+          conclusion: "\\phi \\rightarrow \\psi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "implies_elim",
         latex: {
           ruleName: "\\rightarrow e",
           premises: ["\\phi", "\\phi \\rightarrow \\psi"],
-          conclusion: "\\psi"
+          conclusion: "\\psi",
         },
-        numPremises: 2
+        numPremises: 2,
       },
       {
         ruleName: "not_intro",
         latex: {
           ruleName: "\\lnot i",
           premises: ["\\text{BOX}"],
-          conclusion: "\\lnot \\phi"
+          conclusion: "\\lnot \\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "not_elim",
         latex: {
           ruleName: "\\lnot e",
           premises: ["\\phi", "\\lnot \\phi"],
-          conclusion: "\\bot"
+          conclusion: "\\bot",
         },
-        numPremises: 2
+        numPremises: 2,
       },
       {
         ruleName: "bot_elim",
         latex: {
           ruleName: "\\bot e",
           premises: ["\\bot"],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "not_not_elim",
         latex: {
           ruleName: "\\lnot\\lnot e",
           premises: ["\\lnot \\lnot \\phi"],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "modus_tollens",
         latex: {
           ruleName: "\\text{MT}",
           premises: ["\\phi \\rightarrow \\psi", "\\lnot \\psi"],
-          conclusion: "\\lnot \\phi"
+          conclusion: "\\lnot \\phi",
         },
-        numPremises: 2
+        numPremises: 2,
       },
       {
         ruleName: "not_not_intro",
         latex: {
           ruleName: "\\lnot\\lnot i",
           premises: ["\\phi"],
-          conclusion: "\\lnot \\lnot \\phi"
+          conclusion: "\\lnot \\lnot \\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "proof_by_contradiction",
         latex: {
           ruleName: "\\text{PBC}",
           premises: ["\\text{BOX}"],
-          conclusion: "\\phi"
+          conclusion: "\\phi",
         },
-        numPremises: 1
+        numPremises: 1,
       },
       {
         ruleName: "law_of_excluded_middle",
         latex: {
           ruleName: "\\text{LEM}",
           premises: [],
-          conclusion: "\\phi \\lor \\lnot \\phi"
+          conclusion: "\\phi \\lor \\lnot \\phi",
         },
-        numPremises: 0
-      }
-    ]
-  }] as Ruleset[];
+        numPremises: 0,
+      },
+    ],
+  },
+] as Ruleset[];

@@ -6,7 +6,7 @@ import { InlineMath } from "react-katex";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
 
-export function Justification ({
+export function Justification({
   justification,
   lines,
   onHover,
@@ -16,7 +16,9 @@ export function Justification ({
   onHover: (highlightedLatex: string) => void;
 }) {
   const { ruleset } = useRuleset();
-  const rule = ruleset.rules.find((rule) => rule.ruleName == justification.ruleName);
+  const rule = ruleset.rules.find(
+    (rule) => rule.ruleName == justification.ruleName,
+  );
   if (!rule) return;
   const refs = justification.refs.map((ref) => {
     const referencedLine = lines.find((line) => line.uuid == ref);
@@ -37,8 +39,8 @@ export function Justification ({
               rule.latex.premises,
               rule.latex.conclusion,
               [],
-              false
-            )
+              false,
+            ),
           )
         }
       >
@@ -60,16 +62,17 @@ export function Justification ({
                       rule.latex.premises,
                       rule.latex.conclusion,
                       [i],
-                      false
-                    )
+                      false,
+                    ),
                   )
                 }
               >
                 <InlineMath math={`${ref || "?"}${comma}`} />
               </span>
-            )
+            );
           })}
-        </span>)}
+        </span>
+      )}
     </span>
   );
 }

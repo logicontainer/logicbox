@@ -9,14 +9,12 @@ type ProviderProps = {
   children: React.ReactNode;
 };
 
-export function Providers ({ children }: ProviderProps) {
+export function Providers({ children }: ProviderProps) {
   return (
     <ServerProvider>
       <RulesetProvider>
         <ProofProvider>
-          <HistoryProvider>
-            {children}
-          </HistoryProvider>
+          <HistoryProvider>{children}</HistoryProvider>
         </ProofProvider>
       </RulesetProvider>
     </ServerProvider>

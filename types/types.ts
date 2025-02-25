@@ -1,51 +1,56 @@
 export type Ruleset = {
   rulesetName: string;
   rules: Rule[];
-}
+};
 export type Rule = {
-  ruleName: string,
-  numPremises: number,
+  ruleName: string;
+  numPremises: number;
   latex: {
-    ruleName: string,
-    premises: string[],
-    conclusion: string
-  }
-}
+    ruleName: string;
+    premises: string[];
+    conclusion: string;
+  };
+};
 
 export type Justification = {
-  ruleName: string,
-  refs: string[]
-}
+  ruleName: string;
+  refs: string[];
+};
 export type LineProofStep = {
-  uuid: string,
-  stepType: string,
-  formula: string,
-  latexFormula: string,
-  justification: Justification
-  formulaUnsynced?: boolean
-}
+  uuid: string;
+  stepType: string;
+  formula: string;
+  latexFormula: string;
+  justification: Justification;
+  formulaUnsynced?: boolean;
+};
 export type BoxProofStep = {
-  uuid: string,
-  stepType: string,
-  proof: Proof
-}
+  uuid: string;
+  stepType: string;
+  proof: Proof;
+};
 export type ProofStep = LineProofStep | BoxProofStep;
 
-export type Proof = ProofStep[]
+export type Proof = ProofStep[];
 
-export type LineNumberLine = { uuid: string, isBox: boolean, boxStartLine?: number, boxEndLine?: number, lineNumber?: number };
+export type LineNumberLine = {
+  uuid: string;
+  isBox: boolean;
+  boxStartLine?: number;
+  boxEndLine?: number;
+  lineNumber?: number;
+};
 
 export type ProofStepDetails = {
-  proofStep: ProofStep,
-  parentBoxUuid: string | null,
-  position: ProofStepPosition
-}
+  proofStep: ProofStep;
+  parentBoxUuid: string | null;
+  position: ProofStepPosition;
+};
 
 export type ProofStepPosition = {
-  nearProofStepWithUuid: string,
-  prepend: boolean
-}
-
+  nearProofStepWithUuid: string;
+  prepend: boolean;
+};
 
 type UUID = string;
 
@@ -91,14 +96,38 @@ type MiscellaneousViolation = {
 
 // Union type for all possible violations
 type Violation =
-  | { violationType: "references_mismatch"; violation: ReferencesMismatchViolation }
-  | { violationType: "wrong_number_of_references"; violation: WrongNumberOfReferencesViolation }
-  | { violationType: "reference_should_be_box"; violation: ReferenceShouldBeBoxViolation }
-  | { violationType: "reference_should_be_line"; violation: ReferenceShouldBeLineViolation }
-  | { violationType: "reference_doesnt_match_rule"; violation: ReferenceDoesntMatchRuleViolation }
-  | { violationType: "formula_doesnt_match_reference"; violation: FormulaDoesntMatchReferenceViolation }
-  | { violationType: "formula_doesnt_match_rule"; violation: FormulaDoesntMatchRuleViolation }
-  | { violationType: "miscellaneousViolation"; violation: MiscellaneousViolation };
+  | {
+      violationType: "references_mismatch";
+      violation: ReferencesMismatchViolation;
+    }
+  | {
+      violationType: "wrong_number_of_references";
+      violation: WrongNumberOfReferencesViolation;
+    }
+  | {
+      violationType: "reference_should_be_box";
+      violation: ReferenceShouldBeBoxViolation;
+    }
+  | {
+      violationType: "reference_should_be_line";
+      violation: ReferenceShouldBeLineViolation;
+    }
+  | {
+      violationType: "reference_doesnt_match_rule";
+      violation: ReferenceDoesntMatchRuleViolation;
+    }
+  | {
+      violationType: "formula_doesnt_match_reference";
+      violation: FormulaDoesntMatchReferenceViolation;
+    }
+  | {
+      violationType: "formula_doesnt_match_rule";
+      violation: FormulaDoesntMatchRuleViolation;
+    }
+  | {
+      violationType: "miscellaneousViolation";
+      violation: MiscellaneousViolation;
+    };
 
 // Diagnostic type
 export type Diagnostic = {
@@ -140,10 +169,22 @@ type UpdateLineOptions = {
 };
 
 // Union type for all possible commands
-export type InitLineServerCommand = { commandName: "initLine"; options: InitLineOptions };
-export type InitBoxServerCommand = { commandName: "initBox"; options: InitBoxOptions };
-export type RemoveStepServerCommand = { commandName: "removeStep"; options: RemoveStepOptions };
-export type UpdateLineServerCommand = { commandName: "updateLine"; options: UpdateLineOptions };
+export type InitLineServerCommand = {
+  commandName: "initLine";
+  options: InitLineOptions;
+};
+export type InitBoxServerCommand = {
+  commandName: "initBox";
+  options: InitBoxOptions;
+};
+export type RemoveStepServerCommand = {
+  commandName: "removeStep";
+  options: RemoveStepOptions;
+};
+export type UpdateLineServerCommand = {
+  commandName: "updateLine";
+  options: UpdateLineOptions;
+};
 
 export type ServerCommand =
   | InitLineServerCommand

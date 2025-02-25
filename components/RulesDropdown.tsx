@@ -1,24 +1,30 @@
-import { InlineMath } from "react-katex"
+import { InlineMath } from "react-katex";
 import { Rule } from "@/types/types";
-import { createHighlightedLatexRule } from "@/lib/rules"
-import { useRuleset } from "@/contexts/RulesetProvider"
+import { createHighlightedLatexRule } from "@/lib/rules";
+import { useRuleset } from "@/contexts/RulesetProvider";
 
-export function RulesDropdown () {
+export function RulesDropdown() {
   const rulesetContext = useRuleset();
   return (
     <ul>
       {rulesetContext.ruleset.rules.map((rule) => {
-        return (
-          <RulesDropdownItem key={rule.ruleName} rule={rule} />
-        )
+        return <RulesDropdownItem key={rule.ruleName} rule={rule} />;
       })}
     </ul>
-  )
+  );
 }
 
-export function RulesDropdownItem ({ rule }: { rule: Rule }) {
-  const tooptipExample = createHighlightedLatexRule(rule.latex.ruleName, rule.latex.premises, rule.latex.conclusion, [], false)
-  return (<div>
-    <InlineMath math={tooptipExample} />
-  </div>)
+export function RulesDropdownItem({ rule }: { rule: Rule }) {
+  const tooptipExample = createHighlightedLatexRule(
+    rule.latex.ruleName,
+    rule.latex.premises,
+    rule.latex.conclusion,
+    [],
+    false,
+  );
+  return (
+    <div>
+      <InlineMath math={tooptipExample} />
+    </div>
+  );
 }

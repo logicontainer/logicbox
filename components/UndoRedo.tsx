@@ -3,36 +3,72 @@ import { cn } from "@/lib/utils";
 import { useHistory } from "@/contexts/HistoryProvider";
 import { useProof } from "@/contexts/ProofProvider";
 
-export function UndoRedo () {
+export function UndoRedo() {
   const historyContext = useHistory();
   const proofContext = useProof();
   const handleUndo = () => {
     historyContext.undo();
-  }
+  };
   const handleRedo = () => {
     historyContext.redo();
-  }
+  };
   return (
     <div className="flex gap-2">
-      <button className={cn("border-solid border-2 border-slate-800 rounded-sm px-4", !historyContext.canUndo ? "text-slate-500 border-slate-500" : "")} title="Undo" onClick={handleUndo} disabled={!historyContext.canUndo}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+      <button
+        className={cn(
+          "border-solid border-2 border-slate-800 rounded-sm px-4",
+          !historyContext.canUndo ? "text-slate-500 border-slate-500" : "",
+        )}
+        title="Undo"
+        onClick={handleUndo}
+        disabled={!historyContext.canUndo}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-4 h-4"
+        >
           <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
         </svg>
       </button>
-      <button className={cn("border-solid border-2 border-slate-800 rounded-sm px-4", !historyContext.canRedo ? "text-slate-500 border-slate-500" : "")} title="Redo" onClick={handleRedo} disabled={!historyContext.canRedo}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+      <button
+        className={cn(
+          "border-solid border-2 border-slate-800 rounded-sm px-4",
+          !historyContext.canRedo ? "text-slate-500 border-slate-500" : "",
+        )}
+        title="Redo"
+        onClick={handleRedo}
+        disabled={!historyContext.canRedo}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-4 h-4"
+        >
           <path d="M12 4V1l4 4-4 4V6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z" />
         </svg>
       </button>
 
-      <button data-tooltip-id="proof-text-area" className={cn("border-solid border-2 border-slate-800 rounded-sm px-4")} onClick={handleRedo} disabled={!historyContext.canRedo}>
+      <button
+        data-tooltip-id="proof-text-area"
+        className={cn("border-solid border-2 border-slate-800 rounded-sm px-4")}
+        onClick={handleRedo}
+        disabled={!historyContext.canRedo}
+      >
         Content
       </button>
 
       <Tooltip className="z-50" id="proof-text-area" clickable place="top">
-        <textarea className="p-4 bg-transparent text-slate-200" value={JSON.stringify(proofContext.proof, null, 2)} onChange={(e) => proofContext.setStringProof(e.target.value)} rows={15} cols={50} />
+        <textarea
+          className="p-4 bg-transparent text-slate-200"
+          value={JSON.stringify(proofContext.proof, null, 2)}
+          onChange={(e) => proofContext.setStringProof(e.target.value)}
+          rows={15}
+          cols={50}
+        />
       </Tooltip>
-
     </div>
-  )
+  );
 }

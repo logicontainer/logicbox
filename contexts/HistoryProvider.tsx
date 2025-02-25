@@ -19,57 +19,58 @@ const HistoryContext = React.createContext<HistoryContextProps>({
   now: 0,
   canUndo: false,
   canRedo: false,
-  addToHistory: () => { },
-  undo: () => { },
-  redo: () => { }
-})
+  addToHistory: () => {},
+  undo: () => {},
+  redo: () => {},
+});
 
-export function useHistory () {
+export function useHistory() {
   const context = React.useContext(HistoryContext);
   if (!context) {
     throw new Error("useHistory must be used within a HistoryProvider");
   }
   return context;
-
 }
 
-export function HistoryProvider ({ children }: React.PropsWithChildren<object>) {
+export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   const proofContext = useProof();
   const serverContext = useServer();
   const [history, setHistory] = useState<Command[]>([]);
   const [now, setNow] = useState<number>(0);
 
   const addToHistory = (command: Command, deferExecution: boolean = false) => {
-    const newHistory = [...history.slice(0, now), command]
+    const newHistory = [...history.slice(0, now), command];
     if (!deferExecution) {
       executeStep(newHistory);
     }
     setHistory(newHistory);
-  }
+  };
   const executeStep = (history: Command[]) => {
     if (now + 1 <= history.length) {
-      const serverCommands = history[now].execute(proofContext)
-      serverContext.addCommands(serverCommands)
-      setNow(now + 1)
+      const serverCommands = history[now].execute(proofContext);
+      serverContext.addCommands(serverCommands);
+      setNow(now + 1);
     }
-  }
+  };
   const undo = () => {
     if (now - 1 >= 0) {
-      const serverCommands = history[now - 1].undo(proofContext)
-      serverContext.addCommands(serverCommands)
-      setNow(now - 1)
+      const serverCommands = history[now - 1].undo(proofContext);
+      serverContext.addCommands(serverCommands);
+      setNow(now - 1);
     }
-  }
+  };
   const redo = () => {
-    executeStep(history)
-  }
+    executeStep(history);
+  };
 
   const canUndo = now != 0;
   const canRedo = now != history.length;
 
   return (
-    <HistoryContext.Provider value={{ history, now, canUndo, canRedo, addToHistory, undo, redo }}>
+    <HistoryContext.Provider
+      value={{ history, now, canUndo, canRedo, addToHistory, undo, redo }}
+    >
       {children}
     </HistoryContext.Provider>
-  )
+  );
 }
