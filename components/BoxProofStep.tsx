@@ -1,6 +1,5 @@
 import { LineNumberLine, BoxProofStep as TBoxProofStep } from "@/types/types";
 
-import { AddLineTooltip } from "./AddLineTooltip";
 import { Proof } from "./Proof";
 import { useContextMenu } from "react-contexify";
 import { useProof } from "@/contexts/ProofProvider";
@@ -26,9 +25,7 @@ export function BoxProofStep ({ ...props }: TBoxProofStep & { lines: LineNumberL
       onMouseOverCapture={() => setLineInFocus(props.uuid)}
       onContextMenuCapture={handleContextMenu}
     >
-      <AddLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend />
       <Proof proof={props.proof} lines={props.lines} uuid={props.uuid} />
-      <AddLineTooltip uuid={props.uuid} isVisible={isInFocus} />
     </div>
   )
 }

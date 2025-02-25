@@ -24,6 +24,14 @@ export const rulesets = [
     rulesetName: "propositional-logic",
     rules: [
       {
+        ruleName: null,
+        latex: {
+          ruleName: "\\text{?}",
+          premises: [],
+          conclusion: "\\text{?}"
+        },
+        numPremises: 0
+      }, {
         ruleName: "premise",
         latex: {
           ruleName: "\\text{premise}",

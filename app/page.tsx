@@ -1,13 +1,12 @@
 "use client";
 
-import { AddLinePopover } from "@/components/AddLinePopover";
 import { InlineMath } from "react-katex";
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import { Toolbar } from "@/components/Toolbar";
 import { Tooltip } from "react-tooltip";
-// import { UnsyncedServerCommands } from "@/components/UnsyncedServerCommands";
+import { UnsyncedServerCommands } from "@/components/UnsyncedServerCommands";
 import { parseLinesFromProof } from "@/lib/lines-parser";
 import { useProof } from "@/contexts/ProofProvider";
 
@@ -26,12 +25,11 @@ export default function Home () {
           }>
             <LineNumbers lines={lines} />
             <Proof proof={proofContext.proof} lines={lines} />
-            {/* <UnsyncedServerCommands /> */}
+            <UnsyncedServerCommands />
             <Tooltip id={`tooltip-id-${proofContext.lineInFocus}`} place="right" render={({ content }) => (
               <p className="text-lg"><InlineMath math={content || ""}></InlineMath></p>
             )} >
             </Tooltip>
-            <AddLinePopover uuid={proofContext.latestLineInFocus || ""} />
             <ProofStepContextMenu />
           </div>
         </div>

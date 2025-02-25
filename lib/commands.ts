@@ -32,10 +32,10 @@ export class AddLineCommand extends Command {
     proofContext.addLine({
       "stepType": "line",
       "uuid": this.newLineUuid,
-      "formula": "p and r",
-      "latexFormula": this.newLineUuid.slice(0, 5),
+      "formula": "?",
+      "latexFormula": "?",
       "justification": {
-        "ruleName": "assumption",
+        "ruleName": "no_rule",
         "refs": []
       },
     }, this.position)

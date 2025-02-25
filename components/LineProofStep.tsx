@@ -3,7 +3,6 @@ import "katex/dist/katex.min.css";
 import { LineNumberLine, LineProofStep as TLineProofStep } from "@/types/types";
 import Select, { SingleValue, Theme } from 'react-select'
 
-import { AddLineTooltip } from "./AddLineTooltip";
 import AutosizeInput from 'react-input-autosize';
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
@@ -55,7 +54,6 @@ export function LineProofStepView ({ ...props }: TLineProofStep & { lines: LineN
       onClick={() => isTheActiveEdit ? removeIsActiveEditFromLine(props.uuid) : setActiveEdit(props.uuid)}
       onContextMenuCapture={handleContextMenu}
     >
-      <AddLineTooltip uuid={props.uuid} isVisible={isInFocus} prepend />
       <p className="shrink">
         {props.formulaUnsynced ? props.formula : (<InlineMath math={props.latexFormula} />)}
       </p>
@@ -63,7 +61,6 @@ export function LineProofStepView ({ ...props }: TLineProofStep & { lines: LineN
         data-tooltip-content={tooltipContent}>
         <Justification justification={props.justification} lines={props.lines} onHover={handleOnHoverJustification} />
       </div>
-      <AddLineTooltip uuid={props.uuid} isVisible={isInFocus} />
     </div>)
   );
 }
