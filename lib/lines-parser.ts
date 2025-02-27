@@ -1,35 +1,39 @@
 import { BoxProofStep, LineNumberLine, ProofStep } from "@/types/types";
+
 function extractLineUuids(
   proof: ProofStep[],
-  openedBoxes: number = 0,
-): LineNumberLine[] {
+  currLineNumber: number = 1
+): {
+  lines: LineNumberLine[];
+  boxes: LineNumberLine[];
+  currLineNumber: number;
+} {
   let lines = [] as LineNumberLine[];
+  let boxes = [] as LineNumberLine[];
   proof.forEach((proofStep: ProofStep) => {
     const newLine: LineNumberLine = { uuid: proofStep.uuid, isBox: false };
     if (proofStep.stepType == "line") {
+      newLine.lineNumber = currLineNumber;
+      currLineNumber++;
       lines.push(newLine);
     } else {
       proofStep = proofStep as BoxProofStep;
-      openedBoxes++;
-      const subProofLines = extractLineUuids(proofStep.proof, openedBoxes);
+      const {
+        lines: subProofLines,
+        boxes: subProofBoxes,
+        currLineNumber: subCurrLineNumber,
+      } = extractLineUuids(proofStep.proof, currLineNumber);
       newLine.isBox = true;
-      newLine.boxStartLine = lines.length + openedBoxes;
-      newLine.boxEndLine =
-        newLine.boxStartLine +
-        subProofLines.filter((line) => !line.isBox).length -
-        1;
-      lines = [...lines, { ...newLine }, ...subProofLines];
+      newLine.boxStartLine = currLineNumber;
+      newLine.boxEndLine = subCurrLineNumber - 1;
+      currLineNumber = subCurrLineNumber;
+      lines = [...lines, ...subProofLines];
+      boxes = [...boxes, ...subProofBoxes, newLine];
     }
   });
-  return lines;
+  return { lines, boxes, currLineNumber };
 }
 export function parseLinesFromProof(proof: ProofStep[]): LineNumberLine[] {
-  const lines = extractLineUuids(proof);
-  let lineCount = 1;
-  return lines.map((line) => {
-    if (line.isBox) {
-      return line;
-    }
-    return { ...line, lineNumber: lineCount++ };
-  });
+  const { lines, boxes } = extractLineUuids(proof);
+  return [...lines, ...boxes];
 }

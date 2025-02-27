@@ -8,21 +8,28 @@ export function LineNumbers({ lines }: { lines: LineNumberLine[] }) {
   if (!lines) return;
 
   return (
-    <div className="flex-col items-start">
-      {lines
-        .filter((line) => !line.isBox)
-        .map((line) => {
-          const proofStepDiagnostics = proofDiagnostics.find(
-            (diagnostic) => diagnostic.uuid === line.uuid,
-          );
-          return (
-            <LineNumber
-              key={line.uuid}
-              line={line}
-              proofStepDiagnostics={proofStepDiagnostics}
-            />
-          );
+    <>
+      <ul>
+        {lines.map((line) => {
+          return <li>{JSON.stringify(line)}</li>;
         })}
-    </div>
+      </ul>
+      <div className="flex-col items-start">
+        {lines
+          .filter((line) => !line.isBox)
+          .map((line) => {
+            const proofStepDiagnostics = proofDiagnostics.find(
+              (diagnostic) => diagnostic.uuid === line.uuid
+            );
+            return (
+              <LineNumber
+                key={line.uuid}
+                line={line}
+                proofStepDiagnostics={proofStepDiagnostics}
+              />
+            );
+          })}
+      </div>
+    </>
   );
 }
