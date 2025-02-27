@@ -11,7 +11,7 @@ export function LineNumber({
   line: LineNumberLine;
   proofStepDiagnostics?: Diagnostic;
 }) {
-  const { setLineInFocus, removeFocusFromLine, isUnfocused } = useProof();
+  const { isUnfocused } = useProof();
 
   return (
     <>
@@ -23,8 +23,6 @@ export function LineNumber({
             ? "bg-red-500 text-slate-200"
             : "bg-green-500 text-slate-200",
         )}
-        onMouseOver={() => setLineInFocus(line.uuid)}
-        onMouseLeave={() => removeFocusFromLine(line.uuid)}
         data-tooltip-content={proofStepDiagnostics?.violation?.explanation}
         data-tooltip-id={
           proofStepDiagnostics ? `line-number-tooltip-${line.uuid}` : ""

@@ -9,17 +9,12 @@ export function LineNumbers({ lines }: { lines: LineNumberLine[] }) {
 
   return (
     <>
-      <ul>
-        {lines.map((line) => {
-          return <li>{JSON.stringify(line)}</li>;
-        })}
-      </ul>
       <div className="flex-col items-start">
         {lines
           .filter((line) => !line.isBox)
           .map((line) => {
             const proofStepDiagnostics = proofDiagnostics.find(
-              (diagnostic) => diagnostic.uuid === line.uuid
+              (diagnostic) => diagnostic.uuid === line.uuid,
             );
             return (
               <LineNumber

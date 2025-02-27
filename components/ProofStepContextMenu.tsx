@@ -46,10 +46,10 @@ export function ProofStepContextMenu() {
         handleUpdateProofStep(props.uuid, {
           uuid: props.uuid,
           stepType: "line",
-          formula: "p and r",
-          latexFormula: `Id: ${props.uuid.slice(0, 5)}`,
+          formula: "",
+          latexFormula: "",
           justification: {
-            ruleName: "assumption",
+            ruleName: "",
             refs: [],
           },
         });
