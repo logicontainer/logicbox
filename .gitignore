@@ -37,5 +37,5 @@ profiling/src/main/scala/Main.scala
 
 backend/target/**/*
 !backend/target/docker/
-!backend/target/docker/stage/
-!backend/target/docker/stage/Dockerfile
+!backend/target/docker/stage
+!backend/target/docker/stage/**/*
