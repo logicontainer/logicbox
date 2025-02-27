@@ -2,7 +2,6 @@ import "./globals.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 
-import LogicBoxSVG from "@/app/logicbox-icon.svg";
 import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
 
@@ -32,7 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
         <div className="fixed top-0 left-0 w-16 h-16 m-4 lg:w-24 lg:h-24">
-          <LogicBoxSVG />
+          <img src="/logicbox-icon.svg"></img>
         </div>
         <Providers>{children}</Providers>
       </body>
