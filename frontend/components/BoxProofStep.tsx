@@ -17,7 +17,7 @@ export function BoxProofStep({
       | React.MouseEvent<HTMLElement>
       | React.TouchEvent<HTMLElement>
       | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent,
+      | KeyboardEvent
   ) {
     show({
       event,
@@ -31,6 +31,7 @@ export function BoxProofStep({
       className="relative"
       onMouseOverCapture={() => setLineInFocus(props.uuid)}
       onContextMenuCapture={handleContextMenu}
+      onClick={handleContextMenu}
     >
       <Proof proof={props.proof} lines={props.lines} uuid={props.uuid} />
     </div>
