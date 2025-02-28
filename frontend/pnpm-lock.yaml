@@ -44,9 +44,6 @@ importers:
       react-select:
         specifier: ^5.10.0
         version: 5.10.0(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      react-toolbar:
-        specifier: link:@types/@radix-ui/react-toolbar
-        version: link:@types/@radix-ui/react-toolbar
       react-tooltip:
         specifier: ^5.28.0
         version: 5.28.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)

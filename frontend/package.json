@@ -23,7 +23,6 @@
     "react-input-autosize": "^3.0.0",
     "react-katex": "^3.0.1",
     "react-select": "^5.10.0",
-    "react-toolbar": "link:@types/@radix-ui/react-toolbar",
     "react-tooltip": "^5.28.0",
     "tailwind-merge": "^3.0.1",
     "uuid": "^11.0.5"
