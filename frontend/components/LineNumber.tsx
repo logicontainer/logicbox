@@ -37,7 +37,7 @@ export function LineNumber({
     <>
       <p
         className={cn(
-          "text-sm/10 text-left text-slate-800 align-baseline cursor-pointer",
+          "text-sm/10 text-left text-slate-800 align-baseline cursor-pointer px-2",
           isUnfocused(line.uuid) ? "text-slate-400" : "",
           proofStepDiagnostics
             ? "bg-red-500 text-slate-200"

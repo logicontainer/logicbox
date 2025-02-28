@@ -1,3 +1,6 @@
+import { Toolbar } from "radix-ui";
+import { UpdateIcon } from "@radix-ui/react-icons";
+import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
 
@@ -8,11 +11,17 @@ export function ValidateProofButton() {
     serverContext.validateProof(proofContext.proof);
   };
   return (
-    <button
-      className="btn btn-primary border-2 border-slate-800 px-2"
+    <Toolbar.ToolbarButton
+      title="Validate proof by syncing with the server"
       onClick={handleValidateProof}
     >
-      Validate Proof (Syncing status: {serverContext.syncingStatus})
-    </button>
+      <div
+        className={cn(
+          serverContext.syncingStatus == "syncing" ? "animate-spin" : ""
+        )}
+      >
+        <UpdateIcon />
+      </div>
+    </Toolbar.ToolbarButton>
   );
 }
