@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
-        with:
-          path: main
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
