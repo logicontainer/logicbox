@@ -1,4 +1,4 @@
-package dev.zio.quickstart
+package logicbox
 
 import zio._
 import zio.http._
@@ -17,7 +17,7 @@ object GreetingRoutes {
     )
 }
 
-object MainApp extends ZIOAppDefault {
+object Main extends ZIOAppDefault {
   def run = {
     Server
       .serve(GreetingRoutes())
