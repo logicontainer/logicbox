@@ -14,5 +14,15 @@ jobs:
         with:
           path: main
 
-      - name: Echo a message
-        run: echo "Hello, GitHub Actions!"
+      - name: Setup Java JDK
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '21'
+
+      - name: Setup SBT
+      - uses: actions/setup-sbt@v4
+
+      - name: Run sbt docker:stage
+        working-directory: backend
+        run: sbt docker:stage
