@@ -24,5 +24,4 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Run sbt docker:stage
-        working-directory: ./backend
-        run: sbt docker:stage
+        run: cd backend && sbt docker:stage
