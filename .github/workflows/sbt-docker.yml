@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
 
-      - uses: actions/setup-sbt@v1
+      - uses: sbt/setup-sbt@v1
 
       - name: Run sbt docker:stage
         working-directory: backend
