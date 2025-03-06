@@ -14,12 +14,14 @@ jobs:
         with:
           path: main
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
 
-      - uses: sbt/setup-sbt@v1
+      - name: Setup SBT
+        uses: sbt/setup-sbt@v1
 
       - name: Run sbt docker:stage
         working-directory: ./backend
