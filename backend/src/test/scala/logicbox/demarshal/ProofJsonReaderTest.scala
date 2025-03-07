@@ -12,6 +12,7 @@ import logicbox.framework.ModifiableProof._
 
 class ProofJsonReaderTest extends AnyFunSpec {
   import logicbox.proof.ProofStubs._
+  import ProofJsonReader.Err
 
   def formulaParser(str: String): StubFormula = StubFormula(str.charAt(0) - '0')
   def ruleParser(str: String): StubRule = str match {
@@ -199,5 +200,75 @@ class ProofJsonReaderTest extends AnyFunSpec {
         AddBox("HEY inner", BoxTop("HEY outer"))
       ))
     }
+
+    it("should reject when step is not an object") {
+      val json = JsArray(JsNull)
+      reader.read(json) should matchPattern {
+        case Left(Err(_)) =>
+      }
+    }
+
+    it("should reject line with no formula.userInput specified") {
+      val json = JsArray(JsObject(
+        "stepType" -> JsString("line"),
+        "uuid" -> JsString("some_id"),
+        "formula" -> JsObject(),
+        "justification" -> JsObject(
+          "rule" -> JsNull,     // empty rule
+          "refs" -> JsArray()   // empty reference
+        )
+      ))
+      reader.read(json) should matchPattern {
+        case Left(Err(_)) =>
+      }
+    }
+
+    it("should reject box when uuid is not string") {
+      val json = JsArray(JsObject(
+        "stepType" -> JsString("box"),
+        "uuid" -> JsNull,
+        "proof" -> JsArray()
+      ))
+    
+      reader.read(json) should matchPattern {
+        case Left(Err(_)) => 
+      }
+    }
+
+    it("should reject when rule is not string nor null") {
+      val json = JsArray(JsObject(
+        "stepType" -> JsString("line"),
+        "uuid" -> JsString("some_id"),
+        "formula" -> JsObject(
+          "userInput" -> JsNull
+        ),
+        "justification" -> JsObject(
+          "rule" -> JsNumber(4),
+          "refs" -> JsArray()
+        )
+      ))
+      
+      reader.read(json) should matchPattern {
+        case Left(Err(_)) => 
+      }
+    }
+
+    it("should reject line when refs is not an array") {
+      val json = JsArray(JsObject(
+        "stepType" -> JsString("line"),
+        "uuid" -> JsString("some_id"),
+        "formula" -> JsObject(
+          "userInput" -> JsNull
+        ),
+        "justification" -> JsObject(
+          "rule" -> JsNull,
+          "refs" -> JsNull      // invalid
+        )
+      ))
+      reader.read(json) should matchPattern {
+        case Left(Err(_)) =>
+      }
+    }
+
   }
 }

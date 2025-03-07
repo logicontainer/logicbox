@@ -18,7 +18,7 @@ case class ProofJsonReader[F, R, Id](
 
   private def asArray(value: JsValue): Either[ProofJsonReader.Err, JsArray] = value match {
     case arr: JsArray => Right(arr)
-    case _ => ??? // Left(Err(s"not an array: ${value.prettyPrint}"))
+    case _ => Left(Err(s"not an array: ${value.prettyPrint}"))
   }
 
   private def transform[T, U](elms: Seq[T], f: T => Either[Err, U]): Either[Err, List[U]] =
@@ -27,29 +27,29 @@ case class ProofJsonReader[F, R, Id](
       case (elm, Right(acc)) => f(elm).map(_ :: acc)
     }
 
-  private def asStringArray(value: JsValue): Either[Err, Seq[String]] = value match {
-    case JsArray(elements) => transform(elements, asString)
-    case _ => ???
-  }
+  private def asStringArray(value: JsValue): Either[Err, Seq[String]] = for {
+    arr <- asArray(value)
+    res <- transform(arr.elements, asString)
+  } yield res
 
   private def asString(value: JsValue): Either[ProofJsonReader.Err, String] = value match {
     case JsString(str) => Right(str)
-    case _ => ??? // Left(Err(s"not a string: ${value.prettyPrint}"))
+    case _ => Left(Err(s"not a string: ${value.prettyPrint}"))
   }
 
   private def asStringOrNull(value: JsValue): Either[Err, Option[String]] = value match {
     case JsString(str) => Right(Some(str))
     case JsNull => Right(None)
-    case _ => ??? // Left(Err(s"neither a string nor null: ${value.prettyPrint}"))
+    case _ => Left(Err(s"neither a string nor null: ${value.prettyPrint}"))
   }
 
   private def asObject(value: JsValue): Either[ProofJsonReader.Err, JsObject] = value match {
     case obj: JsObject => Right(obj)
-    case _ => Left(???)
+    case _ => Left(Err(s"not an object: ${value.prettyPrint}"))
   }
 
   private def getField(value: JsObject, field: String): Either[ProofJsonReader.Err, JsValue] = 
-    value.fields.get(field).toRight(???) // Err(s"field $field not found in object ${value.prettyPrint}"))
+    value.fields.get(field).toRight(Err(s"field $field not found in object ${value.prettyPrint}"))
 
   private def readLine(obj: JsObject, pos: Pos[Id]): Either[Err, List[ModifyProofCommand[F, R, Id]]] = for {
     uuid <- getField(obj, "uuid")
