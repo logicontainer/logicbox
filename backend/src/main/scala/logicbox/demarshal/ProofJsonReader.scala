@@ -29,6 +29,7 @@ case class ProofJsonReader[F, R, Id](
 
   private def asStringArray(value: JsValue): Either[Err, Seq[String]] = value match {
     case JsArray(elements) => transform(elements, asString)
+    case _ => ???
   }
 
   private def asString(value: JsValue): Either[ProofJsonReader.Err, String] = value match {
@@ -81,18 +82,23 @@ case class ProofJsonReader[F, R, Id](
     case refs => List(UpdateReferences(uuid, refs))
   })
 
-  private def readBox(obj: JsObject): Either[Err, List[ModifyProofCommand[F, R, Id]]] = for {
+  private def readBox(obj: JsObject, pos: Pos[Id]): Either[Err, List[ModifyProofCommand[F, R, Id]]] = for {
     uuid <- getField(obj, "uuid")
       .flatMap(asString)
       .map(idParser)
-  } yield List(AddBox(uuid, ProofTop))
+    steps <- for {
+      pf <- getField(obj, "proof")
+      steps <- asArray(pf)
+    } yield steps
+    cmds <- readElms(steps.elements, BoxTop(uuid))
+  } yield AddBox(uuid, pos) :: cmds // fake
 
   private def readElm(json: JsValue, pos: Pos[Id]): Either[ProofJsonReader.Err, List[ModifyProofCommand[F, R, Id]]] = for {
     obj <- asObject(json)
     tpe <- getField(obj, "stepType").flatMap(asString)
     res <- tpe match {
       case "line" => readLine(obj, pos)
-      case "box" => readBox(obj)
+      case "box" => readBox(obj, pos)
       case _ => Left(???)
     }
   } yield res

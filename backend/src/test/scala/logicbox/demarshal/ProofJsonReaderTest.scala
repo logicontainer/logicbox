@@ -116,7 +116,7 @@ class ProofJsonReaderTest extends AnyFunSpec {
       ))
     }
 
-    it("should have correct add positions when inserting two lines") {
+    it("should have correct add positions when inserting multiple lines") {
       val json = JsArray(
         JsObject(
           "stepType" -> JsString("line"),
@@ -139,12 +139,64 @@ class ProofJsonReaderTest extends AnyFunSpec {
             "rule" -> JsNull,
             "refs" -> JsArray(),
           )
+        ),
+        JsObject(
+          "stepType" -> JsString("line"),
+          "uuid" -> JsString("line_3_id"),
+          "formula" -> JsObject(
+            "userInput" -> JsNull,
+          ),
+          "justification" -> JsObject(
+            "rule" -> JsNull,
+            "refs" -> JsArray(),
+          )
         )
       )
 
       reader.read(json) shouldBe Right(List(
         AddLine("HEY line_1_id", ProofTop),
-        AddLine("HEY line_2_id", AtLine("HEY line_1_id", Direction.Below))
+        AddLine("HEY line_2_id", AtLine("HEY line_1_id", Direction.Below)),
+        AddLine("HEY line_3_id", AtLine("HEY line_2_id", Direction.Below))
+      ))
+    }
+
+    it("should correct place line inside box when nested") {
+      val json = JsArray(JsObject(
+        "stepType" -> JsString("box"),
+        "uuid" -> JsString("box_id"),
+        "proof" -> JsArray(JsObject(
+          "stepType" -> JsString("line"),
+          "uuid" -> JsString("line_id"),
+          "formula" -> JsObject(
+            "userInput" -> JsNull,
+          ),
+          "justification" -> JsObject(
+            "rule" -> JsNull,
+            "refs" -> JsArray(),
+          )
+        ))
+      ))
+
+      reader.read(json) shouldBe Right(List(
+        AddBox("HEY box_id", ProofTop),
+        AddLine("HEY line_id", BoxTop("HEY box_id"))
+      ))
+    }
+
+    it("should have correct box within box") {
+      val json = JsArray(JsObject(
+        "stepType" -> JsString("box"),
+        "uuid" -> JsString("outer"),
+        "proof" -> JsArray(JsObject(
+          "stepType" -> JsString("box"),
+          "uuid" -> JsString("inner"),
+          "proof" -> JsArray()
+        ))
+      ))
+
+      reader.read(json) shouldBe Right(List(
+        AddBox("HEY outer", ProofTop),
+        AddBox("HEY inner", BoxTop("HEY outer"))
       ))
     }
   }
