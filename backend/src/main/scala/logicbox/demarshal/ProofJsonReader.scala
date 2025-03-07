@@ -16,7 +16,7 @@ case class ProofJsonReader[F, R, Id](
 ) extends RootJsonReader[Either[ProofJsonReader.Err, List[ModifyProofCommand[F, R, Id]]]] {
   import ProofJsonReader.Err
 
-  private def asArray(value: JsValue): Either[ProofJsonReader.Err, JsArray] = value match {
+  private def asArray(value: JsValue): Either[Err, JsArray] = value match {
     case arr: JsArray => Right(arr)
     case _ => Left(Err(s"not an array: ${value.prettyPrint}"))
   }
@@ -32,7 +32,7 @@ case class ProofJsonReader[F, R, Id](
     res <- transform(arr.elements, asString)
   } yield res
 
-  private def asString(value: JsValue): Either[ProofJsonReader.Err, String] = value match {
+  private def asString(value: JsValue): Either[Err, String] = value match {
     case JsString(str) => Right(str)
     case _ => Left(Err(s"not a string: ${value.prettyPrint}"))
   }
@@ -43,12 +43,12 @@ case class ProofJsonReader[F, R, Id](
     case _ => Left(Err(s"neither a string nor null: ${value.prettyPrint}"))
   }
 
-  private def asObject(value: JsValue): Either[ProofJsonReader.Err, JsObject] = value match {
+  private def asObject(value: JsValue): Either[Err, JsObject] = value match {
     case obj: JsObject => Right(obj)
     case _ => Left(Err(s"not an object: ${value.prettyPrint}"))
   }
 
-  private def getField(value: JsObject, field: String): Either[ProofJsonReader.Err, JsValue] = 
+  private def getField(value: JsObject, field: String): Either[Err, JsValue] = 
     value.fields.get(field).toRight(Err(s"field $field not found in object ${value.prettyPrint}"))
 
   private def readLine(obj: JsObject, pos: Pos[Id]): Either[Err, List[ModifyProofCommand[F, R, Id]]] = for {
@@ -93,7 +93,7 @@ case class ProofJsonReader[F, R, Id](
     cmds <- readElms(steps.elements, BoxTop(uuid))
   } yield AddBox(uuid, pos) :: cmds // fake
 
-  private def readElm(json: JsValue, pos: Pos[Id]): Either[ProofJsonReader.Err, List[ModifyProofCommand[F, R, Id]]] = for {
+  private def readElm(json: JsValue, pos: Pos[Id]): Either[Err, List[ModifyProofCommand[F, R, Id]]] = for {
     obj <- asObject(json)
     tpe <- getField(obj, "stepType").flatMap(asString)
     res <- tpe match {
@@ -117,7 +117,7 @@ case class ProofJsonReader[F, R, Id](
 
   } yield res.flatten
 
-  override def read(json: JsValue): Either[ProofJsonReader.Err, List[ModifyProofCommand[F, R, Id]]] = for {
+  override def read(json: JsValue): Either[Err, List[ModifyProofCommand[F, R, Id]]] = for {
     arr <- asArray(json)
     res <- readElms(arr.elements, ProofTop)
   } yield res

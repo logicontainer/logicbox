@@ -37,7 +37,7 @@ class IntegrateJsonWritePLProofTest extends AnyFunSpec {
   describe("integration between json writers, plformula/plrule and proof impl") {
     import PLFormula._
 
-    val writer: JsonWriter[Proof[F, R, ?, Id]] = SimpleProofJsonWriter[F, R, Id](
+    val writer: JsonWriter[Proof[F, R, B, Id]] = SimpleProofJsonWriter[F, R, B, Id](
       idWriter, 
       IncompleteFormulaWriter[PLFormula](PrettyPLFormula.asLaTeX, PrettyPLFormula.asASCII), 
       JustificationWriter(ruleWriter, idWriter)
