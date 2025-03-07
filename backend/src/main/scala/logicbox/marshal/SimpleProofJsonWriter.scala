@@ -5,10 +5,10 @@ import spray.json._
 import logicbox.framework.Proof.Line
 import logicbox.framework.Proof.Box
 
-case class SimpleProofJsonWriter[F, R, Id](
+case class SimpleProofJsonWriter[F, R, B, Id](
   idWriter: JsonWriter[Id], formulaWriter: JsonWriter[F],
   justficationWriter: JsonWriter[Justification[R, Id]]
-) extends RootJsonWriter[Proof[F, R, ?, Id]] {
+) extends RootJsonWriter[Proof[F, R, B, Id]] {
 
   private def writeLine(id: Id, line: Proof.Line[F, R, Id]): JsValue = {
     JsObject(
@@ -19,7 +19,7 @@ case class SimpleProofJsonWriter[F, R, Id](
     )
   }
 
-  private def writeBox(id: Id, box: Proof.Box[?, Id], proof: Proof[F, R, ?, Id]): JsValue = {
+  private def writeBox(id: Id, box: Proof.Box[B, Id], proof: Proof[F, R, B, Id]): JsValue = {
     JsObject(
       "stepType" -> JsString("box"),
       "uuid" -> idWriter.write(id),
@@ -29,16 +29,16 @@ case class SimpleProofJsonWriter[F, R, Id](
     )
   }
 
-  private def writeStep(id: Id, proof: Proof[F, R, ?, Id]): JsValue = {
+  private def writeStep(id: Id, proof: Proof[F, R, B, Id]): JsValue = {
     val step = proof.getStep(id)
     assert(step.isRight, s"attempt to marshal incomplete proof. on id: $id")
     val Right(s) = step: @unchecked
     s match {
       case l: Line[F, R, Id] => writeLine(id, l)
-      case b: Box[?, Id] => writeBox(id, b, proof)
+      case b: Box[B, Id] => writeBox(id, b, proof)
     }
   }
 
-  override def write(proof: Proof[F, R, ?, Id]): JsValue = 
+  override def write(proof: Proof[F, R, B, Id]): JsValue = 
     JsArray(proof.rootSteps.map(id => writeStep(id, proof)).toList)
 }

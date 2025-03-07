@@ -1,10 +1,7 @@
 package logicbox.marshal
 
 import spray.json._
-
-case class IncompleteFormula[F](
-  userInput: String, optFormula: Option[F]
-)
+import logicbox.framework.IncompleteFormula
 
 class IncompleteFormulaWriter[F](
   toLaTeX: F => String, toASCII: F => String

@@ -3,11 +3,10 @@ package logicbox.proof
 import logicbox.framework.ProofChecker
 import logicbox.framework.Proof
 import logicbox.proof.ScopedProofChecker.Diagnostic
+import logicbox.framework.StepDiagnostic
 
 object ScopedProofChecker {
-  sealed trait Diagnostic[+Id] {
-    def stepId: Id
-  }
+  sealed trait Diagnostic[+Id] extends StepDiagnostic[Id]
 
   case object Root
   type Scope[+Id] = Root.type | Id

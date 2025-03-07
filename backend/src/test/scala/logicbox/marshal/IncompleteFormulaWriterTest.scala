@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 import spray.json._
+import logicbox.framework.IncompleteFormula
 
 class IncompleteFormulaWriterTest extends AnyFunSpec {
   case class StubFormula(i: Int)

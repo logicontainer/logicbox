@@ -1,11 +1,10 @@
 package logicbox.proof
 
 import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference}
+import logicbox.framework.StepDiagnostic
 
 object RuledBasedProofChecker {
-  sealed trait Diagnostic[+Id, +V] {
-    def stepId: Id
-  }
+  sealed trait Diagnostic[+Id, +V] extends StepDiagnostic[Id]
 
   case class RuleViolation[Id, V](stepId: Id, violation: V) extends Diagnostic[Id, V]
   case class StepNotFound[Id](stepId: Id, expl: String) extends Diagnostic[Id, Nothing]
