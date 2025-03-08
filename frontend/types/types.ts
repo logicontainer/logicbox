@@ -19,8 +19,11 @@ export type Justification = {
 export type LineProofStep = {
   uuid: string;
   stepType: string;
-  formula: string;
-  latexFormula: string;
+  formula: {
+    userInput: string;
+    ascii: string;
+    latex: string;
+  };
   justification: Justification;
   formulaUnsynced?: boolean;
 };
