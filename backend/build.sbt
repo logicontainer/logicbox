@@ -16,6 +16,8 @@ libraryDependencies ++= Seq(
 enablePlugins(JavaAppPackaging)
 enablePlugins(DockerPlugin)
 
+javacOptions ++= Seq("-source", "8", "-target", "8")
+
 dockerExposedPorts := Seq(8080)
 
 dockerUsername   := sys.props.get("docker.username")
