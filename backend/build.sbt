@@ -16,8 +16,11 @@ libraryDependencies ++= Seq(
 enablePlugins(JavaAppPackaging)
 enablePlugins(DockerPlugin)
 
-javacOptions ++= Seq("-source", "8", "-target", "8")
+// use java version 11 for compiled sources
+javacOptions ++= Seq("-source", "11", "-target", "11")
 
+// require that docker JVM supports java 11
+dockerBaseImage := "openjdk:11"
 dockerExposedPorts := Seq(8080)
 
 dockerUsername   := sys.props.get("docker.username")
