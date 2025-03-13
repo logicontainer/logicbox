@@ -1,0 +1,16 @@
+name: Trigger deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sbt-run-backend:
+    runs-on: self-hosted
+    steps:
+      - name: Send HTTP request to invoke redeployment
+        uses: lukuapik/gh-actions-http-status@v1
+        with:
+          sites: control.felixberg.dev/redeploy/logicbox
+          expected: 200
