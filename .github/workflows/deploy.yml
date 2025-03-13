@@ -1,0 +1,17 @@
+name: Trigger deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sbt-run-backend:
+    runs-on: self-hosted
+    steps:
+      - name: Deploy Stage
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://control.felixberg.dev/logicbox/redeploy'
+          method: 'GET'
+          customHeaders: '{"X-Control-FelixBergDev-Secret": "${{ secrets.controlfelixbergdevsecret }}"}'
