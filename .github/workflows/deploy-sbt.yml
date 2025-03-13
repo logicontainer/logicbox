@@ -1,0 +1,25 @@
+name: Deploy app with SBT
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sbt-run-backend:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '8'
+
+      - name: Setup SBT
+        uses: sbt/setup-sbt@v1
+
+      - name: Run sbt run
+        run: cd backend && sbt run
