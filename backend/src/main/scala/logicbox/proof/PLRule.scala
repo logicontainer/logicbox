@@ -372,7 +372,7 @@ object PLRule {
       formula match {
         case Not(Not(phi)) => 
           if (phi != ref) List(
-            FormulaDoesntMatchReference(0, "must be ")
+            FormulaDoesntMatchReference(0, "must equal the reference, but with two outer negations removed")
           ) else Nil
         case _ => List(
           FormulaDoesntMatchRule("must equal the reference, but with the two outer negations removed")
