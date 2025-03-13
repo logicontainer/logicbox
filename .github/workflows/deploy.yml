@@ -9,8 +9,8 @@ jobs:
   sbt-run-backend:
     runs-on: self-hosted
     steps:
-      - name: Send HTTP request to invoke redeployment
-        uses: lakuapik/gh-actions-http-status@v1
+      - name: Deploy Stage
+        uses: fjogeleit/http-request-action@v1
         with:
-          sites: '["https://control.felixberg.dev/redeploy/logicbox"]'
-          expected: '[200]'
+          url: 'https://control.felixberg.dev/redeploy/logicbox'
+          method: 'GET'
