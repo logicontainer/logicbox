@@ -34,11 +34,31 @@ import logicbox.proof.ProofImpl
 import logicbox.proof.StandardStepStrategy
 import logicbox.marshal.PLRuleWriter
 import logicbox.marshal.JustificationWriter
+
 import spray.json._
+import spray.json.DefaultJsonProtocol._
+
 import logicbox.proof.ScopedProofChecker.ReferenceToLaterStep
 import logicbox.proof.ScopedProofChecker.ScopeViolation
 import logicbox.proof.ScopedProofChecker.ReferenceToUnclosedBox
 import logicbox.proof.PLRuleParser
+import logicbox.proof.RuledBasedProofChecker.RuleViolation
+import logicbox.proof.RuledBasedProofChecker.StepNotFound
+import logicbox.proof.RuledBasedProofChecker.ReferenceIdNotFound
+import logicbox.proof.RuledBasedProofChecker.MalformedReference
+import logicbox.proof.OptionRuleChecker.MissingFormula
+import logicbox.proof.OptionRuleChecker.MissingRule
+import logicbox.proof.OptionRuleChecker.MissingDetailInReference
+import logicbox.proof.PLViolation.WrongNumberOfReferences
+import logicbox.proof.PLViolation.ReferenceShouldBeBox
+import logicbox.proof.PLViolation.ReferenceShouldBeLine
+import logicbox.proof.PLViolation.ReferenceDoesntMatchRule
+import logicbox.proof.PLViolation.ReferencesMismatch
+import logicbox.proof.PLViolation.FormulaDoesntMatchReference
+import logicbox.proof.PLViolation.FormulaDoesntMatchRule
+import logicbox.proof.PLViolation.MiscellaneousViolation
+import logicbox.proof.ScopedProofChecker.Scope
+import logicbox.proof.ScopedProofChecker.Root
 
 
 // 'factory'
@@ -107,10 +127,74 @@ object StandardProofValidatorService {
     )
   )
 
+  private def getViolationType(diag: Diag): String = diag match {
+    case diag: RuledBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]] => diag match {
+      case RuleViolation(stepId, violation: OptionRuleChecker.Violation[PLViolation] @unchecked) => violation match {
+        case MissingFormula => "missingFormula"
+        case MissingRule => "missingRule"
+        case MissingDetailInReference(_, _) => "missingDetailInReference"
+        case logicbox.proof.OptionRuleChecker.RuleViolation(violation) => 
+          val shortName = violation match {
+            case WrongNumberOfReferences(_, _, _) => "wrongNumberOfReferences"
+            case ReferenceShouldBeBox(_, _) => "referenceShouldBeBox"
+            case ReferenceShouldBeLine(_, _) => "referenceShouldBeLine"
+            case ReferenceDoesntMatchRule(_, _) => "referenceDoesntMatchRule"
+            case ReferencesMismatch(_, _) => "referencesMismatch"
+            case FormulaDoesntMatchReference(_, _) => "formulaDoesntMatchReference"
+            case FormulaDoesntMatchRule(_) => "formulaDoesntMatchRule"
+            case MiscellaneousViolation(_) => "miscellaneousViolation"
+          }
+          s"propositionalLogic:$shortName"
+      }
+      case StepNotFound(_, _) => "stepNotFound"
+      case ReferenceIdNotFound(_, _, _, _) => "referenceIdNotFound"
+      case MalformedReference(_, _, _, _) => "malformedReference"
+    }
+    case diag: ScopedProofChecker.Diagnostic[Id] => diag match {
+      case ReferenceToLaterStep(_, _, _) => "referenceToLaterStep" 
+      case ScopeViolation(_, _, _, _, _) => "scopeViolation"
+      case ReferenceToUnclosedBox(_, _, _) => "referenceToUnclosedBox"
+    }
+  }
+
+  private def getViolation(diag: Diag): JsValue = diag match {
+    case diag: RuledBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]] => diag match {
+      case RuleViolation(stepId, violation: OptionRuleChecker.Violation[PLViolation] @unchecked) => violation match {
+        case MissingFormula | MissingRule => JsObject()
+        case v: MissingDetailInReference => jsonFormat2(MissingDetailInReference.apply).write(v)
+        case logicbox.proof.OptionRuleChecker.RuleViolation(violation) => violation match {
+          case v: WrongNumberOfReferences => jsonFormat3(WrongNumberOfReferences.apply).write(v)
+          case v: ReferenceShouldBeBox => jsonFormat2(ReferenceShouldBeBox.apply).write(v)
+          case v: ReferenceShouldBeLine => jsonFormat2(ReferenceShouldBeLine.apply).write(v)
+          case v: ReferenceDoesntMatchRule => jsonFormat2(ReferenceDoesntMatchRule.apply).write(v)
+          case v: ReferencesMismatch => jsonFormat2(ReferencesMismatch.apply).write(v)
+          case v: FormulaDoesntMatchReference => jsonFormat2(FormulaDoesntMatchReference.apply).write(v)
+          case v: FormulaDoesntMatchRule => jsonFormat1(FormulaDoesntMatchRule.apply).write(v)
+          case v: MiscellaneousViolation => jsonFormat1(MiscellaneousViolation.apply).write(v)
+        }
+      }
+      case d: StepNotFound[Id] => jsonFormat2(StepNotFound[Id].apply).write(d)
+      case d: ReferenceIdNotFound[Id] => jsonFormat4(ReferenceIdNotFound[Id].apply).write(d)
+      case d: MalformedReference[Id] => jsonFormat4(MalformedReference[Id].apply).write(d)
+    }
+    case diag: ScopedProofChecker.Diagnostic[Id] => diag match {
+      case d: ReferenceToLaterStep[Id] => jsonFormat3(ReferenceToLaterStep[Id].apply).write(d)
+      case ScopeViolation(stepId, stepScope, refIdx, refId, refScope) => JsObject(
+        "stepId" -> JsString(stepId),
+        "stepScope" -> JsString(stepScope match { case s: String => s ; case Root => "root" }),
+        "refIdx" -> JsNumber(refIdx),
+        "refId" -> JsString(refId),
+        "refScope" -> JsString(refScope match { case s: String => s ; case Root => "root" })
+      )
+      case d: ReferenceToUnclosedBox[Id] => jsonFormat3(ReferenceToUnclosedBox[Id].apply).write(d)
+    }
+  }
+
+
   private def writeDiagnostic(diag: Diag): JsValue = JsObject(
     "uuid" -> JsString(diag.stepId),
-    "violationType" -> JsString(diag.getClass.getName),
-    "violation" -> JsString(diag.toString)
+    "violationType" -> JsString(getViolationType(diag)),
+    "violation" -> getViolation(diag)
   )
   
   private def diagnosticWriter: JsonWriter[Diag] = JsonWriter.func2Writer(writeDiagnostic)
