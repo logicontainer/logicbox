@@ -5,8 +5,11 @@ import zio.http._
 
 import spray.json.JsonParser
 import logicbox.server.StandardProofValidatorService
+import zio.http.Middleware.{CorsConfig, cors}
 
 object GreetingRoutes {
+  val config: CorsConfig = CorsConfig()
+
   def apply(): Routes[Any, Nothing] =
     Routes(
       // GET /greet
@@ -31,7 +34,7 @@ object GreetingRoutes {
             }
           } yield res).catchAll(err => ZIO.succeed(Response.status(Status.InternalServerError)))
       }
-    )
+    ) @@ cors(config)
 }
 
 // TODO: bug with List() in refs to not not intro
