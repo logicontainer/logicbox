@@ -29,7 +29,7 @@ object GreetingRoutes {
             res = StandardProofValidatorService().validateProof(json) match {
               case Left(value) => Response.text(value.toString)
               case Right(value) => Response.text(value.prettyPrint).updateHeaders(
-                _ => Headers("Access-Control-Allow-Origin" -> "*")
+                headers => headers.addHeader(Header.ContentType(MediaType.application.json))
               )
             }
           } yield res).catchAll(err => ZIO.succeed(Response.status(Status.InternalServerError)))
