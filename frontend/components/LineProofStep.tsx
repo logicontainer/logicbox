@@ -51,7 +51,7 @@ export function LineProofStepView({
       | React.MouseEvent<HTMLElement>
       | React.TouchEvent<HTMLElement>
       | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent,
+      | KeyboardEvent
   ) {
     show({
       event,
@@ -64,7 +64,7 @@ export function LineProofStepView({
     <div
       className={cn(
         "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors",
-        isInFocus ? "text-blue-400" : "",
+        isInFocus ? "text-blue-400" : ""
       )}
       onMouseOver={() => setLineInFocus(props.uuid)}
       onClick={() =>
@@ -75,10 +75,10 @@ export function LineProofStepView({
       onContextMenuCapture={handleContextMenu}
     >
       <p className="shrink">
-        {props.formulaUnsynced ? (
-          props.formula
+        {props.formula.unsynced ? (
+          props.formula.userInput
         ) : (
-          <InlineMath math={props.latexFormula} />
+          <InlineMath math={props.formula.latex || ""} />
         )}
       </p>
       <div
@@ -117,18 +117,18 @@ export function LineProofStepEdit({
     currLineProofStepDetails.proofStep as TLineProofStep;
 
   const rulesetDropdownValue = rulesetContext.rulesetDropdownOptions.find(
-    (option) => option.value === currLineProofStep.justification.ruleName,
+    (option) => option.value === currLineProofStep.justification.rule
   );
 
   const handleChangeRule = (
-    newValue: SingleValue<{ value: string; label: string }>,
+    newValue: SingleValue<{ value: string; label: string }>
   ) => {
     if (newValue == null) {
       return;
     }
 
     const numPremises = rulesetContext.ruleset.rules.find(
-      (rule) => rule.ruleName === newValue.value,
+      (rule) => rule.ruleName === newValue.value
     )!.numPremises;
     let newRefs = currLineProofStep.justification.refs;
     console.log("numPremises", numPremises, "newRefs", newRefs);
@@ -141,13 +141,13 @@ export function LineProofStepEdit({
     const updatedLineProofStep: TLineProofStep = {
       ...currLineProofStep,
       justification: {
-        ruleName: newValue.value,
+        rule: newValue.value,
         refs: newRefs,
       },
     };
     const updateLineCommand = new UpdateLineProofStepCommand(
       props.uuid,
-      updatedLineProofStep,
+      updatedLineProofStep
     );
     historyContext.addToHistory(updateLineCommand);
   };
@@ -155,19 +155,21 @@ export function LineProofStepEdit({
   const handleChangeFormula = (event: React.ChangeEvent<HTMLInputElement>) => {
     const updatedLineProofStep: TLineProofStep = {
       ...currLineProofStep,
-      formula: event.target.value,
-      formulaUnsynced: true,
+      formula: {
+        userInput: event.target.value,
+        unsynced: true,
+      },
     };
     const updateLineCommand = new UpdateLineProofStepCommand(
       props.uuid,
-      updatedLineProofStep,
+      updatedLineProofStep
     );
     historyContext.addToHistory(updateLineCommand);
   };
 
   const handleChangeRef = (
     event: React.ChangeEvent<HTMLInputElement>,
-    index: number,
+    index: number
   ) => {
     const newRefs = currLineProofStep.justification.refs.map((ref, i) => {
       if (i === index) {
@@ -179,13 +181,13 @@ export function LineProofStepEdit({
     const updatedLineProofStep: TLineProofStep = {
       ...currLineProofStep,
       justification: {
-        ruleName: currLineProofStep.justification.ruleName,
+        rule: currLineProofStep.justification.rule,
         refs: newRefs,
       },
     };
     const updateLineCommand = new UpdateLineProofStepCommand(
       props.uuid,
-      updatedLineProofStep,
+      updatedLineProofStep
     );
     historyContext.addToHistory(updateLineCommand);
   };
@@ -195,7 +197,7 @@ export function LineProofStepEdit({
       | React.MouseEvent<HTMLElement>
       | React.TouchEvent<HTMLElement>
       | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent,
+      | KeyboardEvent
   ) {
     show({
       event,
@@ -216,7 +218,7 @@ export function LineProofStepEdit({
   return (
     <div
       className={cn(
-        "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors items-stretch border-blue-400 border-2",
+        "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors items-stretch border-blue-400 border-2"
       )}
       onMouseOver={() => setLineInFocus(props.uuid)}
       onClick={(e) => {
@@ -231,7 +233,7 @@ export function LineProofStepEdit({
         suppressHydrationWarning
         title="Enter a formula"
         type="text"
-        value={props.formula}
+        value={props.formula.userInput}
         onChange={handleChangeFormula}
         className="text-slate-800 grow resize shrink"
         inputClassName="px-2"

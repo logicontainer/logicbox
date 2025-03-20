@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import { Command } from "@/lib/commands";
 import { useProof } from "./ProofProvider";
-import { useServer } from "./ServerProvider";
 
 interface HistoryContextProps {
   history: Command[];
@@ -34,7 +33,6 @@ export function useHistory() {
 
 export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   const proofContext = useProof();
-  const serverContext = useServer();
   const [history, setHistory] = useState<Command[]>([]);
   const [now, setNow] = useState<number>(0);
 
@@ -47,15 +45,13 @@ export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   };
   const executeStep = (history: Command[]) => {
     if (now + 1 <= history.length) {
-      const serverCommands = history[now].execute(proofContext);
-      serverContext.addCommands(serverCommands);
+      history[now].execute(proofContext);
       setNow(now + 1);
     }
   };
   const undo = () => {
     if (now - 1 >= 0) {
-      const serverCommands = history[now - 1].undo(proofContext);
-      serverContext.addCommands(serverCommands);
+      history[now - 1].undo(proofContext);
       setNow(now - 1);
     }
   };

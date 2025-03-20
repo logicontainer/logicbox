@@ -19,7 +19,7 @@ export function ProofStepContextMenu() {
   const handleAddProofStep = (
     uuid: string,
     isBox: boolean = false,
-    prepend: boolean = false,
+    prepend: boolean = false
   ) => {
     const addLineCommand = isBox
       ? new AddBoxedLineCommand(uuid, prepend)
@@ -32,7 +32,7 @@ export function ProofStepContextMenu() {
   };
   const handleUpdateProofStep = (
     uuid: string,
-    updatedLineProofStep: LineProofStep,
+    updatedLineProofStep: LineProofStep
   ) => {
     console.log(updatedLineProofStep.uuid);
     proofContext.setActiveEdit(uuid);
@@ -46,10 +46,11 @@ export function ProofStepContextMenu() {
         handleUpdateProofStep(props.uuid, {
           uuid: props.uuid,
           stepType: "line",
-          formula: "",
-          latexFormula: "",
+          formula: {
+            userInput: "",
+          },
           justification: {
-            ruleName: "",
+            rule: "",
             refs: [],
           },
         });

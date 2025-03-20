@@ -43,7 +43,7 @@ export function LineNumber({
             ? "bg-red-500 text-slate-200"
             : "bg-green-500 text-slate-200"
         )}
-        data-tooltip-content={proofStepDiagnostics?.violation?.explanation}
+        data-tooltip-content={proofStepDiagnostics?.violationType}
         data-tooltip-id={
           proofStepDiagnostics ? `line-number-tooltip-${line.uuid}` : ""
         }

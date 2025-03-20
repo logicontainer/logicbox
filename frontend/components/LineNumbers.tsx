@@ -4,7 +4,7 @@ import { useServer } from "@/contexts/ServerProvider";
 
 export function LineNumbers({ lines }: { lines: LineNumberLine[] }) {
   const serverContext = useServer();
-  const proofDiagnostics = serverContext.proofDiagnostics.diagnostics;
+  const proofDiagnostics = serverContext.proofDiagnostics;
   if (!lines) return;
 
   return (
@@ -14,7 +14,7 @@ export function LineNumbers({ lines }: { lines: LineNumberLine[] }) {
           .filter((line) => !line.isBox)
           .map((line) => {
             const proofStepDiagnostics = proofDiagnostics.find(
-              (diagnostic) => diagnostic.uuid === line.uuid,
+              (diagnostic) => diagnostic.uuid === line.uuid
             );
             return (
               <LineNumber

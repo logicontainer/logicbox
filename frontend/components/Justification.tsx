@@ -17,7 +17,7 @@ export function Justification({
 }) {
   const { ruleset } = useRuleset();
   const rule = ruleset.rules.find(
-    (rule) => rule.ruleName == justification.ruleName,
+    (rule) => rule.ruleName == justification.rule
   );
   if (!rule) return;
   const refs = justification.refs.map((ref) => {
@@ -39,8 +39,8 @@ export function Justification({
               rule.latex.premises,
               rule.latex.conclusion,
               [],
-              false,
-            ),
+              false
+            )
           )
         }
       >
@@ -62,8 +62,8 @@ export function Justification({
                       rule.latex.premises,
                       rule.latex.conclusion,
                       [i],
-                      false,
-                    ),
+                      false
+                    )
                   )
                 }
               >

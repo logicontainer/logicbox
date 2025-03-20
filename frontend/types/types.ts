@@ -13,16 +13,18 @@ export type Rule = {
 };
 
 export type Justification = {
-  ruleName: string;
+  rule: string | null;
   refs: string[];
 };
 export type LineProofStep = {
   uuid: string;
   stepType: string;
-  formula: string;
-  latexFormula: string;
+  formula: {
+    userInput: string;
+    unsynced?: boolean;
+    latex?: string | null;
+  };
   justification: Justification;
-  formulaUnsynced?: boolean;
 };
 export type BoxProofStep = {
   uuid: string;
@@ -136,58 +138,9 @@ export type Diagnostic = {
 
 // Main response type
 export type ValidationResponse = {
-  isValid: boolean;
+  proof: Proof;
   diagnostics: Diagnostic[];
 };
 
 // Enum for placement options
 export type Placement = "before" | "after";
-
-// Command options for each command type
-type InitLineOptions = {
-  newLineUuid: UUID;
-  neighbourUuid: UUID;
-  placement: Placement;
-};
-
-type InitBoxOptions = {
-  newBoxUuid: UUID;
-  newLineUuid: UUID;
-  neighbourUuid: UUID;
-  placement: Placement;
-};
-
-type RemoveStepOptions = {
-  uuid: UUID;
-};
-
-type UpdateLineOptions = {
-  lineUuid: UUID;
-  formula: string | null;
-  rule: string | null;
-  refs: UUID[] | null;
-};
-
-// Union type for all possible commands
-export type InitLineServerCommand = {
-  commandName: "initLine";
-  options: InitLineOptions;
-};
-export type InitBoxServerCommand = {
-  commandName: "initBox";
-  options: InitBoxOptions;
-};
-export type RemoveStepServerCommand = {
-  commandName: "removeStep";
-  options: RemoveStepOptions;
-};
-export type UpdateLineServerCommand = {
-  commandName: "updateLine";
-  options: UpdateLineOptions;
-};
-
-export type ServerCommand =
-  | InitLineServerCommand
-  | InitBoxServerCommand
-  | RemoveStepServerCommand
-  | UpdateLineServerCommand;
