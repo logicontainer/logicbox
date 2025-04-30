@@ -6,12 +6,12 @@ import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import Toolbar from "@/components/Toolbar";
 import { Tooltip } from "react-tooltip";
-import { parseLinesFromProof } from "@/lib/lines-parser";
+import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 
 export default function Home() {
   const proofContext = useProof();
-  const lines = parseLinesFromProof(proofContext.proof);
+  const { lines } = useLines();
   return (
     <div className="flex justify-center">
       <main className="flex flex-col  row-start-2 items-center sm:items-start">

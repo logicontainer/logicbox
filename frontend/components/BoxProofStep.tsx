@@ -1,4 +1,4 @@
-import { LineNumberLine, BoxProofStep as TBoxProofStep } from "@/types/types";
+import { BoxProofStep as TBoxProofStep, TLineNumber } from "@/types/types";
 
 import { Proof } from "./Proof";
 import { useContextMenu } from "react-contexify";
@@ -6,7 +6,7 @@ import { useProof } from "@/contexts/ProofProvider";
 
 export function BoxProofStep({
   ...props
-}: TBoxProofStep & { lines: LineNumberLine[] }) {
+}: TBoxProofStep & { lines: TLineNumber[] }) {
   const { setLineInFocus } = useProof();
 
   const { show } = useContextMenu({

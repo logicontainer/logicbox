@@ -1,11 +1,12 @@
 import "katex/dist/katex.min.css";
 
-import { LineNumberLine, LineProofStep as TLineProofStep } from "@/types/types";
 import Select, { SingleValue, Theme } from "react-select";
+import { TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
 
 import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
+import { RefSelect } from "./RefSelect";
 import { UpdateLineProofStepCommand } from "@/lib/commands";
 import { cn } from "@/lib/utils";
 import { useContextMenu } from "react-contexify";
@@ -16,7 +17,7 @@ import { useState } from "react";
 
 export function LineProofStep({
   ...props
-}: TLineProofStep & { lines: LineNumberLine[] }) {
+}: TLineProofStep & { lines: TLineNumber[] }) {
   const { isActiveEdit } = useProof();
   const isTheActiveEdit = isActiveEdit(props.uuid);
   return isTheActiveEdit ? (
@@ -28,7 +29,7 @@ export function LineProofStep({
 
 export function LineProofStepView({
   ...props
-}: TLineProofStep & { lines: LineNumberLine[] }) {
+}: TLineProofStep & { lines: TLineNumber[] }) {
   const {
     setLineInFocus,
     isFocused,
@@ -97,7 +98,7 @@ export function LineProofStepView({
 
 export function LineProofStepEdit({
   ...props
-}: TLineProofStep & { lines: LineNumberLine[] }) {
+}: TLineProofStep & { lines: TLineNumber[] }) {
   const { setLineInFocus, isActiveEdit, removeIsActiveEditFromLine } =
     useProof();
   const [tooltipContent] = useState<string>("");
@@ -215,6 +216,7 @@ export function LineProofStepEdit({
       baseUnit: 0,
     },
   });
+
   return (
     <div
       className={cn(
@@ -267,15 +269,15 @@ export function LineProofStepEdit({
         />
         {currLineProofStep.justification.refs.length > 0 && (
           <div className="flex gap-2">
-            {currLineProofStep.justification.refs.map((ref, index) => (
-              <AutosizeInput
-                suppressHydrationWarning
-                key={index}
-                inputClassName="bg-blue-200 text-blue-800 px-2 rounded text-sm/loose "
-                value={ref}
-                onChange={(e) => handleChangeRef(e, index)}
-              />
-            ))}
+            {currLineProofStep.justification.refs.map((ref, index) => {
+              return (
+                <RefSelect
+                  key={index}
+                  value={ref}
+                  onChange={(e) => handleChangeRef(e, index)}
+                ></RefSelect>
+              );
+            })}
           </div>
         )}
       </div>

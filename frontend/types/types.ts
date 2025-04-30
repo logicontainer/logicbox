@@ -35,7 +35,7 @@ export type ProofStep = LineProofStep | BoxProofStep;
 
 export type Proof = ProofStep[];
 
-export type LineNumberLine = {
+export type TLineNumber = {
   uuid: string;
   isBox: boolean;
   boxStartLine?: number;

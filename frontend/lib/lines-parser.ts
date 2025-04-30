@@ -1,17 +1,17 @@
-import { BoxProofStep, LineNumberLine, ProofStep } from "@/types/types";
+import { BoxProofStep, ProofStep, TLineNumber } from "@/types/types";
 
 function extractLineUuids(
   proof: ProofStep[],
-  currLineNumber: number = 1,
+  currLineNumber: number = 1
 ): {
-  lines: LineNumberLine[];
-  boxes: LineNumberLine[];
+  lines: TLineNumber[];
+  boxes: TLineNumber[];
   currLineNumber: number;
 } {
-  let lines = [] as LineNumberLine[];
-  let boxes = [] as LineNumberLine[];
+  let lines = [] as TLineNumber[];
+  let boxes = [] as TLineNumber[];
   proof.forEach((proofStep: ProofStep) => {
-    const newLine: LineNumberLine = { uuid: proofStep.uuid, isBox: false };
+    const newLine: TLineNumber = { uuid: proofStep.uuid, isBox: false };
     if (proofStep.stepType == "line") {
       newLine.lineNumber = currLineNumber;
       currLineNumber++;
@@ -33,7 +33,7 @@ function extractLineUuids(
   });
   return { lines, boxes, currLineNumber };
 }
-export function parseLinesFromProof(proof: ProofStep[]): LineNumberLine[] {
+export function parseLinesFromProof(proof: ProofStep[]): TLineNumber[] {
   const { lines, boxes } = extractLineUuids(proof);
   return [...lines, ...boxes];
 }

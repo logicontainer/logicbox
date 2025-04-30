@@ -1,6 +1,7 @@
 "use client";
 
 import { HistoryProvider } from "@/contexts/HistoryProvider";
+import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
 import { RulesetProvider } from "@/contexts/RulesetProvider";
 import { ServerProvider } from "@/contexts/ServerProvider";
@@ -14,7 +15,9 @@ export function Providers({ children }: ProviderProps) {
     <ServerProvider>
       <RulesetProvider>
         <ProofProvider>
-          <HistoryProvider>{children}</HistoryProvider>
+          <LinesProvider>
+            <HistoryProvider>{children}</HistoryProvider>
+          </LinesProvider>
         </ProofProvider>
       </RulesetProvider>
     </ServerProvider>

@@ -1,4 +1,4 @@
-import { Diagnostic, LineNumberLine } from "@/types/types";
+import { Diagnostic, TLineNumber } from "@/types/types";
 
 import { Tooltip } from "react-tooltip";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ export function LineNumber({
   line,
   proofStepDiagnostics,
 }: {
-  line: LineNumberLine;
+  line: TLineNumber;
   proofStepDiagnostics?: Diagnostic;
 }) {
   const { isUnfocused } = useProof();

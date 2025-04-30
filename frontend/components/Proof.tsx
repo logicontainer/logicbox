@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  LineNumberLine,
   BoxProofStep as TBoxProofStep,
+  TLineNumber,
   LineProofStep as TLineProofStep,
 } from "@/types/types";
 
@@ -16,7 +16,7 @@ export function Proof({
   ...props
 }: {
   proof: ProofStep[];
-  lines: LineNumberLine[];
+  lines: TLineNumber[];
   uuid?: string;
 }) {
   const { isFocused } = useProof();
@@ -25,7 +25,7 @@ export function Proof({
     <div
       className={cn(
         "outline-2 outline outline-slate-800 text-slate-800 px-4 cursor-auto",
-        isInFocus ? "outline-green-400" : "",
+        isInFocus ? "outline-green-400" : ""
       )}
     >
       {props.proof.map((proofStep) => {

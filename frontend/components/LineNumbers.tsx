@@ -1,8 +1,8 @@
 import { LineNumber } from "./LineNumber";
-import { LineNumberLine } from "@/types/types";
+import { TLineNumber } from "@/types/types";
 import { useServer } from "@/contexts/ServerProvider";
 
-export function LineNumbers({ lines }: { lines: LineNumberLine[] }) {
+export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
   const serverContext = useServer();
   const proofDiagnostics = serverContext.proofDiagnostics;
   if (!lines) return;

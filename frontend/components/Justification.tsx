@@ -1,6 +1,6 @@
 "use client";
 
-import { LineNumberLine, Justification as TJustification } from "@/types/types";
+import { Justification as TJustification, TLineNumber } from "@/types/types";
 
 import { InlineMath } from "react-katex";
 import { createHighlightedLatexRule } from "@/lib/rules";
@@ -12,7 +12,7 @@ export function Justification({
   onHover,
 }: {
   justification: TJustification;
-  lines: LineNumberLine[];
+  lines: TLineNumber[];
   onHover: (highlightedLatex: string) => void;
 }) {
   const { ruleset } = useRuleset();
