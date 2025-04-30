@@ -3,15 +3,18 @@ import { BoxProofStep as TBoxProofStep, TLineNumber } from "@/types/types";
 import { Proof } from "./Proof";
 import { useContextMenu } from "react-contexify";
 import { useProof } from "@/contexts/ProofProvider";
+import { TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
 
 export function BoxProofStep({
   ...props
 }: TBoxProofStep & { lines: TLineNumber[] }) {
   const { setLineInFocus } = useProof();
+  const { doTransition } = useInteractionState()
 
   const { show } = useContextMenu({
     id: "proof-step-context-menu",
   });
+
   function handleContextMenu(
     event:
       | React.MouseEvent<HTMLElement>
@@ -33,7 +36,7 @@ export function BoxProofStep({
       onContextMenuCapture={handleContextMenu}
       onClick={handleContextMenu}
     >
-      <Proof proof={props.proof} lines={props.lines} uuid={props.uuid} />
+      <Proof proof={props.proof} lines={props.lines} uuid={props.uuid}/>
     </div>
   );
 }

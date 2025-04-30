@@ -3,7 +3,7 @@ import "katex/dist/katex.min.css";
 import Select, { SingleValue, Theme } from "react-select";
 import { TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
 
-import AutosizeInput from "react-input-autosize";
+import AutosizeInput, { AutosizeInputProps } from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
 import { RefSelect } from "./RefSelect";
@@ -14,12 +14,16 @@ import { useHistory } from "@/contexts/HistoryProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import { useState } from "react";
+import { InteractionStateEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
+import { lineIsBeingEdited } from "@/lib/state-helpers";
+import React from "react";
 
 export function LineProofStep({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
-  const { isActiveEdit } = useProof();
-  const isTheActiveEdit = isActiveEdit(props.uuid);
+  const { interactionState } = useInteractionState()
+  const isTheActiveEdit = lineIsBeingEdited(props.uuid, interactionState)
+
   return isTheActiveEdit ? (
     <LineProofStepEdit {...props} />
   ) : (
@@ -33,13 +37,12 @@ export function LineProofStepView({
   const {
     setLineInFocus,
     isFocused,
-    isActiveEdit,
-    setActiveEdit,
-    removeIsActiveEditFromLine,
   } = useProof();
+
+  const { doTransition } = useInteractionState()
+
   const [tooltipContent, setTooltipContent] = useState<string>();
   const isInFocus = isFocused(props.uuid);
-  const isTheActiveEdit = isActiveEdit(props.uuid);
 
   const handleOnHoverJustification = (highlightedLatex: string) => {
     setTooltipContent(highlightedLatex);
@@ -68,11 +71,7 @@ export function LineProofStepView({
         isInFocus ? "text-blue-400" : ""
       )}
       onMouseOver={() => setLineInFocus(props.uuid)}
-      onClick={() =>
-        isTheActiveEdit
-          ? removeIsActiveEditFromLine(props.uuid)
-          : setActiveEdit(props.uuid)
-      }
+      onClick={() => doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })}
       onContextMenuCapture={handleContextMenu}
     >
       <p className="shrink">
@@ -96,16 +95,33 @@ export function LineProofStepView({
   );
 }
 
+interface ControlledFocusProps {
+  value: string 
+  onChange: (_: string) => void
+
+  shouldFocus: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
+
+  title: string
+  className?: string
+  inputClassName?: string
+}
+
 export function LineProofStepEdit({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
-  const { setLineInFocus, isActiveEdit, removeIsActiveEditFromLine } =
-    useProof();
+
+  const { setLineInFocus, } = useProof();
+  const { interactionState, doTransition } = useInteractionState()
+
   const [tooltipContent] = useState<string>("");
   const proofContext = useProof();
   const rulesetContext = useRuleset();
-  const historyContext = useHistory();
-  const isTheActiveEdit = isActiveEdit(props.uuid);
+
+  const currentlyEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE && interactionState.lineUuid === props.uuid
+  const currentlyEditingFormula = interactionState.enum === InteractionStateEnum.EDITING_FORMULA && interactionState.lineUuid === props.uuid
+
   const { show } = useContextMenu({
     id: "proof-step-context-menu",
   });
@@ -128,69 +144,7 @@ export function LineProofStepEdit({
       return;
     }
 
-    const numPremises = rulesetContext.ruleset.rules.find(
-      (rule) => rule.ruleName === newValue.value
-    )!.numPremises;
-    let newRefs = currLineProofStep.justification.refs;
-    console.log("numPremises", numPremises, "newRefs", newRefs);
-    if (numPremises > newRefs.length) {
-      newRefs = newRefs.concat(Array(numPremises - newRefs.length).fill("?"));
-    } else {
-      newRefs = newRefs.slice(0, numPremises);
-    }
-
-    const updatedLineProofStep: TLineProofStep = {
-      ...currLineProofStep,
-      justification: {
-        rule: newValue.value,
-        refs: newRefs,
-      },
-    };
-    const updateLineCommand = new UpdateLineProofStepCommand(
-      props.uuid,
-      updatedLineProofStep
-    );
-    historyContext.addToHistory(updateLineCommand);
-  };
-
-  const handleChangeFormula = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedLineProofStep: TLineProofStep = {
-      ...currLineProofStep,
-      formula: {
-        userInput: event.target.value,
-        unsynced: true,
-      },
-    };
-    const updateLineCommand = new UpdateLineProofStepCommand(
-      props.uuid,
-      updatedLineProofStep
-    );
-    historyContext.addToHistory(updateLineCommand);
-  };
-
-  const handleChangeRef = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const newRefs = currLineProofStep.justification.refs.map((ref, i) => {
-      if (i === index) {
-        return event.target.value;
-      } else {
-        return ref;
-      }
-    });
-    const updatedLineProofStep: TLineProofStep = {
-      ...currLineProofStep,
-      justification: {
-        rule: currLineProofStep.justification.rule,
-        refs: newRefs,
-      },
-    };
-    const updateLineCommand = new UpdateLineProofStepCommand(
-      props.uuid,
-      updatedLineProofStep
-    );
-    historyContext.addToHistory(updateLineCommand);
+    doTransition({ enum: TransitionEnum.SELECT_RULE, ruleName: newValue.value })
   };
 
   function handleContextMenu(
@@ -217,6 +171,16 @@ export function LineProofStepEdit({
     },
   });
 
+  const onFocusAutoSizeInput = () => {
+    if (!currentlyEditingFormula) 
+      doTransition({ enum: TransitionEnum.EDIT_FORMULA })
+  }
+
+  const onBlurAutoSizeInput = () => {
+    if (currentlyEditingFormula)
+      doTransition({ enum: TransitionEnum.CLOSE })
+  }
+
   return (
     <div
       className={cn(
@@ -227,16 +191,18 @@ export function LineProofStepEdit({
         if (e.target !== e.currentTarget) {
           return;
         }
-        return isTheActiveEdit && removeIsActiveEditFromLine(props.uuid);
+        return doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })
       }}
       onContextMenuCapture={handleContextMenu}
     >
-      <AutosizeInput
-        suppressHydrationWarning
-        title="Enter a formula"
-        type="text"
-        value={props.formula.userInput}
-        onChange={handleChangeFormula}
+      <AutosizeInput 
+        value={currLineProofStep.formula.userInput}
+        onChange={e => console.log(e.target.value)}
+
+        onFocus={onFocusAutoSizeInput}
+        onBlur={onBlurAutoSizeInput}
+
+        title="Write a formula"
         className="text-slate-800 grow resize shrink"
         inputClassName="px-2"
       />
@@ -250,6 +216,15 @@ export function LineProofStepEdit({
           instanceId={props.uuid}
           value={rulesetDropdownValue}
           onChange={handleChangeRule}
+
+          menuIsOpen={currentlyEditingRule}
+          onMenuOpen={() => doTransition({ enum: TransitionEnum.EDIT_RULE })}
+          closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
+          onMenuClose={() => {
+            if (currentlyEditingRule) // i don't know why this is necessary, i think Select i buggy
+              doTransition({ enum: TransitionEnum.CLOSE }) 
+          }}
+
           options={rulesetContext.rulesetDropdownOptions}
           theme={dropdownTheme}
           styles={{
@@ -274,7 +249,7 @@ export function LineProofStepEdit({
                 <RefSelect
                   key={index}
                   value={ref}
-                  onChange={(e) => handleChangeRef(e, index)}
+                  onClick={() => doTransition({ enum: TransitionEnum.EDIT_REF, refIdx: index })}
                 ></RefSelect>
               );
             })}

@@ -16,6 +16,7 @@ const MENU_ID = "proof-step-context-menu";
 export function ProofStepContextMenu() {
   const historyContext = useHistory();
   const proofContext = useProof();
+
   const handleAddProofStep = (
     uuid: string,
     isBox: boolean = false,
@@ -26,10 +27,12 @@ export function ProofStepContextMenu() {
       : new AddLineCommand(uuid, prepend);
     historyContext.addToHistory(addLineCommand);
   };
+
   const handleRemoveProofStep = (uuid: string) => {
     const removeLineCommand = new RemoveProofStepCommand(uuid);
     historyContext.addToHistory(removeLineCommand);
   };
+
   const handleUpdateProofStep = (
     uuid: string,
     updatedLineProofStep: LineProofStep
