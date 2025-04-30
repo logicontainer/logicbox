@@ -40,7 +40,7 @@ class PLParser extends PackratParsers {
   private def formula: Parser[PLFormula] = a
 
   def apply(input: List[PLToken]): PLFormula =
-    phrase(formula)(TokenReader(input)) match {
+    phrase(formula)(PLTokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
         throw new RuntimeException(p.toString)
       case Success(result, _) => result

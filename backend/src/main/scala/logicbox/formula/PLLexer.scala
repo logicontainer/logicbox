@@ -27,9 +27,9 @@ class PLLexer extends RegexParsers {
     }
 }
 
-class TokenReader(tokens: List[PLToken]) extends Reader[PLToken] {
+class PLTokenReader(tokens: List[PLToken]) extends Reader[PLToken] {
   override def first: PLToken = tokens.head
   override def atEnd: Boolean = tokens.isEmpty
   override def pos: Position = NoPosition
-  override def rest: Reader[PLToken] = TokenReader(tokens.tail)
+  override def rest: Reader[PLToken] = PLTokenReader(tokens.tail)
 }
