@@ -18,7 +18,7 @@ const HistoryContext = React.createContext<HistoryContextProps>({
   now: 0,
   canUndo: false,
   canRedo: false,
-  addToHistory: () => { throw new Error("Add to history call from outside HistoryProvider") },
+  addToHistory: () => { throw new Error("")},
   undo: () => {},
   redo: () => {},
 });

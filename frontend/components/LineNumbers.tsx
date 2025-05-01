@@ -5,6 +5,7 @@ import { useServer } from "@/contexts/ServerProvider";
 export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
   const serverContext = useServer();
   const proofDiagnostics = serverContext.proofDiagnostics;
+  const diagnosticMap = Object.fromEntries(proofDiagnostics.map(d => [d.uuid, d]))
   if (!lines) return;
 
   return (
@@ -13,14 +14,11 @@ export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
         {lines
           .filter((line) => !line.isBox)
           .map((line) => {
-            const proofStepDiagnostics = proofDiagnostics.find(
-              (diagnostic) => diagnostic.uuid === line.uuid
-            );
             return (
               <LineNumber
                 key={line.uuid}
                 line={line}
-                proofStepDiagnostics={proofStepDiagnostics}
+                proofStepDiagnostics={diagnosticMap[line.uuid]}
               />
             );
           })}

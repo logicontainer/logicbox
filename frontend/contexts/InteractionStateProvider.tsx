@@ -10,6 +10,7 @@ import { Command, UpdateLineProofStepCommand } from "@/lib/commands";
 import { useHistory } from "./HistoryProvider";
 import { getLineBeingEdited } from "@/lib/state-helpers";
 import { useRuleset } from "./RulesetProvider";
+import { useServer } from "./ServerProvider";
 
 export enum TransitionEnum {
   CLICK_LINE,
@@ -24,6 +25,8 @@ export enum TransitionEnum {
 
   SELECT_RULE,
   UPDATE_FORMULA,
+
+  VALIDATE_PROOF,
 
   CLOSE,
 }
@@ -52,6 +55,7 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
   | { enum: TransitionEnum.EDIT_RULE }
+  | { enum: TransitionEnum.VALIDATE_PROOF }
   | { enum: TransitionEnum.EDIT_FORMULA }
   | { enum: TransitionEnum.EDIT_REF; refIdx: number }
   | { enum: TransitionEnum.SELECT_RULE; ruleName: string }
@@ -101,25 +105,39 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
     });
 
-  const { getProofStepDetails } = useProof()
+  const serverContext = useServer()
+  const proofContext = useProof()
   const { ruleset } = useRuleset()
   const historyContext = useHistory()
+  
+  // keep command queue of state modifying things which must be executed fully in order
+  enum Validate { VALIDATE }
+  const commandQueue = React.useRef<(Validate | Command)[]>([]);
+  const enqueueCommand = (f: Validate | Command) => commandQueue.current.push(f)
+  const [flushTrigger, setFlushTrigger] = React.useState(0)
 
-  const commandQueue = React.useRef<Command[]>([]);
-
-  const [transitionCount, setTransitionCount] = React.useState(0) // to trigger command queue emptying
-  const executeCommand = (cmd: Command) => commandQueue.current.push(cmd)
-
-  // when transition count changes, flush the command queue
   React.useEffect(() => {
-    if (commandQueue.current.length > 0) {
-      commandQueue.current.forEach(cmd => historyContext.addToHistory(cmd))
-      commandQueue.current = []
+    if (commandQueue.current.length === 0) 
+      return;
+
+    // execute a single command
+    const cmd = commandQueue.current.shift()!
+    if (cmd === Validate.VALIDATE) {
+      serverContext.validateProof(proofContext.proof)
+    } else {
+      historyContext.addToHistory(cmd)
     }
-  }, [transitionCount, historyContext])
+
+    if (commandQueue.current.length > 0) {
+      // update the flush trigger, so after a full state rerender, 
+      //  we get a new command
+      setTimeout(() => setFlushTrigger(c => c + 1), 0)
+    }
+  }, [flushTrigger])
+
 
   const getLineProofStep = (uuid: string) => {
-    const currLineProofStepDetails = getProofStepDetails(uuid);
+    const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
     if (!currLineProofStepDetails) 
       throw new Error(`Updating ref, but the line we are editing ${uuid} doesn't have step details`);
 
@@ -154,7 +172,7 @@ export function InteractionStateProvider({
       },
     };
 
-    executeCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
+    enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
   }
 
   const updateRef = (lineUuid: string, refIdx: number, newRefUuid: string) => {
@@ -176,7 +194,7 @@ export function InteractionStateProvider({
       },
     };
 
-    executeCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
+    enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
   }
 
   const updateFormula = (lineUuid: string, formula: string) => {
@@ -189,15 +207,19 @@ export function InteractionStateProvider({
       },
     };
 
-    executeCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
+    enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
   }
 
   const { EDITING_LINE, IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } = InteractionStateEnum
-  const { EDIT_REF, EDIT_RULE, EDIT_FORMULA, CLICK_LINE, SELECT_RULE, CLOSE, UPDATE_FORMULA, CLICK_OUTSIDE } = TransitionEnum
+  const { EDIT_REF, EDIT_RULE, EDIT_FORMULA, CLICK_LINE, SELECT_RULE, CLOSE, UPDATE_FORMULA, CLICK_OUTSIDE, VALIDATE_PROOF } = TransitionEnum
 
   const behavior: Behavior = {
     [IDLE]: {
-      [CLICK_LINE]: (_, trans) => ({ enum: EDITING_LINE, lineUuid: trans.lineUuid })
+      [CLICK_LINE]: (_, trans) => ({ enum: EDITING_LINE, lineUuid: trans.lineUuid }),
+      [VALIDATE_PROOF]: (state, _) => {
+        enqueueCommand(Validate.VALIDATE)
+        return state
+      }
     },
 
     [EDITING_LINE]: {
@@ -220,6 +242,10 @@ export function InteractionStateProvider({
       },
 
       [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
+      [VALIDATE_PROOF]: () => {
+        enqueueCommand(Validate.VALIDATE)
+        return { enum: IDLE }
+      }
     },
 
     [EDITING_FORMULA]: {
@@ -239,6 +265,11 @@ export function InteractionStateProvider({
       },
       [CLICK_OUTSIDE]: (state, _) => {
         updateFormula(state.lineUuid, state.currentFormula);
+        return { enum: IDLE }
+      },
+      [VALIDATE_PROOF]: (state, _) => {
+        updateFormula(state.lineUuid, state.currentFormula)
+        enqueueCommand(Validate.VALIDATE)
         return { enum: IDLE }
       }
     },
@@ -290,8 +321,7 @@ export function InteractionStateProvider({
       }
     })
 
-    // trigger flushing of command queue
-    setTransitionCount(c => c + 1)
+    setFlushTrigger(t => t + 1)
   };
 
   return (
