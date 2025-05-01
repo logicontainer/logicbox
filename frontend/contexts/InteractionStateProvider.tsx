@@ -43,7 +43,7 @@ export type InteractionState = { enum: InteractionStateEnum } & (
   | { enum: InteractionStateEnum.IDLE }
   | { enum: InteractionStateEnum.EDITING_LINE; lineUuid: string }
   | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string; }
-  | { enum: InteractionStateEnum.EDITING_FORMULA; lineUuid: string; }
+  | { enum: InteractionStateEnum.EDITING_FORMULA; lineUuid: string; currentFormula: string }
   | { enum: InteractionStateEnum.EDITING_REF; lineUuid: string; refIdx: number }
 );
 
@@ -71,18 +71,6 @@ type Behavior = {
     [T in TransitionEnum]?: FuncForStateAndTransition<S, T>;
   };
 };
-
-function defineBehaviorForStates<S extends InteractionStateEnum>(
-  states: S[],
-  transitions: {
-    [T in TransitionEnum]?: FuncForStateAndTransition<S, T>;
-  },
-): Partial<Record<S, typeof transitions>> {
-  return states.reduce((acc, state) => {
-    acc[state] = transitions;
-    return acc;
-  }, {} as Partial<Record<S, typeof transitions>>);
-}
 
 export interface InteractionStateContextProps {
   interactionState: InteractionState;
@@ -118,6 +106,7 @@ export function InteractionStateProvider({
   const historyContext = useHistory()
 
   const commandQueue = React.useRef<Command[]>([]);
+
   const [transitionCount, setTransitionCount] = React.useState(0) // to trigger command queue emptying
   const executeCommand = (cmd: Command) => commandQueue.current.push(cmd)
 
@@ -204,7 +193,7 @@ export function InteractionStateProvider({
   }
 
   const { EDITING_LINE, IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } = InteractionStateEnum
-  const { EDIT_REF, EDIT_RULE, EDIT_FORMULA, CLICK_LINE, SELECT_RULE, CLOSE, UPDATE_FORMULA } = TransitionEnum
+  const { EDIT_REF, EDIT_RULE, EDIT_FORMULA, CLICK_LINE, SELECT_RULE, CLOSE, UPDATE_FORMULA, CLICK_OUTSIDE } = TransitionEnum
 
   const behavior: Behavior = {
     [IDLE]: {
@@ -221,17 +210,48 @@ export function InteractionStateProvider({
           lineUuid: trans.lineUuid,
         };
       },
-      [UPDATE_FORMULA]: (state, { formula }) => {
-        updateFormula(state.lineUuid, formula)
-        return state;
-      },
+
       [EDIT_RULE]: (state, _) => ({ enum: EDITING_RULE, lineUuid: state.lineUuid }),
       [EDIT_REF]: (state, { refIdx }) => ({ enum: EDITING_REF, lineUuid: state.lineUuid, refIdx }),
-      [EDIT_FORMULA]: (state, _) => ({ enum: EDITING_FORMULA, lineUuid: state.lineUuid })
+      [EDIT_FORMULA]: (state, _) => {
+        // obtain the contents of the formula
+        const { formula: { userInput } } = getLineProofStep(state.lineUuid)
+        return ({ enum: EDITING_FORMULA, lineUuid: state.lineUuid, currentFormula: userInput })
+      },
+
+      [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
+    },
+
+    [EDITING_FORMULA]: {
+      [UPDATE_FORMULA]: (state, { formula }) => {
+        return { ...state, currentFormula: formula };
+      },
+      [CLOSE]: (state, _) => {
+        updateFormula(state.lineUuid, state.currentFormula)
+        return { enum: EDITING_LINE, lineUuid: state.lineUuid }
+      },
+      [CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
+        // we are exiting this state, so update formula in proof
+        updateFormula(state.lineUuid, state.currentFormula)
+
+        // go to editing mode on the clicked line
+        return { enum: EDITING_LINE, lineUuid: clickedLineUuid }
+      },
+      [CLICK_OUTSIDE]: (state, _) => {
+        updateFormula(state.lineUuid, state.currentFormula);
+        return { enum: IDLE }
+      }
     },
 
     [EDITING_REF]: {
-      [EDIT_REF]: (state, trans) => ({ enum: EDITING_REF, lineUuid: state.lineUuid, refIdx: trans.refIdx }),
+      [EDIT_REF]: (state, trans) => {
+        if (trans.refIdx === state.refIdx) {
+          // unselect
+          return { enum: EDITING_LINE, lineUuid: state.lineUuid }
+        }
+
+        return { enum: EDITING_REF, lineUuid: state.lineUuid, refIdx: trans.refIdx }
+      },
       [CLICK_LINE]: ({ refIdx, lineUuid: editedLineUuid }, { lineUuid: clickedLineUuid }) => {
         updateRef(editedLineUuid, refIdx, clickedLineUuid)
         return { enum: EDITING_LINE, lineUuid: editedLineUuid }
@@ -271,7 +291,7 @@ export function InteractionStateProvider({
     })
 
     // trigger flushing of command queue
-    setTransitionCount(c => c + 1) 
+    setTransitionCount(c => c + 1)
   };
 
   return (

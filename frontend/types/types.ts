@@ -22,6 +22,7 @@ export type LineProofStep = {
   formula: {
     userInput: string;
     unsynced?: boolean;
+    ascii?: string | null;
     latex?: string | null;
   };
   justification: Justification;

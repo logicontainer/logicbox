@@ -47,9 +47,11 @@ export function LineProofStepView({
   const handleOnHoverJustification = (highlightedLatex: string) => {
     setTooltipContent(highlightedLatex);
   };
+
   const { show } = useContextMenu({
     id: "proof-step-context-menu",
   });
+
   function handleContextMenu(
     event:
       | React.MouseEvent<HTMLElement>
@@ -95,19 +97,6 @@ export function LineProofStepView({
   );
 }
 
-interface ControlledFocusProps {
-  value: string 
-  onChange: (_: string) => void
-
-  shouldFocus: boolean;
-  onFocus?: () => void;
-  onBlur?: () => void;
-
-  title: string
-  className?: string
-  inputClassName?: string
-}
-
 export function LineProofStepEdit({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
@@ -132,6 +121,8 @@ export function LineProofStepEdit({
   }
   const currLineProofStep =
     currLineProofStepDetails.proofStep as TLineProofStep;
+
+  const formulaContent = currentlyEditingFormula ? interactionState.currentFormula : currLineProofStep.formula.userInput
 
   const rulesetDropdownValue = rulesetContext.rulesetDropdownOptions.find(
     (option) => option.value === currLineProofStep.justification.rule
@@ -176,9 +167,18 @@ export function LineProofStepEdit({
       doTransition({ enum: TransitionEnum.EDIT_FORMULA })
   }
 
-  const onBlurAutoSizeInput = () => {
-    if (currentlyEditingFormula)
+  const formulaInputRef = React.useRef<HTMLInputElement>(null)
+  const handleInputRefChange = (ref: HTMLInputElement | null) => {
+    formulaInputRef.current = ref
+  }
+
+  const onKeyDownAutoSizeInput = (key: string) => {
+    if (currentlyEditingFormula && key === "Enter") {
       doTransition({ enum: TransitionEnum.CLOSE })
+      formulaInputRef.current?.blur()
+    } else if (currentlyEditingFormula) {
+      doTransition({ enum: TransitionEnum.UPDATE_FORMULA, formula: formulaContent })
+    }
   }
 
   return (
@@ -196,11 +196,14 @@ export function LineProofStepEdit({
       onContextMenuCapture={handleContextMenu}
     >
       <AutosizeInput 
-        value={currLineProofStep.formula.userInput}
-        onChange={e => console.log(e.target.value)}
+        inputRef={handleInputRefChange}
+        value={formulaContent}
+        onChange={e => doTransition({ enum: TransitionEnum.UPDATE_FORMULA, formula: e.target.value })}
 
         onFocus={onFocusAutoSizeInput}
-        onBlur={onBlurAutoSizeInput}
+        onKeyDown={e => onKeyDownAutoSizeInput(e.key)}
+
+        onSubmit={() => console.log("Balls")}
 
         title="Write a formula"
         className="text-slate-800 grow resize shrink"
@@ -220,10 +223,6 @@ export function LineProofStepEdit({
           menuIsOpen={currentlyEditingRule}
           onMenuOpen={() => doTransition({ enum: TransitionEnum.EDIT_RULE })}
           closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
-          onMenuClose={() => {
-            if (currentlyEditingRule) // i don't know why this is necessary, i think Select i buggy
-              doTransition({ enum: TransitionEnum.CLOSE }) 
-          }}
 
           options={rulesetContext.rulesetDropdownOptions}
           theme={dropdownTheme}
@@ -249,6 +248,11 @@ export function LineProofStepEdit({
                 <RefSelect
                   key={index}
                   value={ref}
+                  isCurrentlyBeingChanged={
+                    interactionState.enum === InteractionStateEnum.EDITING_REF && 
+                    interactionState.lineUuid === props.uuid && 
+                    interactionState.refIdx === index
+                  }
                   onClick={() => doTransition({ enum: TransitionEnum.EDIT_REF, refIdx: index })}
                 ></RefSelect>
               );
