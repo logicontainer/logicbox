@@ -1,3 +1,5 @@
+"use client";
+
 import "katex/dist/katex.min.css";
 
 import {
@@ -25,82 +27,77 @@ export function LineProofStep({
 }: TLineProofStep & { lines: TLineNumber[] }) {
   const { interactionState } = useInteractionState();
   const isTheActiveEdit = lineIsBeingEdited(props.uuid, interactionState);
-
-  return isTheActiveEdit ? (
-    <LineProofStepEdit {...props} />
-  ) : (
-    <LineProofStepView {...props} />
-  );
+  return <LineProofStepEdit {...props} />;
 }
 
-export function LineProofStepView({
-  ...props
-}: TLineProofStep & { lines: TLineNumber[] }) {
-  const { setLineInFocus, isFocused } = useProof();
+// export function LineProofStepView({
+//   ...props
+// }: TLineProofStep & { lines: TLineNumber[] }) {
+//   const { setLineInFocus, isFocused } = useProof();
 
-  const { doTransition } = useInteractionState();
-  const { setContextMenuPosition } = useContextMenu();
+//   const { doTransition } = useInteractionState();
+//   const { setContextMenuPosition } = useContextMenu();
 
-  const [tooltipContent, setTooltipContent] = useState<string>();
-  const isInFocus = isFocused(props.uuid);
+//   const [tooltipContent, setTooltipContent] = useState<string>();
+//   const isInFocus = isFocused(props.uuid);
 
-  const handleOnHoverJustification = (highlightedLatex: string) => {
-    setTooltipContent(highlightedLatex);
-  };
+//   const handleOnHoverJustification = (highlightedLatex: string) => {
+//     setTooltipContent(highlightedLatex);
+//   };
 
-  return (
-    <div
-      className={cn(
-        "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors",
-        isInFocus ? "text-blue-400" : ""
-      )}
-      onMouseOver={() => setLineInFocus(props.uuid)}
-      onContextMenuCapture={(e) => {
-        e.preventDefault();
-        setContextMenuPosition({ x: e.clientX, y: e.clientY });
-        doTransition({
-          enum: TransitionEnum.RIGHT_CLICK_STEP,
-          proofStepUuid: props.uuid,
-          isBox: false,
-        });
-      }}
-      onClick={() =>
-        doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })
-      }
-    >
-      <p className="shrink">
-        {props.formula.unsynced ? (
-          props.formula.userInput
-        ) : (
-          <InlineMath math={props.formula.latex || ""} />
-        )}
-      </p>
-      <div
-        data-tooltip-id={`tooltip-id-${props.uuid}`}
-        data-tooltip-content={tooltipContent}
-      >
-        <Justification
-          justification={props.justification}
-          lines={props.lines}
-          onHover={handleOnHoverJustification}
-          onClickRule={() =>
-            doTransition({
-              enum: TransitionEnum.CLICK_RULE,
-              lineUuid: props.uuid,
-            })
-          }
-          onClickRef={(refIdx) =>
-            doTransition({
-              enum: TransitionEnum.CLICK_REF,
-              lineUuid: props.uuid,
-              refIdx,
-            })
-          }
-        />
-      </div>
-    </div>
-  );
-}
+//   return (
+//     <div
+//       className={cn(
+//         "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors",
+//         isInFocus ? "text-blue-400" : ""
+//       )}
+//       onMouseOver={() => setLineInFocus(props.uuid)}
+//       onContextMenuCapture={(e) => {
+//         e.preventDefault();
+//         setContextMenuPosition({ x: e.clientX, y: e.clientY });
+//         doTransition({
+//           enum: TransitionEnum.RIGHT_CLICK_STEP,
+//           proofStepUuid: props.uuid,
+//           isBox: false,
+//         });
+//       }}
+//       onClick={() =>
+//         doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })
+//       }
+//     >
+//       <p className="shrink">
+//         {props.formula.unsynced ? (
+//           props.formula.userInput
+//         ) : (
+//           <InlineMath math={props.formula.latex || ""} />
+//         )}
+//       </p>
+//       <div
+//         data-tooltip-id={`tooltip-id-${props.uuid}`}
+//         data-tooltip-content={tooltipContent}
+//       >
+//         <Justification
+//           justification={props.justification}
+//           lines={props.lines}
+//           onHover={handleOnHoverJustification}
+//           onClickRule={() =>
+//             doTransition({
+//               enum: TransitionEnum.CLICK_RULE,
+//               lineUuid: props.uuid,
+//             })
+//           }
+//           onClickRef={(refIdx) =>
+//             doTransition({
+//               enum: TransitionEnum.CLICK_REF,
+//               lineUuid: props.uuid,
+//               refIdx,
+//             })
+//           }
+//         />
+//       </div>
+//     </div>
+//   );
+// }
 
 export function LineProofStepEdit({
   ...props
@@ -108,11 +105,12 @@ export function LineProofStepEdit({
   const { setLineInFocus } = useProof();
   const { interactionState, doTransition } = useInteractionState();
 
-  const [tooltipContent] = useState<string>("");
   const proofContext = useProof();
   const rulesetContext = useRuleset();
 
   const { setContextMenuPosition } = useContextMenu();
+
+  const [tooltipContent, setTooltipContent] = useState<string>("");
 
   const formulaInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -133,10 +131,6 @@ export function LineProofStepEdit({
   const formulaContent = currentlyEditingFormula
     ? interactionState.currentFormula
     : currLineProofStep.formula.userInput;
-
-  const rulesetDropdownValue = rulesetContext.rulesetDropdownOptions.find(
-    (option) => option.value === currLineProofStep.justification.rule
-  );
 
   const handleChangeRule = (
     newValue: SingleValue<{ value: string; label: string }>
@@ -171,10 +165,18 @@ export function LineProofStepEdit({
     }
   };
 
+  const handleOnHoverJustification = (highlightedLatex: string) => {
+    setTooltipContent(highlightedLatex);
+  };
+
+  const isEditingFormula =
+    interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
+    interactionState.lineUuid === props.uuid;
+
   return (
     <div
       className={cn(
-        "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors items-stretch border-blue-400 border-2"
+        "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors items-stretch"
       )}
       onMouseOver={() => setLineInFocus(props.uuid)}
       onClick={(e) => {
@@ -196,82 +198,66 @@ export function LineProofStepEdit({
         });
       }}
     >
-      <AutosizeInput
-        inputRef={handleInputRefChange}
-        value={formulaContent}
-        onChange={(e) => {
-          console.log(e);
-          doTransition({
-            enum: TransitionEnum.UPDATE_FORMULA,
-            formula: e.target.value,
-          });
-        }}
-        autoFocus={currentlyEditingFormula}
-        onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-        title="Write a formula"
-        className="text-slate-800 grow resize shrink"
-        inputClassName="px-2"
-      />
+      {isEditingFormula ? (
+        <AutosizeInput
+          inputRef={handleInputRefChange}
+          value={formulaContent}
+          onChange={(e) => {
+            console.log(e);
+            doTransition({
+              enum: TransitionEnum.UPDATE_FORMULA,
+              formula: e.target.value,
+            });
+          }}
+          autoFocus={currentlyEditingFormula}
+          onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
+          title="Write a formula"
+          className="text-slate-800 grow resize shrink"
+          inputClassName="px-2"
+        />
+      ) : (
+        <p
+          className="shrink"
+          onClick={() =>
+            doTransition({
+              enum: TransitionEnum.CLICK_LINE,
+              lineUuid: props.uuid,
+            })
+          }
+        >
+          {props.formula.unsynced ? (
+            props.formula.userInput
+          ) : (
+            <InlineMath math={props.formula.latex || ""} />
+          )}
+        </p>
+      )}
+
       <div
         data-tooltip-id={`tooltip-id-${props.uuid}`}
         data-tooltip-content={tooltipContent}
         title="Select a rule"
         className="flex items-center gap-2 whitespace-nowrap"
       >
-        <Select
-          instanceId={props.uuid}
-          value={rulesetDropdownValue}
-          onChange={handleChangeRule}
-          menuIsOpen={currentlyEditingRule}
-          onMenuOpen={() =>
+        <Justification
+          uuid={props.uuid}
+          justification={props.justification}
+          lines={props.lines}
+          onHover={handleOnHoverJustification}
+          onClickRule={() =>
             doTransition({
               enum: TransitionEnum.CLICK_RULE,
               lineUuid: props.uuid,
             })
           }
-          closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
-          options={rulesetContext.rulesetDropdownOptions}
-          theme={dropdownTheme}
-          styles={{
-            singleValue: (base) => ({
-              ...base,
-              paddingLeft: "8px",
-              paddingRight: "8px",
-            }),
-            input(base) {
-              return {
-                ...base,
-                paddingLeft: "8px",
-                paddingRight: "8px",
-              };
-            },
-          }}
+          onClickRef={(refIdx) =>
+            doTransition({
+              enum: TransitionEnum.CLICK_REF,
+              lineUuid: props.uuid,
+              refIdx,
+            })
+          }
         />
-        {currLineProofStep.justification.refs.length > 0 && (
-          <div className="flex gap-2">
-            {currLineProofStep.justification.refs.map((ref, index) => {
-              return (
-                <RefSelect
-                  key={index}
-                  value={ref}
-                  isCurrentlyBeingChanged={
-                    interactionState.enum ===
-                      InteractionStateEnum.EDITING_REF &&
-                    interactionState.lineUuid === props.uuid &&
-                    interactionState.refIdx === index
-                  }
-                  onClick={() =>
-                    doTransition({
-                      enum: TransitionEnum.CLICK_REF,
-                      lineUuid: props.uuid,
-                      refIdx: index,
-                    })
-                  }
-                ></RefSelect>
-              );
-            })}
-          </div>
-        )}
       </div>
     </div>
   );
