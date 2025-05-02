@@ -5,7 +5,7 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import { Proof } from "./Proof";
-import { useContextMenu } from "react-contexify";
+import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
 
 export function BoxProofStep({
@@ -14,29 +14,21 @@ export function BoxProofStep({
   const { setLineInFocus } = useProof();
   const { doTransition } = useInteractionState();
 
-  const { show } = useContextMenu({
-    id: "proof-step-context-menu",
-  });
+  const { setContextMenuPosition } = useContextMenu();
 
-  function handleContextMenu(
-    event:
-      | React.MouseEvent<HTMLElement>
-      | React.TouchEvent<HTMLElement>
-      | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent
-  ) {
-    show({
-      event,
-      props: {
-        uuid: props.uuid,
-      },
-    });
-  }
   return (
     <div
       className="relative"
       onMouseOverCapture={() => setLineInFocus(props.uuid)}
-      onContextMenuCapture={handleContextMenu}
+      onContextMenuCapture={(e) => {
+        e.preventDefault();
+        setContextMenuPosition({ x: e.clientX, y: e.clientY });
+        doTransition({
+          enum: TransitionEnum.RIGHT_CLICK_STEP,
+          proofStepUuid: props.uuid,
+          isBox: true,
+        });
+      }}
       onClick={() =>
         doTransition({
           enum: TransitionEnum.CLICK_BOX,

@@ -2,7 +2,6 @@ import { Diagnostic, TLineNumber } from "@/types/types";
 
 import { Tooltip } from "react-tooltip";
 import { cn } from "@/lib/utils";
-import { useContextMenu } from "react-contexify";
 import { useProof } from "@/contexts/ProofProvider";
 
 export function LineNumber({
@@ -13,25 +12,6 @@ export function LineNumber({
   proofStepDiagnostics?: Diagnostic;
 }) {
   const { isUnfocused } = useProof();
-
-  const { show } = useContextMenu({
-    id: "proof-step-context-menu",
-  });
-
-  function handleContextMenu(
-    event:
-      | React.MouseEvent<HTMLElement>
-      | React.TouchEvent<HTMLElement>
-      | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent
-  ) {
-    show({
-      event,
-      props: {
-        uuid: line.uuid,
-      },
-    });
-  }
 
   return (
     <>
@@ -47,7 +27,6 @@ export function LineNumber({
         data-tooltip-id={
           proofStepDiagnostics ? `line-number-tooltip-${line.uuid}` : ""
         }
-        onClick={handleContextMenu}
       >
         {line.lineNumber}.
       </p>

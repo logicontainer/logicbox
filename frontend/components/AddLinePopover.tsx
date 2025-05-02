@@ -3,11 +3,9 @@ import { AddBoxedLineCommand, AddLineCommand } from "@/lib/commands";
 import { PlusIcon } from "./PlusIcon";
 import { Tooltip } from "react-tooltip";
 import { useHistory } from "@/contexts/HistoryProvider";
-import { useProof } from "@/contexts/ProofProvider";
 
 export function AddLinePopover({ uuid }: { uuid: string }) {
   const historyContext = useHistory();
-  const proofContext = useProof();
   const handleAddLine = (isBox: boolean = false, prepend: boolean = false) => {
     const addLineCommand = isBox
       ? new AddBoxedLineCommand(uuid, prepend)
@@ -30,7 +28,7 @@ export function AddLinePopover({ uuid }: { uuid: string }) {
             onMouseOverCapture={(e) => {
               console.log("Capture mouse over");
               e.stopPropagation();
-              proofContext.setLineInFocus(proofContext.latestLineInFocus || "");
+              // proofContext.setLineInFocus(proofContext.latestLineInFocus || "");
             }}
           >
             <div
