@@ -47,7 +47,10 @@ export function Justification({
             )
           )
         }
-        onClick={onClickRule}
+        onClick={e => {
+          onClickRule()
+          e.stopPropagation()
+        }}
       >
         <InlineMath math={rule.latex.ruleName}></InlineMath>
       </span>
@@ -60,7 +63,10 @@ export function Justification({
               <span
                 key={i}
                 className="hover:text-red-500"
-                onClick={() => onClickRef(i)}
+                onClick={e => {
+                  onClickRef(i)
+                  e.stopPropagation()
+                }}
                 onMouseOver={() =>
                   onHover(
                     createHighlightedLatexRule(

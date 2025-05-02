@@ -76,7 +76,7 @@ export function LineProofStepView({
       onContextMenuCapture={handleContextMenu}
       onClick={() => doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })}
     >
-      <p className="shrink" onClick={() => doTransition({ enum: TransitionEnum.CLICK_FORMULA, lineUuid: props.uuid })}>
+      <p className="shrink">
         {props.formula.unsynced ? (
           props.formula.userInput
         ) : (
@@ -137,7 +137,7 @@ export function LineProofStepEdit({
       return;
     }
 
-    doTransition({ enum: TransitionEnum.SELECT_RULE, ruleName: newValue.value })
+    doTransition({ enum: TransitionEnum.UPDATE_RULE, ruleName: newValue.value })
   };
 
   function handleContextMenu(
