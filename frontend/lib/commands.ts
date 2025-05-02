@@ -19,9 +19,9 @@ export abstract class Command {
 export class AddLineCommand extends Command {
   private newLineUuid: string;
   private position: ProofStepPosition;
-  constructor(uuid: string, prepend: boolean = false) {
+  constructor(uuid: string, prepend: boolean = false, newLineUuid?: string) {
     super();
-    this.newLineUuid = uuidv4();
+    this.newLineUuid = newLineUuid ?? uuidv4();
     this.position = {
       nearProofStepWithUuid: uuid,
       prepend: prepend,
@@ -66,10 +66,10 @@ export class AddBoxedLineCommand extends Command {
   private newBoxUuid: string;
   private newLineUuid: string;
   private position: ProofStepPosition;
-  constructor(uuid: string, prepend: boolean = false) {
+  constructor(uuid: string, prepend: boolean = false, newLineUuid?: string, newBoxUuid?: string) {
     super();
-    this.newBoxUuid = uuidv4();
-    this.newLineUuid = uuidv4();
+    this.newBoxUuid = newBoxUuid ?? uuidv4();
+    this.newLineUuid = newLineUuid ?? uuidv4();
     this.position = {
       nearProofStepWithUuid: uuid,
       prepend: prepend,

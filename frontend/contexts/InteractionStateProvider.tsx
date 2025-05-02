@@ -5,6 +5,8 @@ import React, { useCallback } from "react";
 
 import { useProof } from "./ProofProvider";
 import {
+    AddBoxedLineCommand,
+  AddLineCommand,
   Command,
   RemoveProofStepCommand,
   UpdateLineProofStepCommand,
@@ -14,6 +16,8 @@ import { getLineBeingEdited } from "@/lib/state-helpers";
 import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
+import { v4 as uuidv4 } from "uuid"
+import { transferableAbortSignal } from "util";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -243,6 +247,17 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
     );
+  };
+
+  const addProofStep = (
+    uuid: string,
+    isBox: boolean = false,
+    prepend: boolean = false
+  ) => {
+    const addLineCommand = isBox
+      ? new AddBoxedLineCommand(uuid, prepend)
+      : new AddLineCommand(uuid, prepend);
+    historyContext.addToHistory(addLineCommand);
   };
 
   const startEditingFormula = (lineUuid: string) => {
@@ -481,9 +496,8 @@ export function InteractionStateProvider({
               );
             }
 
-            const line = getLineProofStep(
-              "TODO: Should get ID from context menu"
-            );
+            const line = getLineProofStep(state.proofStepUuid);
+
             return {
               enum: EDITING_FORMULA,
               lineUuid: state.proofStepUuid,
@@ -493,17 +507,25 @@ export function InteractionStateProvider({
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
             return { enum: IDLE };
-          default:
-            return { enum: IDLE };
+
+          case ContextMenuOptions.LINE_ABOVE: case ContextMenuOptions.LINE_BELOW: {
+            const newLineUuid = uuidv4()
+            enqueueCommand(new AddLineCommand(state.proofStepUuid, option === ContextMenuOptions.LINE_ABOVE, newLineUuid))
+            return { enum: EDITING_FORMULA, lineUuid: newLineUuid, currentFormula: "" }
+          }
+
+          case ContextMenuOptions.BOX_ABOVE: case ContextMenuOptions.BOX_BELOW: {
+            const newLineUuid = uuidv4()
+            enqueueCommand(new AddBoxedLineCommand(state.proofStepUuid, option === ContextMenuOptions.BOX_BELOW, newLineUuid))
+            return { enum: EDITING_FORMULA, lineUuid: newLineUuid, currentFormula: "" }
+          }
         }
       },
     },
   };
 
   const doTransition = (transition: Transition) => {
-    console.trace("doTransition 1", transition);
     setInteractionStateValue((prevState) => {
-      console.trace("doTransition 2", transition);
       const func = behavior[prevState.enum]?.[transition.enum] as
         | FuncForStateAndTransition<
             typeof prevState.enum,
