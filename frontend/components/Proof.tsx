@@ -18,6 +18,7 @@ export function Proof({
   proof: ProofStep[];
   lines: TLineNumber[];
   uuid?: string;
+  isOuterProof?: boolean;
 }) {
   const { isFocused } = useProof();
   const isInFocus = isFocused(props.uuid || "");
@@ -25,9 +26,11 @@ export function Proof({
   return (
     <div
       className={cn(
-        "outline-2 outline outline-slate-800 text-slate-800 px-4 cursor-auto",
-        isInFocus ? "outline-green-400" : ""
+        " text-slate-800 px-4 cursor-auto",
+        !props.isOuterProof && "outline outline-slate-800",
+        isInFocus && "outline-blue-400"
       )}
+      style={{ outlineWidth: "1.5px" }}
     >
       {props.proof.map((proofStep) => {
         if (proofStep.stepType == "line") {

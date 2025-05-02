@@ -37,7 +37,7 @@ export default function Home() {
               onClick={(e) => e.stopPropagation()}
             >
               <LineNumbers lines={lines} />
-              <Proof proof={proofContext.proof} lines={lines} />
+              <Proof proof={proofContext.proof} lines={lines} isOuterProof />
               <Tooltip
                 id={`tooltip-id-${proofContext.lineInFocus}`}
                 place="right"
