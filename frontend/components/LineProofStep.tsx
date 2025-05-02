@@ -1,6 +1,5 @@
 import "katex/dist/katex.min.css";
 
-import AutosizeInput, { AutosizeInputProps } from "react-input-autosize";
 import {
   InteractionStateEnum,
   TransitionEnum,
@@ -9,6 +8,7 @@ import {
 import Select, { SingleValue, Theme } from "react-select";
 import { TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
 
+import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
 import React from "react";
@@ -39,7 +39,7 @@ export function LineProofStepView({
   const { setLineInFocus, isFocused } = useProof();
 
   const { doTransition } = useInteractionState();
-  const { setContextMenuDOMEvent } = useContextMenu();
+  const { setContextMenuPosition } = useContextMenu();
 
   const [tooltipContent, setTooltipContent] = useState<string>();
   const isInFocus = isFocused(props.uuid);
@@ -57,10 +57,11 @@ export function LineProofStepView({
       onMouseOver={() => setLineInFocus(props.uuid)}
       onContextMenuCapture={(e) => {
         e.preventDefault();
-        setContextMenuDOMEvent(e);
+        setContextMenuPosition({ x: e.clientX, y: e.clientY });
         doTransition({
           enum: TransitionEnum.RIGHT_CLICK_STEP,
           proofStepUuid: props.uuid,
+          isBox: false,
         });
       }}
       onClick={() =>
@@ -111,7 +112,9 @@ export function LineProofStepEdit({
   const proofContext = useProof();
   const rulesetContext = useRuleset();
 
-  const { setContextMenuDOMEvent } = useContextMenu();
+  const { setContextMenuPosition } = useContextMenu();
+
+  const formulaInputRef = React.useRef<HTMLInputElement>(null);
 
   const currentlyEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE &&
@@ -157,7 +160,6 @@ export function LineProofStepEdit({
     },
   });
 
-  const formulaInputRef = React.useRef<HTMLInputElement>(null);
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
     formulaInputRef.current = ref;
   };
@@ -166,11 +168,6 @@ export function LineProofStepEdit({
     if (currentlyEditingFormula && key === "Enter") {
       doTransition({ enum: TransitionEnum.CLOSE });
       formulaInputRef.current?.blur();
-    } else if (currentlyEditingFormula) {
-      doTransition({
-        enum: TransitionEnum.UPDATE_FORMULA,
-        formula: formulaContent,
-      });
     }
   };
 
@@ -191,25 +188,26 @@ export function LineProofStepEdit({
       }}
       onContextMenuCapture={(e) => {
         e.preventDefault();
-        setContextMenuDOMEvent(e);
+        setContextMenuPosition({ x: e.clientX, y: e.clientY });
         doTransition({
           enum: TransitionEnum.RIGHT_CLICK_STEP,
           proofStepUuid: props.uuid,
+          isBox: false,
         });
       }}
     >
       <AutosizeInput
         inputRef={handleInputRefChange}
         value={formulaContent}
-        onChange={(e) =>
+        onChange={(e) => {
+          console.log(e);
           doTransition({
             enum: TransitionEnum.UPDATE_FORMULA,
             formula: e.target.value,
-          })
-        }
+          });
+        }}
         autoFocus={currentlyEditingFormula}
         onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-        onSubmit={() => console.log("Balls")}
         title="Write a formula"
         className="text-slate-800 grow resize shrink"
         inputClassName="px-2"

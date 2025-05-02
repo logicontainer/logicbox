@@ -1,14 +1,19 @@
 "use client";
 
 import { LineProofStep } from "@/types/types";
-import React from "react";
+import React, { useCallback } from "react";
 
 import { useProof } from "./ProofProvider";
-import { Command, UpdateLineProofStepCommand } from "@/lib/commands";
+import {
+  Command,
+  RemoveProofStepCommand,
+  UpdateLineProofStepCommand,
+} from "@/lib/commands";
 import { useHistory } from "./HistoryProvider";
 import { getLineBeingEdited } from "@/lib/state-helpers";
 import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
+import { ContextMenuOptions } from "./ContextMenuProvider";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -23,6 +28,8 @@ export enum TransitionEnum {
   UPDATE_FORMULA,
 
   VALIDATE_PROOF,
+
+  CLICK_CONTEXT_MENU_OPTION,
 
   CLOSE,
 }
@@ -49,13 +56,18 @@ export type InteractionState = { enum: InteractionStateEnum } & (
   | {
       enum: InteractionStateEnum.VIEWING_CONTEXT_MENU;
       proofStepUuid: string;
+      isBox: boolean;
     }
 );
 
 export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
-  | { enum: TransitionEnum.RIGHT_CLICK_STEP; proofStepUuid: string }
+  | {
+      enum: TransitionEnum.RIGHT_CLICK_STEP;
+      proofStepUuid: string;
+      isBox: boolean;
+    }
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
   | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
@@ -63,6 +75,10 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.VALIDATE_PROOF }
   | { enum: TransitionEnum.UPDATE_RULE; ruleName: string }
   | { enum: TransitionEnum.UPDATE_FORMULA; formula: string }
+  | {
+      enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION;
+      option: ContextMenuOptions;
+    }
 );
 
 type FuncForStateAndTransition<
@@ -256,6 +272,7 @@ export function InteractionStateProvider({
     UPDATE_FORMULA,
     CLICK_OUTSIDE,
     VALIDATE_PROOF,
+    CLICK_CONTEXT_MENU_OPTION,
   } = TransitionEnum;
 
   const doNothing = (s: any) => s;
@@ -274,8 +291,8 @@ export function InteractionStateProvider({
 
       [CLICK_BOX]: doNothing,
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
-        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
 
       [VALIDATE_PROOF]: (state, _) => {
@@ -325,9 +342,9 @@ export function InteractionStateProvider({
         return { enum: IDLE };
       },
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
         updateFormulaInProof(state.lineUuid, state.currentFormula);
-        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
 
@@ -356,8 +373,8 @@ export function InteractionStateProvider({
 
       [CLOSE]: () => ({ enum: IDLE }),
 
-      [RIGHT_CLICK_STEP]: (_, { proofStepUuid }) => {
-        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
 
@@ -419,8 +436,8 @@ export function InteractionStateProvider({
 
       [CLOSE]: () => ({ enum: IDLE }),
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
-        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
     [VIEWING_CONTEXT_MENU]: {
@@ -444,8 +461,8 @@ export function InteractionStateProvider({
         refIdx,
       }),
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
-        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
 
       [VALIDATE_PROOF]: () => {
@@ -454,11 +471,39 @@ export function InteractionStateProvider({
       },
 
       [CLOSE]: () => ({ enum: IDLE }),
+
+      [CLICK_CONTEXT_MENU_OPTION]: (state, { option }) => {
+        switch (option) {
+          case ContextMenuOptions.EDIT:
+            if (state.isBox) {
+              throw new Error(
+                "Editing a box is not implemented yet. Why are you here?"
+              );
+            }
+
+            const line = getLineProofStep(
+              "TODO: Should get ID from context menu"
+            );
+            return {
+              enum: EDITING_FORMULA,
+              lineUuid: state.proofStepUuid,
+              currentFormula: line.formula.userInput,
+            };
+
+          case ContextMenuOptions.DELETE:
+            enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
+            return { enum: IDLE };
+          default:
+            return { enum: IDLE };
+        }
+      },
     },
   };
 
   const doTransition = (transition: Transition) => {
+    console.trace("doTransition 1", transition);
     setInteractionStateValue((prevState) => {
+      console.trace("doTransition 2", transition);
       const func = behavior[prevState.enum]?.[transition.enum] as
         | FuncForStateAndTransition<
             typeof prevState.enum,

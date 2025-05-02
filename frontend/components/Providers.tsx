@@ -1,8 +1,7 @@
 "use client";
 
-import { HistoryProvider, useHistory } from "@/contexts/HistoryProvider";
-
 import { ContextMenuProvider } from "@/contexts/ContextMenuProvider";
+import { HistoryProvider } from "@/contexts/HistoryProvider";
 import { InteractionStateProvider } from "@/contexts/InteractionStateProvider";
 import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";

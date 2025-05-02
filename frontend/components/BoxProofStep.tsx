@@ -14,7 +14,7 @@ export function BoxProofStep({
   const { setLineInFocus } = useProof();
   const { doTransition } = useInteractionState();
 
-  const { setContextMenuDOMEvent } = useContextMenu();
+  const { setContextMenuPosition } = useContextMenu();
 
   return (
     <div
@@ -22,10 +22,11 @@ export function BoxProofStep({
       onMouseOverCapture={() => setLineInFocus(props.uuid)}
       onContextMenuCapture={(e) => {
         e.preventDefault();
-        setContextMenuDOMEvent(e);
+        setContextMenuPosition({ x: e.clientX, y: e.clientY });
         doTransition({
           enum: TransitionEnum.RIGHT_CLICK_STEP,
           proofStepUuid: props.uuid,
+          isBox: true,
         });
       }}
       onClick={() =>

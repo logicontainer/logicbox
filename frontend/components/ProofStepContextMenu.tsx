@@ -1,118 +1,161 @@
-import "react-contexify/ReactContexify.css";
-
+import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons";
 import {
-  AddBoxedLineCommand,
-  AddLineCommand,
-  RemoveProofStepCommand,
-} from "@/lib/commands";
-import { Item, ItemParams, Menu, Separator, Submenu } from "react-contexify";
+  ContextMenuOptions,
+  useContextMenu,
+} from "@/contexts/ContextMenuProvider";
+import {
+  InteractionStateEnum,
+  TransitionEnum,
+  useInteractionState,
+} from "@/contexts/InteractionStateProvider";
 
-import { LineProofStep } from "@/types/types";
-import { useHistory } from "@/contexts/HistoryProvider";
-import { useProof } from "@/contexts/ProofProvider";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
-const MENU_ID = "proof-step-context-menu";
+export function ProofStepContextMenu() {
+  const {
+    contextMenuShouldBeVisible,
+    contextMenuPosition: { x, y },
+  } = useContextMenu();
 
-export function ProofStepContextMenu({
-  onVisibilityChange,
-}: {
-  onVisibilityChange: (visible: boolean) => void;
-}) {
-  const historyContext = useHistory();
-  const proofContext = useProof();
+  // const historyContext = useHistory();
+  const { interactionState, doTransition } = useInteractionState();
 
-  const handleAddProofStep = (
-    uuid: string,
-    isBox: boolean = false,
-    prepend: boolean = false
-  ) => {
-    const addLineCommand = isBox
-      ? new AddBoxedLineCommand(uuid, prepend)
-      : new AddLineCommand(uuid, prepend);
-    historyContext.addToHistory(addLineCommand);
-  };
+  // const handleAddProofStep = (
+  //   uuid: string,
+  //   isBox: boolean = false,
+  //   prepend: boolean = false
+  // ) => {
+  //   const addLineCommand = isBox
+  //     ? new AddBoxedLineCommand(uuid, prepend)
+  //     : new AddLineCommand(uuid, prepend);
+  //   historyContext.addToHistory(addLineCommand);
+  // };
 
-  const handleRemoveProofStep = (uuid: string) => {
-    const removeLineCommand = new RemoveProofStepCommand(uuid);
-    historyContext.addToHistory(removeLineCommand);
-  };
-
-  const handleUpdateProofStep = (
-    uuid: string,
-    updatedLineProofStep: LineProofStep
-  ) => {
-    console.log(updatedLineProofStep.uuid);
-    proofContext.setActiveEdit(uuid);
-  };
-
-  const handleItemClick = ({ id, props }: ItemParams) => {
-    console.log("handleItemClick", id, props);
+  const handleItemClick = (id: string) => {
     switch (id) {
       case "edit":
-        console.log("edit", props.uuid);
-        handleUpdateProofStep(props.uuid, {
-          uuid: props.uuid,
-          stepType: "line",
-          formula: {
-            userInput: "",
-          },
-          justification: {
-            rule: "",
-            refs: [],
-          },
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.EDIT,
         });
         break;
-      case "line-above":
-        handleAddProofStep(props.uuid, false, true);
-        break;
-      case "line-below":
-        handleAddProofStep(props.uuid, false, false);
-        break;
-      case "box-above":
-        handleAddProofStep(props.uuid, true, true);
-        break;
-      case "box-below":
-        handleAddProofStep(props.uuid, true, false);
-        break;
+      // case "line-above":
+      //   handleAddProofStep(props.uuid, false, true);
+      //   break;
+      // case "line-below":
+      //   handleAddProofStep(props.uuid, false, false);
+      //   break;
+      // case "box-above":
+      //   handleAddProofStep(props.uuid, true, true);
+      //   break;
+      // case "box-below":
+      //   handleAddProofStep(props.uuid, true, false);
+      //   break;
       case "delete":
-        handleRemoveProofStep(props.uuid);
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.DELETE,
+        });
         break;
     }
   };
 
+  if (interactionState.enum !== InteractionStateEnum.VIEWING_CONTEXT_MENU) {
+    return null;
+  }
+
+  if (!contextMenuShouldBeVisible) {
+    return null;
+  }
+
   return (
-    <div>
-      <Menu
-        id={MENU_ID}
-        onVisibilityChange={onVisibilityChange}
-        onBlur={(e) => e.preventDefault()}
-        animation={false}
-      >
+    <div
+      className={
+        "absolute z-50 bg-white min-w-48 rounded-md shadow-md overflow-hidden"
+      }
+      style={{ top: y, left: x }}
+    >
+      {!interactionState.isBox && (
         <Item id="edit" onClick={handleItemClick}>
           Edit
         </Item>
-        <Separator />
-        <Submenu label="Add above">
-          <Item id="line-above" onClick={handleItemClick}>
-            Line
-          </Item>
-          <Item id="box-above" onClick={handleItemClick}>
-            Box
-          </Item>
-        </Submenu>
-        <Submenu label="Add below">
-          <Item id="line-below" onClick={handleItemClick}>
-            Line
-          </Item>
-          <Item id="box-below" onClick={handleItemClick}>
-            Box
-          </Item>
-        </Submenu>
-        <Separator />
-        <Item id="delete" className="text-red-500" onClick={handleItemClick}>
-          Delete
-        </Item>
-      </Menu>
+      )}
+      <hr />
+      <Item
+        id="line-above"
+        onClick={handleItemClick}
+        className="flex justify-between gap-2 items-center"
+      >
+        <div className="text"> Add line</div>
+        <div className={"flex items-center"}>
+          <Button
+            variant={"ghost"}
+            size="icon"
+            className="flex justify-center items-center h-7 w-7"
+          >
+            <ArrowUpIcon className="inline-block" />
+          </Button>
+          <Button
+            variant={"ghost"}
+            size="icon"
+            className="flex justify-center items-center h-7 w-7"
+          >
+            <ArrowDownIcon className="inline-block" />
+          </Button>
+        </div>
+      </Item>
+      <Item
+        id="line-above"
+        onClick={handleItemClick}
+        className="flex justify-between gap-2 items-center"
+      >
+        <div className="text"> Add box</div>
+        <div className={"flex items-center"}>
+          <Button
+            variant={"ghost"}
+            size="icon"
+            className="flex justify-center items-center h-7 w-7"
+          >
+            <ArrowUpIcon className="inline-block" />
+          </Button>
+          <Button
+            variant={"ghost"}
+            size="icon"
+            className="flex justify-center items-center h-7 w-7"
+          >
+            <ArrowDownIcon className="inline-block" />
+          </Button>
+        </div>
+      </Item>
+      <hr />
+      <Item id="delete" className="text-red-500" onClick={handleItemClick}>
+        Delete
+      </Item>
+    </div>
+  );
+}
+
+function Item({
+  id,
+  onClick,
+  className,
+  children,
+}: {
+  children: React.ReactNode;
+  id: string;
+  className?: string;
+  onClick: (id: string) => void;
+}) {
+  return (
+    <div
+      className={cn("p-2 hover:bg-slate-200 cursor-pointer h-10", className)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(id);
+      }}
+    >
+      {children}
     </div>
   );
 }

@@ -1,37 +1,36 @@
 "use client";
 
 import {
-  BoxProofStep,
-  LineProofStep,
-  Proof,
-  ProofStep,
-  ProofStepDetails,
-  ProofStepPosition,
-  TLineNumber,
-} from "@/types/types";
-import {
   InteractionStateEnum,
   useInteractionState,
 } from "./InteractionStateProvider";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import _ from "lodash";
-import { useProof } from "./ProofProvider";
-import { useContextMenu as useReactContexifyMenu } from "react-contexify";
 
+export enum ContextMenuOptions {
+  EDIT,
+  DELETE,
+  LINE_ABOVE,
+  LINE_BELOW,
+  BOX_ABOVE,
+  BOX_BELOW,
+}
+
+export type ContextMenuPosition = {
+  x: number;
+  y: number;
+};
 export interface ContextMenuContextProps {
-  setContextMenuDOMEvent: (
-    event:
-      | React.MouseEvent<HTMLElement>
-      | React.TouchEvent<HTMLElement>
-      | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent
-  ) => void;
+  contextMenuShouldBeVisible: boolean;
+  contextMenuPosition: ContextMenuPosition;
+  setContextMenuPosition: (position: ContextMenuPosition) => void;
 }
 // Context Setup
 const ContextMenuContext = React.createContext<ContextMenuContextProps>({
-  setContextMenuDOMEvent: () => {},
+  contextMenuShouldBeVisible: false,
+  contextMenuPosition: { x: 0, y: 0 },
+  setContextMenuPosition: () => {},
 });
 
 export function useContextMenu() {
@@ -45,56 +44,25 @@ export function useContextMenu() {
 export function ContextMenuProvider({
   children,
 }: React.PropsWithChildren<object>) {
-  const [contextMenuDOMEvent, setContextMenuDOMEvent] = useState<
-    | React.MouseEvent<HTMLElement>
-    | React.TouchEvent<HTMLElement>
-    | React.KeyboardEvent<HTMLElement>
-    | KeyboardEvent
-    | null
-  >(null);
+  const [contextMenuPosition, setContextMenuPosition] =
+    useState<ContextMenuPosition>({
+      x: 0,
+      y: 0,
+    });
 
   const { interactionState } = useInteractionState();
 
-  const { show, hideAll } = useReactContexifyMenu({
-    id: "proof-step-context-menu",
-  });
-
-  const [trackedContextMenuVisibility, setTrackedContextMenuVisibility] =
-    useState(false); // Should not be updated as reaction to state change. Should just track the state of the context menu
-
-  useEffect(() => {
-    const contextMenuShouldBeVisible =
-      interactionState.enum === InteractionStateEnum.VIEWING_CONTEXT_MENU;
-    if (contextMenuShouldBeVisible && trackedContextMenuVisibility === false) {
-      console.log("balls");
-      if (contextMenuDOMEvent === null) {
-        throw new Error("contextMenuDOMEvent is null");
-      }
-      queueMicrotask(() => {
-        show({
-          event: contextMenuDOMEvent,
-          props: {
-            uuid: interactionState.proofStepUuid,
-          },
-        });
-      });
-    }
-
-    if (!contextMenuShouldBeVisible && trackedContextMenuVisibility === true) {
-      hideAll();
-      setContextMenuDOMEvent(null);
-    }
-  }, [interactionState, trackedContextMenuVisibility]);
+  const contextMenuShouldBeVisible =
+    interactionState.enum === InteractionStateEnum.VIEWING_CONTEXT_MENU;
 
   return (
     <ContextMenuContext.Provider
       value={{
-        setContextMenuDOMEvent,
+        contextMenuShouldBeVisible,
+        contextMenuPosition,
+        setContextMenuPosition,
       }}
     >
-      <ProofStepContextMenu
-        onVisibilityChange={setTrackedContextMenuVisibility}
-      />
       {children}
     </ContextMenuContext.Provider>
   );
