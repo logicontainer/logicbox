@@ -78,7 +78,9 @@ export function ProofStepContextMenu() {
 
   return (
     <div>
-      <Menu id={MENU_ID}>
+      <Menu 
+        id={MENU_ID}
+      >
         <Item id="edit" onClick={handleItemClick}>
           Edit
         </Item>

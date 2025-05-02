@@ -19,9 +19,9 @@ export enum TransitionEnum {
   // RIGHT_CLICK_LINE,
   // RIGHT_CLICK_BOX,
   
-  EDIT_RULE,
-  EDIT_REF,
-  EDIT_FORMULA,
+  CLICK_RULE,
+  CLICK_REF,
+  CLICK_FORMULA,
 
   SELECT_RULE,
   UPDATE_FORMULA,
@@ -34,7 +34,6 @@ export enum TransitionEnum {
 export enum InteractionStateEnum {
   IDLE,
 
-  EDITING_LINE,
   EDITING_REF,
   EDITING_FORMULA,
   EDITING_RULE,
@@ -44,7 +43,6 @@ export enum InteractionStateEnum {
 
 export type InteractionState = { enum: InteractionStateEnum } & (
   | { enum: InteractionStateEnum.IDLE }
-  | { enum: InteractionStateEnum.EDITING_LINE; lineUuid: string }
   | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string; }
   | { enum: InteractionStateEnum.EDITING_FORMULA; lineUuid: string; currentFormula: string }
   | { enum: InteractionStateEnum.EDITING_REF; lineUuid: string; refIdx: number }
@@ -54,10 +52,10 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
-  | { enum: TransitionEnum.EDIT_RULE }
+  | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
+  | { enum: TransitionEnum.CLICK_FORMULA; lineUuid: string  }
+  | { enum: TransitionEnum.CLICK_REF; lineUuid: string; refIdx: number }
   | { enum: TransitionEnum.VALIDATE_PROOF }
-  | { enum: TransitionEnum.EDIT_FORMULA }
-  | { enum: TransitionEnum.EDIT_REF; refIdx: number }
   | { enum: TransitionEnum.SELECT_RULE; ruleName: string }
   | { enum: TransitionEnum.UPDATE_FORMULA; formula: string }
 );
@@ -210,42 +208,30 @@ export function InteractionStateProvider({
     enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
   }
 
-  const { EDITING_LINE, IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } = InteractionStateEnum
-  const { EDIT_REF, EDIT_RULE, EDIT_FORMULA, CLICK_LINE, SELECT_RULE, CLOSE, UPDATE_FORMULA, CLICK_OUTSIDE, VALIDATE_PROOF } = TransitionEnum
+  const startEditingFormula = (lineUuid: string) => {
+    const line = getLineProofStep(lineUuid)
+    return { enum: InteractionStateEnum.EDITING_FORMULA, lineUuid, currentFormula: line.formula.userInput } satisfies InteractionState
+  }
+
+  const { IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } = InteractionStateEnum
+  const { CLICK_REF, CLICK_RULE, CLICK_FORMULA, CLICK_LINE, SELECT_RULE, CLOSE, UPDATE_FORMULA, CLICK_OUTSIDE, VALIDATE_PROOF } = TransitionEnum
 
   const behavior: Behavior = {
     [IDLE]: {
-      [CLICK_LINE]: (_, trans) => ({ enum: EDITING_LINE, lineUuid: trans.lineUuid }),
+      [CLICK_LINE]: (_, { lineUuid }) => {
+        return startEditingFormula(lineUuid)
+      },
       [VALIDATE_PROOF]: (state, _) => {
         enqueueCommand(Validate.VALIDATE)
         return state
-      }
-    },
-
-    [EDITING_LINE]: {
-      [CLICK_LINE]: (state, trans) => {
-        if (trans.lineUuid == state.lineUuid)
-          return state;
-
-        return {
-          enum: InteractionStateEnum.EDITING_LINE,
-          lineUuid: trans.lineUuid,
-        };
       },
-
-      [EDIT_RULE]: (state, _) => ({ enum: EDITING_RULE, lineUuid: state.lineUuid }),
-      [EDIT_REF]: (state, { refIdx }) => ({ enum: EDITING_REF, lineUuid: state.lineUuid, refIdx }),
-      [EDIT_FORMULA]: (state, _) => {
+      [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
+      [CLICK_REF]: (_, { lineUuid, refIdx }) => ({ enum: EDITING_REF, lineUuid, refIdx }),
+      [CLICK_FORMULA]: (_, { lineUuid }) => {
         // obtain the contents of the formula
-        const { formula: { userInput } } = getLineProofStep(state.lineUuid)
-        return ({ enum: EDITING_FORMULA, lineUuid: state.lineUuid, currentFormula: userInput })
+        const { formula: { userInput } } = getLineProofStep(lineUuid)
+        return ({ enum: EDITING_FORMULA, lineUuid, currentFormula: userInput })
       },
-
-      [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
-      [VALIDATE_PROOF]: () => {
-        enqueueCommand(Validate.VALIDATE)
-        return { enum: IDLE }
-      }
     },
 
     [EDITING_FORMULA]: {
@@ -254,14 +240,14 @@ export function InteractionStateProvider({
       },
       [CLOSE]: (state, _) => {
         updateFormula(state.lineUuid, state.currentFormula)
-        return { enum: EDITING_LINE, lineUuid: state.lineUuid }
+        return { enum: IDLE }
       },
       [CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
         // we are exiting this state, so update formula in proof
         updateFormula(state.lineUuid, state.currentFormula)
 
         // go to editing mode on the clicked line
-        return { enum: EDITING_LINE, lineUuid: clickedLineUuid }
+        return startEditingFormula(clickedLineUuid)
       },
       [CLICK_OUTSIDE]: (state, _) => {
         updateFormula(state.lineUuid, state.currentFormula);
@@ -275,26 +261,26 @@ export function InteractionStateProvider({
     },
 
     [EDITING_REF]: {
-      [EDIT_REF]: (state, trans) => {
+      [CLICK_REF]: (state, trans) => {
         if (trans.refIdx === state.refIdx) {
           // unselect
-          return { enum: EDITING_LINE, lineUuid: state.lineUuid }
+          return { enum: IDLE }
         }
 
         return { enum: EDITING_REF, lineUuid: state.lineUuid, refIdx: trans.refIdx }
       },
       [CLICK_LINE]: ({ refIdx, lineUuid: editedLineUuid }, { lineUuid: clickedLineUuid }) => {
         updateRef(editedLineUuid, refIdx, clickedLineUuid)
-        return { enum: EDITING_LINE, lineUuid: editedLineUuid }
+        return { enum: IDLE }
       },
     },
 
     [EDITING_RULE]: {
       [SELECT_RULE]: ({ lineUuid }, { ruleName }) => {
         updateRule(lineUuid, ruleName)
-        return { enum: EDITING_LINE, lineUuid }
+        return { enum: IDLE }
       },
-      [CLOSE]: ({lineUuid}, _) => ({ enum: EDITING_LINE, lineUuid })
+      [CLOSE]: () => ({ enum: IDLE })
     },
   };
 

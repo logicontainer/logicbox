@@ -10,10 +10,14 @@ export function Justification({
   justification,
   lines,
   onHover,
+  onClickRule,
+  onClickRef,
 }: {
   justification: TJustification;
   lines: TLineNumber[];
   onHover: (highlightedLatex: string) => void;
+  onClickRule: () => void;
+  onClickRef: (idx: number) => void;
 }) {
   const { ruleset } = useRuleset();
   const rule = ruleset.rules.find(
@@ -43,6 +47,7 @@ export function Justification({
             )
           )
         }
+        onClick={onClickRule}
       >
         <InlineMath math={rule.latex.ruleName}></InlineMath>
       </span>
@@ -55,6 +60,7 @@ export function Justification({
               <span
                 key={i}
                 className="hover:text-red-500"
+                onClick={() => onClickRef(i)}
                 onMouseOver={() =>
                   onHover(
                     createHighlightedLatexRule(

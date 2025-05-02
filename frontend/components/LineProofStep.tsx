@@ -73,10 +73,10 @@ export function LineProofStepView({
         isInFocus ? "text-blue-400" : ""
       )}
       onMouseOver={() => setLineInFocus(props.uuid)}
-      onClick={() => doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })}
       onContextMenuCapture={handleContextMenu}
+      onClick={() => doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })}
     >
-      <p className="shrink">
+      <p className="shrink" onClick={() => doTransition({ enum: TransitionEnum.CLICK_FORMULA, lineUuid: props.uuid })}>
         {props.formula.unsynced ? (
           props.formula.userInput
         ) : (
@@ -91,6 +91,8 @@ export function LineProofStepView({
           justification={props.justification}
           lines={props.lines}
           onHover={handleOnHoverJustification}
+          onClickRule={() => doTransition({ enum: TransitionEnum.CLICK_RULE, lineUuid: props.uuid })}
+          onClickRef={refIdx => doTransition({ enum: TransitionEnum.CLICK_REF, lineUuid: props.uuid, refIdx })}
         />
       </div>
     </div>
@@ -162,11 +164,6 @@ export function LineProofStepEdit({
     },
   });
 
-  const onFocusAutoSizeInput = () => {
-    if (!currentlyEditingFormula) 
-      doTransition({ enum: TransitionEnum.EDIT_FORMULA })
-  }
-
   const formulaInputRef = React.useRef<HTMLInputElement>(null)
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
     formulaInputRef.current = ref
@@ -200,7 +197,7 @@ export function LineProofStepEdit({
         value={formulaContent}
         onChange={e => doTransition({ enum: TransitionEnum.UPDATE_FORMULA, formula: e.target.value })}
 
-        onFocus={onFocusAutoSizeInput}
+        autoFocus={currentlyEditingFormula}
         onKeyDown={e => onKeyDownAutoSizeInput(e.key)}
 
         onSubmit={() => console.log("Balls")}
@@ -221,7 +218,7 @@ export function LineProofStepEdit({
           onChange={handleChangeRule}
 
           menuIsOpen={currentlyEditingRule}
-          onMenuOpen={() => doTransition({ enum: TransitionEnum.EDIT_RULE })}
+          onMenuOpen={() => doTransition({ enum: TransitionEnum.CLICK_RULE, lineUuid: props.uuid })}
           closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
 
           options={rulesetContext.rulesetDropdownOptions}
@@ -253,7 +250,7 @@ export function LineProofStepEdit({
                     interactionState.lineUuid === props.uuid && 
                     interactionState.refIdx === index
                   }
-                  onClick={() => doTransition({ enum: TransitionEnum.EDIT_REF, refIdx: index })}
+                  onClick={() => doTransition({ enum: TransitionEnum.CLICK_REF, lineUuid: props.uuid, refIdx: index })}
                 ></RefSelect>
               );
             })}
