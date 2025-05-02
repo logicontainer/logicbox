@@ -13,7 +13,11 @@ import { useProof } from "@/contexts/ProofProvider";
 
 const MENU_ID = "proof-step-context-menu";
 
-export function ProofStepContextMenu() {
+export function ProofStepContextMenu({
+  onVisibilityChange,
+}: {
+  onVisibilityChange: (visible: boolean) => void;
+}) {
   const historyContext = useHistory();
   const proofContext = useProof();
 
@@ -78,8 +82,11 @@ export function ProofStepContextMenu() {
 
   return (
     <div>
-      <Menu 
+      <Menu
         id={MENU_ID}
+        onVisibilityChange={onVisibilityChange}
+        onBlur={(e) => e.preventDefault()}
+        animation={false}
       >
         <Item id="edit" onClick={handleItemClick}>
           Edit

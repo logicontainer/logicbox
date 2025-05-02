@@ -1,28 +1,30 @@
 import "katex/dist/katex.min.css";
 
+import AutosizeInput, { AutosizeInputProps } from "react-input-autosize";
+import {
+  InteractionStateEnum,
+  TransitionEnum,
+  useInteractionState,
+} from "@/contexts/InteractionStateProvider";
 import Select, { SingleValue, Theme } from "react-select";
 import { TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
 
-import AutosizeInput, { AutosizeInputProps } from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
+import React from "react";
 import { RefSelect } from "./RefSelect";
-import { UpdateLineProofStepCommand } from "@/lib/commands";
 import { cn } from "@/lib/utils";
-import { useContextMenu } from "react-contexify";
-import { useHistory } from "@/contexts/HistoryProvider";
+import { lineIsBeingEdited } from "@/lib/state-helpers";
+import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import { useState } from "react";
-import { InteractionStateEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
-import { lineIsBeingEdited } from "@/lib/state-helpers";
-import React from "react";
 
 export function LineProofStep({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
-  const { interactionState } = useInteractionState()
-  const isTheActiveEdit = lineIsBeingEdited(props.uuid, interactionState)
+  const { interactionState } = useInteractionState();
+  const isTheActiveEdit = lineIsBeingEdited(props.uuid, interactionState);
 
   return isTheActiveEdit ? (
     <LineProofStepEdit {...props} />
@@ -34,12 +36,10 @@ export function LineProofStep({
 export function LineProofStepView({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
-  const {
-    setLineInFocus,
-    isFocused,
-  } = useProof();
+  const { setLineInFocus, isFocused } = useProof();
 
-  const { doTransition } = useInteractionState()
+  const { doTransition } = useInteractionState();
+  const { setContextMenuDOMEvent } = useContextMenu();
 
   const [tooltipContent, setTooltipContent] = useState<string>();
   const isInFocus = isFocused(props.uuid);
@@ -48,24 +48,6 @@ export function LineProofStepView({
     setTooltipContent(highlightedLatex);
   };
 
-  const { show } = useContextMenu({
-    id: "proof-step-context-menu",
-  });
-
-  function handleContextMenu(
-    event:
-      | React.MouseEvent<HTMLElement>
-      | React.TouchEvent<HTMLElement>
-      | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent
-  ) {
-    show({
-      event,
-      props: {
-        uuid: props.uuid,
-      },
-    });
-  }
   return (
     <div
       className={cn(
@@ -73,8 +55,17 @@ export function LineProofStepView({
         isInFocus ? "text-blue-400" : ""
       )}
       onMouseOver={() => setLineInFocus(props.uuid)}
-      onContextMenuCapture={handleContextMenu}
-      onClick={() => doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })}
+      onContextMenuCapture={(e) => {
+        e.preventDefault();
+        setContextMenuDOMEvent(e);
+        doTransition({
+          enum: TransitionEnum.RIGHT_CLICK_STEP,
+          proofStepUuid: props.uuid,
+        });
+      }}
+      onClick={() =>
+        doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })
+      }
     >
       <p className="shrink">
         {props.formula.unsynced ? (
@@ -91,8 +82,19 @@ export function LineProofStepView({
           justification={props.justification}
           lines={props.lines}
           onHover={handleOnHoverJustification}
-          onClickRule={() => doTransition({ enum: TransitionEnum.CLICK_RULE, lineUuid: props.uuid })}
-          onClickRef={refIdx => doTransition({ enum: TransitionEnum.CLICK_REF, lineUuid: props.uuid, refIdx })}
+          onClickRule={() =>
+            doTransition({
+              enum: TransitionEnum.CLICK_RULE,
+              lineUuid: props.uuid,
+            })
+          }
+          onClickRef={(refIdx) =>
+            doTransition({
+              enum: TransitionEnum.CLICK_REF,
+              lineUuid: props.uuid,
+              refIdx,
+            })
+          }
         />
       </div>
     </div>
@@ -102,20 +104,21 @@ export function LineProofStepView({
 export function LineProofStepEdit({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
-
-  const { setLineInFocus, } = useProof();
-  const { interactionState, doTransition } = useInteractionState()
+  const { setLineInFocus } = useProof();
+  const { interactionState, doTransition } = useInteractionState();
 
   const [tooltipContent] = useState<string>("");
   const proofContext = useProof();
   const rulesetContext = useRuleset();
 
-  const currentlyEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE && interactionState.lineUuid === props.uuid
-  const currentlyEditingFormula = interactionState.enum === InteractionStateEnum.EDITING_FORMULA && interactionState.lineUuid === props.uuid
+  const { setContextMenuDOMEvent } = useContextMenu();
 
-  const { show } = useContextMenu({
-    id: "proof-step-context-menu",
-  });
+  const currentlyEditingRule =
+    interactionState.enum === InteractionStateEnum.EDITING_RULE &&
+    interactionState.lineUuid === props.uuid;
+  const currentlyEditingFormula =
+    interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
+    interactionState.lineUuid === props.uuid;
 
   const currLineProofStepDetails = proofContext.getProofStepDetails(props.uuid);
   if (currLineProofStepDetails?.proofStep.stepType !== "line") {
@@ -124,7 +127,9 @@ export function LineProofStepEdit({
   const currLineProofStep =
     currLineProofStepDetails.proofStep as TLineProofStep;
 
-  const formulaContent = currentlyEditingFormula ? interactionState.currentFormula : currLineProofStep.formula.userInput
+  const formulaContent = currentlyEditingFormula
+    ? interactionState.currentFormula
+    : currLineProofStep.formula.userInput;
 
   const rulesetDropdownValue = rulesetContext.rulesetDropdownOptions.find(
     (option) => option.value === currLineProofStep.justification.rule
@@ -137,23 +142,11 @@ export function LineProofStepEdit({
       return;
     }
 
-    doTransition({ enum: TransitionEnum.UPDATE_RULE, ruleName: newValue.value })
-  };
-
-  function handleContextMenu(
-    event:
-      | React.MouseEvent<HTMLElement>
-      | React.TouchEvent<HTMLElement>
-      | React.KeyboardEvent<HTMLElement>
-      | KeyboardEvent
-  ) {
-    show({
-      event,
-      props: {
-        uuid: props.uuid,
-      },
+    doTransition({
+      enum: TransitionEnum.UPDATE_RULE,
+      ruleName: newValue.value,
     });
-  }
+  };
 
   const dropdownTheme = (theme: Theme) => ({
     ...theme,
@@ -164,19 +157,22 @@ export function LineProofStepEdit({
     },
   });
 
-  const formulaInputRef = React.useRef<HTMLInputElement>(null)
+  const formulaInputRef = React.useRef<HTMLInputElement>(null);
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
-    formulaInputRef.current = ref
-  }
+    formulaInputRef.current = ref;
+  };
 
   const onKeyDownAutoSizeInput = (key: string) => {
     if (currentlyEditingFormula && key === "Enter") {
-      doTransition({ enum: TransitionEnum.CLOSE })
-      formulaInputRef.current?.blur()
+      doTransition({ enum: TransitionEnum.CLOSE });
+      formulaInputRef.current?.blur();
     } else if (currentlyEditingFormula) {
-      doTransition({ enum: TransitionEnum.UPDATE_FORMULA, formula: formulaContent })
+      doTransition({
+        enum: TransitionEnum.UPDATE_FORMULA,
+        formula: formulaContent,
+      });
     }
-  }
+  };
 
   return (
     <div
@@ -188,20 +184,32 @@ export function LineProofStepEdit({
         if (e.target !== e.currentTarget) {
           return;
         }
-        return doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })
+        return doTransition({
+          enum: TransitionEnum.CLICK_LINE,
+          lineUuid: props.uuid,
+        });
       }}
-      onContextMenuCapture={handleContextMenu}
+      onContextMenuCapture={(e) => {
+        e.preventDefault();
+        setContextMenuDOMEvent(e);
+        doTransition({
+          enum: TransitionEnum.RIGHT_CLICK_STEP,
+          proofStepUuid: props.uuid,
+        });
+      }}
     >
-      <AutosizeInput 
+      <AutosizeInput
         inputRef={handleInputRefChange}
         value={formulaContent}
-        onChange={e => doTransition({ enum: TransitionEnum.UPDATE_FORMULA, formula: e.target.value })}
-
+        onChange={(e) =>
+          doTransition({
+            enum: TransitionEnum.UPDATE_FORMULA,
+            formula: e.target.value,
+          })
+        }
         autoFocus={currentlyEditingFormula}
-        onKeyDown={e => onKeyDownAutoSizeInput(e.key)}
-
+        onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
         onSubmit={() => console.log("Balls")}
-
         title="Write a formula"
         className="text-slate-800 grow resize shrink"
         inputClassName="px-2"
@@ -216,11 +224,14 @@ export function LineProofStepEdit({
           instanceId={props.uuid}
           value={rulesetDropdownValue}
           onChange={handleChangeRule}
-
           menuIsOpen={currentlyEditingRule}
-          onMenuOpen={() => doTransition({ enum: TransitionEnum.CLICK_RULE, lineUuid: props.uuid })}
+          onMenuOpen={() =>
+            doTransition({
+              enum: TransitionEnum.CLICK_RULE,
+              lineUuid: props.uuid,
+            })
+          }
           closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
-
           options={rulesetContext.rulesetDropdownOptions}
           theme={dropdownTheme}
           styles={{
@@ -246,11 +257,18 @@ export function LineProofStepEdit({
                   key={index}
                   value={ref}
                   isCurrentlyBeingChanged={
-                    interactionState.enum === InteractionStateEnum.EDITING_REF && 
-                    interactionState.lineUuid === props.uuid && 
+                    interactionState.enum ===
+                      InteractionStateEnum.EDITING_REF &&
+                    interactionState.lineUuid === props.uuid &&
                     interactionState.refIdx === index
                   }
-                  onClick={() => doTransition({ enum: TransitionEnum.CLICK_REF, lineUuid: props.uuid, refIdx: index })}
+                  onClick={() =>
+                    doTransition({
+                      enum: TransitionEnum.CLICK_REF,
+                      lineUuid: props.uuid,
+                      refIdx: index,
+                    })
+                  }
                 ></RefSelect>
               );
             })}

@@ -13,8 +13,7 @@ import { useServer } from "./ServerProvider";
 export enum TransitionEnum {
   CLICK_OUTSIDE,
   CLICK_BOX,
-  // RIGHT_CLICK_LINE,
-  // RIGHT_CLICK_BOX,
+  RIGHT_CLICK_STEP,
 
   CLICK_LINE,
   CLICK_RULE,
@@ -35,7 +34,7 @@ export enum InteractionStateEnum {
   EDITING_FORMULA,
   EDITING_RULE,
 
-  // CONTEXT_MENU,
+  VIEWING_CONTEXT_MENU,
 }
 
 export type InteractionState = { enum: InteractionStateEnum } & (
@@ -47,11 +46,16 @@ export type InteractionState = { enum: InteractionStateEnum } & (
       currentFormula: string;
     }
   | { enum: InteractionStateEnum.EDITING_REF; lineUuid: string; refIdx: number }
+  | {
+      enum: InteractionStateEnum.VIEWING_CONTEXT_MENU;
+      proofStepUuid: string;
+    }
 );
 
 export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
+  | { enum: TransitionEnum.RIGHT_CLICK_STEP; proofStepUuid: string }
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
   | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
@@ -234,13 +238,19 @@ export function InteractionStateProvider({
     } satisfies InteractionState;
   };
 
-  const { IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } =
-    InteractionStateEnum;
+  const {
+    IDLE,
+    EDITING_REF,
+    EDITING_RULE,
+    EDITING_FORMULA,
+    VIEWING_CONTEXT_MENU,
+  } = InteractionStateEnum;
   const {
     CLICK_REF,
     CLICK_RULE,
     CLICK_LINE,
     CLICK_BOX,
+    RIGHT_CLICK_STEP,
     UPDATE_RULE,
     CLOSE,
     UPDATE_FORMULA,
@@ -261,6 +271,12 @@ export function InteractionStateProvider({
         lineUuid,
         refIdx,
       }),
+
+      [CLICK_BOX]: doNothing,
+
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      },
 
       [VALIDATE_PROOF]: (state, _) => {
         enqueueCommand(Validate.VALIDATE);
@@ -292,6 +308,8 @@ export function InteractionStateProvider({
         return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx };
       },
 
+      [CLICK_BOX]: doNothing,
+
       [UPDATE_FORMULA]: (state, { formula }) => {
         return { ...state, currentFormula: formula };
       },
@@ -306,6 +324,11 @@ export function InteractionStateProvider({
         updateFormulaInProof(state.lineUuid, state.currentFormula);
         return { enum: IDLE };
       },
+
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
+        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      },
     },
 
     [EDITING_RULE]: {
@@ -319,6 +342,8 @@ export function InteractionStateProvider({
         refIdx,
       }),
 
+      [CLICK_BOX]: doNothing,
+
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
         updateRule(lineUuid, ruleName);
         return { enum: IDLE };
@@ -330,6 +355,10 @@ export function InteractionStateProvider({
       },
 
       [CLOSE]: () => ({ enum: IDLE }),
+
+      [RIGHT_CLICK_STEP]: (_, { proofStepUuid }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      },
     },
 
     [EDITING_REF]: {
@@ -381,6 +410,42 @@ export function InteractionStateProvider({
           lineUuid: state.lineUuid,
           refIdx: trans.refIdx,
         };
+      },
+
+      [VALIDATE_PROOF]: () => {
+        enqueueCommand(Validate.VALIDATE);
+        return { enum: IDLE };
+      },
+
+      [CLOSE]: () => ({ enum: IDLE }),
+
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
+      },
+    },
+    [VIEWING_CONTEXT_MENU]: {
+      [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
+
+      [CLICK_LINE]: (state, { lineUuid }) => {
+        return startEditingFormula(lineUuid);
+      },
+
+      [CLICK_BOX]: (state, {}) => {
+        return { enum: IDLE };
+      },
+
+      [CLICK_RULE]: (state, { lineUuid }) => {
+        return { enum: EDITING_RULE, lineUuid };
+      },
+
+      [CLICK_REF]: (state, { lineUuid, refIdx }) => ({
+        enum: EDITING_REF,
+        lineUuid,
+        refIdx,
+      }),
+
+      [RIGHT_CLICK_STEP]: (state, { proofStepUuid }) => {
+        return { enum: VIEWING_CONTEXT_MENU, proofStepUuid };
       },
 
       [VALIDATE_PROOF]: () => {

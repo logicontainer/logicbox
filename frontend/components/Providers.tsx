@@ -1,6 +1,8 @@
 "use client";
 
 import { HistoryProvider, useHistory } from "@/contexts/HistoryProvider";
+
+import { ContextMenuProvider } from "@/contexts/ContextMenuProvider";
 import { InteractionStateProvider } from "@/contexts/InteractionStateProvider";
 import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
@@ -11,7 +13,6 @@ type ProviderProps = {
   children: React.ReactNode;
 };
 
-
 export function Providers({ children }: ProviderProps) {
   return (
     <ServerProvider>
@@ -20,7 +21,7 @@ export function Providers({ children }: ProviderProps) {
           <LinesProvider>
             <HistoryProvider>
               <InteractionStateProvider>
-                {children}
+                <ContextMenuProvider>{children}</ContextMenuProvider>
               </InteractionStateProvider>
             </HistoryProvider>
           </LinesProvider>
