@@ -44,14 +44,6 @@ export function Justification({
     (rule) => rule.ruleName == justification.rule
   );
   if (!rule) return;
-  // const refs = justification.refs.map((ref) => {
-  //   const referencedLine = lines.find((line) => line.uuid == ref);
-  //   if (referencedLine?.isBox) {
-  //     return `${referencedLine.boxStartLine}\\text{-}${referencedLine.boxEndLine}`;
-  //   } else {
-  //     return referencedLine?.lineNumber;
-  //   }
-  // });
 
   if (currLineProofStepDetails?.proofStep.stepType !== "line") {
     return null;
