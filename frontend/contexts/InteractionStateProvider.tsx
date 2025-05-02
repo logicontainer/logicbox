@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  LineProofStep,
-} from "@/types/types";
+import { LineProofStep } from "@/types/types";
 import React from "react";
 
 import { useProof } from "./ProofProvider";
@@ -14,10 +12,10 @@ import { useServer } from "./ServerProvider";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
-  // CLICK_BOX,
+  CLICK_BOX,
   // RIGHT_CLICK_LINE,
   // RIGHT_CLICK_BOX,
-  
+
   CLICK_LINE,
   CLICK_RULE,
   CLICK_REF,
@@ -42,13 +40,18 @@ export enum InteractionStateEnum {
 
 export type InteractionState = { enum: InteractionStateEnum } & (
   | { enum: InteractionStateEnum.IDLE }
-  | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string; }
-  | { enum: InteractionStateEnum.EDITING_FORMULA; lineUuid: string; currentFormula: string }
+  | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string }
+  | {
+      enum: InteractionStateEnum.EDITING_FORMULA;
+      lineUuid: string;
+      currentFormula: string;
+    }
   | { enum: InteractionStateEnum.EDITING_REF; lineUuid: string; refIdx: number }
 );
 
 export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
+  | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
   | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
@@ -101,61 +104,71 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
     });
 
-  const serverContext = useServer()
-  const proofContext = useProof()
-  const { ruleset } = useRuleset()
-  const historyContext = useHistory()
-  
+  const serverContext = useServer();
+  const proofContext = useProof();
+  const { ruleset } = useRuleset();
+  const historyContext = useHistory();
+
   // keep command queue of state modifying things which must be executed fully in order
-  enum Validate { VALIDATE }
+  enum Validate {
+    VALIDATE,
+  }
   const commandQueue = React.useRef<(Validate | Command)[]>([]);
-  const enqueueCommand = (f: Validate | Command) => commandQueue.current.push(f)
-  const [flushTrigger, setFlushTrigger] = React.useState(0)
+  const enqueueCommand = (f: Validate | Command) =>
+    commandQueue.current.push(f);
+  const [flushTrigger, setFlushTrigger] = React.useState(0);
 
   React.useEffect(() => {
-    if (commandQueue.current.length === 0) 
-      return;
+    if (commandQueue.current.length === 0) return;
 
     // execute a single command
-    const cmd = commandQueue.current.shift()!
+    const cmd = commandQueue.current.shift()!;
     if (cmd === Validate.VALIDATE) {
-      serverContext.validateProof(proofContext.proof)
+      serverContext.validateProof(proofContext.proof);
     } else {
-      historyContext.addToHistory(cmd)
+      historyContext.addToHistory(cmd);
     }
 
     if (commandQueue.current.length > 0) {
-      // update the flush trigger, so after a full state rerender, 
+      // update the flush trigger, so after a full state rerender,
       //  we get a new command
-      setTimeout(() => setFlushTrigger(c => c + 1), 0)
+      setTimeout(() => setFlushTrigger((c) => c + 1), 0);
     }
-  }, [flushTrigger])
-
+  }, [flushTrigger]);
 
   const getLineProofStep = (uuid: string) => {
     const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
-    if (!currLineProofStepDetails) 
-      throw new Error(`Updating ref, but the line we are editing ${uuid} doesn't have step details`);
+    if (!currLineProofStepDetails)
+      throw new Error(
+        `Updating ref, but the line we are editing ${uuid} doesn't have step details`
+      );
 
-    if (currLineProofStepDetails.proofStep.stepType !== 'line')
-      throw new Error(`Updating ref, but the line we are editing doesn't have stepType 'line', has ${currLineProofStepDetails.proofStep.stepType}`)
+    if (currLineProofStepDetails.proofStep.stepType !== "line")
+      throw new Error(
+        `Updating ref, but the line we are editing doesn't have stepType 'line', has ${currLineProofStepDetails.proofStep.stepType}`
+      );
 
-    const currLineProofStep = currLineProofStepDetails.proofStep as LineProofStep
-    return currLineProofStep
-  }
-  
+    const currLineProofStep =
+      currLineProofStepDetails.proofStep as LineProofStep;
+    return currLineProofStep;
+  };
+
   const updateRule = (lineUuid: string, newRule: string) => {
-    const currLineProofStep = getLineProofStep(lineUuid)
+    const currLineProofStep = getLineProofStep(lineUuid);
 
-    const ruleSetEntry = ruleset.rules.find(r => r.ruleName === newRule)
+    const ruleSetEntry = ruleset.rules.find((r) => r.ruleName === newRule);
     if (ruleSetEntry === undefined)
-      throw new Error(`Updating rule, but could not find rule with name ${newRule} in ruleset ${ruleset}`)
+      throw new Error(
+        `Updating rule, but could not find rule with name ${newRule} in ruleset ${ruleset}`
+      );
 
     const newNumPremises = ruleSetEntry.numPremises;
 
     let newRefs = currLineProofStep.justification.refs;
     if (newNumPremises > newRefs.length) {
-      newRefs = newRefs.concat(Array(newNumPremises - newRefs.length).fill("?"));
+      newRefs = newRefs.concat(
+        Array(newNumPremises - newRefs.length).fill("?")
+      );
     } else {
       newRefs = newRefs.slice(0, newNumPremises);
     }
@@ -163,20 +176,22 @@ export function InteractionStateProvider({
     const updatedLineProofStep: LineProofStep = {
       ...currLineProofStep,
       justification: {
-        rule: newRule, 
+        rule: newRule,
         refs: newRefs,
       },
     };
 
-    enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
-  }
+    enqueueCommand(
+      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
+    );
+  };
 
   const updateRef = (lineUuid: string, refIdx: number, newRefUuid: string) => {
-    const currLineProofStep = getLineProofStep(lineUuid)
+    const currLineProofStep = getLineProofStep(lineUuid);
 
     const newRefs = currLineProofStep.justification.refs.map((ref, i) => {
       if (i === refIdx) {
-        return newRefUuid
+        return newRefUuid;
       } else {
         return ref;
       }
@@ -190,11 +205,13 @@ export function InteractionStateProvider({
       },
     };
 
-    enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
-  }
+    enqueueCommand(
+      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
+    );
+  };
 
   const updateFormulaInProof = (lineUuid: string, formula: string) => {
-    const currLineProofStep = getLineProofStep(lineUuid)
+    const currLineProofStep = getLineProofStep(lineUuid);
     const updatedLineProofStep: LineProofStep = {
       ...currLineProofStep,
       formula: {
@@ -203,18 +220,35 @@ export function InteractionStateProvider({
       },
     };
 
-    enqueueCommand(new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep))
-  }
+    enqueueCommand(
+      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
+    );
+  };
 
   const startEditingFormula = (lineUuid: string) => {
-    const line = getLineProofStep(lineUuid)
-    return { enum: InteractionStateEnum.EDITING_FORMULA, lineUuid, currentFormula: line.formula.userInput } satisfies InteractionState
-  }
+    const line = getLineProofStep(lineUuid);
+    return {
+      enum: InteractionStateEnum.EDITING_FORMULA,
+      lineUuid,
+      currentFormula: line.formula.userInput,
+    } satisfies InteractionState;
+  };
 
-  const { IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } = InteractionStateEnum
-  const { CLICK_REF, CLICK_RULE, CLICK_LINE, UPDATE_RULE, CLOSE, UPDATE_FORMULA, CLICK_OUTSIDE, VALIDATE_PROOF } = TransitionEnum
+  const { IDLE, EDITING_REF, EDITING_RULE, EDITING_FORMULA } =
+    InteractionStateEnum;
+  const {
+    CLICK_REF,
+    CLICK_RULE,
+    CLICK_LINE,
+    CLICK_BOX,
+    UPDATE_RULE,
+    CLOSE,
+    UPDATE_FORMULA,
+    CLICK_OUTSIDE,
+    VALIDATE_PROOF,
+  } = TransitionEnum;
 
-  const doNothing = (s: any) => s
+  const doNothing = (s: any) => s;
 
   const behavior: Behavior = {
     [IDLE]: {
@@ -222,36 +256,40 @@ export function InteractionStateProvider({
 
       [CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
-      [CLICK_REF]: (_, { lineUuid, refIdx }) => ({ enum: EDITING_REF, lineUuid, refIdx }),
+      [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
+        enum: EDITING_REF,
+        lineUuid,
+        refIdx,
+      }),
 
       [VALIDATE_PROOF]: (state, _) => {
-        enqueueCommand(Validate.VALIDATE)
-        return state
+        enqueueCommand(Validate.VALIDATE);
+        return state;
       },
     },
 
     [EDITING_FORMULA]: {
       [CLICK_OUTSIDE]: (state, _) => {
         updateFormulaInProof(state.lineUuid, state.currentFormula);
-        return { enum: IDLE }
+        return { enum: IDLE };
       },
 
       [CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
         // we are exiting this state, so update formula in proof
-        updateFormulaInProof(state.lineUuid, state.currentFormula)
+        updateFormulaInProof(state.lineUuid, state.currentFormula);
 
         // go to editing mode on the clicked line
-        return startEditingFormula(clickedLineUuid)
+        return startEditingFormula(clickedLineUuid);
       },
 
       [CLICK_RULE]: (state, { lineUuid: clickedLineUuid }) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula)
-        return { enum: EDITING_RULE, lineUuid: clickedLineUuid }
+        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        return { enum: EDITING_RULE, lineUuid: clickedLineUuid };
       },
 
       [CLICK_REF]: (state, { lineUuid: clickedLineUuid, refIdx }) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula)
-        return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx }
+        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx };
       },
 
       [UPDATE_FORMULA]: (state, { formula }) => {
@@ -259,76 +297,97 @@ export function InteractionStateProvider({
       },
 
       [VALIDATE_PROOF]: (state, _) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula)
-        enqueueCommand(Validate.VALIDATE)
-        return { enum: IDLE }
+        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        enqueueCommand(Validate.VALIDATE);
+        return { enum: IDLE };
       },
 
       [CLOSE]: (state, _) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula)
-        return { enum: IDLE }
+        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        return { enum: IDLE };
       },
     },
-
 
     [EDITING_RULE]: {
       [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
 
       [CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
-      [CLICK_REF]: (_, { lineUuid, refIdx }) => ({ enum: EDITING_REF, lineUuid, refIdx }),
+      [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
+        enum: EDITING_REF,
+        lineUuid,
+        refIdx,
+      }),
 
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
-        updateRule(lineUuid, ruleName)
-        return { enum: IDLE }
+        updateRule(lineUuid, ruleName);
+        return { enum: IDLE };
       },
 
       [VALIDATE_PROOF]: () => {
-        enqueueCommand(Validate.VALIDATE)
-        return { enum: IDLE }
+        enqueueCommand(Validate.VALIDATE);
+        return { enum: IDLE };
       },
-    
+
       [CLOSE]: () => ({ enum: IDLE }),
     },
 
     [EDITING_REF]: {
       [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
 
-      [CLICK_LINE]: ({ refIdx, lineUuid: editedLineUuid }, { lineUuid: clickedLineUuid }) => {
+      [CLICK_LINE]: (
+        { refIdx, lineUuid: editedLineUuid },
+        { lineUuid: clickedLineUuid }
+      ) => {
         if (editedLineUuid !== clickedLineUuid) {
-          updateRef(editedLineUuid, refIdx, clickedLineUuid)
-          return { enum: IDLE }
+          updateRef(editedLineUuid, refIdx, clickedLineUuid);
+          return { enum: IDLE };
         }
-        return startEditingFormula(clickedLineUuid)
+        return startEditingFormula(clickedLineUuid);
       },
 
-      [CLICK_RULE]: ({ refIdx, lineUuid: editedLineUuid }, { lineUuid: clickedLineUuid }) => {
+      [CLICK_BOX]: (
+        { refIdx, lineUuid: editedLineUuid },
+        { boxUuid: clickedBoxUuid }
+      ) => {
+        updateRef(editedLineUuid, refIdx, clickedBoxUuid);
+        return { enum: IDLE };
+      },
+
+      [CLICK_RULE]: (
+        { refIdx, lineUuid: editedLineUuid },
+        { lineUuid: clickedLineUuid }
+      ) => {
         if (editedLineUuid !== clickedLineUuid) {
-          updateRef(editedLineUuid, refIdx, clickedLineUuid)
-          return { enum: IDLE }
+          updateRef(editedLineUuid, refIdx, clickedLineUuid);
+          return { enum: IDLE };
         }
-        return { enum: EDITING_RULE, lineUuid: clickedLineUuid }
+        return { enum: EDITING_RULE, lineUuid: clickedLineUuid };
       },
 
       [CLICK_REF]: (state, trans) => {
         if (trans.lineUuid !== state.lineUuid) {
-          updateRef(state.lineUuid, state.refIdx, trans.lineUuid)
-          return { enum: IDLE }
+          updateRef(state.lineUuid, state.refIdx, trans.lineUuid);
+          return { enum: IDLE };
         }
 
         if (trans.refIdx === state.refIdx) {
           // unselect
-          return { enum: IDLE }
+          return { enum: IDLE };
         }
 
-        return { enum: EDITING_REF, lineUuid: state.lineUuid, refIdx: trans.refIdx }
+        return {
+          enum: EDITING_REF,
+          lineUuid: state.lineUuid,
+          refIdx: trans.refIdx,
+        };
       },
 
       [VALIDATE_PROOF]: () => {
         enqueueCommand(Validate.VALIDATE);
-        return { enum: IDLE }
+        return { enum: IDLE };
       },
-      
+
       [CLOSE]: () => ({ enum: IDLE }),
     },
   };
@@ -344,19 +403,25 @@ export function InteractionStateProvider({
 
       if (!func) {
         console.warn(
-          `No transition function found for state ${InteractionStateEnum[prevState.enum]} and transition ${TransitionEnum[transition.enum]}`,
+          `No transition function found for state ${
+            InteractionStateEnum[prevState.enum]
+          } and transition ${TransitionEnum[transition.enum]}`,
           prevState,
           transition
         );
         return prevState;
       } else {
         const newState = func(prevState, transition);
-        console.log(`${TransitionEnum[transition.enum]}: ${InteractionStateEnum[prevState.enum]} -> ${InteractionStateEnum[newState.enum]}`)
-        return newState
+        console.log(
+          `${TransitionEnum[transition.enum]}: ${
+            InteractionStateEnum[prevState.enum]
+          } -> ${InteractionStateEnum[newState.enum]}`
+        );
+        return newState;
       }
-    })
+    });
 
-    setFlushTrigger(t => t + 1)
+    setFlushTrigger((t) => t + 1);
   };
 
   return (
