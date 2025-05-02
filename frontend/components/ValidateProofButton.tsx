@@ -1,24 +1,24 @@
 import { Toolbar } from "radix-ui";
 import { UpdateIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
-import { useProof } from "@/contexts/ProofProvider";
+import { TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
 import { useServer } from "@/contexts/ServerProvider";
 
 export function ValidateProofButton() {
-  const proofContext = useProof();
-  const serverContext = useServer();
+  const { doTransition } = useInteractionState()
+  const { syncingStatus } = useServer()
+
   const handleValidateProof = () => {
-    serverContext.validateProof(proofContext.proof);
+    doTransition({ enum: TransitionEnum.VALIDATE_PROOF })
   };
+
   return (
     <Toolbar.ToolbarButton
       title="Validate proof by syncing with the server"
       onClick={handleValidateProof}
     >
       <div
-        className={cn(
-          serverContext.syncingStatus == "syncing" ? "animate-spin" : ""
-        )}
+        className={cn(syncingStatus == "syncing" ? "animate-spin" : "")}
       >
         <UpdateIcon />
       </div>

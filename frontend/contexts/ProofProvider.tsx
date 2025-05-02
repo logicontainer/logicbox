@@ -15,15 +15,6 @@ import { useServer } from "./ServerProvider";
 
 export interface ProofContextProps {
   proof: Proof;
-  lineInFocus: string | null;
-  latestLineInFocus: string | null;
-  isFocused: (uuid: string) => boolean;
-  isUnfocused: (uuid: string) => boolean;
-  isActiveEdit: (uuid: string) => boolean;
-  removeIsActiveEditFromLine: (uuid: string) => unknown;
-  setActiveEdit: (uuid: string) => unknown;
-  setLineInFocus: (uuid: string) => unknown;
-  removeFocusFromLine: (uuid: string) => unknown;
   setStringProof: (proof: string) => unknown;
   addLine: (proofStep: ProofStep, position: ProofStepPosition) => unknown;
   removeLine: (uuid: string) => unknown;
@@ -35,19 +26,21 @@ export interface ProofContextProps {
     proofStepDetails: ProofStepDetails | null;
     cascadeCount: number;
   };
+  removeFocusFromLine: (uuid: string) => unknown;
+  lineInFocus: string | null;
+  latestLineInFocus: string | null;
+  isFocused: (uuid: string) => boolean;
+  isUnfocused: (uuid: string) => boolean;
+  setLineInFocus: (uuid: string) => unknown;
+
+  // HANDLED BY STATE MACHINE
+  // removeIsActiveEditFromLine: (uuid: string) => unknown;
+  // setActiveEdit: (uuid: string) => unknown;
+  // isActiveEdit: (uuid: string) => boolean;
 }
 // Context Setup
 const ProofContext = React.createContext<ProofContextProps>({
   proof: [],
-  lineInFocus: null,
-  latestLineInFocus: null,
-  isFocused: () => false,
-  isUnfocused: () => false,
-  isActiveEdit: () => false,
-  removeIsActiveEditFromLine: () => {},
-  setActiveEdit: () => {},
-  setLineInFocus: () => {},
-  removeFocusFromLine: () => {},
   setStringProof: () => {},
   addLine: () => {},
   removeLine: () => {},
@@ -56,6 +49,18 @@ const ProofContext = React.createContext<ProofContextProps>({
   getNearestDeletableProofStep: () => {
     return { proofStepDetails: null, cascadeCount: 0 };
   },
+
+  lineInFocus: null,
+  latestLineInFocus: null,
+  isFocused: () => false,
+  isUnfocused: () => false,
+  setLineInFocus: () => {},
+  removeFocusFromLine: () => {},
+
+  // HANDLED BY STATE MACHINE
+  // isActiveEdit: () => false,
+  // removeIsActiveEditFromLine: () => {},
+  // setActiveEdit: () => {},
 });
 
 export function useProof() {
@@ -272,12 +277,12 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         latestLineInFocus,
         isFocused,
         isUnfocused,
-        isActiveEdit,
-        removeIsActiveEditFromLine,
-        setActiveEdit: setActiveEdit,
-        setStringProof,
         setLineInFocus,
         removeFocusFromLine,
+        setStringProof,
+        // removeIsActiveEditFromLine,
+        // isActiveEdit,
+        // setActiveEdit: setActiveEdit,
         addLine,
         removeLine,
         updateLine,

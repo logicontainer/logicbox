@@ -8,23 +8,27 @@ import Toolbar from "@/components/Toolbar";
 import { Tooltip } from "react-tooltip";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
 
 export default function Home() {
   const proofContext = useProof();
+  const { doTransition } = useInteractionState()
+
   const { lines } = useLines();
+
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center" onClick={_ => doTransition({ enum: TransitionEnum.CLICK_OUTSIDE })}>
       <main className="flex flex-col  row-start-2 items-center sm:items-start">
         <div className="p-4 flex flex-col justify-between items-center rounded-sm">
-          <div className="fixed z-50">
+          <div 
+            className="fixed z-50"
+            onClick={e => e.stopPropagation()}
+          >
             <Toolbar />
           </div>
           <div
             className="flex box-content gap-2 mt-20"
-            onMouseLeave={() => {
-              proofContext.setLineInFocus("");
-              return;
-            }}
+            onClick={e => e.stopPropagation()}
           >
             <LineNumbers lines={lines} />
             <Proof proof={proofContext.proof} lines={lines} />
@@ -37,7 +41,7 @@ export default function Home() {
                 </p>
               )}
             ></Tooltip>
-            <ProofStepContextMenu />
+            {/*<ProofStepContextMenu />*/}
           </div>
         </div>
       </main>

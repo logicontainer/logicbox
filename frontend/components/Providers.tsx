@@ -1,6 +1,7 @@
 "use client";
 
-import { HistoryProvider } from "@/contexts/HistoryProvider";
+import { HistoryProvider, useHistory } from "@/contexts/HistoryProvider";
+import { InteractionStateProvider } from "@/contexts/InteractionStateProvider";
 import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
 import { RulesetProvider } from "@/contexts/RulesetProvider";
@@ -10,13 +11,18 @@ type ProviderProps = {
   children: React.ReactNode;
 };
 
+
 export function Providers({ children }: ProviderProps) {
   return (
     <ServerProvider>
       <RulesetProvider>
         <ProofProvider>
           <LinesProvider>
-            <HistoryProvider>{children}</HistoryProvider>
+            <HistoryProvider>
+              <InteractionStateProvider>
+                {children}
+              </InteractionStateProvider>
+            </HistoryProvider>
           </LinesProvider>
         </ProofProvider>
       </RulesetProvider>

@@ -21,6 +21,7 @@ export function Proof({
 }) {
   const { isFocused } = useProof();
   const isInFocus = isFocused(props.uuid || "");
+
   return (
     <div
       className={cn(
