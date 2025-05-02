@@ -38,8 +38,6 @@ export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   const [history, setHistory] = useState<Command[]>([]);
   const [now, setNow] = useState<number>(0);
 
-  console.log("History is being rendered", history);
-
   const addToHistory = (command: Command, deferExecution: boolean = false) => {
     const newHistory = [...history.slice(0, now), command];
     if (!deferExecution) {

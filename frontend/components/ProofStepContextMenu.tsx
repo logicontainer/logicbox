@@ -18,19 +18,7 @@ export function ProofStepContextMenu() {
     contextMenuPosition: { x, y },
   } = useContextMenu();
 
-  // const historyContext = useHistory();
   const { interactionState, doTransition } = useInteractionState();
-
-  // const handleAddProofStep = (
-  //   uuid: string,
-  //   isBox: boolean = false,
-  //   prepend: boolean = false
-  // ) => {
-  //   const addLineCommand = isBox
-  //     ? new AddBoxedLineCommand(uuid, prepend)
-  //     : new AddLineCommand(uuid, prepend);
-  //   historyContext.addToHistory(addLineCommand);
-  // };
 
   const handleItemClick = (id: string) => {
     switch (id) {
@@ -40,18 +28,30 @@ export function ProofStepContextMenu() {
           option: ContextMenuOptions.EDIT,
         });
         break;
-      // case "line-above":
-      //   handleAddProofStep(props.uuid, false, true);
-      //   break;
-      // case "line-below":
-      //   handleAddProofStep(props.uuid, false, false);
-      //   break;
-      // case "box-above":
-      //   handleAddProofStep(props.uuid, true, true);
-      //   break;
-      // case "box-below":
-      //   handleAddProofStep(props.uuid, true, false);
-      //   break;
+      case "line-above":
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.LINE_ABOVE,
+        });
+        break;
+      case "line-below":
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.LINE_BELOW,
+        });
+        break;
+      case "box-above":
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.BOX_ABOVE,
+        });
+        break;
+      case "box-below":
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.BOX_BELOW,
+        });
+        break;
       case "delete":
         doTransition({
           enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
@@ -83,8 +83,6 @@ export function ProofStepContextMenu() {
       )}
       <hr />
       <Item
-        id="line-above"
-        onClick={handleItemClick}
         className="flex justify-between gap-2 items-center"
       >
         <div className="text"> Add line</div>
@@ -93,6 +91,7 @@ export function ProofStepContextMenu() {
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
+            onClick={_ => handleItemClick("line-above")}
           >
             <ArrowUpIcon className="inline-block" />
           </Button>
@@ -100,14 +99,13 @@ export function ProofStepContextMenu() {
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
+            onClick={_ => handleItemClick("line-below")}
           >
             <ArrowDownIcon className="inline-block" />
           </Button>
         </div>
       </Item>
       <Item
-        id="line-above"
-        onClick={handleItemClick}
         className="flex justify-between gap-2 items-center"
       >
         <div className="text"> Add box</div>
@@ -116,6 +114,7 @@ export function ProofStepContextMenu() {
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
+            onClick={_ => handleItemClick("box-above")}
           >
             <ArrowUpIcon className="inline-block" />
           </Button>
@@ -123,6 +122,7 @@ export function ProofStepContextMenu() {
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
+            onClick={_ => handleItemClick("box-below")}
           >
             <ArrowDownIcon className="inline-block" />
           </Button>
@@ -137,22 +137,22 @@ export function ProofStepContextMenu() {
 }
 
 function Item({
-  id,
   onClick,
   className,
   children,
+  id,
 }: {
   children: React.ReactNode;
-  id: string;
+  id?: string;
   className?: string;
-  onClick: (id: string) => void;
+  onClick?: (id: string) => void;
 }) {
   return (
     <div
       className={cn("p-2 hover:bg-slate-200 cursor-pointer h-10", className)}
       onClick={(e) => {
         e.stopPropagation();
-        onClick(id);
+        id && onClick?.(id);
       }}
     >
       {children}
