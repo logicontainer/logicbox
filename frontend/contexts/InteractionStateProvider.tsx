@@ -249,17 +249,6 @@ export function InteractionStateProvider({
     );
   };
 
-  const addProofStep = (
-    uuid: string,
-    isBox: boolean = false,
-    prepend: boolean = false
-  ) => {
-    const addLineCommand = isBox
-      ? new AddBoxedLineCommand(uuid, prepend)
-      : new AddLineCommand(uuid, prepend);
-    historyContext.addToHistory(addLineCommand);
-  };
-
   const startEditingFormula = (lineUuid: string) => {
     const line = getLineProofStep(lineUuid);
     return {
@@ -516,7 +505,7 @@ export function InteractionStateProvider({
 
           case ContextMenuOptions.BOX_ABOVE: case ContextMenuOptions.BOX_BELOW: {
             const newLineUuid = uuidv4()
-            enqueueCommand(new AddBoxedLineCommand(state.proofStepUuid, option === ContextMenuOptions.BOX_BELOW, newLineUuid))
+            enqueueCommand(new AddBoxedLineCommand(state.proofStepUuid, option === ContextMenuOptions.BOX_ABOVE, newLineUuid))
             return { enum: EDITING_FORMULA, lineUuid: newLineUuid, currentFormula: "" }
           }
         }
