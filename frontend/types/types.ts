@@ -16,33 +16,36 @@ export type Justification = {
   rule: string | null;
   refs: string[];
 };
+
 export type LineProofStep = {
   uuid: string;
   stepType: string;
   formula: {
     userInput: string;
     unsynced?: boolean;
-    ascii?: string | null;
-    latex?: string | null;
+    ascii: string | null;
+    latex: string | null;
   };
   justification: Justification;
 };
+
 export type BoxProofStep = {
   uuid: string;
   stepType: string;
   proof: Proof;
 };
+
 export type ProofStep = LineProofStep | BoxProofStep;
 
 export type Proof = ProofStep[];
 
 export type TLineNumber = {
   uuid: string;
-  isBox: boolean;
-  boxStartLine?: number;
-  boxEndLine?: number;
-  lineNumber?: number;
-};
+  stepType: 'line' | 'box';
+} & (
+  { stepType: 'line', lineNumber: number } | 
+  { stepType: 'box', boxStartLine: number, boxEndLine: number }
+);
 
 export type ProofStepDetails = {
   proofStep: ProofStep;

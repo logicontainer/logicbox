@@ -10,27 +10,32 @@ function extractLineUuids(
 } {
   let lines = [] as TLineNumber[];
   let boxes = [] as TLineNumber[];
+
   proof.forEach((proofStep: ProofStep) => {
-    const newLine: TLineNumber = { uuid: proofStep.uuid, isBox: false };
     if (proofStep.stepType == "line") {
-      newLine.lineNumber = currLineNumber;
+      lines.push(
+        { uuid: proofStep.uuid, stepType: "line", lineNumber: currLineNumber  }
+      )
       currLineNumber++;
-      lines.push(newLine);
-    } else {
+    } else if (proofStep.stepType === "box" ) {
       proofStep = proofStep as BoxProofStep;
       const {
         lines: subProofLines,
         boxes: subProofBoxes,
         currLineNumber: subCurrLineNumber,
       } = extractLineUuids(proofStep.proof, currLineNumber);
-      newLine.isBox = true;
-      newLine.boxStartLine = currLineNumber;
-      newLine.boxEndLine = subCurrLineNumber - 1;
+      const newLine = {
+        uuid: proofStep.uuid,
+        stepType: "box" as "box",
+        boxStartLine: currLineNumber,
+        boxEndLine: subCurrLineNumber - 1,
+      }
       currLineNumber = subCurrLineNumber;
       lines = [...lines, ...subProofLines];
       boxes = [...boxes, ...subProofBoxes, newLine];
-    }
+    } else throw new Error("unreachable")
   });
+
   return { lines, boxes, currLineNumber };
 }
 export function parseLinesFromProof(proof: ProofStep[]): TLineNumber[] {

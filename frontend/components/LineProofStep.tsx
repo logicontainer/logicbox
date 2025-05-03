@@ -7,7 +7,7 @@ import {
   TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
-import { TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
+import { Diagnostic, TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
 
 import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
@@ -20,57 +20,21 @@ import { useState } from "react";
 
 export function LineProofStep({
   ...props
-}: TLineProofStep & { lines: TLineNumber[] }) {
+}: TLineProofStep & { lines: TLineNumber[], diagnosticsForLine: Diagnostic[] }) {
   return <LineProofStepEdit {...props} />;
 }
 
 export function LineProofStepEdit({
   ...props
-}: TLineProofStep & { lines: TLineNumber[] }) {
+}: TLineProofStep & { lines: TLineNumber[], diagnosticsForLine: Diagnostic[] }) {
   const { setLineInFocus } = useProof();
   const { interactionState, doTransition } = useInteractionState();
-
-  const proofContext = useProof();
-
   const { setContextMenuPosition } = useContextMenu();
-
   const [tooltipContent, setTooltipContent] = useState<string>("");
 
-  const formulaInputRef = React.useRef<HTMLInputElement>(null);
-
-  const currentlyEditingFormula =
-    interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
-    interactionState.lineUuid === props.uuid;
-
-  const currLineProofStepDetails = proofContext.getProofStepDetails(props.uuid);
-  if (currLineProofStepDetails?.proofStep.stepType !== "line") {
-    return null;
-  }
-  const currLineProofStep =
-    currLineProofStepDetails.proofStep as TLineProofStep;
-
-  const formulaContent = currentlyEditingFormula
-    ? interactionState.currentFormula
-    : currLineProofStep.formula.userInput;
-
-  const handleInputRefChange = (ref: HTMLInputElement | null) => {
-    formulaInputRef.current = ref;
+  const handleOnHoverJustification = (highlightedLatex: string | null) => {
+    setTooltipContent(highlightedLatex || "");
   };
-
-  const onKeyDownAutoSizeInput = (key: string) => {
-    if (currentlyEditingFormula && key === "Enter") {
-      doTransition({ enum: TransitionEnum.CLOSE });
-      formulaInputRef.current?.blur();
-    }
-  };
-
-  const handleOnHoverJustification = (highlightedLatex: string) => {
-    setTooltipContent(highlightedLatex);
-  };
-
-  const isEditingFormula =
-    interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
-    interactionState.lineUuid === props.uuid;
 
   return (
     <div
@@ -97,40 +61,12 @@ export function LineProofStepEdit({
         });
       }}
     >
-      {isEditingFormula ? (
-        <AutosizeInput
-          inputRef={handleInputRefChange}
-          value={formulaContent}
-          onChange={(e) => {
-            console.log(e);
-            doTransition({
-              enum: TransitionEnum.UPDATE_FORMULA,
-              formula: e.target.value,
-            });
-          }}
-          autoFocus={currentlyEditingFormula}
-          onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-          title="Write a formula"
-          className="text-slate-800 grow resize shrink"
-          inputClassName="px-2"
-        />
-      ) : (
-        <p
-          className="shrink"
-          onClick={() =>
-            doTransition({
-              enum: TransitionEnum.CLICK_LINE,
-              lineUuid: props.uuid,
-            })
-          }
-        >
-          {props.formula.unsynced ? (
-            props.formula.userInput
-          ) : (
-            <InlineMath math={props.formula.latex || ""} />
-          )}
-        </p>
-      )}
+      <Formula
+        userInput={props.formula.userInput}
+        latexFormula={props.formula.latex ?? null}
+        isSyncedWithServer={!props.formula.unsynced}
+        lineUuid={props.uuid}
+      />
 
       <div
         data-tooltip-id={`tooltip-id-${props.uuid}`}
@@ -160,4 +96,78 @@ export function LineProofStepEdit({
       </div>
     </div>
   );
+}
+
+
+function Formula({
+  userInput,
+  latexFormula,
+  lineUuid,
+  isSyncedWithServer
+} : {
+  userInput: string,
+  latexFormula: string | null,
+  lineUuid: string,
+  isSyncedWithServer: boolean
+}) {
+  const { interactionState, doTransition } = useInteractionState()
+
+  const isEditingFormula = 
+    interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
+    interactionState.lineUuid === lineUuid
+
+  const currentFormulaValue = isEditingFormula ? interactionState.currentFormula : userInput
+  const formulaInputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleInputRefChange = (ref: HTMLInputElement | null) => {
+    formulaInputRef.current = ref;
+  };
+
+  const onKeyDownAutoSizeInput = (key: string) => {
+    if (isEditingFormula && key === "Enter") {
+      doTransition({ enum: TransitionEnum.CLOSE });
+      formulaInputRef.current?.blur();
+    }
+  };
+
+  const formulaIsWrong = false
+  const withUnderline = (str: string) => `{\\color{red}\\underline{${str}}}`
+  const formulaContent = !latexFormula || latexFormula === "" ?  "???" : latexFormula
+  const formulaLatexContentWithUnderline = formulaIsWrong ? withUnderline(formulaContent) : formulaContent
+
+  return isEditingFormula ? (
+    <AutosizeInput
+      inputRef={handleInputRefChange}
+      value={currentFormulaValue}
+      onChange={(e) => {
+        console.log(e);
+        doTransition({
+          enum: TransitionEnum.UPDATE_FORMULA,
+          formula: e.target.value,
+        });
+      }}
+      autoFocus={isEditingFormula}
+      onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
+      title="Write a formula"
+      className={cn("text-slate-800 grow resize shrink", formulaIsWrong && "text-red-500")}
+      inputClassName="px-2"
+    />
+  ) : (
+    <p
+      className={cn("shrink", formulaIsWrong && "text-red-500 underline underline-offset-2")}
+      onClick={() =>
+        doTransition({
+          enum: TransitionEnum.CLICK_LINE,
+          lineUuid
+        })
+      }
+    >
+      
+      {!isSyncedWithServer ? (
+        currentFormulaValue
+      ) : (
+        <InlineMath math={formulaLatexContentWithUnderline} />
+      )}
+    </p>
+  )
 }
