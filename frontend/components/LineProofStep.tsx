@@ -17,11 +17,12 @@ import { cn } from "@/lib/utils";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
+import { getLineBeingEdited } from "@/lib/state-helpers";
 
 export function LineProofStep({
   ...props
-}: TLineProofStep & { lines: TLineNumber[], diagnosticsForLine: Diagnostic[] }) {
-  const { setLineInFocus } = useProof();
+}: TLineProofStep & { lines: TLineNumber[] }) {
+  const { setStepInFocus: setLineInFocus, isFocused } = useProof();
   const { interactionState, doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const [tooltipContent, setTooltipContent] = useState<string>("");
@@ -30,12 +31,15 @@ export function LineProofStep({
     setTooltipContent(highlightedLatex || "");
   };
 
+  const currentlyBeingHovered = isFocused(props.uuid)
+
   return (
     <div
       className={cn(
-        "flex relative justify-between gap-8 text-lg/10 text-slate-800 pointer px-[-1rem] transition-colors items-stretch"
+        "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
+        currentlyBeingHovered && "bg-slate-50"
       )}
-      onMouseOver={() => setLineInFocus(props.uuid)}
+      onMouseOver={_ => setLineInFocus(props.uuid)}
       onClick={(e) => {
         if (e.target !== e.currentTarget) {
           return;
@@ -47,7 +51,7 @@ export function LineProofStep({
       }}
       onContextMenuCapture={(e) => {
         e.preventDefault();
-        setContextMenuPosition({ x: e.clientX, y: e.clientY });
+        setContextMenuPosition({ x: e.pageX, y: e.pageY });
         doTransition({
           enum: TransitionEnum.RIGHT_CLICK_STEP,
           proofStepUuid: props.uuid,
@@ -97,10 +101,10 @@ function Formula({
   userInput,
   latexFormula,
   lineUuid,
-  isSyncedWithServer
+  isSyncedWithServer,
 } : {
-  userInput: string,
-  latexFormula: string | null,
+  userInput: string
+  latexFormula: string | null
   lineUuid: string,
   isSyncedWithServer: boolean
 }) {
@@ -130,38 +134,38 @@ function Formula({
   const formulaLatexContentWithUnderline = formulaIsWrong ? withUnderline(formulaContent) : formulaContent
 
   return isEditingFormula ? (
-    <AutosizeInput
-      inputRef={handleInputRefChange}
-      value={currentFormulaValue}
-      onChange={(e) => {
-        console.log(e);
-        doTransition({
-          enum: TransitionEnum.UPDATE_FORMULA,
-          formula: e.target.value,
-        });
-      }}
-      autoFocus={isEditingFormula}
-      onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-      title="Write a formula"
-      className={cn("text-slate-800 grow resize shrink", formulaIsWrong && "text-red-500")}
-      inputClassName="px-2"
-    />
-  ) : (
-    <p
-      className={cn("shrink", formulaIsWrong && "text-red-500 underline underline-offset-2")}
-      onClick={() =>
-        doTransition({
-          enum: TransitionEnum.CLICK_LINE,
-          lineUuid
-        })
-      }
-    >
+      <AutosizeInput
+        inputRef={handleInputRefChange}
+        value={currentFormulaValue}
+        onChange={(e) => {
+          console.log(e);
+          doTransition({
+            enum: TransitionEnum.UPDATE_FORMULA,
+            formula: e.target.value,
+          });
+        }}
+        autoFocus={isEditingFormula}
+        onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
+        title="Write a formula"
+        className={cn("text-slate-800 grow resize shrink", formulaIsWrong && "text-red-500")}
+        inputClassName="px-2"
+      />
+    ) : (
+      <p
+        className={cn("shrink", formulaIsWrong && "text-red-500 underline underline-offset-2")}
+        onClick={() =>
+          doTransition({
+            enum: TransitionEnum.CLICK_LINE,
+            lineUuid
+          })
+        }
+      >
 
-      {!isSyncedWithServer ? (
-        currentFormulaValue
-      ) : (
-        <InlineMath math={formulaLatexContentWithUnderline} />
-      )}
-    </p>
-  )
+        {!isSyncedWithServer ? (
+          currentFormulaValue
+        ) : (
+          <InlineMath math={formulaLatexContentWithUnderline} />
+        )}
+      </p>
+    )
 }

@@ -237,7 +237,7 @@ function CustomOption(props: any) {
       {...innerProps}
       className="text-slate-800 hover:bg-slate-100 cursor-pointer px-2"
     >
-      <InlineMath math={data.latexRuleName}></InlineMath>
+      <InlineMath math={data?.latexRuleName || ""}></InlineMath>
     </div>
   );
 }
@@ -251,7 +251,7 @@ function CustomValueContainer(props: any) {
       {...innerProps}
       className="flex items-center gap-2 px-2"
     >
-      <InlineMath math={value.latexRuleName}></InlineMath>
+      <InlineMath math={value?.latexRuleName || ""}></InlineMath>
     </div>
   );
 }

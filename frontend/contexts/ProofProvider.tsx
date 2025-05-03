@@ -30,7 +30,7 @@ export interface ProofContextProps {
   lineInFocus: string | null;
   isFocused: (uuid: string) => boolean;
   isUnfocused: (uuid: string) => boolean;
-  setLineInFocus: (uuid: string) => unknown;
+  setStepInFocus: (uuid: string) => void;
 
   // HANDLED BY STATE MACHINE
   // removeIsActiveEditFromLine: (uuid: string) => unknown;
@@ -52,7 +52,7 @@ const ProofContext = React.createContext<ProofContextProps>({
   lineInFocus: null,
   isFocused: () => false,
   isUnfocused: () => false,
-  setLineInFocus: () => {},
+  setStepInFocus: () => {},
   removeFocusFromLine: () => {},
 
   // HANDLED BY STATE MACHINE
@@ -81,16 +81,10 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     setProof(JSON.parse(stringProof));
   };
   const [lineInFocus, setLineInFocus] = useState<string | null>(null);
-  const [activeEdit, setActiveEdit] = useState<string | null>(null);
 
   const removeFocusFromLine = (uuid: string) => {
     if (lineInFocus == uuid) {
       setLineInFocus(null);
-    }
-  };
-  const removeIsActiveEditFromLine = (uuid: string) => {
-    if (activeEdit == uuid) {
-      setActiveEdit(null);
     }
   };
 
@@ -193,11 +187,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     return uuid != lineInFocus;
   };
 
-  const isActiveEdit = (uuid: string) => {
-    if (!uuid) return false;
-    return uuid == activeEdit;
-  };
-
   const getProofStepDetails = (
     uuid: string
   ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
@@ -267,7 +256,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         lineInFocus,
         isFocused,
         isUnfocused,
-        setLineInFocus,
+        setStepInFocus: setLineInFocus,
         removeFocusFromLine,
         setStringProof,
         // removeIsActiveEditFromLine,
