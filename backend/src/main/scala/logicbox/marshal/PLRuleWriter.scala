@@ -8,9 +8,9 @@ class PLRuleWriter extends JsonWriter[PLRule] {
   private def toStr(rule: PLRule): String = rule match {
     case Assumption() => "assumption"
     case Premise() => "premise"
-    case AndElim(side) => s"and_elim_${if (side == PLRule.Side.Left) then 0 else 1}"
+    case AndElim(side) => s"and_elim_${if (side == PLRule.Side.Left) then 1 else 2}"
     case AndIntro() => "and_intro"
-    case OrIntro(side) => s"or_intro_${if (side == PLRule.Side.Left) then 0 else 1}"
+    case OrIntro(side) => s"or_intro_${if (side == PLRule.Side.Left) then 1 else 2}"
     case OrElim() => "or_elim"
     case ImplicationIntro() => "implies_intro"
     case ImplicationElim() => "implies_elim"
