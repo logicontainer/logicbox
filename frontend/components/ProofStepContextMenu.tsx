@@ -82,16 +82,14 @@ export function ProofStepContextMenu() {
         </Item>
       )}
       <hr />
-      <Item
-        className="flex justify-between gap-2 items-center"
-      >
+      <Item className="flex justify-between gap-2 items-center">
         <div className="text"> Add line</div>
         <div className={"flex items-center"}>
           <Button
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
-            onClick={_ => handleItemClick("line-above")}
+            onClick={() => handleItemClick("line-above")}
           >
             <ArrowUpIcon className="inline-block" />
           </Button>
@@ -99,22 +97,20 @@ export function ProofStepContextMenu() {
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
-            onClick={_ => handleItemClick("line-below")}
+            onClick={() => handleItemClick("line-below")}
           >
             <ArrowDownIcon className="inline-block" />
           </Button>
         </div>
       </Item>
-      <Item
-        className="flex justify-between gap-2 items-center"
-      >
+      <Item className="flex justify-between gap-2 items-center">
         <div className="text"> Add box</div>
         <div className={"flex items-center"}>
           <Button
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
-            onClick={_ => handleItemClick("box-above")}
+            onClick={() => handleItemClick("box-above")}
           >
             <ArrowUpIcon className="inline-block" />
           </Button>
@@ -122,7 +118,7 @@ export function ProofStepContextMenu() {
             variant={"ghost"}
             size="icon"
             className="flex justify-center items-center h-7 w-7"
-            onClick={_ => handleItemClick("box-below")}
+            onClick={() => handleItemClick("box-below")}
           >
             <ArrowDownIcon className="inline-block" />
           </Button>
@@ -152,7 +148,7 @@ function Item({
       className={cn("p-2 hover:bg-slate-200 cursor-pointer h-10", className)}
       onClick={(e) => {
         e.stopPropagation();
-        id && onClick?.(id);
+        if (id) onClick?.(id);
       }}
     >
       {children}
