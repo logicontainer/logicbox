@@ -1,33 +1,19 @@
-name: Mirror full repo to private
-
+name: (main) push to external repo
 on:
   push:
     branches:
-      - "**"
-  delete:
-    branches:
-      - "**"
-  create:
-    branches:
-      - "**"
-  schedule:
-    - cron: "0 * * * *" # Optional: hourly mirror
-  workflow_dispatch:
-
+      - main
 jobs:
-  mirror:
+  push-to-external-repo:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout full history
-        uses: actions/checkout@v4
+      - name: checkout repository
+        uses: actions/checkout@v3
+      - name: push to external repository
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          fetch-depth: 0 # Important: fetch full history for mirror
-
-      - name: Push mirror to private repo
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git remote add mirror https://x-access-token:${{secrets.MIRROR_TOKEN}}@github.com/kasperskovhansen/logicbox-mirror.git
-          git remote -v
-          git push --mirror mirror || (echo "Push failed" && exit 1)
+          deploy_key: ${{ secrets.SSH_DEPLOY_KEY }}
+          publish_dir: .
+          external_repository: kasperskovhansen/logicbox-mirror
+          publish_branch: main
+          allow_empty_commit: true
