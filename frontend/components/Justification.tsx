@@ -213,7 +213,7 @@ export function Justification({
     </>
   );
 }
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function CustomMenu(props: any) {
   const { innerProps, innerRef } = props;
   return (
@@ -227,6 +227,7 @@ function CustomMenu(props: any) {
   );
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function CustomOption(props: any) {
   const { data, innerRef, innerProps } = props;
   return (
@@ -239,7 +240,7 @@ function CustomOption(props: any) {
     </div>
   );
 }
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function CustomValueContainer(props: any) {
   const { getValue, innerRef, innerProps } = props;
   const value = getValue()[0];
