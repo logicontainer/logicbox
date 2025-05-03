@@ -3,7 +3,7 @@ name: Mirror full repo to private
 on:
   push:
     branches:
-      - "**" # Trigger on all branches
+      - "**"
   delete:
     branches:
       - "**"
@@ -11,7 +11,7 @@ on:
     branches:
       - "**"
   schedule:
-    - cron: "0 * * * *" # Optional: also mirror every hour
+    - cron: "0 * * * *" # Optional: hourly mirror
   workflow_dispatch:
 
 jobs:
@@ -19,17 +19,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the full repository
+      - name: Checkout full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch full history
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
+          fetch-depth: 0 # Important: fetch full history for mirror
 
       - name: Push mirror to private repo
+        env:
+          GIT_TOKEN: ${{ secrets.MIRROR_TOKEN }}
         run: |
-          git remote add mirror git@github.com:kasperskovhansen/logicbox-mirror.git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          git remote add mirror https://x-access-token:${GIT_TOKEN}@github.com/kasperskovhansen/logicbox-mirror.git
           git push --mirror mirror
