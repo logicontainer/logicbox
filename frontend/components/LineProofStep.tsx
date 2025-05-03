@@ -21,12 +21,6 @@ import { useState } from "react";
 export function LineProofStep({
   ...props
 }: TLineProofStep & { lines: TLineNumber[] }) {
-  return <LineProofStepEdit {...props} />;
-}
-
-export function LineProofStepEdit({
-  ...props
-}: TLineProofStep & { lines: TLineNumber[] }) {
   const { setLineInFocus } = useProof();
   const { interactionState, doTransition } = useInteractionState();
 

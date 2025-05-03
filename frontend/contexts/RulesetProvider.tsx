@@ -34,6 +34,7 @@ export function RulesetProvider({ children }: React.PropsWithChildren<object>) {
   const rulesetDropdownOptions = ruleset.rules.map((rule) => ({
     value: rule.ruleName,
     label: rule.ruleName,
+    latexRuleName: rule.latex.ruleName,
   }));
 
   return (
