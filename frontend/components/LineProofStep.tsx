@@ -21,12 +21,6 @@ import { useState } from "react";
 export function LineProofStep({
   ...props
 }: TLineProofStep & { lines: TLineNumber[], diagnosticsForLine: Diagnostic[] }) {
-  return <LineProofStepEdit {...props} />;
-}
-
-export function LineProofStepEdit({
-  ...props
-}: TLineProofStep & { lines: TLineNumber[], diagnosticsForLine: Diagnostic[] }) {
   const { setLineInFocus } = useProof();
   const { interactionState, doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
@@ -112,7 +106,7 @@ function Formula({
 }) {
   const { interactionState, doTransition } = useInteractionState()
 
-  const isEditingFormula = 
+  const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
     interactionState.lineUuid === lineUuid
 
@@ -162,7 +156,7 @@ function Formula({
         })
       }
     >
-      
+
       {!isSyncedWithServer ? (
         currentFormulaValue
       ) : (

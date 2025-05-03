@@ -97,6 +97,12 @@ export function Justification({
           }
           closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
           options={rulesetDropdownOptions}
+          components={{
+            Menu: CustomMenu,
+            Option: CustomOption,
+            ValueContainer: CustomValueContainer,
+          }}
+          menuPosition="fixed"
           theme={dropdownTheme}
           styles={{
             singleValue: (base) => ({
@@ -111,6 +117,10 @@ export function Justification({
                 paddingRight: "8px",
               };
             },
+            menuPortal: (base) => ({
+              ...base,
+              width: 100,
+            }),
           }}
         />
       ) : (
@@ -202,5 +212,46 @@ export function Justification({
         </>
       )}
     </>
+  );
+}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function CustomMenu(props: any) {
+  const { innerProps, innerRef } = props;
+  return (
+    <div
+      ref={innerRef}
+      {...innerProps}
+      className="bg-white border border-slate-300 rounded-md shadow-lg z-10 overflow-visible"
+    >
+      {props.children}
+    </div>
+  );
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function CustomOption(props: any) {
+  const { data, innerRef, innerProps } = props;
+  return (
+    <div
+      ref={innerRef}
+      {...innerProps}
+      className="text-slate-800 hover:bg-slate-100 cursor-pointer px-2"
+    >
+      <InlineMath math={data.latexRuleName}></InlineMath>
+    </div>
+  );
+}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function CustomValueContainer(props: any) {
+  const { getValue, innerRef, innerProps } = props;
+  const value = getValue()[0];
+  return (
+    <div
+      ref={innerRef}
+      {...innerProps}
+      className="flex items-center gap-2 px-2"
+    >
+      <InlineMath math={value.latexRuleName}></InlineMath>
+    </div>
   );
 }

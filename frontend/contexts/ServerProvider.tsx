@@ -4,7 +4,8 @@ import { Diagnostic, Proof, ValidationResponse } from "@/types/types";
 import React, { useState } from "react";
 
 import _ from "lodash";
-import proofExample1 from "@/examples/proof-example-1";
+import examples from "@/examples/proof-example-1";
+import { randomInt } from "crypto";
 
 export interface ServerContextProps {
   proof: Proof;
@@ -30,8 +31,20 @@ export function useServer() {
 
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
-  const [proof, setProof] = useState<Proof>(proofExample1);
+
+  const [proof, setProof] = useState<Proof>([]);
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
+
+  React.useEffect(() => {
+    // This will only run on the client side
+    if (examples.length === 0) {
+      console.warn('No examples provided, using empty proof');
+      setProof({} as Proof);
+      return;
+    }
+    const randomIndex = Math.floor(Math.random() * examples.length);
+    setProof(examples[randomIndex]);
+  }, []); // Empty dependency array means this runs once on mount
 
   const validateProof = async (proof: Proof): Promise<boolean> => {
     setServerSyncingStatus("syncing");
