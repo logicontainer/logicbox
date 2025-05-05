@@ -1,11 +1,11 @@
 "use client";
 
 import { Diagnostic, Proof, ValidationResponse } from "@/types/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
 import examples from "@/examples/proof-example-1";
-import { randomInt } from "crypto";
+import { useCurrentProofId } from "./CurrentProofIdProvider";
 
 export interface ServerContextProps {
   proof: Proof;
@@ -31,20 +31,59 @@ export function useServer() {
 
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
-
   const [proof, setProof] = useState<Proof>([]);
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
+  const { proofId } = useCurrentProofId();
+
+  const prevProof = React.useRef<Proof>(proof);
+  const prevProofDiagnostics = React.useRef<Diagnostic[]>(proofDiagnostics);
 
   React.useEffect(() => {
     // This will only run on the client side
     if (examples.length === 0) {
-      console.warn('No examples provided, using empty proof');
+      console.warn("No examples provided, using empty proof");
       setProof({} as Proof);
       return;
     }
     const randomIndex = Math.floor(Math.random() * examples.length);
-    setProof(examples[randomIndex]);
-  }, []); // Empty dependency array means this runs once on mount
+
+    if (proofId === null) {
+      return;
+    }
+    let proofIdNumber = parseInt(proofId);
+    if (proofId) {
+      if (
+        isNaN(proofIdNumber) ||
+        proofIdNumber < 0 ||
+        proofIdNumber >= examples.length
+      ) {
+        console.warn("Invalid proofId, using random example");
+        proofIdNumber = randomIndex;
+      }
+      setProof(examples[proofIdNumber]);
+    } else {
+      console.warn("No proofId provided, using random example");
+      proofIdNumber = randomIndex;
+      setProof(examples[proofIdNumber]);
+    }
+  }, [proofId]);
+
+  useEffect(() => {
+    if (proofId == null) setProof([]);
+  }, []);
+
+  useEffect(() => {
+    if (_.isEmpty(proof)) {
+      return;
+    }
+    if (
+      _.isEqual(proof, prevProof.current) &&
+      _.isEqual(proofDiagnostics, prevProofDiagnostics.current)
+    ) {
+      return;
+    }
+    validateProof(proof);
+  }, [proof]);
 
   const validateProof = async (proof: Proof): Promise<boolean> => {
     setServerSyncingStatus("syncing");
@@ -67,6 +106,8 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         return await serverResponse.json();
       })
       .then((serverResponse: ValidationResponse) => {
+        prevProofDiagnostics.current = serverResponse.diagnostics;
+        prevProof.current = proof;
         console.log("Server response", serverResponse);
         setProofDiagnostics(serverResponse.diagnostics);
         setProof(serverResponse.proof);

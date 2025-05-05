@@ -13,11 +13,13 @@ function extractLineUuids(
 
   proof.forEach((proofStep: ProofStep) => {
     if (proofStep.stepType == "line") {
-      lines.push(
-        { uuid: proofStep.uuid, stepType: "line", lineNumber: currLineNumber  }
-      )
+      lines.push({
+        uuid: proofStep.uuid,
+        stepType: "line",
+        lineNumber: currLineNumber,
+      });
       currLineNumber++;
-    } else if (proofStep.stepType === "box" ) {
+    } else if (proofStep.stepType === "box") {
       proofStep = proofStep as BoxProofStep;
       const {
         lines: subProofLines,
@@ -29,11 +31,11 @@ function extractLineUuids(
         stepType: "box" as "box",
         boxStartLine: currLineNumber,
         boxEndLine: subCurrLineNumber - 1,
-      }
+      };
       currLineNumber = subCurrLineNumber;
       lines = [...lines, ...subProofLines];
       boxes = [...boxes, ...subProofBoxes, newLine];
-    } else throw new Error("unreachable")
+    } else throw new Error("unreachable");
   });
 
   return { lines, boxes, currLineNumber };

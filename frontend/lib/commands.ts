@@ -39,6 +39,8 @@ export class AddLineCommand extends Command {
         uuid: this.newLineUuid,
         formula: {
           userInput: "?",
+          ascii: null,
+          latex: null,
         },
         justification: {
           rule: "no_rule",
@@ -66,7 +68,12 @@ export class AddBoxedLineCommand extends Command {
   private newBoxUuid: string;
   private newLineUuid: string;
   private position: ProofStepPosition;
-  constructor(uuid: string, prepend: boolean = false, newLineUuid?: string, newBoxUuid?: string) {
+  constructor(
+    uuid: string,
+    prepend: boolean = false,
+    newLineUuid?: string,
+    newBoxUuid?: string
+  ) {
     super();
     this.newBoxUuid = newBoxUuid ?? uuidv4();
     this.newLineUuid = newLineUuid ?? uuidv4();
@@ -91,6 +98,8 @@ export class AddBoxedLineCommand extends Command {
             uuid: this.newLineUuid,
             formula: {
               userInput: "?",
+              ascii: null,
+              latex: null,
             },
             justification: {
               rule: "assumption",
