@@ -15,7 +15,7 @@ export function createHighlightedLatexRule(
   });
   const premiseLine = `{\\begin{array}{${premises.map(_ => "c").join("")}}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{array}}`;
   const conclusionLine = conclusionIsHighlighted
-    ? `\\color{red}\\boxed{${conclusion}}`
+    ? `\\color{red}\\underline{${conclusion}}`
     : conclusion;
   return `\\cfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }
@@ -31,7 +31,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\text{premise}",
           premises: [],
-          conclusion: "\\phi",
+          conclusion: "\\varphi",
         },
         numPremises: 0,
       },
@@ -40,7 +40,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\text{ass.}",
           premises: [],
-          conclusion: "\\phi",
+          conclusion: "\\varphi",
         },
         numPremises: 0,
       },
@@ -48,8 +48,8 @@ export const rulesets = [
         ruleName: "copy",
         latex: {
           ruleName: "\\text{copy}",
-          premises: ["\\phi"],
-          conclusion: "\\phi",
+          premises: ["\\varphi"],
+          conclusion: "\\varphi",
         },
         numPremises: 1,
       },
@@ -57,8 +57,8 @@ export const rulesets = [
         ruleName: "and_intro",
         latex: {
           ruleName: "\\land i",
-          premises: ["\\phi", "\\psi"],
-          conclusion: "\\phi \\land \\psi",
+          premises: ["\\varphi", "\\psi"],
+          conclusion: "\\varphi \\land \\psi",
         },
         numPremises: 2,
       },
@@ -66,8 +66,8 @@ export const rulesets = [
         ruleName: "and_elim_1",
         latex: {
           ruleName: "\\land e_1",
-          premises: ["\\phi \\land \\psi"],
-          conclusion: "\\phi",
+          premises: ["\\varphi \\land \\psi"],
+          conclusion: "\\varphi",
         },
         numPremises: 1,
       },
@@ -75,7 +75,7 @@ export const rulesets = [
         ruleName: "and_elim_2",
         latex: {
           ruleName: "\\land e_2",
-          premises: ["\\phi \\land \\psi"],
+          premises: ["\\varphi \\land \\psi"],
           conclusion: "\\psi",
         },
         numPremises: 1,
@@ -84,8 +84,8 @@ export const rulesets = [
         ruleName: "or_intro_1",
         latex: {
           ruleName: "\\lor i_1",
-          premises: ["\\phi"],
-          conclusion: "\\phi \\land \\psi",
+          premises: ["\\varphi"],
+          conclusion: "\\varphi \\land \\psi",
         },
         numPremises: 1,
       },
@@ -94,7 +94,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\lor i_2",
           premises: ["\\psi"],
-          conclusion: "\\phi \\land \\psi",
+          conclusion: "\\varphi \\land \\psi",
         },
         numPremises: 1,
       },
@@ -102,7 +102,7 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\phi \\lor \\psi", box("\\phi\\\\ \\vdots \\\\ \\bot"), box("\\phi\\\\ \\vdots \\\\ \\bot")],
+          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\bot"), box("\\varphi\\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\chi",
         },
         numPremises: 3,
@@ -111,8 +111,8 @@ export const rulesets = [
         ruleName: "implies_intro",
         latex: {
           ruleName: "\\rightarrow i",
-          premises: [box("\\phi \\\\ \\vdots \\\\ \\psi")],
-          conclusion: "\\phi \\rightarrow \\psi",
+          premises: [box("\\varphi \\\\ \\vdots \\\\ \\psi")],
+          conclusion: "\\varphi \\rightarrow \\psi",
         },
         numPremises: 1,
       },
@@ -120,7 +120,7 @@ export const rulesets = [
         ruleName: "implies_elim",
         latex: {
           ruleName: "\\rightarrow e",
-          premises: ["\\phi", "\\phi \\rightarrow \\psi"],
+          premises: ["\\varphi", "\\varphi \\rightarrow \\psi"],
           conclusion: "\\psi",
         },
         numPremises: 2,
@@ -129,8 +129,8 @@ export const rulesets = [
         ruleName: "not_intro",
         latex: {
           ruleName: "\\lnot i",
-          premises: [box("\\phi \\\\ \\vdots \\\\ \\bot")],
-          conclusion: "\\lnot \\phi",
+          premises: [box("\\varphi \\\\ \\vdots \\\\ \\bot")],
+          conclusion: "\\lnot \\varphi",
         },
         numPremises: 1,
       },
@@ -138,7 +138,7 @@ export const rulesets = [
         ruleName: "not_elim",
         latex: {
           ruleName: "\\lnot e",
-          premises: ["\\phi", "\\lnot \\phi"],
+          premises: ["\\varphi", "\\lnot \\varphi"],
           conclusion: "\\bot",
         },
         numPremises: 2,
@@ -148,7 +148,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\bot e",
           premises: ["\\bot"],
-          conclusion: "\\phi",
+          conclusion: "\\varphi",
         },
         numPremises: 1,
       },
@@ -156,8 +156,8 @@ export const rulesets = [
         ruleName: "not_not_elim",
         latex: {
           ruleName: "\\lnot\\lnot e",
-          premises: ["\\lnot \\lnot \\phi"],
-          conclusion: "\\phi",
+          premises: ["\\lnot \\lnot \\varphi"],
+          conclusion: "\\varphi",
         },
         numPremises: 1,
       },
@@ -165,8 +165,8 @@ export const rulesets = [
         ruleName: "modus_tollens",
         latex: {
           ruleName: "\\text{MT}",
-          premises: ["\\phi \\rightarrow \\psi", "\\lnot \\psi"],
-          conclusion: "\\lnot \\phi",
+          premises: ["\\varphi \\rightarrow \\psi", "\\lnot \\psi"],
+          conclusion: "\\lnot \\varphi",
         },
         numPremises: 2,
       },
@@ -174,8 +174,8 @@ export const rulesets = [
         ruleName: "not_not_intro",
         latex: {
           ruleName: "\\lnot\\lnot i",
-          premises: ["\\phi"],
-          conclusion: "\\lnot \\lnot \\phi",
+          premises: ["\\varphi"],
+          conclusion: "\\lnot \\lnot \\varphi",
         },
         numPremises: 1,
       },
@@ -183,8 +183,8 @@ export const rulesets = [
         ruleName: "proof_by_contradiction",
         latex: {
           ruleName: "\\text{PBC}",
-          premises: [box("\\phi\\\\ \\vdots \\\\ \\bot")],
-          conclusion: "\\phi",
+          premises: [box("\\varphi\\\\ \\vdots \\\\ \\bot")],
+          conclusion: "\\varphi",
         },
         numPremises: 1,
       },
@@ -193,7 +193,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\text{LEM}",
           premises: [],
-          conclusion: "\\phi \\lor \\lnot \\phi",
+          conclusion: "\\varphi \\lor \\lnot \\varphi",
         },
         numPremises: 0,
       },

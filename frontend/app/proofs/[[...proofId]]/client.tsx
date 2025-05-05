@@ -19,9 +19,11 @@ import { useCurrentProofId } from "@/contexts/CurrentProofIdProvider";
 import { useEffect } from "react";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { useServer } from "@/contexts/ServerProvider";
 
 export default function Client({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
+  const { proofDiagnostics } = useServer()
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
 
@@ -72,7 +74,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
               onClick={(e) => e.stopPropagation()}
             >
               <LineNumbers lines={lines} />
-              <Proof proof={proofContext.proof} lines={lines} />
+              <Proof proof={proofContext.proof} lines={lines} diagnostics={proofDiagnostics} />
               <Tooltip
                 id={`tooltip-id-${proofContext.lineInFocus}`}
                 place="right"

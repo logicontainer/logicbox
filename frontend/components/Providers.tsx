@@ -2,6 +2,7 @@
 
 import { ContextMenuProvider } from "@/contexts/ContextMenuProvider";
 import { CurrentProofIdProvider } from "@/contexts/CurrentProofIdProvider";
+import { DiagnosticsProvider } from "@/contexts/DiagnosticsProvider";
 import { HistoryProvider } from "@/contexts/HistoryProvider";
 import { InteractionStateProvider } from "@/contexts/InteractionStateProvider";
 import { LinesProvider } from "@/contexts/LinesProvider";
@@ -20,11 +21,13 @@ export function Providers({ children }: ProviderProps) {
         <RulesetProvider>
           <ProofProvider>
             <LinesProvider>
-              <HistoryProvider>
-                <InteractionStateProvider>
-                  <ContextMenuProvider>{children}</ContextMenuProvider>
-                </InteractionStateProvider>
-              </HistoryProvider>
+              <DiagnosticsProvider>
+                <HistoryProvider>
+                  <InteractionStateProvider>
+                    <ContextMenuProvider>{children}</ContextMenuProvider>
+                  </InteractionStateProvider>
+                </HistoryProvider>
+              </DiagnosticsProvider>
             </LinesProvider>
           </ProofProvider>
         </RulesetProvider>

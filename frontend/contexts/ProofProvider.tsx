@@ -80,6 +80,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   const setStringProof = (stringProof: string) => {
     setProof(JSON.parse(stringProof));
   };
+
   const [lineInFocus, setLineInFocus] = useState<string | null>(null);
 
   const removeFocusFromLine = (uuid: string) => {

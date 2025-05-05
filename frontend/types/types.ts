@@ -19,7 +19,7 @@ export type Justification = {
 
 export type LineProofStep = {
   uuid: string;
-  stepType: string;
+  stepType: 'line';
   formula: {
     userInput: string;
     unsynced?: boolean;
@@ -31,7 +31,7 @@ export type LineProofStep = {
 
 export type BoxProofStep = {
   uuid: string;
-  stepType: string;
+  stepType: 'box';
   proof: Proof;
 };
 
@@ -68,87 +68,34 @@ export type ProofStepPosition = {
 
 type UUID = string;
 
-// Individual violation types
-type ReferencesMismatchViolation = {
-  explanation: string;
-  refs: UUID[];
-};
 
-type WrongNumberOfReferencesViolation = {
-  explanation: string;
-  expected: number;
-  actual: number;
-};
+export type Violation =
+  | { violationType: "missingFormula" }
+  | { violationType: "missingRule" }
+  | { violationType: "missingDetailInReference"; refIdx: number; expl: string }
+  | { violationType: "propositionalLogic:wrongNumberOfReferences"; exp: number; actual: number; }
+  | { violationType: "propositionalLogic:referenceShouldBeBox"; ref: number; }
+  | { violationType: "propositionalLogic:referenceShouldBeLine"; ref: number; }
+  | { violationType: "propositionalLogic:referenceDoesntMatchRule"; ref: number; expl: string }
+  | { violationType: "propositionalLogic:referencesMismatch"; refs: number[]; expl: string }
+  | { violationType: "propositionalLogic:formulaDoesntMatchReference"; refs: number; expl: string }
+  | { violationType: "propositionalLogic:formulaDoesntMatchRule"; expl: string }
+  | { violationType: "propositionalLogic:miscellaneousViolation"; expl: string }
+  | { violationType: "stepNotFound"; stepId: string; expl: string }
+  | { violationType: "referenceIdNotFound"; stepId: string; whichRef: number; refId: string; expl: string }
+  | { violationType: "malformedReference"; stepId: string; whichRef: number; refId: string; expl: string }
+  | { violationType: "referenceToLaterStep"; stepId: string; refIdx: number; refId: string }
+  | { violationType: "scopeViolation"; stepId: string; stepScope: string; refIdx: number; refId: string; refScope: string }
+  | { violationType: "referenceToUnclosedBox"; stepId: string; refIdx: number; boxId: string };
 
-type ReferenceShouldBeBoxViolation = {
-  explanation: string;
-  ref: UUID;
-};
+export type ViolationType = Violation["violationType"]
 
-type ReferenceShouldBeLineViolation = {
-  explanation: string;
-  ref: UUID;
-};
-
-type ReferenceDoesntMatchRuleViolation = {
-  explanation: string;
-  ref: UUID;
-};
-
-type FormulaDoesntMatchReferenceViolation = {
-  explanation: string;
-  ref: UUID;
-};
-
-type FormulaDoesntMatchRuleViolation = {
-  explanation: string;
-};
-
-type MiscellaneousViolation = {
-  explanation: string;
-};
-
-// Union type for all possible violations
-type Violation =
-  | {
-      violationType: "references_mismatch";
-      violation: ReferencesMismatchViolation;
-    }
-  | {
-      violationType: "wrong_number_of_references";
-      violation: WrongNumberOfReferencesViolation;
-    }
-  | {
-      violationType: "reference_should_be_box";
-      violation: ReferenceShouldBeBoxViolation;
-    }
-  | {
-      violationType: "reference_should_be_line";
-      violation: ReferenceShouldBeLineViolation;
-    }
-  | {
-      violationType: "reference_doesnt_match_rule";
-      violation: ReferenceDoesntMatchRuleViolation;
-    }
-  | {
-      violationType: "formula_doesnt_match_reference";
-      violation: FormulaDoesntMatchReferenceViolation;
-    }
-  | {
-      violationType: "formula_doesnt_match_rule";
-      violation: FormulaDoesntMatchRuleViolation;
-    }
-  | {
-      violationType: "miscellaneousViolation";
-      violation: MiscellaneousViolation;
-    };
-
-// Diagnostic type
 export type Diagnostic = {
   uuid: UUID;
-} & Violation;
+  violationType: string;
+  violation: any;
+}
 
-// Main response type
 export type ValidationResponse = {
   proof: Proof;
   diagnostics: Diagnostic[];

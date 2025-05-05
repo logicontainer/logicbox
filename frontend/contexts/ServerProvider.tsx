@@ -14,12 +14,7 @@ export interface ServerContextProps {
   validateProof: (proof: Proof) => Promise<boolean>;
 }
 
-const ServerContext = React.createContext<ServerContextProps>({
-  proof: [],
-  proofDiagnostics: [],
-  syncingStatus: "idle",
-  validateProof: async () => false,
-});
+const ServerContext = React.createContext<ServerContextProps | null>(null);
 
 const getProofById = (id: string | null): Proof => {
   if (id) {

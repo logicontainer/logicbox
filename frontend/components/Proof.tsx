@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    Diagnostic,
   BoxProofStep as TBoxProofStep,
   TLineNumber,
   LineProofStep as TLineProofStep,
@@ -16,6 +17,7 @@ export function Proof({
   ...props
 }: {
   proof: ProofStep[];
+  diagnostics: Diagnostic[];
   lines: TLineNumber[];
   uuid?: string;
 }) {
@@ -37,6 +39,7 @@ export function Proof({
             <LineProofStep
               key={lineProofStepProps.uuid}
               lines={props.lines}
+              diagnosticsForLine={props.diagnostics.filter(d => d.uuid === proofStep.uuid)}
               {...lineProofStepProps}
             />
           );
@@ -46,6 +49,7 @@ export function Proof({
             <BoxProofStep
               key={boxProofStepProps.uuid}
               lines={props.lines}
+              diagnostics={props.diagnostics}
               {...boxProofStepProps}
             />
           );

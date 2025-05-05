@@ -72,9 +72,13 @@ export function ProofStepContextMenu() {
   return (
     <div
       className={
-        "absolute z-50 bg-white min-w-48 rounded-md shadow-md shadow-slate-400 overflow-hidden"
+        "z-50 bg-white min-w-48 rounded-md shadow-md shadow-slate-400 overflow-hidden"
       }
-      style={{ top: y, left: x }}
+      style={{
+        position: 'fixed',
+        left: x,
+        top: y,
+      }}
     >
       {!interactionState.isBox && (
         <Item id="edit" onClick={handleItemClick}>
