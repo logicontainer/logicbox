@@ -25,7 +25,7 @@ export function Proof({
   return (
     <div
       className={cn(
-        " text-slate-800 cursor-auto",
+        " text-slate-800 cursor-auto w-full",
         isInFocus && "outline-blue-400"
       )}
       style={{ outlineWidth: "1.5px" }}
