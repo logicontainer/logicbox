@@ -55,8 +55,8 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
       if (step.proof.length === 0)
         return "EMPTY BOX"
 
-      const ass = getStepAsLatex(step.proof[0].uuid)
-      const concl = getStepAsLatex(step.proof[step.proof.length - 1].uuid)
+      const ass = getStepAsLatex(step.proof[0].uuid) ?? "???"
+      const concl = getStepAsLatex(step.proof[step.proof.length - 1].uuid) ?? "???"
 
       return `\\begin{array}{|c|} \\hline ${ass} \\\\ \\vdots \\\\ ${concl} \\\\ \\hline \\end{array}`
     } else {

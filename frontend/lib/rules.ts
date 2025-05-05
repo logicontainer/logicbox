@@ -102,7 +102,7 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\varphi \\lor \\psi", box("\\phi\\\\ \\vdots \\\\ \\bot"), box("\\phi\\\\ \\vdots \\\\ \\bot")],
+          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\bot"), box("\\varphi\\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\chi",
         },
         numPremises: 3,
@@ -120,7 +120,7 @@ export const rulesets = [
         ruleName: "implies_elim",
         latex: {
           ruleName: "\\rightarrow e",
-          premises: ["\\varphi", "\\phi \\rightarrow \\psi"],
+          premises: ["\\varphi", "\\varphi \\rightarrow \\psi"],
           conclusion: "\\psi",
         },
         numPremises: 2,
@@ -138,7 +138,7 @@ export const rulesets = [
         ruleName: "not_elim",
         latex: {
           ruleName: "\\lnot e",
-          premises: ["\\varphi", "\\lnot \\phi"],
+          premises: ["\\varphi", "\\lnot \\varphi"],
           conclusion: "\\bot",
         },
         numPremises: 2,
@@ -193,7 +193,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\text{LEM}",
           premises: [],
-          conclusion: "\\varphi \\lor \\lnot \\phi",
+          conclusion: "\\varphi \\lor \\lnot \\varphi",
         },
         numPremises: 0,
       },

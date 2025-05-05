@@ -3,27 +3,28 @@
 import { DiagnosticMessage } from "@/components/Diagnostics"
 import { ProofProvider, useProof } from "@/contexts/ProofProvider";
 import { ServerProvider } from "@/contexts/ServerProvider";
-import { ProofStep, Violation } from "@/types/types"
+import { Diagnostic, ProofStep, Violation } from "@/types/types"
+import { Diagnostics } from "next/dist/build/swc/types";
 import React from "react";
 
-const violations: Violation[] = [
-  {violationType: "missingFormula", },
-  {violationType: "missingRule", },
-  {violationType: "missingDetailInReference", "expl":"Reference lacks required details","refIdx":1},
-  {violationType: "wrongNumberOfReferences", "actual":1,"exp":2,},
-  {violationType: "referenceShouldBeBox","ref":1},
-  {violationType: "referenceShouldBeLine","ref":2},
-  {violationType: "referenceDoesntMatchRule", "expl":"must be a disjunction (or)","ref":0},
-  {violationType: "referencesMismatch", "expl":"last lines of boxes must match","refs":[1,2]},
-  {violationType: "formulaDoesntMatchReference", "expl":"must match right-hand side of implication","refs":2},
-  {violationType: "formulaDoesntMatchRule", "expl":"must be a negation"},
-  {violationType: "miscellaneousViolation", "expl":"Unknown validation error occurred"},
-  {violationType: "stepNotFound", "expl":"The referenced step doesn't exist","stepId":"step5"},
-  {violationType: "referenceIdNotFound", "expl":"Reference points to non-existent step","refId":"nonexistent","stepId":"step7","whichRef":1},
-  {violationType: "malformedReference", "expl":"malformed reference","refId":"bad$ref","stepId":"step9","whichRef":0},
-  {violationType: "referenceToLaterStep", "refId":"step4","refIdx":1,"stepId":"step2"},
-  {violationType: "scopeViolation", "refId":"box2.step1","refIdx":2,"refScope":"6c132815-cf2a-4a8f-b3b0-034bd0c6e09b","stepId":"box1.step3","stepScope":"root"},
-  {violationType: "referenceToUnclosedBox", "boxId":"box3","refIdx":0,"stepId":"step10"},
+const violations: Diagnostic[] = [
+  {uuid: "", violationType: "missingFormula", violation: {   } },
+  {uuid: "", violationType: "missingRule", violation: {   } },
+  {uuid: "", violationType: "missingDetailInReference", violation: {  "expl":"Reference lacks required details","refIdx":1 } },
+  {uuid: "", violationType: "propositionalLogic:wrongNumberOfReferences", violation: {  "actual":1,"exp":2, } },
+  {uuid: "", violationType: "propositionalLogic:referenceShouldBeBox", violation: { "ref":1 } },
+  {uuid: "", violationType: "propositionalLogic:referenceShouldBeLine", violation: { "ref":2 } },
+  {uuid: "", violationType: "propositionalLogic:referenceDoesntMatchRule", violation: {  "expl":"must be a disjunction (or)","ref":0 } },
+  {uuid: "", violationType: "propositionalLogic:referencesMismatch", violation: {  "expl":"last lines of boxes must match","refs":[1,2] } },
+  {uuid: "", violationType: "propositionalLogic:formulaDoesntMatchReference", violation: {  "expl":"must match right-hand side of implication","refs":2 } },
+  {uuid: "", violationType: "propositionalLogic:formulaDoesntMatchRule", violation: {  "expl":"must be a negation" } },
+  {uuid: "", violationType: "propositionalLogic:miscellaneousViolation", violation: {  "expl":"Unknown validation error occurred" } },
+  {uuid: "", violationType: "stepNotFound", violation: {  "expl":"The referenced step doesn't exist","stepId":"step5" } },
+  {uuid: "", violationType: "referenceIdNotFound", violation: {  "expl":"Reference points to non-existent step","refId":"nonexistent","stepId":"step7","whichRef":1 } },
+  {uuid: "", violationType: "malformedReference", violation: {  "expl":"malformed reference","refId":"bad$ref","stepId":"step9","whichRef":0 } },
+  {uuid: "", violationType: "referenceToLaterStep", violation: {  "refId":"step4","refIdx":1,"stepId":"step2" } },
+  {uuid: "", violationType: "scopeViolation", violation: {  "refId":"box2.step1","refIdx":2,"refScope":"6c132815-cf2a-4a8f-b3b0-034bd0c6e09b","stepId":"box1.step3","stepScope":"root" } },
+  {uuid: "", violationType: "referenceToUnclosedBox", violation: {  "boxId":"box3","refIdx":0,"stepId":"step10" } },
 ]
 
 const proofExample: ProofStep[] = [
