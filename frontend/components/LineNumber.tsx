@@ -28,7 +28,7 @@ export function LineNumber({
           proofStepDiagnostics ? `line-number-tooltip-${line.uuid}` : ""
         }
       >
-        {line.lineNumber}.
+        {line.stepType === "line" && line.lineNumber}.
       </p>
       <Tooltip className="z-50" id={`line-number-tooltip-${line.uuid}`} />
     </>

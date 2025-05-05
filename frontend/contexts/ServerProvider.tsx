@@ -14,12 +14,7 @@ export interface ServerContextProps {
   validateProof: (proof: Proof) => Promise<boolean>;
 }
 
-const ServerContext = React.createContext<ServerContextProps>({
-  proof: [],
-  proofDiagnostics: [],
-  syncingStatus: "idle",
-  validateProof: async () => false,
-});
+const ServerContext = React.createContext<ServerContextProps | null>(null);
 
 export function useServer() {
   const context = React.useContext(ServerContext);
@@ -29,7 +24,7 @@ export function useServer() {
   return context;
 }
 
-export function ServerProvider({ children }: React.PropsWithChildren<object>) {
+export function ServerProvider({ children }: React.PropsWithChildren<{ initialProof?: Proof }>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
 
   const [proof, setProof] = useState<Proof>([]);
@@ -48,10 +43,8 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
 
   const validateProof = async (proof: Proof): Promise<boolean> => {
     setServerSyncingStatus("syncing");
-    console.log(proof);
     return Promise.resolve()
       .then(async () => {
-        console.log("Calling server");
         return fetch("https://logicbox.felixberg.dev/verify", {
           method: "POST",
           headers: {
@@ -67,7 +60,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         return await serverResponse.json();
       })
       .then((serverResponse: ValidationResponse) => {
-        console.log("Server response", serverResponse);
         setProofDiagnostics(serverResponse.diagnostics);
         setProof(serverResponse.proof);
         return true;

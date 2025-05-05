@@ -1,0 +1,220 @@
+import { LineProofStep, ProofStep, Violation } from "@/types/types";
+import { InlineMath } from "react-katex";
+import "katex/dist/katex.min.css";
+
+function MissingFormulaDiagnostic({
+}: Violation & { violationType: "missingFormula" }) {
+  return <p>Formula is malformed/not specified</p>;
+}
+
+function MissingRuleDiagnostic({
+}: Violation & { violationType: "missingRule" }) {
+  return <p>Missing rule</p>;
+}
+
+function MissingDetailInReferenceDiagnostic({
+  refIdx,
+  expl,
+  refLatex,
+}: Violation & { 
+  violationType: "missingDetailInReference",
+  refLatex: string | null
+}) {
+  return <>
+    <p>{expl}</p>
+    {refLatex !== null && <p>
+      <InlineMath math={refLatex + `\\quad \\quad (${refIdx})`}/>
+    </p>}
+  </>;
+}
+
+function WrongNumberOfReferencesDiagnostic({
+  exp,
+  actual,
+  expl,
+}: Violation & { 
+  violationType: "wrongNumberOfReferences",
+}) {
+  return <p>Expected {exp} references but found {actual}. {expl}</p>;
+}
+
+function ReferenceShouldBeBoxDiagnostic({
+  ref,
+  expl,
+}: Violation & { violationType: "referenceShouldBeBox" }) {
+  return <p>Reference {ref} should be a box. {expl}</p>;
+}
+
+function ReferenceShouldBeLineDiagnostic({
+  ref,
+  expl,
+}: Violation & { violationType: "referenceShouldBeLine" }) {
+  return <p>Reference {ref} should be a line. {expl}</p>;
+}
+
+function ReferenceDoesntMatchRuleDiagnostic({
+  ref,
+  expl,
+}: Violation & { violationType: "referenceDoesntMatchRule" }) {
+  return <p>Reference {ref} doesn't match the rule. {expl}</p>;
+}
+
+function ReferencesMismatchDiagnostic({
+  refs,
+  expl,
+}: Violation & { violationType: "referencesMismatch" }) {
+  return <p>References {refs.join(', ')} mismatch. {expl}</p>;
+}
+
+function FormulaDoesntMatchReferenceDiagnostic({
+  refs,
+  expl,
+}: Violation & { violationType: "formulaDoesntMatchReference" }) {
+  return <p>Formula doesn't match reference {refs}. {expl}</p>;
+}
+
+function FormulaDoesntMatchRuleDiagnostic({
+  expl,
+}: Violation & { violationType: "formulaDoesntMatchRule" }) {
+  return <p>Formula doesn't match rule. {expl}</p>;
+}
+
+function MiscellaneousViolationDiagnostic({
+  expl,
+}: Violation & { violationType: "miscellaneousViolation" }) {
+  return <p>Validation error: {expl}</p>;
+}
+
+function StepNotFoundDiagnostic({
+  stepId,
+  expl,
+}: Violation & { violationType: "stepNotFound" }) {
+  return <p>Step {stepId} not found. {expl}</p>;
+}
+
+function ReferenceIdNotFoundDiagnostic({
+  stepId,
+  whichRef,
+  refId,
+  expl,
+}: Violation & { violationType: "referenceIdNotFound" }) {
+  return (
+    <p>
+      In step {stepId}, reference #{whichRef} ({refId}) not found. {expl}
+    </p>
+  );
+}
+
+function MalformedReferenceDiagnostic({
+  stepId,
+  whichRef,
+  refId,
+  expl,
+}: Violation & { violationType: "malformedReference" }) {
+  return (
+    <p>
+      In step {stepId}, reference #{whichRef} ({refId}) is malformed. {expl}
+    </p>
+  );
+}
+
+function ReferenceToLaterStepDiagnostic({
+  stepId,
+  refIdx,
+  refId,
+}: Violation & { violationType: "referenceToLaterStep" }) {
+  return (
+    <p>
+      Step {stepId} illegally references later step {refId} (reference #{refIdx})
+    </p>
+  );
+}
+
+function ScopeViolationDiagnostic({
+  stepId,
+  stepScope,
+  refIdx,
+  refId,
+  refScope,
+}: Violation & { violationType: "scopeViolation" }) {
+  return (
+    <p>
+      Scope violation in step {stepId} (scope: {stepScope}): 
+      Cannot reference {refId} (scope: {refScope}) in reference #{refIdx}
+    </p>
+  );
+}
+
+function ReferenceToUnclosedBoxDiagnostic({
+  stepId,
+  refIdx,
+  boxId,
+}: Violation & { violationType: "referenceToUnclosedBox" }) {
+  return (
+    <p>
+      Step {stepId} references unclosed box {boxId} in reference #{refIdx}
+    </p>
+  );
+}
+
+export function ViolationDiagnostic({ uuid, viol, getProofStep, }: { 
+  uuid: string,
+  viol: Violation, 
+  getProofStep: (uuid: string) => ProofStep,
+}) {
+  const step = getProofStep(uuid)
+  const refs = step.stepType === "box" ? [] : step.justification.refs.map(refId => {
+    const refStep = getProofStep(refId)
+    console.log(refStep)
+    if (refStep.stepType === "line") {
+      return refStep.formula.latex
+    } else if (refStep.stepType === "box") {
+      const ass = (refStep.proof[0] as LineProofStep)?.formula.latex
+      return `\\begin{array}{|c|}   ${ass} \\\\ \\vdots \\end{array}`
+    } else {
+      const _: never = refStep
+    }
+  })
+  
+  console.log(refs)
+
+  switch (viol.violationType) {
+    case "missingFormula":
+      return <MissingFormulaDiagnostic {...viol}/>;
+    case "missingRule":
+      return <MissingRuleDiagnostic {...viol} />;
+    case "missingDetailInReference":
+      return <MissingDetailInReferenceDiagnostic {...viol} refLatex={refs[viol.refIdx] ?? null}/>;
+    case "wrongNumberOfReferences":
+      return <WrongNumberOfReferencesDiagnostic {...viol} />;
+    case "referenceShouldBeBox":
+      return <ReferenceShouldBeBoxDiagnostic {...viol} />;
+    case "referenceShouldBeLine":
+      return <ReferenceShouldBeLineDiagnostic {...viol} />;
+    case "referenceDoesntMatchRule":
+      return <ReferenceDoesntMatchRuleDiagnostic {...viol} />;
+    case "referencesMismatch":
+      return <ReferencesMismatchDiagnostic {...viol} />;
+    case "formulaDoesntMatchReference":
+      return <FormulaDoesntMatchReferenceDiagnostic {...viol} />;
+    case "formulaDoesntMatchRule":
+      return <FormulaDoesntMatchRuleDiagnostic {...viol} />;
+    case "miscellaneousViolation":
+      return <MiscellaneousViolationDiagnostic {...viol} />;
+    case "stepNotFound":
+      return <StepNotFoundDiagnostic {...viol} />;
+    case "referenceIdNotFound":
+      return <ReferenceIdNotFoundDiagnostic {...viol} />;
+    case "malformedReference":
+      return <MalformedReferenceDiagnostic {...viol} />;
+    case "referenceToLaterStep":
+      return <ReferenceToLaterStepDiagnostic {...viol} />;
+    case "scopeViolation":
+      return <ScopeViolationDiagnostic {...viol} />;
+    case "referenceToUnclosedBox":
+      return <ReferenceToUnclosedBoxDiagnostic {...viol} />;
+    default:
+      const _: never = viol;
+      return null;
+  }
+}

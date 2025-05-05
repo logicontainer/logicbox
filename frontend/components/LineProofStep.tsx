@@ -18,12 +18,13 @@ import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
 import { getLineBeingEdited } from "@/lib/state-helpers";
+import { formulaIsWrong } from "@/lib/diagnostic-helpers";
 
 export function LineProofStep({
   ...props
-}: TLineProofStep & { lines: TLineNumber[] }) {
+}: TLineProofStep & { lines: TLineNumber[]; diagnosticsForLine: Diagnostic[] }) {
   const { setStepInFocus: setLineInFocus, isFocused } = useProof();
-  const { interactionState, doTransition } = useInteractionState();
+  const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const [tooltipContent, setTooltipContent] = useState<string>("");
 
@@ -60,9 +61,10 @@ export function LineProofStep({
       }}
     >
       <Formula
-        userInput={props.formula.userInput}
         latexFormula={props.formula.latex ?? null}
         isSyncedWithServer={!props.formula.unsynced}
+        formulaIsWrong={formulaIsWrong(props.diagnosticsForLine)}
+        userInput={props.formula.userInput}
         lineUuid={props.uuid}
       />
 
@@ -102,11 +104,13 @@ function Formula({
   latexFormula,
   lineUuid,
   isSyncedWithServer,
+  formulaIsWrong
 } : {
   userInput: string
   latexFormula: string | null
   lineUuid: string,
   isSyncedWithServer: boolean
+  formulaIsWrong: boolean
 }) {
   const { interactionState, doTransition } = useInteractionState()
 
@@ -128,7 +132,6 @@ function Formula({
     }
   };
 
-  const formulaIsWrong = false
   const withUnderline = (str: string) => `{\\color{red}\\underline{${str}}}`
   const formulaContent = !latexFormula || latexFormula === "" ?  "???" : latexFormula
   const formulaLatexContentWithUnderline = formulaIsWrong ? withUnderline(formulaContent) : formulaContent
@@ -161,10 +164,10 @@ function Formula({
         }
       >
 
-        {!isSyncedWithServer ? (
+        {!isSyncedWithServer || formulaIsWrong ? (
           currentFormulaValue
         ) : (
-          <InlineMath math={formulaLatexContentWithUnderline} />
+          <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
         )}
       </p>
     )

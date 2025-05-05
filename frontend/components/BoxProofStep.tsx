@@ -1,4 +1,4 @@
-import { BoxProofStep as TBoxProofStep, TLineNumber } from "@/types/types";
+import { Diagnostic, BoxProofStep as TBoxProofStep, TLineNumber } from "@/types/types";
 import {
   TransitionEnum,
   useInteractionState,
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 export function BoxProofStep({
   ...props
-}: TBoxProofStep & { lines: TLineNumber[] }) {
+}: TBoxProofStep & { lines: TLineNumber[]; diagnostics: Diagnostic[] }) {
   const { setStepInFocus, isFocused } = useProof();
   const { doTransition } = useInteractionState();
 
@@ -39,7 +39,7 @@ export function BoxProofStep({
         })
       }
     >
-      <Proof proof={props.proof} lines={props.lines} uuid={props.uuid} />
+      <Proof proof={props.proof} lines={props.lines} uuid={props.uuid} diagnostics={props.diagnostics}/>
     </div>
   );
 }

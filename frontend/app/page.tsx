@@ -16,11 +16,15 @@ import { Tooltip } from "react-tooltip";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import React from "react";
+import { useServer } from "@/contexts/ServerProvider";
 
 export default function Home() {
   const proofContext = useProof();
+  const serverContext = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
+
+  const diagnostics = serverContext.proofDiagnostics
 
   const [keybindTransition, setKeybindTransition] = React.useState<Transition | null>()
 
@@ -55,7 +59,11 @@ export default function Home() {
               onClick={(e) => e.stopPropagation()}
             >
               <LineNumbers lines={lines} />
-              <Proof proof={proofContext.proof} lines={lines} isOuterProof />
+              <Proof 
+                proof={proofContext.proof} 
+                lines={lines}
+                diagnostics={diagnostics}
+              />
               <Tooltip
                 id={`tooltip-id-${proofContext.lineInFocus}`}
                 place="right"
