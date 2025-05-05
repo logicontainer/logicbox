@@ -1,11 +1,15 @@
+import ContextSidebar from "@/components/ContextSidebar";
+import Footer from "@/components/Footer";
 import NavigationSidebar from "@/components/NavigationSidebar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[300px_auto] border">
+    <div className="max-w-screen grid md:grid-cols-[200px_1fr_minmax(300px,300px)]">
       <NavigationSidebar />
-      <div className="bg-white flex flex-col h-full overflow-auto">
-        <div className="flex-1">{children}</div>
+      <div className="overflow-auto relative">{children}</div>
+      <ContextSidebar />
+      <div className="sm:hidden">
+        <Footer />
       </div>
     </div>
   );

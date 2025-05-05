@@ -24,7 +24,6 @@ function AppToolbar() {
   };
   return (
     <div className="flex gap-2">
-      <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
       <Toolbar.Root
         className="flex w-full min-w-max rounded-md bg-white p-2.5 shadow-[0_2px_4px] shadow-blackA4 shadow-gray-600"
         aria-label="Formatting options"

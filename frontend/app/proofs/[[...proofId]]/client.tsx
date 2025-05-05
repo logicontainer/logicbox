@@ -7,6 +7,7 @@ import {
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
 
+import Footer from "@/components/Footer";
 import { InlineMath } from "react-katex";
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
@@ -51,19 +52,23 @@ export default function Client({ proofId }: { proofId: string | null }) {
   }, [keybindTransition]);
 
   return (
-    <div className="relative">
+    <>
       <ProofStepContextMenu />
       <div
-        className="flex justify-center h-screen"
+        className="flex flex-col items-center w-full  max-h-screen overflow-auto justify-between sm:h-screen sm:gap-2"
         onClick={() => doTransition({ enum: TransitionEnum.CLICK_OUTSIDE })}
       >
-        <main className="flex flex-col  row-start-2 items-center sm:items-start">
+        <div
+          className="absolute mx-auto top-4 z-50"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Toolbar />
+        </div>
+        <div className="grid grid-cols-[1fr_auto_1fr] w-full">
+          <div></div>
           <div className="p-4 flex flex-col justify-between items-center rounded-sm">
-            <div className="fixed z-50" onClick={(e) => e.stopPropagation()}>
-              <Toolbar />
-            </div>
             <div
-              className="flex box-content gap-2 mt-20"
+              className="flex box-content gap-2 mt-16 w-full"
               onClick={(e) => e.stopPropagation()}
             >
               <LineNumbers lines={lines} />
@@ -83,8 +88,11 @@ export default function Client({ proofId }: { proofId: string | null }) {
               {/*<ProofStepContextMenu />*/}
             </div>
           </div>
-        </main>
+        </div>
+        <div className="w-full hidden sm:block">
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
