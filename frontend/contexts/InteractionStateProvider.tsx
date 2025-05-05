@@ -12,12 +12,10 @@ import {
   UpdateLineProofStepCommand,
 } from "@/lib/commands";
 import { useHistory } from "./HistoryProvider";
-import { getLineBeingEdited } from "@/lib/state-helpers";
 import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
 import { v4 as uuidv4 } from "uuid"
-import { transferableAbortSignal } from "util";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -236,11 +234,18 @@ export function InteractionStateProvider({
 
   const updateFormulaInProof = (lineUuid: string, formula: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
+
+    // if nothing change, don't add to history
+    if (currLineProofStep.formula.userInput === formula)
+      return;
+
     const updatedLineProofStep: LineProofStep = {
       ...currLineProofStep,
       formula: {
         userInput: formula,
         unsynced: true,
+        latex: null,
+        ascii: null
       },
     };
 

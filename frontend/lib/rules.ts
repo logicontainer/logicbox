@@ -8,32 +8,24 @@ export function createHighlightedLatexRule(
   conclusionIsHighlighted: boolean = false,
 ): string {
   const premisesWithHighlights = premises.map((p, idx) => {
-    if (highlightedPremises.includes(idx)) {
-      return `\\color{red}\\boxed{${p}}`;
-    } else {
-      return p;
-    }
+    const content = highlightedPremises.includes(idx)
+      ? `{\\color{red}\\underline{${p}}}`
+      : p;
+    return content
   });
-  const premiseLine = `\\begin{matrix}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{matrix}`;
+  const premiseLine = `{\\begin{array}{${premises.map(_ => "c").join("")}}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{array}}`;
   const conclusionLine = conclusionIsHighlighted
     ? `\\color{red}\\boxed{${conclusion}}`
     : conclusion;
-  return `\\dfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
+  return `\\cfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }
+
+const box = (str: string) => `\\begin{array}{|c|} \\hline ${str} \\\\ \\hline \\end{array}`
 
 export const rulesets = [
   {
     rulesetName: "propositional-logic",
     rules: [
-      {
-        ruleName: null,
-        latex: {
-          ruleName: "\\text{?}",
-          premises: [],
-          conclusion: "\\text{?}",
-        },
-        numPremises: 0,
-      },
       {
         ruleName: "premise",
         latex: {
@@ -110,7 +102,7 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\phi \\lor \\psi", "\\text{BOX}", "\\text{BOX}"],
+          premises: ["\\phi \\lor \\psi", box("\\phi\\\\ \\vdots \\\\ \\bot"), box("\\phi\\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\chi",
         },
         numPremises: 3,
@@ -119,7 +111,7 @@ export const rulesets = [
         ruleName: "implies_intro",
         latex: {
           ruleName: "\\rightarrow i",
-          premises: ["\\text{BOX}"],
+          premises: [box("\\phi \\\\ \\vdots \\\\ \\psi")],
           conclusion: "\\phi \\rightarrow \\psi",
         },
         numPremises: 1,
@@ -137,7 +129,7 @@ export const rulesets = [
         ruleName: "not_intro",
         latex: {
           ruleName: "\\lnot i",
-          premises: ["\\text{BOX}"],
+          premises: [box("\\phi \\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\lnot \\phi",
         },
         numPremises: 1,
@@ -191,7 +183,7 @@ export const rulesets = [
         ruleName: "proof_by_contradiction",
         latex: {
           ruleName: "\\text{PBC}",
-          premises: ["\\text{BOX}"],
+          premises: [box("\\phi\\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\phi",
         },
         numPremises: 1,
