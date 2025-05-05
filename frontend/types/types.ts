@@ -39,12 +39,20 @@ export type ProofStep = LineProofStep | BoxProofStep;
 
 export type Proof = ProofStep[];
 
+export type ProofMetadata = {
+  id: string;
+  title: string;
+};
+export type ProofWithMetadata = {
+  proof: Proof;
+} & ProofMetadata;
+
 export type TLineNumber = {
   uuid: string;
-  stepType: 'line' | 'box';
+  stepType: "line" | "box";
 } & (
-  { stepType: 'line', lineNumber: number } | 
-  { stepType: 'box', boxStartLine: number, boxEndLine: number }
+  | { stepType: "line"; lineNumber: number }
+  | { stepType: "box"; boxStartLine: number; boxEndLine: number }
 );
 
 export type ProofStepDetails = {
