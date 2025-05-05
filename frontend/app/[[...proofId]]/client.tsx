@@ -11,14 +11,23 @@ import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import Toolbar from "@/components/Toolbar";
 import { Tooltip } from "react-tooltip";
+import { useCurrentProofId } from "@/contexts/CurrentProofIdProvider";
+import { useEffect } from "react";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 
-export default function Home() {
+export default function Client({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
   const { doTransition } = useInteractionState();
 
   const { lines } = useLines();
+
+  const { setProofId } = useCurrentProofId();
+
+  useEffect(() => {
+    console.log("proofId", proofId);
+    setProofId(proofId || ""); // Set the proofId in the context
+  }, [proofId, setProofId]);
 
   return (
     <div className="relative">
