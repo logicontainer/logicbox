@@ -1378,6 +1378,172 @@ const examples: Proof[] = [
     "stepType": "line",
     "uuid": "108ad9e1-d366-4100-bc66-51780f00a7ac"
   }
+], [
+  {
+    "proof": [
+      {
+        "formula": {
+          "ascii": "p -> q",
+          "latex": "p \\rightarrow q",
+          "userInput": "p -> q"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "assumption"
+        },
+        "stepType": "line",
+        "uuid": "cb0e66a5-b602-46ef-8a2d-4e5528d3c879"
+      },
+      {
+        "proof": [
+          {
+            "formula": {
+              "ascii": "not p -> q",
+              "latex": "\\lnot p \\rightarrow q",
+              "userInput": "not p -> q"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "2435e17f-cca6-4d5d-9322-4c66db601cbc"
+          },
+          {
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "not q",
+                  "latex": "\\lnot q",
+                  "userInput": "not q"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "630887fe-374f-46d9-a7cf-5be170d80ba9"
+              },
+              {
+                "formula": {
+                  "ascii": "not not p",
+                  "latex": "\\lnot \\lnot p",
+                  "userInput": "not not p"
+                },
+                "justification": {
+                  "refs": [
+                    "2435e17f-cca6-4d5d-9322-4c66db601cbc",
+                    "630887fe-374f-46d9-a7cf-5be170d80ba9"
+                  ],
+                  "rule": "modus_tollens"
+                },
+                "stepType": "line",
+                "uuid": "a3be3344-6a75-48b1-86d2-896a336f4420"
+              },
+              {
+                "formula": {
+                  "ascii": "p",
+                  "latex": "p",
+                  "userInput": "p"
+                },
+                "justification": {
+                  "refs": [
+                    "a3be3344-6a75-48b1-86d2-896a336f4420"
+                  ],
+                  "rule": "not_not_elim"
+                },
+                "stepType": "line",
+                "uuid": "9c988134-c550-4fc1-8bd2-ec814312db54"
+              },
+              {
+                "formula": {
+                  "ascii": "q",
+                  "latex": "q",
+                  "userInput": "q"
+                },
+                "justification": {
+                  "refs": [
+                    "9c988134-c550-4fc1-8bd2-ec814312db54",
+                    "cb0e66a5-b602-46ef-8a2d-4e5528d3c879"
+                  ],
+                  "rule": "implies_elim"
+                },
+                "stepType": "line",
+                "uuid": "323a994a-c81a-46c6-bfa2-f383042258f8"
+              },
+              {
+                "formula": {
+                  "ascii": "false",
+                  "latex": "\\bot",
+                  "userInput": "false"
+                },
+                "justification": {
+                  "refs": [
+                    "323a994a-c81a-46c6-bfa2-f383042258f8",
+                    "630887fe-374f-46d9-a7cf-5be170d80ba9"
+                  ],
+                  "rule": "not_elim"
+                },
+                "stepType": "line",
+                "uuid": "0a142918-b4c1-4aae-aa7a-9c4c1c340260"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "678269ac-8f46-4cac-a605-fe71034ffdd7"
+          },
+          {
+            "formula": {
+              "ascii": "q",
+              "latex": "q",
+              "userInput": "q"
+            },
+            "justification": {
+              "refs": [
+                "678269ac-8f46-4cac-a605-fe71034ffdd7"
+              ],
+              "rule": "proof_by_contradiction"
+            },
+            "stepType": "line",
+            "uuid": "22d5f824-243b-4939-bbad-49be74a55735"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "4389ef78-0d1f-4004-b5fe-1a0897cc81f8"
+      },
+      {
+        "formula": {
+          "ascii": "(not p -> q) -> q",
+          "latex": "(\\lnot p \\rightarrow q) \\rightarrow q",
+          "userInput": "(not p -> q) -> q"
+        },
+        "justification": {
+          "refs": [
+            "4389ef78-0d1f-4004-b5fe-1a0897cc81f8"
+          ],
+          "rule": "implies_intro"
+        },
+        "stepType": "line",
+        "uuid": "1ab33a76-e672-40f3-a685-15105c6dc0d4"
+      }
+    ],
+    "stepType": "box",
+    "uuid": "33a5fe1a-497d-4feb-954f-5f2cb2c76288"
+  },
+  {
+    "formula": {
+      "ascii": "(p -> q) -> ((not p -> q) -> q)",
+      "latex": "(p \\rightarrow q) \\rightarrow ((\\lnot p \\rightarrow q) \\rightarrow q)",
+      "userInput": "(p -> q) -> ((not p -> q) -> q)"
+    },
+    "justification": {
+      "refs": [
+        "33a5fe1a-497d-4feb-954f-5f2cb2c76288"
+      ],
+      "rule": "implies_intro"
+    },
+    "stepType": "line",
+    "uuid": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+  }
 ]
 ]
 

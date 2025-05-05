@@ -29,7 +29,7 @@ export function Justification({
   uuid: string;
   justification: TJustification;
   lines: TLineNumber[];
-  onHover: (highlightedLatex: string) => void;
+  onHover: (highlightedLatex: string | null) => void;
   onClickRule: () => void;
   onClickRef: (idx: number) => void;
 }) {
@@ -43,11 +43,12 @@ export function Justification({
   const rule = ruleset.rules.find(
     (rule) => rule.ruleName == justification.rule
   );
-  if (!rule) return;
+  const ruleNameLatex = rule?.latex.ruleName
 
   if (currLineProofStepDetails?.proofStep.stepType !== "line") {
     return null;
   }
+
   const currLineProofStep =
     currLineProofStepDetails.proofStep as TLineProofStep;
 
@@ -127,13 +128,13 @@ export function Justification({
           className="hover:text-red-500"
           onMouseOver={() =>
             onHover(
-              createHighlightedLatexRule(
+              rule ? createHighlightedLatexRule(
                 rule.latex.ruleName,
                 rule.latex.premises,
                 rule.latex.conclusion,
                 [],
                 false
-              )
+              ) : null
             )
           }
           onClick={(e) => {
@@ -141,7 +142,7 @@ export function Justification({
             e.stopPropagation();
           }}
         >
-          <InlineMath math={rule.latex.ruleName}></InlineMath>
+          <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
         </span>
       )}
       {justification.refs && (
@@ -176,7 +177,7 @@ export function Justification({
             } else {
               let refLatex = "";
               const referencedLine = lines.find((line) => line.uuid == ref);
-              if (referencedLine?.isBox) {
+              if (referencedLine?.stepType === "box") {
                 refLatex = `${referencedLine.boxStartLine}\\text{-}${referencedLine.boxEndLine}`;
               } else {
                 refLatex = JSON.stringify(referencedLine?.lineNumber);
@@ -186,20 +187,20 @@ export function Justification({
               return (
                 <span
                   key={i}
-                  className="hover:text-red-500"
+                  className="hover:text-slate-600"
                   onClick={(e) => {
                     onClickRef(i);
                     e.stopPropagation();
                   }}
                   onMouseOver={() =>
                     onHover(
-                      createHighlightedLatexRule(
+                      rule ? createHighlightedLatexRule(
                         rule.latex.ruleName,
                         rule.latex.premises,
                         rule.latex.conclusion,
                         [i],
                         false
-                      )
+                      ) : null
                     )
                   }
                 >
@@ -236,7 +237,7 @@ function CustomOption(props: any) {
       {...innerProps}
       className="text-slate-800 hover:bg-slate-100 cursor-pointer px-2"
     >
-      <InlineMath math={data.latexRuleName}></InlineMath>
+      <InlineMath math={data?.latexRuleName || ""}></InlineMath>
     </div>
   );
 }
@@ -250,7 +251,7 @@ function CustomValueContainer(props: any) {
       {...innerProps}
       className="flex items-center gap-2 px-2"
     >
-      <InlineMath math={value.latexRuleName}></InlineMath>
+      <InlineMath math={value?.latexRuleName || ""}></InlineMath>
     </div>
   );
 }

@@ -40,7 +40,7 @@ export function LinesProvider({ children }: React.PropsWithChildren<object>) {
   const getReferenceString = (uuid: string) => {
     const line = lines.find((line) => line.uuid === uuid);
     if (line) {
-      if (line.isBox) {
+      if (line.stepType === "box") {
         return `${line.boxStartLine}-${line.boxEndLine}`;
       } else {
         return JSON.stringify(line.lineNumber);

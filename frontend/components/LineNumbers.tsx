@@ -12,7 +12,7 @@ export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
     <>
       <div className="flex-col items-start">
         {lines
-          .filter((line) => !line.isBox)
+          .filter((line) => line.stepType !== "box")
           .map((line) => {
             return (
               <LineNumber

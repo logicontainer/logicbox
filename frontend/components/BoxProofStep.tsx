@@ -7,22 +7,25 @@ import {
 import { Proof } from "./Proof";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { cn } from "@/lib/utils";
 
 export function BoxProofStep({
   ...props
 }: TBoxProofStep & { lines: TLineNumber[] }) {
-  const { setLineInFocus } = useProof();
+  const { setStepInFocus, isFocused } = useProof();
   const { doTransition } = useInteractionState();
 
   const { setContextMenuPosition } = useContextMenu();
 
+  const currentlyBeingHovered = isFocused(props.uuid)
+
   return (
     <div
-      className="relative"
-      onMouseOverCapture={() => setLineInFocus(props.uuid)}
+      className={cn("relative px-3 outline outline-slate-800 m-[1px]", currentlyBeingHovered && "bg-slate-50")}
+      onMouseOverCapture={() => setStepInFocus(props.uuid)}
       onContextMenuCapture={(e) => {
         e.preventDefault();
-        setContextMenuPosition({ x: e.clientX, y: e.clientY });
+        setContextMenuPosition({ x: e.pageX, y: e.pageY });
         doTransition({
           enum: TransitionEnum.RIGHT_CLICK_STEP,
           proofStepUuid: props.uuid,
