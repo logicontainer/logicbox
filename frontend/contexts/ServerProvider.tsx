@@ -38,8 +38,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const prevProof = React.useRef<Proof>(proof);
   const prevProofDiagnostics = React.useRef<Diagnostic[]>(proofDiagnostics);
 
-  console.log(proofId);
-
   React.useEffect(() => {
     // This will only run on the client side
     if (examples.length === 0) {
@@ -49,8 +47,11 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     }
     const randomIndex = Math.floor(Math.random() * examples.length);
 
+    if (proofId === null) {
+      return;
+    }
+    let proofIdNumber = parseInt(proofId);
     if (proofId) {
-      let proofIdNumber = parseInt(proofId);
       if (
         isNaN(proofIdNumber) ||
         proofIdNumber < 0 ||
@@ -59,12 +60,17 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         console.warn("Invalid proofId, using random example");
         proofIdNumber = randomIndex;
       }
-      console.log("Using proofId", proofIdNumber);
       setProof(examples[proofIdNumber]);
     } else {
-      return setProof([] as Proof);
+      console.warn("No proofId provided, using random example");
+      proofIdNumber = randomIndex;
+      setProof(examples[proofIdNumber]);
     }
   }, [proofId]);
+
+  useEffect(() => {
+    if (proofId == null) setProof([]);
+  }, []);
 
   useEffect(() => {
     if (_.isEmpty(proof)) {
@@ -76,7 +82,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     ) {
       return;
     }
-    console.log("Validating proof", proof);
     validateProof(proof);
   }, [proof]);
 

@@ -3,7 +3,7 @@
 import { createContext, useContext, useRef, useState } from "react";
 
 export interface CurrentProofIdProps {
-  proofId: string;
+  proofId: string | null;
   setProofId: (proofId: string) => void;
 }
 
@@ -14,7 +14,7 @@ export const CurrentProofIdProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [proofId, setProofId] = useState<string>("");
+  const [proofId, setProofId] = useState<string | null>(null);
 
   return (
     <CurrentProofIdContext.Provider value={{ proofId, setProofId }}>
