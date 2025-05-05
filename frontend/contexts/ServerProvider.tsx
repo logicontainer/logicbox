@@ -4,7 +4,7 @@ import { Diagnostic, Proof, ValidationResponse } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
-import examples from "@/examples/proof-example-1";
+import examples from "@/examples/proof-examples";
 import { useCurrentProofId } from "./CurrentProofIdProvider";
 
 export interface ServerContextProps {
@@ -20,6 +20,17 @@ const ServerContext = React.createContext<ServerContextProps>({
   syncingStatus: "idle",
   validateProof: async () => false,
 });
+
+const getProofById = (id: string | null): Proof => {
+  if (id) {
+    const example = examples.find((example) => example.id === id);
+    if (example) {
+      return example.proof;
+    }
+  }
+  const randomIndex = Math.floor(Math.random() * examples.length);
+  return examples[randomIndex].proof;
+};
 
 export function useServer() {
   const context = React.useContext(ServerContext);
@@ -50,21 +61,11 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     if (proofId === null) {
       return;
     }
-    let proofIdNumber = parseInt(proofId);
     if (proofId) {
-      if (
-        isNaN(proofIdNumber) ||
-        proofIdNumber < 0 ||
-        proofIdNumber >= examples.length
-      ) {
-        console.warn("Invalid proofId, using random example");
-        proofIdNumber = randomIndex;
-      }
-      setProof(examples[proofIdNumber]);
+      setProof(getProofById(proofId));
     } else {
       console.warn("No proofId provided, using random example");
-      proofIdNumber = randomIndex;
-      setProof(examples[proofIdNumber]);
+      setProof(getProofById(null));
     }
   }, [proofId]);
 
