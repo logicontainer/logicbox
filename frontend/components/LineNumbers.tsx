@@ -5,7 +5,9 @@ import { useServer } from "@/contexts/ServerProvider";
 export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
   const serverContext = useServer();
   const proofDiagnostics = serverContext.proofDiagnostics;
-  const diagnosticMap = Object.fromEntries(proofDiagnostics.map(d => [d.uuid, d]))
+  const diagnosticMap = Object.fromEntries(
+    proofDiagnostics.map((d) => [d.uuid, d])
+  );
   if (!lines) return;
 
   return (

@@ -21,7 +21,7 @@ export function BoxProofStep({
 
   return (
     <div
-      className={cn("relative px-3 outline outline-slate-800", currentlyBeingHovered && "bg-slate-50")}
+      className={cn("relative px-3 outline outline-slate-800 m-[1px]", currentlyBeingHovered && "bg-slate-50")}
       onMouseOverCapture={() => setStepInFocus(props.uuid)}
       onContextMenuCapture={(e) => {
         e.preventDefault();

@@ -8,7 +8,9 @@ export function LineNumber({
   line,
   proofStepDiagnostics,
 }: {
-  line: TLineNumber;
+  line: TLineNumber & {
+    stepType: "line";
+  };
   proofStepDiagnostics?: Diagnostic;
 }) {
   const { isUnfocused } = useProof();

@@ -3,11 +3,15 @@
 import "katex/dist/katex.min.css";
 
 import {
+  Diagnostic,
+  TLineNumber,
+  LineProofStep as TLineProofStep,
+} from "@/types/types";
+import {
   InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
-import { Diagnostic, TLineNumber, LineProofStep as TLineProofStep } from "@/types/types";
 
 import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
@@ -17,7 +21,6 @@ import { cn } from "@/lib/utils";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
-import { getLineBeingEdited } from "@/lib/state-helpers";
 import { formulaIsWrong } from "@/lib/diagnostic-helpers";
 
 export function LineProofStep({
@@ -32,11 +35,12 @@ export function LineProofStep({
     setTooltipContent(highlightedLatex || "");
   };
 
-  const currentlyBeingHovered = isFocused(props.uuid)
+  const currentlyBeingHovered = isFocused(props.uuid);
 
   return (
     <div
       className={cn(
+        "text-nowrap",
         "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
         currentlyBeingHovered && "bg-slate-50"
       )}
