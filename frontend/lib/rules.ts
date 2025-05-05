@@ -183,7 +183,7 @@ export const rulesets = [
         ruleName: "proof_by_contradiction",
         latex: {
           ruleName: "\\text{PBC}",
-          premises: [box("\\phi\\\\ \\vdots \\\\ \\bot \\\\")],
+          premises: [box("\\phi\\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\phi",
         },
         numPremises: 1,

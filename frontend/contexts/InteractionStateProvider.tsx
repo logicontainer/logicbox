@@ -234,6 +234,11 @@ export function InteractionStateProvider({
 
   const updateFormulaInProof = (lineUuid: string, formula: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
+
+    // if nothing change, don't add to history
+    if (currLineProofStep.formula.userInput === formula)
+      return;
+
     const updatedLineProofStep: LineProofStep = {
       ...currLineProofStep,
       formula: {
