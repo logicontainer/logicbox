@@ -32,6 +32,7 @@ export function BoxProofStep({
     <ProofStepWrapper
       currentlyBeingHovered={currentlyBeingHovered}
       isOuterProofStep={props.isOuterProofStep}
+      isBox={true}
     >
       <div
         className={cn(

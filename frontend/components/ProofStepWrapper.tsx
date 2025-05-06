@@ -17,7 +17,7 @@ export function ProofStepWrapper({
     return (
       <div
         className={cn(
-          "px-3 pointer-events-none",
+          "px-3 pointer-events-none bg-none",
           !isBox && currentlyBeingHovered && "bg-slate-50"
         )}
       >
