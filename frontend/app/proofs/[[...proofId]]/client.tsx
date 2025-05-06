@@ -78,6 +78,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
                 proof={proofContext.proof}
                 lines={lines}
                 diagnostics={proofDiagnostics}
+                isOuterProof
               />
               <Tooltip
                 id={`tooltip-id-${proofContext.lineInFocus}`}

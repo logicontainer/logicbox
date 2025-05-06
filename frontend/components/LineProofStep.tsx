@@ -16,6 +16,7 @@ import {
 import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
+import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { formulaIsWrong } from "@/lib/diagnostic-helpers";
@@ -28,6 +29,7 @@ export function LineProofStep({
 }: TLineProofStep & {
   lines: TLineNumber[];
   diagnosticsForLine: Diagnostic[];
+  isOuterProofStep?: boolean;
 }) {
   const { setStepInFocus: setLineInFocus, isFocused } = useProof();
   const { doTransition } = useInteractionState();
@@ -41,67 +43,72 @@ export function LineProofStep({
   const currentlyBeingHovered = isFocused(props.uuid);
 
   return (
-    <div
-      className={cn(
-        "text-nowrap",
-        "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
-        currentlyBeingHovered && "bg-slate-50"
-      )}
-      onMouseOver={(_) => setLineInFocus(props.uuid)}
-      onClick={(e) => {
-        if (e.target !== e.currentTarget) {
-          return;
-        }
-        return doTransition({
-          enum: TransitionEnum.CLICK_LINE,
-          lineUuid: props.uuid,
-        });
-      }}
-      onContextMenuCapture={(e) => {
-        e.preventDefault();
-        setContextMenuPosition({ x: e.pageX, y: e.pageY });
-        doTransition({
-          enum: TransitionEnum.RIGHT_CLICK_STEP,
-          proofStepUuid: props.uuid,
-          isBox: false,
-        });
-      }}
+    <ProofStepWrapper
+      currentlyBeingHovered={currentlyBeingHovered}
+      isOuterProofStep={props.isOuterProofStep}
     >
-      <Formula
-        latexFormula={props.formula.latex ?? null}
-        isSyncedWithServer={!props.formula.unsynced}
-        formulaIsWrong={formulaIsWrong(props.diagnosticsForLine)}
-        userInput={props.formula.userInput}
-        lineUuid={props.uuid}
-      />
-
       <div
-        data-tooltip-id={`tooltip-id-${props.uuid}`}
-        data-tooltip-content={tooltipContent}
-        title="Select a rule"
-        className="flex items-center gap-2 whitespace-nowrap"
+        className={cn(
+          "text-nowrap pointer-events-auto",
+          "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
+          currentlyBeingHovered && "bg-slate-50"
+        )}
+        onMouseOver={(_) => setLineInFocus(props.uuid)}
+        onClick={(e) => {
+          if (e.target !== e.currentTarget) {
+            return;
+          }
+          return doTransition({
+            enum: TransitionEnum.CLICK_LINE,
+            lineUuid: props.uuid,
+          });
+        }}
+        onContextMenuCapture={(e) => {
+          e.preventDefault();
+          setContextMenuPosition({ x: e.pageX, y: e.pageY });
+          doTransition({
+            enum: TransitionEnum.RIGHT_CLICK_STEP,
+            proofStepUuid: props.uuid,
+            isBox: false,
+          });
+        }}
       >
-        <Justification
-          uuid={props.uuid}
-          justification={props.justification}
-          lines={props.lines}
-          onHover={handleOnHoverJustification}
-          onClickRule={() =>
-            doTransition({
-              enum: TransitionEnum.CLICK_RULE,
-              lineUuid: props.uuid,
-            })
-          }
-          onClickRef={(refIdx) =>
-            doTransition({
-              enum: TransitionEnum.CLICK_REF,
-              lineUuid: props.uuid,
-              refIdx,
-            })
-          }
+        <Formula
+          latexFormula={props.formula.latex ?? null}
+          isSyncedWithServer={!props.formula.unsynced}
+          formulaIsWrong={formulaIsWrong(props.diagnosticsForLine)}
+          userInput={props.formula.userInput}
+          lineUuid={props.uuid}
         />
+
+        <div
+          data-tooltip-id={`tooltip-id-${props.uuid}`}
+          data-tooltip-content={tooltipContent}
+          title="Select a rule"
+          className="flex items-center gap-2 whitespace-nowrap"
+        >
+          <Justification
+            uuid={props.uuid}
+            justification={props.justification}
+            lines={props.lines}
+            onHover={handleOnHoverJustification}
+            onClickRule={() =>
+              doTransition({
+                enum: TransitionEnum.CLICK_RULE,
+                lineUuid: props.uuid,
+              })
+            }
+            onClickRef={(refIdx) =>
+              doTransition({
+                enum: TransitionEnum.CLICK_REF,
+                lineUuid: props.uuid,
+                refIdx,
+              })
+            }
+          />
+        </div>
       </div>
-    </div>
+    </ProofStepWrapper>
   );
 }
 

@@ -19,7 +19,7 @@ export function LineNumber({
     <>
       <p
         className={cn(
-          "text-sm/10 text-left text-slate-800 align-baseline cursor-pointer px-2",
+          "text-sm/10 text-center text-slate-800 align-baseline cursor-pointer px-2",
           isUnfocused(line.uuid) ? "text-slate-400" : "",
           proofStepDiagnostics
             ? "bg-red-500 text-slate-200"
@@ -30,7 +30,7 @@ export function LineNumber({
           proofStepDiagnostics ? `line-number-tooltip-${line.uuid}` : ""
         }
       >
-        {line.stepType === "line" && line.lineNumber}.
+        <span>{line.stepType === "line" && line.lineNumber}.</span>
       </p>
       <Tooltip className="z-50" id={`line-number-tooltip-${line.uuid}`} />
     </>
