@@ -36,7 +36,7 @@ export function BoxProofStep({
     >
       <div
         className={cn(
-          "pointer-events-auto relative outline outline-slate-800 m-[1px]",
+          "pointer-events-auto relative border-2 border-black my-[1px] overflow-hidden",
           currentlyBeingHovered && "bg-slate-50"
         )}
         onMouseOverCapture={() => setStepInFocus(props.uuid)}

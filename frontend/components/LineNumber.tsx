@@ -7,11 +7,13 @@ import { useProof } from "@/contexts/ProofProvider";
 export function LineNumber({
   line,
   proofStepDiagnostics,
+  className,
 }: {
   line: TLineNumber & {
     stepType: "line";
   };
   proofStepDiagnostics?: Diagnostic;
+  className?: string;
 }) {
   const { isUnfocused } = useProof();
 
@@ -23,7 +25,8 @@ export function LineNumber({
           isUnfocused(line.uuid) ? "text-slate-400" : "",
           proofStepDiagnostics
             ? "bg-red-500 text-slate-200"
-            : "bg-green-500 text-slate-200"
+            : "bg-green-500 text-slate-200",
+          className
         )}
         data-tooltip-content={proofStepDiagnostics?.violationType}
         data-tooltip-id={

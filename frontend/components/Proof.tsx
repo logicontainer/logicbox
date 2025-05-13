@@ -26,13 +26,7 @@ export function Proof({
   const isInFocus = isFocused(props.uuid || "");
 
   return (
-    <div
-      className={cn(
-        "cursor-pointer text-slate-800 w-full",
-        isInFocus && "outline-blue-400"
-      )}
-      style={{ outlineWidth: "1.5px" }}
-    >
+    <div className={cn("cursor-pointer text-slate-800 w-full -my-[3px]")}>
       {props.proof.map((proofStep) => {
         if (proofStep.stepType == "line") {
           const lineProofStepProps = proofStep as TLineProofStep;
