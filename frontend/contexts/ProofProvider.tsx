@@ -11,6 +11,8 @@ import {
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
+import { useCurrentProofId } from "./CurrentProofIdProvider";
+import { useProofStore } from "@/store/proofStore";
 import { useServer } from "./ServerProvider";
 
 export interface ProofContextProps {
@@ -72,10 +74,17 @@ export function useProof() {
 export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   const serverContext = useServer();
   const [proof, setProof] = useState(serverContext.proof);
+  const updateProofContent = useProofStore((state) => state.updateProofContent);
+  const { proofId } = useCurrentProofId();
 
   useEffect(() => {
     setProof(serverContext.proof);
   }, [serverContext.proof]);
+
+  useEffect(() => {
+    if (!proofId) return;
+    updateProofContent(proofId, proof);
+  }, [proof]);
 
   const setStringProof = (stringProof: string) => {
     setProof(JSON.parse(stringProof));

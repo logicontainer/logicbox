@@ -29,7 +29,8 @@
     "react-tooltip": "^5.28.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
