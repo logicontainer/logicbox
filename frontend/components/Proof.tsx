@@ -1,7 +1,7 @@
 "use client";
 
 import {
-    Diagnostic,
+  Diagnostic,
   BoxProofStep as TBoxProofStep,
   TLineNumber,
   LineProofStep as TLineProofStep,
@@ -20,18 +20,13 @@ export function Proof({
   diagnostics: Diagnostic[];
   lines: TLineNumber[];
   uuid?: string;
+  isOuterProof?: boolean;
 }) {
   const { isFocused } = useProof();
   const isInFocus = isFocused(props.uuid || "");
 
   return (
-    <div
-      className={cn(
-        " text-slate-800 cursor-auto w-full",
-        isInFocus && "outline-blue-400"
-      )}
-      style={{ outlineWidth: "1.5px" }}
-    >
+    <div className={cn("cursor-pointer text-slate-800 w-full -my-[3px]")}>
       {props.proof.map((proofStep) => {
         if (proofStep.stepType == "line") {
           const lineProofStepProps = proofStep as TLineProofStep;
@@ -39,7 +34,10 @@ export function Proof({
             <LineProofStep
               key={lineProofStepProps.uuid}
               lines={props.lines}
-              diagnosticsForLine={props.diagnostics.filter(d => d.uuid === proofStep.uuid)}
+              diagnosticsForLine={props.diagnostics.filter(
+                (d) => d.uuid === proofStep.uuid
+              )}
+              isOuterProofStep={props.isOuterProof}
               {...lineProofStepProps}
             />
           );
@@ -50,6 +48,7 @@ export function Proof({
               key={boxProofStepProps.uuid}
               lines={props.lines}
               diagnostics={props.diagnostics}
+              isOuterProofStep={props.isOuterProof}
               {...boxProofStepProps}
             />
           );

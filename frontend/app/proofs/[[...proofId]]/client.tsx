@@ -23,7 +23,7 @@ import { useServer } from "@/contexts/ServerProvider";
 
 export default function Client({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
-  const { proofDiagnostics } = useServer()
+  const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
 
@@ -70,11 +70,16 @@ export default function Client({ proofId }: { proofId: string | null }) {
           <div></div>
           <div className="p-4 flex flex-col justify-between items-center rounded-sm">
             <div
-              className="flex box-content gap-2 mt-16 w-full"
+              className="flex box-content gap-2 mt-[64px] w-full"
               onClick={(e) => e.stopPropagation()}
             >
               <LineNumbers lines={lines} />
-              <Proof proof={proofContext.proof} lines={lines} diagnostics={proofDiagnostics} />
+              <Proof
+                proof={proofContext.proof}
+                lines={lines}
+                diagnostics={proofDiagnostics}
+                isOuterProof
+              />
               <Tooltip
                 id={`tooltip-id-${proofContext.lineInFocus}`}
                 place="right"

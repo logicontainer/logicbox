@@ -16,16 +16,21 @@ import {
 import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
+import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { formulaIsWrong } from "@/lib/diagnostic-helpers";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useState } from "react";
-import { formulaIsWrong } from "@/lib/diagnostic-helpers";
 
 export function LineProofStep({
   ...props
-}: TLineProofStep & { lines: TLineNumber[]; diagnosticsForLine: Diagnostic[] }) {
+}: TLineProofStep & {
+  lines: TLineNumber[];
+  diagnosticsForLine: Diagnostic[];
+  isOuterProofStep?: boolean;
+}) {
   const { setStepInFocus: setLineInFocus, isFocused } = useProof();
   const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
@@ -38,92 +43,98 @@ export function LineProofStep({
   const currentlyBeingHovered = isFocused(props.uuid);
 
   return (
-    <div
-      className={cn(
-        "text-nowrap",
-        "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
-        currentlyBeingHovered && "bg-slate-50"
-      )}
-      onMouseOver={_ => setLineInFocus(props.uuid)}
-      onClick={(e) => {
-        if (e.target !== e.currentTarget) {
-          return;
-        }
-        return doTransition({
-          enum: TransitionEnum.CLICK_LINE,
-          lineUuid: props.uuid,
-        });
-      }}
-      onContextMenuCapture={(e) => {
-        e.preventDefault();
-        setContextMenuPosition({ x: e.pageX, y: e.pageY });
-        doTransition({
-          enum: TransitionEnum.RIGHT_CLICK_STEP,
-          proofStepUuid: props.uuid,
-          isBox: false,
-        });
-      }}
+    <ProofStepWrapper
+      currentlyBeingHovered={currentlyBeingHovered}
+      isOuterProofStep={props.isOuterProofStep}
     >
-      <Formula
-        latexFormula={props.formula.latex ?? null}
-        isSyncedWithServer={!props.formula.unsynced}
-        formulaIsWrong={formulaIsWrong(props.diagnosticsForLine)}
-        userInput={props.formula.userInput}
-        lineUuid={props.uuid}
-      />
-
       <div
-        data-tooltip-id={`tooltip-id-${props.uuid}`}
-        data-tooltip-content={tooltipContent}
-        title="Select a rule"
-        className="flex items-center gap-2 whitespace-nowrap"
+        className={cn(
+          "text-nowrap pointer-events-auto",
+          "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
+          currentlyBeingHovered && "bg-slate-50"
+        )}
+        onMouseOver={(_) => setLineInFocus(props.uuid)}
+        onClick={(e) => {
+          if (e.target !== e.currentTarget) {
+            return;
+          }
+          return doTransition({
+            enum: TransitionEnum.CLICK_LINE,
+            lineUuid: props.uuid,
+          });
+        }}
+        onContextMenuCapture={(e) => {
+          e.preventDefault();
+          setContextMenuPosition({ x: e.pageX, y: e.pageY });
+          doTransition({
+            enum: TransitionEnum.RIGHT_CLICK_STEP,
+            proofStepUuid: props.uuid,
+            isBox: false,
+          });
+        }}
       >
-        <Justification
-          uuid={props.uuid}
-          justification={props.justification}
-          lines={props.lines}
-          onHover={handleOnHoverJustification}
-          onClickRule={() =>
-            doTransition({
-              enum: TransitionEnum.CLICK_RULE,
-              lineUuid: props.uuid,
-            })
-          }
-          onClickRef={(refIdx) =>
-            doTransition({
-              enum: TransitionEnum.CLICK_REF,
-              lineUuid: props.uuid,
-              refIdx,
-            })
-          }
+        <Formula
+          latexFormula={props.formula.latex ?? null}
+          isSyncedWithServer={!props.formula.unsynced}
+          formulaIsWrong={formulaIsWrong(props.diagnosticsForLine)}
+          userInput={props.formula.userInput}
+          lineUuid={props.uuid}
         />
+
+        <div
+          data-tooltip-id={`tooltip-id-${props.uuid}`}
+          data-tooltip-content={tooltipContent}
+          title="Select a rule"
+          className="flex items-center gap-2 whitespace-nowrap"
+        >
+          <Justification
+            uuid={props.uuid}
+            justification={props.justification}
+            lines={props.lines}
+            onHover={handleOnHoverJustification}
+            onClickRule={() =>
+              doTransition({
+                enum: TransitionEnum.CLICK_RULE,
+                lineUuid: props.uuid,
+              })
+            }
+            onClickRef={(refIdx) =>
+              doTransition({
+                enum: TransitionEnum.CLICK_REF,
+                lineUuid: props.uuid,
+                refIdx,
+              })
+            }
+          />
+        </div>
       </div>
-    </div>
+    </ProofStepWrapper>
   );
 }
-
 
 function Formula({
   userInput,
   latexFormula,
   lineUuid,
   isSyncedWithServer,
-  formulaIsWrong
-} : {
-  userInput: string
-  latexFormula: string | null
-  lineUuid: string,
-  isSyncedWithServer: boolean
-  formulaIsWrong: boolean
+  formulaIsWrong,
+}: {
+  userInput: string;
+  latexFormula: string | null;
+  lineUuid: string;
+  isSyncedWithServer: boolean;
+  formulaIsWrong: boolean;
 }) {
-  const { interactionState, doTransition } = useInteractionState()
+  const { interactionState, doTransition } = useInteractionState();
 
   const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
-    interactionState.lineUuid === lineUuid
+    interactionState.lineUuid === lineUuid;
 
-  const currentFormulaValue = isEditingFormula ? interactionState.currentFormula : userInput
-  const formulaInputRef = React.useRef<HTMLInputElement>(null)
+  const currentFormulaValue = isEditingFormula
+    ? interactionState.currentFormula
+    : userInput;
+  const formulaInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
     formulaInputRef.current = ref;
@@ -136,43 +147,51 @@ function Formula({
     }
   };
 
-  const withUnderline = (str: string) => `{\\color{red}\\underline{${str}}}`
-  const formulaContent = !latexFormula || latexFormula === "" ?  "???" : latexFormula
-  const formulaLatexContentWithUnderline = formulaIsWrong ? withUnderline(formulaContent) : formulaContent
+  const withUnderline = (str: string) => `{\\color{red}\\underline{${str}}}`;
+  const formulaContent =
+    !latexFormula || latexFormula === "" ? "???" : latexFormula;
+  const formulaLatexContentWithUnderline = formulaIsWrong
+    ? withUnderline(formulaContent)
+    : formulaContent;
 
   return isEditingFormula ? (
-      <AutosizeInput
-        inputRef={handleInputRefChange}
-        value={currentFormulaValue}
-        onChange={(e) => {
-          console.log(e);
-          doTransition({
-            enum: TransitionEnum.UPDATE_FORMULA,
-            formula: e.target.value,
-          });
-        }}
-        autoFocus={isEditingFormula}
-        onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-        title="Write a formula"
-        className={cn("text-slate-800 grow resize shrink", formulaIsWrong && "text-red-500")}
-        inputClassName="px-2"
-      />
-    ) : (
-      <p
-        className={cn("shrink", formulaIsWrong && "text-red-500 underline underline-offset-2")}
-        onClick={() =>
-          doTransition({
-            enum: TransitionEnum.CLICK_LINE,
-            lineUuid
-          })
-        }
-      >
-
-        {!isSyncedWithServer || formulaIsWrong ? (
-          currentFormulaValue
-        ) : (
-          <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
-        )}
-      </p>
-    )
+    <AutosizeInput
+      inputRef={handleInputRefChange}
+      value={currentFormulaValue}
+      onChange={(e) => {
+        console.log(e);
+        doTransition({
+          enum: TransitionEnum.UPDATE_FORMULA,
+          formula: e.target.value,
+        });
+      }}
+      autoFocus={isEditingFormula}
+      onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
+      title="Write a formula"
+      className={cn(
+        "text-slate-800 grow resize shrink",
+        formulaIsWrong && "text-red-500"
+      )}
+      inputClassName="px-2"
+    />
+  ) : (
+    <p
+      className={cn(
+        "shrink",
+        formulaIsWrong && "text-red-500 underline underline-offset-2"
+      )}
+      onClick={() =>
+        doTransition({
+          enum: TransitionEnum.CLICK_LINE,
+          lineUuid,
+        })
+      }
+    >
+      {!isSyncedWithServer || formulaIsWrong ? (
+        currentFormulaValue
+      ) : (
+        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
+      )}
+    </p>
+  );
 }

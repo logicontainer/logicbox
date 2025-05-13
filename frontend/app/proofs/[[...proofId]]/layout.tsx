@@ -4,7 +4,7 @@ import NavigationSidebar from "@/components/NavigationSidebar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="max-w-screen grid md:grid-cols-[200px_1fr_minmax(300px,300px)]">
+    <div className="max-w-screen grid lg:grid-cols-[200px_1fr_400px]">
       <NavigationSidebar />
       <div className="overflow-auto relative">{children}</div>
       <ContextSidebar />

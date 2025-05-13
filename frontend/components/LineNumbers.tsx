@@ -1,5 +1,6 @@
 import { LineNumber } from "./LineNumber";
 import { TLineNumber } from "@/types/types";
+import { cn } from "@/lib/utils";
 import { useServer } from "@/contexts/ServerProvider";
 
 export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
@@ -10,20 +11,24 @@ export function LineNumbers({ lines }: { lines: TLineNumber[] }) {
   );
   if (!lines) return;
 
+  const nonBoxLines = lines.filter((line) => line.stepType !== "box");
+
   return (
     <>
       <div className="flex-col items-start">
-        {lines
-          .filter((line) => line.stepType !== "box")
-          .map((line) => {
-            return (
-              <LineNumber
-                key={line.uuid}
-                line={line}
-                proofStepDiagnostics={diagnosticMap[line.uuid]}
-              />
-            );
-          })}
+        {nonBoxLines.map((line, i) => {
+          return (
+            <LineNumber
+              key={line.uuid}
+              line={line}
+              proofStepDiagnostics={diagnosticMap[line.uuid]}
+              className={cn(
+                i === 0 && "rounded-t-md",
+                i === nonBoxLines.length - 1 && "rounded-b-md"
+              )}
+            />
+          );
+        })}
       </div>
     </>
   );
