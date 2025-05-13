@@ -32,7 +32,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const { proofId } = useCurrentProofId();
   const proofs = useProofStore((state) => state.proofs);
   const addProof = useProofStore((state) => state.addProof);
-  const updateProof = useProofStore((state) => state.updateProof);
   const deleteProof = useProofStore((state) => state.deleteProof);
   const getProof = useProofStore((state) => state.getProof);
   const clearAll = useProofStore((state) => state.clearAll);
