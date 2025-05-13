@@ -4,8 +4,9 @@ import { Diagnostic, Proof, ValidationResponse } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
-import examples from "@/examples/proof-examples";
+// import examples from "@/examples/proof-examples";
 import { useCurrentProofId } from "./CurrentProofIdProvider";
+import { useProofStore } from "@/store/proofStore";
 
 export interface ServerContextProps {
   proof: Proof;
@@ -15,17 +16,6 @@ export interface ServerContextProps {
 }
 
 const ServerContext = React.createContext<ServerContextProps | null>(null);
-
-const getProofById = (id: string | null): Proof => {
-  if (id) {
-    const example = examples.find((example) => example.id === id);
-    if (example) {
-      return example.proof;
-    }
-  }
-  const randomIndex = Math.floor(Math.random() * examples.length);
-  return examples[randomIndex].proof;
-};
 
 export function useServer() {
   const context = React.useContext(ServerContext);
@@ -40,18 +30,34 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [proof, setProof] = useState<Proof>([]);
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
   const { proofId } = useCurrentProofId();
-
+  const proofs = useProofStore((state) => state.proofs);
+  const addProof = useProofStore((state) => state.addProof);
+  const updateProof = useProofStore((state) => state.updateProof);
+  const deleteProof = useProofStore((state) => state.deleteProof);
+  const getProof = useProofStore((state) => state.getProof);
+  const clearAll = useProofStore((state) => state.clearAll);
   const prevProof = React.useRef<Proof>(proof);
   const prevProofDiagnostics = React.useRef<Diagnostic[]>(proofDiagnostics);
 
+  const getProofById = (id: string | null): Proof => {
+    if (id) {
+      const proof = getProof(id);
+      if (proof) {
+        return proof.proof;
+      }
+    }
+    const randomIndex = Math.floor(Math.random() * proofs.length);
+    return proofs[randomIndex].proof;
+  };
+
   React.useEffect(() => {
     // This will only run on the client side
-    if (examples.length === 0) {
-      console.warn("No examples provided, using empty proof");
+    if (proofs.length === 0) {
+      console.warn("No existing proofs provided, using empty proof");
       setProof({} as Proof);
       return;
     }
-    const randomIndex = Math.floor(Math.random() * examples.length);
+    const randomIndex = Math.floor(Math.random() * proofs.length);
 
     if (proofId === null) {
       return;
