@@ -17,7 +17,7 @@ object PredLogicFormula {
   case class Tautology() extends Form
 
   case class Predicate(p: Char, ps: List[Term]) extends Form
-  case class Equals(t1: Term, t2: Term)
+  case class Equals(t1: Term, t2: Term) extends Form
 
   case class Not(phi: Form) extends Form
 

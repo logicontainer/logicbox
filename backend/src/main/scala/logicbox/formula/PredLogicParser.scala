@@ -11,8 +11,8 @@ class PredLogicParser extends PackratParsers {
 
   override type Elem = PredLogicToken
 
-  private def varexp: Parser[PredLogicTerm.Var] = accept("var", { case PredLogicToken.LowerIdent(c) => PredLogicTerm.Var(c) })
-  private def funcsymb: Parser[Char] = accept("function symbol", { case PredLogicToken.LowerIdent(c) => c })
+  private def varexp: Parser[PredLogicTerm.Var] = accept("var", { case PredLogicToken.Ident(c) => PredLogicTerm.Var(c) })
+  private def funcsymb: Parser[Char] = accept("function symbol", { case PredLogicToken.Ident(c) => c })
 
   private def funcexp: Parser[PredLogicTerm] = (funcsymb ~ withParens(termlistexp)) ^^ {
     case p ~ ts => FunAppl(p, ts)
@@ -29,12 +29,15 @@ class PredLogicParser extends PackratParsers {
 
   private def contrexp: Parser[Contradiction] = elem(PredLogicToken.Contradiction()) ^^^ Contradiction()
   private def tautexp: Parser[Tautology] = elem(PredLogicToken.Tautology()) ^^^ Tautology()
-  private def predsymb: Parser[Char] = accept("predicate symbol", { case PredLogicToken.UpperIdent(c) => c })
+  private def predsymb: Parser[Char] = accept("predicate symbol", { case PredLogicToken.Ident(c) => c })
   private def predexp: Parser[Predicate] = (predsymb ~ withParens(termlistexp)) ^^ {
     case p ~ ts => Predicate(p, ts)
   }
+  private def equalityexp: Parser[Equals] = (termexp ~ PredLogicToken.Equals() ~ termexp) ^^ {
+    case t1 ~ _ ~ t2 => PredLogicFormula.Equals(t1, t2)
+  }
 
-  private def simpleexps: Parser[PredLogicFormula] = tautexp | contrexp | predexp
+  private def simpleexps: Parser[PredLogicFormula] = tautexp | contrexp | equalityexp | predexp
 
   private def c: Parser[PredLogicFormula] = 
     simpleexps |

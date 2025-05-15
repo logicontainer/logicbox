@@ -15,15 +15,14 @@ class PredLogicLexer extends RegexParsers {
   def tautology = ("top" | "TOP" | "TRUE" | "true" | "TAUTOLOGY" | "tautology" | "⊤") ^^^ Tautology()
   def forall = ("forall" | "FORALL" | "∀") ^^^ ForAll()
   def exists = ("exists" | "EXISTS" | "∃") ^^^ Exists()
-  def lowerIdent = """[a-z]""".r ^^ { str => LowerIdent(str.charAt(0)) }
-  def upperIdent = """[A-Z]""".r ^^ { str => UpperIdent(str.charAt(0)) }
+  def ident = """[a-z|A-Z]""".r ^^ { str => Ident(str.charAt(0)) }
   def equalss = "=" ^^^ Equals()
   
   def comma = "," ^^^ Comma()
   def leftParen = "(" ^^^ LeftParen()
   def rightParen = ")" ^^^ RightParen()
 
-  def token: Parser[PredLogicToken] = and | or | not | implies | contradiction | tautology | leftParen | rightParen | forall | exists | lowerIdent | upperIdent | comma | equalss
+  def token: Parser[PredLogicToken] = and | or | not | implies | contradiction | tautology | leftParen | rightParen | forall | exists | ident | comma | equalss
   def tokens: Parser[List[PredLogicToken]] = rep1(token)
 
   def apply(input: String): List[PredLogicToken] =
