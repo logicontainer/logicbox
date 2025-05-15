@@ -13,8 +13,8 @@ class PredLogicParserTest extends AnyFunSpec {
   describe("apply"){
     it("should parse predicate of variable") {
       val ts = List(
-        UpperIdent('P'), LeftParen(),
-          LowerIdent('x'),
+        Ident('P'), LeftParen(),
+          Ident('x'),
         RightParen(),
       )
 
@@ -23,12 +23,12 @@ class PredLogicParserTest extends AnyFunSpec {
 
     it("should parse predicate of function vars") {
       val ts = List(
-        UpperIdent('P'), LeftParen(),
-          LowerIdent('f'), LeftParen(),
-            LowerIdent('y'),
+        Ident('P'), LeftParen(),
+          Ident('f'), LeftParen(),
+            Ident('y'),
           RightParen(), Comma(),
-          LowerIdent('g'), LeftParen(),
-            LowerIdent('x'),
+          Ident('g'), LeftParen(),
+            Ident('x'),
           RightParen(),
         RightParen(),
       )
@@ -41,8 +41,8 @@ class PredLogicParserTest extends AnyFunSpec {
 
     it("should parse predicate of multiple vars") {
       val ts = List(
-        UpperIdent('P'), LeftParen(),
-          LowerIdent('x'), Comma(), LowerIdent('y'),
+        Ident('P'), LeftParen(),
+          Ident('x'), Comma(), Ident('y'),
         RightParen(),
       )
 
@@ -51,16 +51,16 @@ class PredLogicParserTest extends AnyFunSpec {
 
     it("should parse predicate of complicated terms") {
       val ts = List(
-        UpperIdent('P'), LeftParen(),
-          LowerIdent('f'), LeftParen(), 
-            LowerIdent('x'), Comma(),
-            LowerIdent('y'), Comma(),
-            LowerIdent('g'), LeftParen(),
-              LowerIdent('g'), LeftParen(), LowerIdent('x'), RightParen(),
+        Ident('P'), LeftParen(),
+          Ident('f'), LeftParen(), 
+            Ident('x'), Comma(),
+            Ident('y'), Comma(),
+            Ident('g'), LeftParen(),
+              Ident('g'), LeftParen(), Ident('x'), RightParen(),
             RightParen(),
           RightParen(), Comma(),
-          LowerIdent('g'), LeftParen(), 
-            LowerIdent('x'),
+          Ident('g'), LeftParen(), 
+            Ident('x'),
           RightParen(),
         RightParen(),
       )
@@ -77,16 +77,36 @@ class PredLogicParserTest extends AnyFunSpec {
 
     it("should parse exists and forall") {
       val ts1 = List(
-        PredLogicToken.Exists(), LowerIdent('x'), UpperIdent('P'), LeftParen(), LowerIdent('x'), RightParen(),
+        PredLogicToken.Exists(), Ident('x'), Ident('P'), LeftParen(), Ident('x'), RightParen(),
       )
       val ts2 = List(
-        PredLogicToken.ForAll(), LowerIdent('x'), UpperIdent('P'), LeftParen(), LowerIdent('x'), RightParen(),
+        PredLogicToken.ForAll(), Ident('x'), Ident('P'), LeftParen(), Ident('x'), RightParen(),
       )
 
       PredLogicParser()(ts1) shouldBe 
         PredLogicFormula.Exists(Var('x'), Predicate('P', List(Var('x'))))
       PredLogicParser()(ts2) shouldBe 
         PredLogicFormula.ForAll(Var('x'), Predicate('P', List(Var('x'))))
+    }
+    
+    it("should parse equality of terms") {
+      val ts1 = List(Ident('x'), PredLogicToken.Equals(), Ident('y'))
+      val ts2 = List(
+        Ident('f'), LeftParen(), Ident('x'), Comma(), Ident('y'), RightParen(), 
+        PredLogicToken.Equals(), 
+        Ident('g'), LeftParen(), Ident('y'), RightParen(),
+      )
+
+      PredLogicParser()(ts1) shouldBe PredLogicFormula.Equals(
+        PredLogicTerm.Var('x'),
+        PredLogicTerm.Var('y'),
+      )
+
+      PredLogicParser()(ts2) shouldBe
+        PredLogicFormula.Equals(
+          PredLogicTerm.FunAppl('f', List(PredLogicTerm.Var('x'), PredLogicTerm.Var('y'))),
+          PredLogicTerm.FunAppl('g', List(PredLogicTerm.Var('y'))),
+        )
     }
   }
 }

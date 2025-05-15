@@ -19,6 +19,5 @@ object PredLogicToken {
 
   case class Equals() extends PredLogicToken
 
-  case class LowerIdent(x: Char) extends PredLogicToken
-  case class UpperIdent(x: Char) extends PredLogicToken
+  case class Ident(x: Char) extends PredLogicToken
 }
