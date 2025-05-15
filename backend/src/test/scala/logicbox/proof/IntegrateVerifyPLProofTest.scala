@@ -9,7 +9,6 @@ import logicbox.formula._
 import logicbox.framework.ModifiableProof
 import logicbox.framework.ProofChecker
 import logicbox.framework.Proof
-import logicbox.DelegatingRuleChecker
 import logicbox.framework.RuleChecker
 import logicbox.framework.IncompleteFormula
 
@@ -71,7 +70,7 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
 
       val scopedChecker = ScopedProofChecker[Id]()
       val optionRuleChecker: RuleChecker[Option[PLFormula], Option[PLRule], Option[PLBoxInfo], OptionRuleChecker.Violation[PLViolation]] = 
-        OptionRuleChecker(DelegatingRuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolation]())
+        OptionRuleChecker(PLRuleChecker())
       val ruleBasedProofChecker: ProofChecker[Option[PLFormula], Option[PLRule], Option[PLBoxInfo], Id, RuledBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]]] = 
         RuledBasedProofChecker(optionRuleChecker)
 

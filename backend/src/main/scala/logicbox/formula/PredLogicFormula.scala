@@ -1,5 +1,8 @@
 package logicbox.formula
 
+import logicbox.framework.RuleChecker
+import logicbox.framework.Reference
+
 sealed trait PredLogicTerm
 
 object PredLogicTerm {

@@ -16,7 +16,7 @@ import logicbox.framework.ProofChecker
 import logicbox.proof.ScopedProofChecker
 import logicbox.framework.RuleChecker
 import logicbox.proof.OptionRuleChecker
-import logicbox.DelegatingRuleChecker
+import logicbox.proof.PLRuleChecker
 import logicbox.proof.PLViolation
 import logicbox.proof.RuledBasedProofChecker
 import logicbox.proof.ProofView
@@ -86,7 +86,7 @@ object StandardProofValidatorService {
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id, Diag] = {
     val scopedChecker = ScopedProofChecker[Id]()
     val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B], OptionRuleChecker.Violation[PLViolation]] = 
-      OptionRuleChecker(DelegatingRuleChecker[F, R, B, PLViolation]())
+      OptionRuleChecker(PLRuleChecker())
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id, RuledBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]]] = 
       RuledBasedProofChecker(optionRuleChecker)
 

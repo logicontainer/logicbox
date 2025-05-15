@@ -19,7 +19,7 @@ object Reference {
   }
 
   object Box {
-    def unapply[F, I](b: Box[F, I]): Option[(I, F, F)] =
-      Some(b.info, b.assumption, b.conclusion)
+    def unapply[F, I](b: Box[F, I]): (I, F, F) =
+      (b.info, b.assumption, b.conclusion)
   }
 }
