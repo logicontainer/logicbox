@@ -3,7 +3,7 @@ package logicbox.proof
 import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference}
 import logicbox.framework.StepDiagnostic
 
-object RuledBasedProofChecker {
+object RuleBasedProofChecker {
   sealed trait Diagnostic[+Id, +V] extends StepDiagnostic[Id]
 
   case class RuleViolation[Id, V](stepId: Id, violation: V) extends Diagnostic[Id, V]
@@ -12,13 +12,13 @@ object RuledBasedProofChecker {
   case class MalformedReference[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id, Nothing]
 }
 
-class RuledBasedProofChecker[F, R, B, V, Id](
+class RuleBasedProofChecker[F, R, B, V, Id](
   val ruleChecker: RuleChecker[F, R, B, V]
-) extends ProofChecker[F, R, B, Id, RuledBasedProofChecker.Diagnostic[Id, V]] {
+) extends ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id, V]] {
 
-  import RuledBasedProofChecker._
+  import RuleBasedProofChecker._
   
-  type Diagnostic = RuledBasedProofChecker.Diagnostic[Id, V]
+  type Diagnostic = RuleBasedProofChecker.Diagnostic[Id, V]
 
   type Pf = Proof[F, R, B, Id]
   private def resolveBoxReference(proof: Pf, stepId: Id, refIdx: Int, boxId: Id, box: Proof.Box[B, Id]): Either[List[Diagnostic], Reference.Box[F, B]] =

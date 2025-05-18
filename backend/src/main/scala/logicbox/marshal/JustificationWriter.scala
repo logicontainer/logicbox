@@ -1,6 +1,7 @@
 package logicbox.marshal
 
 import spray.json._
+import logicbox.framework.Justification
 
 case class JustificationWriter[R, Id](
   ruleWriter: JsonWriter[R], idWriter: JsonWriter[Id]

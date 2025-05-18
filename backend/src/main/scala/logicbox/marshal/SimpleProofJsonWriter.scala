@@ -4,6 +4,7 @@ import logicbox.framework.Proof
 import spray.json._
 import logicbox.framework.Proof.Line
 import logicbox.framework.Proof.Box
+import logicbox.framework.Justification
 
 case class SimpleProofJsonWriter[F, R, B, Id](
   idWriter: JsonWriter[Id], formulaWriter: JsonWriter[F],

@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 import org.scalatest.funspec.AnyFunSpec
 
-import logicbox.marshal.Justification
+import logicbox.framework.Justification
 import logicbox.marshal.JustificationWriter
 import spray.json._
 

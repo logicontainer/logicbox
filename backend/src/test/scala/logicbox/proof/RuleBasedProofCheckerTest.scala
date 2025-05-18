@@ -11,11 +11,11 @@ import logicbox.framework.Proof.Step
 class RuleBasedProofCheckerTest extends AnyFunSpec {
   import ProofStubs._
 
-  def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id, RuledBasedProofChecker.Diagnostic[Id, V]] = 
-    RuledBasedProofChecker(ruleChecker)
+  def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id, V]] = 
+    RuleBasedProofChecker(ruleChecker)
 
   describe("RuledBasedProofChecker::check") {
-    import RuledBasedProofChecker._
+    import RuleBasedProofChecker._
 
     it("should be fine with empty proof") {  
       val checker = proofChecker()

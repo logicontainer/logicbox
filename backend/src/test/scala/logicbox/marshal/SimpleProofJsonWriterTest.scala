@@ -11,6 +11,7 @@ import logicbox.framework.Proof
 import logicbox.framework.ModifiableProof
 
 import spray.json._
+import logicbox.framework.Justification
 
 class SimpleProofJsonWriterTest extends AnyFunSpec {
   import logicbox.proof.ProofStubs._

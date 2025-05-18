@@ -1,6 +1,6 @@
 package logicbox.demarshal
 
-import logicbox.marshal.Justification // todo: bad, probably package restructure
+import logicbox.framework.Justification
 import spray.json._
 import logicbox.framework._
 import logicbox.framework.ModifiableProof._

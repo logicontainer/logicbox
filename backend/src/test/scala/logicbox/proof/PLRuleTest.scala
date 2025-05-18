@@ -34,7 +34,7 @@ class PLRuleTest extends AnyFunSpec {
   private def line(fml: String, rl: PLRule, refs: List[Reference[PLFormula, PLBoxInfo]]): Line =
     Line(parse(fml), rl, refs)
 
-  private val checker = PLRuleChecker()
+  private val checker = PLRuleChecker[PLFormula]()
 
   describe("AndElim") {
     val leftRule = AndElim(Side.Left)

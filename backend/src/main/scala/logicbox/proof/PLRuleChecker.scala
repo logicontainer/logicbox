@@ -6,11 +6,11 @@ import logicbox.framework.Reference
 import logicbox.proof.PLRule
 import logicbox.proof.PLRule._
 
-import logicbox.formula.PLFormula
-import logicbox.formula.PLFormula._
+import logicbox.formula.FormulaBase
+import logicbox.formula.FormulaBase._
 
-class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolation] {
-  private type Ref = Reference[PLFormula, PLBoxInfo]
+class PLRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PLRule, PLBoxInfo, PLViolation] {
+  private type Ref = Reference[F, PLBoxInfo]
   private type Viol = PLViolation
 
   import PLViolation._
@@ -34,8 +34,8 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
 
       val result = zp.map {
         // matches
-        case (_, BoxOrFormula.Formula, f: Line[PLFormula] @unchecked) => Right(f)
-        case (_, BoxOrFormula.Box, b: Box[PLFormula, PLBoxInfo]) => Right(b)
+        case (_, BoxOrFormula.Formula, f: Line[F] @unchecked) => Right(f)
+        case (_, BoxOrFormula.Box, b: Box[F, PLBoxInfo]) => Right(b)
 
         // violations
         case (idx, BoxOrFormula.Box, _) => Left(ReferenceShouldBeBox(idx))
@@ -69,10 +69,10 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
   // try to extract a list of `n` formulas from `refs` (only if there are `n`).
   // otherwise report mismatches
   private def extractNFormulasAndThen(refs: List[Ref], n: Int)
-    (func: PartialFunction[List[PLFormula], List[Viol]]): List[Viol] = 
+    (func: PartialFunction[List[F], List[Viol]]): List[Viol] = 
   {
     extractAndThen(refs, (1 to n).map { _ => BoxOrFormula.Formula }) {
-      case lines: List[Reference.Line[PLFormula]] @unchecked =>
+      case lines: List[Reference.Line[F]] @unchecked =>
         func.apply(lines.map(_.formula))
     }
   }
@@ -82,7 +82,7 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: PLRule, formula: PLFormula, refs: List[Ref]): List[Viol] = rule match {
+  override def check(rule: PLRule, formula: F, refs: List[Ref]): List[Viol] = rule match {
     case Premise() | Assumption() => Nil
 
     case AndElim(side) => extractNFormulasAndThen(refs, 1) {
@@ -126,13 +126,10 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
 
       extractAndThen(refs, pattern)  {
         case List(
-          Reference.Line(r0: PLFormula),
-          b1: Reference.Box[PLFormula, _] @unchecked,
-          b2: Reference.Box[PLFormula, _] @unchecked
+          Reference.Line(r0: F),
+          Reference.Box(_, as1, cl1),
+          Reference.Box(_, as2, cl2),
         ) => {
-          val Box(_, as1, cl1) = b1
-          val Box(_, as2, cl2) = b2
-
           failIf(formula != cl1, FormulaDoesntMatchReference(1, "must match last line of box")) ++
           failIf(formula != cl2, FormulaDoesntMatchReference(2, "must match last line of box")) ++
           failIf(cl1 != cl2, ReferencesMismatch(List(1, 2), "last lines of boxes must match")) ++
@@ -148,7 +145,7 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
       }
 
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(box: Reference.Box[PLFormula, _]) => formula match {
+      case List(box: Reference.Box[F, _]) => formula match {
         case Implies(phi, psi) =>
           failIf(phi != box.assumption, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
           failIf(psi != box.conclusion, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
@@ -170,21 +167,25 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
     }
 
     case NotIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(Box[PLFormula, PLBoxInfo](_, asmp, concl)) =>
-        failIf(concl != Contradiction(), ReferenceDoesntMatchRule(0, "last line of box must be contradiction")) ++
-        { formula match {
-            case Not(phi) => 
-              failIf(phi != asmp, FormulaDoesntMatchReference(0, "must be the negation of the assumption in the box"))
+      case List(Box[F, PLBoxInfo](_, asmp, concl)) => 
+        { concl match {
+          case Contradiction() => Nil
+          case _ => fail(ReferenceDoesntMatchRule(0, "last line of box must be contradiction"))
+        }} ++ { formula match {
+          case Not(phi) => 
+            failIf(phi != asmp, FormulaDoesntMatchReference(0, "must be the negation of the assumption in the box"))
 
-            case _ => 
-              fail(FormulaDoesntMatchRule("must be a negation"))
+          case _ => 
+            fail(FormulaDoesntMatchRule("must be a negation"))
         }}
     }
 
     case NotElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) =>
-        failIf(formula != Contradiction(), FormulaDoesntMatchRule("must be contradiction")) ++
-        { r1 match {
+        { formula match {
+          case Contradiction() => Nil
+          case _ => fail(FormulaDoesntMatchRule("must be a contradiction"))
+        }} ++ { r1 match {
           case Not(phi) => 
             failIf(r0 != phi, ReferencesMismatch(List(0, 1), "second reference must be negation of first"))
 
@@ -194,8 +195,8 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
     }
 
     case ContradictionElim() => extractNFormulasAndThen(refs, 1) {
-      case List(r0) =>
-        failIf(r0 != Contradiction(), ReferenceDoesntMatchRule(0, "must be a contradiction"))
+      case List(Contradiction()) => Nil
+      case _ => fail(ReferenceDoesntMatchRule(0, "must be a contradiction"))
     }
 
     case NotNotElim() => extractNFormulasAndThen(refs, 1) {
@@ -237,8 +238,8 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
     }
 
     case ProofByContradiction() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(box: Reference.Box[PLFormula, _] @unchecked) => { 
-        box.assumption match {
+      case List(Reference.Box(_, ass, concl)) => { 
+        ass match {
           case Not(phi) => 
             failIf(formula != phi, FormulaDoesntMatchReference(0, "must be assumption without negation"))
 
@@ -246,7 +247,7 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
             fail(ReferenceDoesntMatchRule(0, "assumption in box must be a negation"))
         }
       } ++ { 
-        box.conclusion match {
+        concl match {
           case Contradiction() => Nil
           case _ => fail(ReferenceDoesntMatchRule(0, "last line in box must be a contradiction"))
         }
