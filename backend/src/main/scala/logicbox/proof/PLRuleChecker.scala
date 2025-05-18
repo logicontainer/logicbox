@@ -77,9 +77,10 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
     }
   }
 
-  // private def failIf(b: Boolean, violations: => Viol*): List[Viol] = {
-  //   if !b then Nil else violations.toList
-  // }
+  private def fail(v: => Viol, vs: => Viol*): List[Viol] = (v +: vs).toList
+  private def failIf(b: Boolean, v: => Viol, vs: => Viol*): List[Viol] = {
+    if !b then Nil else (v +: vs).toList
+  }
 
   override def check(rule: PLRule, formula: PLFormula, refs: List[Ref]): List[Viol] = rule match {
     case Premise() | Assumption() => Nil
@@ -88,49 +89,33 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
       case List(ref) => ref match {
         case And(lhs, rhs) => side match {
           case Side.Left => 
-            if (lhs != formula) List(
-              FormulaDoesntMatchReference(0, "formula doesn't match left-hand side")
-            ) else Nil
+            failIf(lhs != formula, FormulaDoesntMatchReference(0, "formula doesn't match left-hand side"))
               
           case Side.Right =>
-            if (rhs != formula) List(
-              FormulaDoesntMatchReference(0, "formula doesn't match right-hand side")
-            ) else Nil
+            failIf(rhs != formula, FormulaDoesntMatchReference(0, "formula doesn't match right-hand side"))
         }
         
-        case _ => List(
-          ReferenceDoesntMatchRule(0, "must be conjuction (and)")
-        )
+        case _ => fail(ReferenceDoesntMatchRule(0, "must be conjunction (and)"))
       }
     }
 
     case AndIntro() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => formula match {
-        case And(phi, psi) => List(
-          (if (phi != r0) List(
-            FormulaDoesntMatchReference(0, "left-hand side of formula must match")
-          ) else Nil)
-          ++
-          (if (psi != r1) List(
-            FormulaDoesntMatchReference(1, "right-hand side of formula must match")
-          ) else Nil)
-        ).flatten
+        case And(phi, psi) =>
+          failIf(phi != r0, FormulaDoesntMatchReference(0, "left-hand side of formula must match")) ++
+          failIf(psi != r1, FormulaDoesntMatchReference(1, "right-hand side of formula must match"))
         
-        case _ => List(FormulaDoesntMatchRule("must be a conjunction (and)"))
+        case _ => fail(FormulaDoesntMatchRule("must be a conjunction (and)"))
       }
     }
 
     case OrIntro(side) => extractNFormulasAndThen(refs, 1) {
       case List(ref) => (side, formula) match {
         case (Side.Left, Or(lhs, _)) => 
-          if (lhs != ref) List(
-            FormulaDoesntMatchReference(0, "left-hand side of formula must match reference")
-          ) else Nil
+          failIf(lhs != ref, FormulaDoesntMatchReference(0, "left-hand side of formula must match reference"))
 
         case (Side.Right, Or(_, rhs)) =>
-          if (rhs != ref) List(
-            FormulaDoesntMatchReference(0, "right-hand side of formula must match reference")
-          ) else Nil
+          failIf(rhs != ref, FormulaDoesntMatchReference(0, "right-hand side of formula must match reference"))
 
         case _ => List(FormulaDoesntMatchRule("must be a disjunction (or)"))
       }
@@ -140,168 +125,114 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
       val pattern = { import BoxOrFormula._; List(Formula, Box, Box) }
 
       extractAndThen(refs, pattern)  {
-      case List(
-        Reference.Line(r0: PLFormula),
-        b1: Reference.Box[PLFormula, _] @unchecked,
-        b2: Reference.Box[PLFormula, _] @unchecked
-      ) => {
-        val Box(_, as1, cl1) = b1
-        val Box(_, as2, cl2) = b2
+        case List(
+          Reference.Line(r0: PLFormula),
+          b1: Reference.Box[PLFormula, _] @unchecked,
+          b2: Reference.Box[PLFormula, _] @unchecked
+        ) => {
+          val Box(_, as1, cl1) = b1
+          val Box(_, as2, cl2) = b2
 
-        {
-          if (formula != cl1) List(
-            FormulaDoesntMatchReference(1, "must match last line of box")
-          ) else Nil
-        } ++ {
-          if (formula != cl2) List(
-            FormulaDoesntMatchReference(2, "must match last line of box")
-          ) else Nil
-        } ++ {
-          if (cl1 != cl2) List(
-            ReferencesMismatch(List(1, 2), "last lines of boxes must match") 
-          ) else Nil
-        } ++ { 
-          r0 match {
-            case Or(lhs, rhs) => {
-              if (as1 != lhs) List(
-                ReferencesMismatch(List(0, 1), "left-hand side must match assumption")
-              ) else Nil
-            } ++ {
-              if (as2 != rhs) List(
-                ReferencesMismatch(List(0, 2), "right-hand side must match assumption")
-              ) else Nil
-            }
-            case _ => List(
-              ReferenceDoesntMatchRule(0, "must be a disjunction (or)")
-            )
-          }
+          failIf(formula != cl1, FormulaDoesntMatchReference(1, "must match last line of box")) ++
+          failIf(formula != cl2, FormulaDoesntMatchReference(2, "must match last line of box")) ++
+          failIf(cl1 != cl2, ReferencesMismatch(List(1, 2), "last lines of boxes must match")) ++
+          { r0 match {
+            case Or(lhs, rhs) =>
+              failIf(as1 != lhs, ReferencesMismatch(List(0, 1), "left-hand side must match assumption")) ++
+              failIf(as2 != rhs, ReferencesMismatch(List(0, 2), "right-hand side must match assumption"))
+
+            case _ => 
+              fail(ReferenceDoesntMatchRule(0, "must be a disjunction (or)"))
+          }}
         }
       }
-    }
 
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(box: Reference.Box[PLFormula, _]) => formula match {
         case Implies(phi, psi) =>
-          (if (phi != box.assumption) List(
-            FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")
-          ) else Nil) 
-          ++
-          (if (psi != box.conclusion) List(
-            FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box")
-          ) else Nil)
-        case _ => List(
-          FormulaDoesntMatchRule("must be an implication (->)")
-        )
+          failIf(phi != box.assumption, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
+          failIf(psi != box.conclusion, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
+
+        case _ => 
+          fail(FormulaDoesntMatchRule("must be an implication (->)"))
       }
     }
 
     case ImplicationElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => r1 match {
         case Implies(from, to) => 
-          (if (from != r0) List(
-            ReferencesMismatch(List(0, 1), "must match left-hand side of implication")
-          ) else Nil)
-          ++
-          (if (to != formula) List(
-            FormulaDoesntMatchReference(1, "must match right-hand side of implication")
-          ) else Nil)
-        case _ => List(
-          ReferenceDoesntMatchRule(1, "must be an implication")
-        )
+          failIf(from != r0, ReferencesMismatch(List(0, 1), "must match left-hand side of implication")) ++
+          failIf(to != formula, FormulaDoesntMatchReference(1, "must match right-hand side of implication"))
+
+        case _ => 
+          fail(ReferenceDoesntMatchRule(1, "must be an implication"))
       }
     }
 
     case NotIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(Box[PLFormula, PLBoxInfo](_, asmp, concl)) => {
-          if (concl != Contradiction()) List(
-            ReferenceDoesntMatchRule(0, "last line of box must be contradiction")
-          ) else Nil
-        } ++ { formula match {
-          case Not(phi) => 
-            if (phi != asmp) List(
-              FormulaDoesntMatchReference(0, "must be the negation of the assumption in the box")
-            ) else Nil
-          case _ => List(
-            FormulaDoesntMatchRule("must be a negation")
-          )
-        }
-      }
+      case List(Box[PLFormula, PLBoxInfo](_, asmp, concl)) =>
+        failIf(concl != Contradiction(), ReferenceDoesntMatchRule(0, "last line of box must be contradiction")) ++
+        { formula match {
+            case Not(phi) => 
+              failIf(phi != asmp, FormulaDoesntMatchReference(0, "must be the negation of the assumption in the box"))
+
+            case _ => 
+              fail(FormulaDoesntMatchRule("must be a negation"))
+        }}
     }
 
     case NotElim() => extractNFormulasAndThen(refs, 2) {
-      case List(r0, r1) => {
-        if (formula != Contradiction()) List(
-          FormulaDoesntMatchRule("must be contradiction")
-        ) else Nil
-      } ++ { r1 match {
-        case Not(phi) => 
-          if (r0 != phi) List(
-            ReferencesMismatch(List(0, 1), "second reference must be negation of first")
-          ) else Nil
-        case _ => List(
-          ReferenceDoesntMatchRule(1, "must be negation")
-        )
-      }}
+      case List(r0, r1) =>
+        failIf(formula != Contradiction(), FormulaDoesntMatchRule("must be contradiction")) ++
+        { r1 match {
+          case Not(phi) => 
+            failIf(r0 != phi, ReferencesMismatch(List(0, 1), "second reference must be negation of first"))
+
+          case _ =>
+            fail(ReferenceDoesntMatchRule(1, "must be negation"))
+        }}
     }
 
     case ContradictionElim() => extractNFormulasAndThen(refs, 1) {
       case List(r0) =>
-        if (r0 != Contradiction()) List(
-          ReferenceDoesntMatchRule(0, "must be a contradiction")
-        ) else Nil
+        failIf(r0 != Contradiction(), ReferenceDoesntMatchRule(0, "must be a contradiction"))
     }
 
     case NotNotElim() => extractNFormulasAndThen(refs, 1) {
       case List(Not(Not(phi))) => 
-        if (formula != phi) List(
-          FormulaDoesntMatchReference(0, "must equal reference with the two outermost negations removed")
-        ) else Nil
-      case List(_) => List(
-        ReferenceDoesntMatchRule(0, "must be a negation of a negation")
-      )
+        failIf(formula != phi, FormulaDoesntMatchReference(0, "must equal reference with the two outermost negations removed"))
+
+      case List(_) => 
+        fail(ReferenceDoesntMatchRule(0, "must be a negation of a negation"))
     }
 
     case ModusTollens() => extractNFormulasAndThen(refs, 2) {
-      case List(r0, r1) => {
-        formula match {
+      case List(r0, r1) => 
+        { formula match {
           case Not(_) => Nil
           case _ => List(FormulaDoesntMatchRule("must be a negation"))
-        }
-      } ++ {
-        r0 match {
+        }} ++ { r0 match {
           case Implies(_, _) => Nil
           case _ => List(ReferenceDoesntMatchRule(0, "must be an implication"))
-        }
-      } ++ {
-        r1 match {
+        }} ++ { r1 match {
           case Not(_) => Nil
           case _ => List(ReferenceDoesntMatchRule(1, "must be a negation"))
-        }
-      } ++ {
-        (formula, r0, r1) match {
-          case (Not(phi2), Implies(phi1, psi1), Not(psi2)) => {
-            if (phi2 != phi1) List(
-              FormulaDoesntMatchReference(0, "must be negation of left-hand side of implication")
-            ) else Nil
-          } ++ {
-            if (psi1 != psi2) List(
-              ReferencesMismatch(List(0, 1), "second reference must be the negation of the right-hand side of the implication")
-            ) else Nil
-          }
+        }} ++ { (formula, r0, r1) match {
+          case (Not(phi2), Implies(phi1, psi1), Not(psi2)) =>
+            failIf(phi2 != phi1, FormulaDoesntMatchReference(0, "must be negation of left-hand side of implication")) ++
+            failIf(psi1 != psi2, ReferencesMismatch(List(0, 1), "second reference must be the negation of the right-hand side of the implication"))
+
           case _ => Nil
-        }
-      }
+        }}
     }
 
     case NotNotIntro() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => formula match {
         case Not(Not(phi)) => 
-          if (phi != ref) List(
-            FormulaDoesntMatchReference(0, "must equal the reference, but with two outer negations removed")
-          ) else Nil
-        case _ => List(
-          FormulaDoesntMatchRule("must equal the reference, but with the two outer negations removed")
-        )
+          failIf(phi != ref, FormulaDoesntMatchReference(0, "must equal the reference, but with two outer negations removed"))
+
+        case _ => 
+          fail(FormulaDoesntMatchRule("must equal the reference, but with the two outer negations removed"))
       }
     }
 
@@ -309,15 +240,15 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
       case List(box: Reference.Box[PLFormula, _] @unchecked) => { 
         box.assumption match {
           case Not(phi) => 
-            if (formula != phi) List(
-              FormulaDoesntMatchReference(0, "must be assumption without negation")
-            ) else Nil
-          case _ => List(ReferenceDoesntMatchRule(0, "assumption in box must be a negation"))
+            failIf(formula != phi, FormulaDoesntMatchReference(0, "must be assumption without negation"))
+
+          case _ => 
+            fail(ReferenceDoesntMatchRule(0, "assumption in box must be a negation"))
         }
       } ++ { 
         box.conclusion match {
           case Contradiction() => Nil
-          case _ => List(ReferenceDoesntMatchRule(0, "last line in box must be a contradiction"))
+          case _ => fail(ReferenceDoesntMatchRule(0, "last line in box must be a contradiction"))
         }
       }
     }
@@ -325,15 +256,13 @@ class PLRuleChecker extends RuleChecker[PLFormula, PLRule, PLBoxInfo, PLViolatio
     case LawOfExcludedMiddle() => extractNFormulasAndThen(refs, 0) {
       case _ => formula match {
         case Or(lhs, Not(rhs)) if lhs == rhs => Nil
-        case _ => List(FormulaDoesntMatchRule("must be the disjunction of a formula and its negation"))
+        case _ => fail(FormulaDoesntMatchRule("must be the disjunction of a formula and its negation"))
       }
     }
 
     case Copy() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => 
-        if (ref != formula) List(
-          FormulaDoesntMatchReference(0, "must be an exact copy of reference")
-        ) else Nil
+        failIf(ref != formula, FormulaDoesntMatchReference(0, "must be an exact copy of reference"))
     }
   }
 }
