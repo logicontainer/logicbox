@@ -1,6 +1,6 @@
 package logicbox.proof
 
-object PLRuleParser {
+object PropLogicRuleParser {
   import logicbox.proof.PropLogicRule
   import logicbox.proof.PropLogicRule._
 

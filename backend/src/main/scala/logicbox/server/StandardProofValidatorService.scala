@@ -32,13 +32,13 @@ import logicbox.marshal.IncompleteFormulaWriter
 import logicbox.framework.Justification
 import logicbox.proof.ProofImpl
 import logicbox.proof.StandardStepStrategy
-import logicbox.marshal.PLRuleWriter
+import logicbox.marshal.PropLogicRuleWriter
 import logicbox.marshal.JustificationWriter
 
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
-import logicbox.proof.PLRuleParser
+import logicbox.proof.PropLogicRuleParser
 import logicbox.proof.RuleBasedProofChecker._
 import logicbox.proof.OptionRuleChecker._
 import logicbox.proof.PropLogicViolation._
@@ -61,7 +61,7 @@ object StandardProofValidatorService {
     } catch { case _ => None }
   )
 
-  private def ruleParser(rule: String): Option[R] = PLRuleParser.parse(rule)
+  private def ruleParser(rule: String): Option[R] = PropLogicRuleParser.parse(rule)
 
   private def idParser(str: String): Id = str
 
@@ -93,7 +93,7 @@ object StandardProofValidatorService {
   private def idWriter: JsonWriter[Id] = JsonWriter.func2Writer(JsString(_))
   private def ruleWriter: JsonWriter[Option[R]] = JsonWriter.func2Writer {
     case None => JsNull
-    case Some(value) => PLRuleWriter().write(value)
+    case Some(value) => PropLogicRuleWriter().write(value)
   }
 
   private def formulaWriter: JsonWriter[IncompleteFormula[F]] = IncompleteFormulaWriter(
