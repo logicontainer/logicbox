@@ -85,7 +85,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\lor i_1",
           premises: ["\\varphi"],
-          conclusion: "\\varphi \\land \\psi",
+          conclusion: "\\varphi \\lor \\psi",
         },
         numPremises: 1,
       },
@@ -94,7 +94,7 @@ export const rulesets = [
         latex: {
           ruleName: "\\lor i_2",
           premises: ["\\psi"],
-          conclusion: "\\varphi \\land \\psi",
+          conclusion: "\\varphi \\lor \\psi",
         },
         numPremises: 1,
       },
@@ -102,7 +102,7 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\bot"), box("\\varphi\\\\ \\vdots \\\\ \\bot")],
+          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\chi"), box("\\varphi\\\\ \\vdots \\\\ \\chi")],
           conclusion: "\\chi",
         },
         numPremises: 3,
@@ -183,7 +183,7 @@ export const rulesets = [
         ruleName: "proof_by_contradiction",
         latex: {
           ruleName: "\\text{PBC}",
-          premises: [box("\\varphi\\\\ \\vdots \\\\ \\bot")],
+          premises: [box("\\lnot \\varphi\\\\ \\vdots \\\\ \\bot")],
           conclusion: "\\varphi",
         },
         numPremises: 1,
