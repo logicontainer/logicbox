@@ -19,25 +19,29 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
   private val lexer = PredLogicLexer()
   private val parser = PredLogicParser()
 
+  private type BI = PredLogicBoxInfo[PredLogicTerm.Var]
+
   private def parse(str: String): PredLogicFormula = parser(lexer(str))
 
-  private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, PredLogicBoxInfo]])
+  private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, BI]])
     extends Reference.Line[PredLogicFormula]
 
-  private case class Box(fst: PredLogicFormula, lst: PredLogicFormula, freshVar: Option[Char]) extends Reference.Box[PredLogicFormula, PredLogicBoxInfo] {
-    override def info = PredLogicBoxInfo(freshVar)
+  private case class Box(fst: PredLogicFormula, lst: PredLogicFormula, freshVar: Option[Char]) extends Reference.Box[PredLogicFormula, BI] {
+    override def info = PredLogicBoxInfo(freshVar.map(Var(_)))
     override def first = fst
     override def last = lst
   }
 
-  private def refLine(str: String): Reference[PredLogicFormula, PredLogicBoxInfo] = new Reference.Line[PredLogicFormula] {
+  private def refLine(str: String): Reference[PredLogicFormula, BI] = new Reference.Line[PredLogicFormula] {
     def formula = parse(str)
   }
 
-  private def refBox(ass: String, concl: String, fresh: Char = '\u0000'): Reference.Box[PredLogicFormula, PredLogicBoxInfo] =
+  private def refBox(ass: String, concl: String, fresh: Char = '\u0000'): Reference.Box[PredLogicFormula, BI] =
     Box(parse(ass), parse(concl), if fresh === '\u0000' then None else Some(fresh))
 
-  private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var]()
+  private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var](
+    PredLogicFormulaSubstitutor()
+  )
 
   describe("ForAllElim") {
     it("should reject if refs are empty") {
@@ -87,6 +91,18 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(x)")
       checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", 'a'))) should matchPattern {
         case List(FormulaDoesntMatchRule(_)) =>
+      }
+    }
+
+    it("should allow correct usage") {
+      val f = parse("forall x P(x)")
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", 'a'))) shouldBe Nil
+    }
+
+    it("should reject when last line doesn't match") {
+      val f = parse("forall x P(x)")
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "Q(x)", 'a'))) should matchPattern {
+        case List(FormulaDoesntMatchReference(0, _)) =>
       }
     }
   }

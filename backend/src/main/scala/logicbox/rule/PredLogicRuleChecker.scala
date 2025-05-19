@@ -12,9 +12,11 @@ import QuantifierFormula._
 import logicbox.rule.PredLogicRule.ForAllIntro
 import logicbox.framework.Violation._
 
-class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T] extends RuleChecker[F, PredLogicRule, PredLogicBoxInfo] {
+class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
+  substitutor: Substitutor[F, T, V]
+) extends RuleChecker[F, PredLogicRule, PredLogicBoxInfo[V]] {
   private type R = PredLogicRule
-  private type B = PredLogicBoxInfo
+  private type B = PredLogicBoxInfo[V]
 
   private def fail(v: => Violation, vs: => Violation*): List[Violation] = (v +: vs).toList
   private def failIf(b: Boolean, v: => Violation, vs: => Violation*): List[Violation] = {
@@ -32,14 +34,23 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T] extends R
           fail(ReferenceDoesntMatchRule(0, "must be forall"))
       }
     }
+
     case ForAllIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(Reference.Box(info, _, _)) => 
-        failIf(info.freshVar.isEmpty, ReferenceDoesntMatchRule(0, "box does not contain fresh variable")) ++ {
-          formula match {
-            case ForAll(_, _) => Nil // TODO: fake
-            case _ => fail(FormulaDoesntMatchRule("must be forall"))
-          }
+      case List(Reference.Box(info, _, lst)) => info.freshVar match {
+        case None => 
+          fail(ReferenceDoesntMatchRule(0, "box does not contain fresh variable"))
+
+        case Some(x0) => formula match {
+          case ForAll(x, phi) =>
+            failIf(
+              lst != substitutor.substitute(phi, x0, x),
+              FormulaDoesntMatchReference(0, "last line of box must match formula")
+            )
+
+          case _ => fail(FormulaDoesntMatchRule("must be forall"))
         }
+
+      }
     }
   }
 }

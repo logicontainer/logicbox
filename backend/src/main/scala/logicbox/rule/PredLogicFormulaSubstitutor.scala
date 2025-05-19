@@ -6,27 +6,27 @@ import logicbox.formula.PredLogicTerm._
 import logicbox.formula.PredLogicFormula._
 
 class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var] {
-  private def substitute(src: PredLogicTerm, x: Var, t: PredLogicTerm): PredLogicTerm = src match {
+  private def substitute(src: PredLogicTerm, t: PredLogicTerm, x: Var): PredLogicTerm = src match {
     case y: Var if y == x => t
     case y: Var => y
 
     case FunAppl(f, ps) => 
-      FunAppl(f, ps.map(substitute(_, x, t)))
+      FunAppl(f, ps.map(substitute(_, t, x)))
   }
 
-  override def substitute(f: PredLogicFormula, x: Var, t: PredLogicTerm): PredLogicFormula = f match {
-    case Predicate(p, ps) => Predicate(p, ps.map(substitute(_, x, t)))
-    case And(phi, psi) => And(substitute(phi, x, t), substitute(psi, x, t))
-    case Or(phi, psi) => Or(substitute(phi, x, t), substitute(psi, x, t))
-    case Implies(phi, psi) => Implies(substitute(phi, x, t), substitute(psi, x, t))
-    case Not(phi) => Not(substitute(phi, x, t))
+  override def substitute(f: PredLogicFormula, t: PredLogicTerm, x: Var): PredLogicFormula = f match {
+    case Predicate(p, ps) => Predicate(p, ps.map(substitute(_, t, x)))
+    case And(phi, psi) => And(substitute(phi, t, x), substitute(psi, t, x))
+    case Or(phi, psi) => Or(substitute(phi, t, x), substitute(psi, t, x))
+    case Implies(phi, psi) => Implies(substitute(phi, t, x), substitute(psi, t, x))
+    case Not(phi) => Not(substitute(phi, t, x))
     case f @ (Contradiction() | Tautology()) => f
-    case Equals(t1, t2) => Equals(substitute(t1, x, t), substitute(t2, x, t))
+    case Equals(t1, t2) => Equals(substitute(t1, t, x), substitute(t2, t, x))
 
     case ForAll(y, phi) if y == x => ForAll(x, phi)
-    case ForAll(y, phi) => ForAll(y, substitute(phi, x, t))
+    case ForAll(y, phi) => ForAll(y, substitute(phi, t, x))
 
     case Exists(y, phi) if y == x => Exists(y, phi)
-    case Exists(y, phi) => Exists(y, substitute(phi, x, t))
+    case Exists(y, phi) => Exists(y, substitute(phi, t, x))
   }
 }
