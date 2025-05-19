@@ -1,8 +1,8 @@
 package logicbox.marshal
 
 import spray.json._
-import logicbox.proof.PropLogicRule
-import logicbox.proof.PropLogicRule._
+import logicbox.rule.PropLogicRule
+import logicbox.rule.PropLogicRule._
 
 class PropLogicRuleWriter extends JsonWriter[PropLogicRule] {
   private def toStr(rule: PropLogicRule): String = rule match {

@@ -1,4 +1,4 @@
-package logicbox.proof
+package logicbox.rule
 
 import logicbox.framework._
 import org.scalatest.matchers.should.*
@@ -6,10 +6,13 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 import org.scalatest.funspec.AnyFunSpec
+import logicbox.ProofStubs
+import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
 
 class OptionRuleCheckerTest extends AnyFunSpec {
-  import ProofStubs._
-  import logicbox.proof.OptionRuleChecker._
+  import logicbox.ProofStubs._
+  import logicbox.rule.OptionRuleChecker
+  import logicbox.rule.OptionRuleChecker._
 
   describe("OptionRuleChecker::check") {
     val baseChecker = StubRuleChecker()

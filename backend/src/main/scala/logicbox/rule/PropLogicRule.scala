@@ -1,4 +1,4 @@
-package logicbox.proof
+package logicbox.rule
 
 import logicbox.framework.{ Reference }
 import logicbox.formula.PropLogicFormula

@@ -1,8 +1,9 @@
-package logicbox.proof
+package logicbox.rule
 
 import logicbox.framework.{RuleChecker, Reference}
 import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
+import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
 
 object OptionRuleChecker {
   sealed trait Violation[+V]

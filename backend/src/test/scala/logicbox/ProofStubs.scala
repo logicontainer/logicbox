@@ -1,4 +1,4 @@
-package logicbox.proof
+package logicbox
 
 import logicbox.framework._
 

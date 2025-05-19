@@ -7,9 +7,10 @@ import org.scalatest.Inspectors
 
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.framework.Proof.Step
+import logicbox.ProofStubs
 
 class ScopedProofCheckerTest extends AnyFunSpec {
-  import ProofStubs._
+  import logicbox.ProofStubs._
   import ScopedProofChecker._
 
   describe("ScopedProofCheckerTest::check") {

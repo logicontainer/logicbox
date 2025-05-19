@@ -6,9 +6,10 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 import logicbox.framework.Proof
+import logicbox.ProofStubs
 
 class ProofViewTest extends AnyFunSpec {
-  import ProofStubs._
+  import logicbox.ProofStubs._
 
   private case class F2(f: StubFormula)
   private case class R2(r: StubRule)

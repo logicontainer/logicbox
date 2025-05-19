@@ -11,7 +11,7 @@ import logicbox.framework._
 import logicbox.framework.ModifiableProof._
 
 class ProofJsonReaderTest extends AnyFunSpec {
-  import logicbox.proof.ProofStubs._
+  import logicbox.ProofStubs._
   import ProofJsonReader.Err
 
   def formulaParser(str: String): StubFormula = StubFormula(str.charAt(0) - '0')

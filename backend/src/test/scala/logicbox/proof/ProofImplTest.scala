@@ -9,9 +9,10 @@ import logicbox.framework.ModifiableProof
 import logicbox.framework.Proof
 import logicbox.framework.Proof.Box
 import logicbox.framework.Proof.Line
+import logicbox.ProofStubs
 
 class ProofImplTest extends AnyFunSpec {
-  import ProofStubs._
+  import logicbox.ProofStubs._
   import ModifiableProof._
 
   private type Pf = ModifiableProof[F, R, B, Id]

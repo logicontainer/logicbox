@@ -1,8 +1,7 @@
-package logicbox.proof
+package logicbox.rule
 
 object PropLogicRuleParser {
-  import logicbox.proof.PropLogicRule
-  import logicbox.proof.PropLogicRule._
+  import PropLogicRule._
 
   def parse(rule: String): Option[PropLogicRule] = rule match {
     case "assumption" => Some(Assumption())

@@ -1,10 +1,9 @@
 package logicbox.server
 
-import logicbox.proof.PLBoxInfo
 import logicbox.framework.JsonReaderWithErr
 import logicbox.framework.ModifyProofCommand
 import logicbox.formula.PropLogicFormula
-import logicbox.proof.PropLogicRule
+import logicbox.rule.PropLogicRule
 import logicbox.demarshal.ProofJsonReader
 import spray.json.JsonReader
 import logicbox.framework.Proof
@@ -15,9 +14,9 @@ import logicbox.framework.IncompleteFormula
 import logicbox.framework.ProofChecker
 import logicbox.proof.ScopedProofChecker
 import logicbox.framework.RuleChecker
-import logicbox.proof.OptionRuleChecker
-import logicbox.proof.PropLogicRuleChecker
-import logicbox.proof.PropLogicViolation
+import logicbox.rule.OptionRuleChecker
+import logicbox.rule.PropLogicRuleChecker
+import logicbox.rule.PropLogicViolation
 import logicbox.proof.RuleBasedProofChecker
 import logicbox.proof.ProofView
 import logicbox.proof.ProofLineImpl
@@ -38,10 +37,10 @@ import logicbox.marshal.JustificationWriter
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
-import logicbox.proof.PropLogicRuleParser
 import logicbox.proof.RuleBasedProofChecker._
-import logicbox.proof.OptionRuleChecker._
-import logicbox.proof.PropLogicViolation._
+import logicbox.rule.PropLogicRuleParser
+import logicbox.rule.OptionRuleChecker._
+import logicbox.rule.PropLogicViolation._
 
 import logicbox.proof.ScopedProofChecker._
 
@@ -50,7 +49,7 @@ import logicbox.proof.ScopedProofChecker._
 object StandardProofValidatorService {
   private type F = PropLogicFormula
   private type R = PropLogicRule
-  private type B = PLBoxInfo
+  private type B = Unit
   private type Id = String
   private type Err = ProofJsonReader.Err
   private type Diag = RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] | ScopedProofChecker.Diagnostic[Id]
@@ -118,7 +117,7 @@ object StandardProofValidatorService {
         case MissingFormula => "missingFormula"
         case MissingRule => "missingRule"
         case MissingDetailInReference(_, _) => "missingDetailInReference"
-        case logicbox.proof.OptionRuleChecker.RuleViolation(violation) => 
+        case logicbox.rule.OptionRuleChecker.RuleViolation(violation) => 
           val shortName = violation match {
             case WrongNumberOfReferences(_, _, _) => "wrongNumberOfReferences"
             case ReferenceShouldBeBox(_, _) => "referenceShouldBeBox"
@@ -147,7 +146,7 @@ object StandardProofValidatorService {
       case RuleBasedProofChecker.RuleViolation(stepId, violation: OptionRuleChecker.Violation[PropLogicViolation] @unchecked) => violation match {
         case MissingFormula | MissingRule => JsObject()
         case v: MissingDetailInReference => jsonFormat2(MissingDetailInReference.apply).write(v)
-        case logicbox.proof.OptionRuleChecker.RuleViolation(violation) => violation match {
+        case logicbox.rule.OptionRuleChecker.RuleViolation(violation) => violation match {
           case v: WrongNumberOfReferences => jsonFormat3(WrongNumberOfReferences.apply).write(v)
           case v: ReferenceShouldBeBox => jsonFormat2(ReferenceShouldBeBox.apply).write(v)
           case v: ReferenceShouldBeLine => jsonFormat2(ReferenceShouldBeLine.apply).write(v)

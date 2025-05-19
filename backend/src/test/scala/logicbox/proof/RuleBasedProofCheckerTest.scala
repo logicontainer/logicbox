@@ -7,9 +7,11 @@ import org.scalatest.Inspectors
 
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.framework.Proof.Step
+import logicbox.ProofStubs
+import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
 
 class RuleBasedProofCheckerTest extends AnyFunSpec {
-  import ProofStubs._
+  import logicbox.ProofStubs._
 
   def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id, V]] = 
     RuleBasedProofChecker(ruleChecker)
