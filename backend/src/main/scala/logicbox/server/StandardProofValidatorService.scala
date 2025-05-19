@@ -3,21 +3,21 @@ package logicbox.server
 import logicbox.proof.PLBoxInfo
 import logicbox.framework.JsonReaderWithErr
 import logicbox.framework.ModifyProofCommand
-import logicbox.formula.PLFormula
-import logicbox.proof.PLRule
+import logicbox.formula.PropLogicFormula
+import logicbox.proof.PropLogicRule
 import logicbox.demarshal.ProofJsonReader
 import spray.json.JsonReader
 import logicbox.framework.Proof
-import logicbox.formula.PLLexer
-import logicbox.formula.PLParser
+import logicbox.formula.PropLogicLexer
+import logicbox.formula.PropLogicParser
 
 import logicbox.framework.IncompleteFormula
 import logicbox.framework.ProofChecker
 import logicbox.proof.ScopedProofChecker
 import logicbox.framework.RuleChecker
 import logicbox.proof.OptionRuleChecker
-import logicbox.proof.PLRuleChecker
-import logicbox.proof.PLViolation
+import logicbox.proof.PropLogicRuleChecker
+import logicbox.proof.PropLogicViolation
 import logicbox.proof.RuleBasedProofChecker
 import logicbox.proof.ProofView
 import logicbox.proof.ProofLineImpl
@@ -38,41 +38,26 @@ import logicbox.marshal.JustificationWriter
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
-import logicbox.proof.ScopedProofChecker.ReferenceToLaterStep
-import logicbox.proof.ScopedProofChecker.ScopeViolation
-import logicbox.proof.ScopedProofChecker.ReferenceToUnclosedBox
 import logicbox.proof.PLRuleParser
-import logicbox.proof.RuleBasedProofChecker.RuleViolation
-import logicbox.proof.RuleBasedProofChecker.StepNotFound
-import logicbox.proof.RuleBasedProofChecker.ReferenceIdNotFound
-import logicbox.proof.RuleBasedProofChecker.MalformedReference
-import logicbox.proof.OptionRuleChecker.MissingFormula
-import logicbox.proof.OptionRuleChecker.MissingRule
-import logicbox.proof.OptionRuleChecker.MissingDetailInReference
-import logicbox.proof.PLViolation.WrongNumberOfReferences
-import logicbox.proof.PLViolation.ReferenceShouldBeBox
-import logicbox.proof.PLViolation.ReferenceShouldBeLine
-import logicbox.proof.PLViolation.ReferenceDoesntMatchRule
-import logicbox.proof.PLViolation.ReferencesMismatch
-import logicbox.proof.PLViolation.FormulaDoesntMatchReference
-import logicbox.proof.PLViolation.FormulaDoesntMatchRule
-import logicbox.proof.PLViolation.MiscellaneousViolation
-import logicbox.proof.ScopedProofChecker.Scope
-import logicbox.proof.ScopedProofChecker.Root
+import logicbox.proof.RuleBasedProofChecker._
+import logicbox.proof.OptionRuleChecker._
+import logicbox.proof.PropLogicViolation._
+
+import logicbox.proof.ScopedProofChecker._
 
 
 // 'factory'
 object StandardProofValidatorService {
-  private type F = PLFormula
-  private type R = PLRule
+  private type F = PropLogicFormula
+  private type R = PropLogicRule
   private type B = PLBoxInfo
   private type Id = String
   private type Err = ProofJsonReader.Err
-  private type Diag = RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]] | ScopedProofChecker.Diagnostic[Id]
+  private type Diag = RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] | ScopedProofChecker.Diagnostic[Id]
 
   private def formulaParser(userInput: String): IncompleteFormula[F] = IncompleteFormula(
     userInput, optFormula = try {
-      Some(PLParser()(PLLexer()(userInput)))
+      Some(PropLogicParser()(PropLogicLexer()(userInput)))
     } catch { case _ => None }
   )
 
@@ -85,9 +70,9 @@ object StandardProofValidatorService {
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id, Diag] = {
     val scopedChecker = ScopedProofChecker[Id]()
-    val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B], OptionRuleChecker.Violation[PLViolation]] = 
-      OptionRuleChecker(PLRuleChecker[PLFormula]())
-    val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]]] = 
+    val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B], OptionRuleChecker.Violation[PropLogicViolation]] = 
+      OptionRuleChecker(PropLogicRuleChecker[PropLogicFormula]())
+    val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]]] = 
       RuleBasedProofChecker(optionRuleChecker)
 
     new ProofChecker[IncompleteFormula[F], Option[R], B, Id, Diag] {
@@ -128,8 +113,8 @@ object StandardProofValidatorService {
   )
 
   private def getViolationType(diag: Diag): String = diag match {
-    case diag: RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]] => diag match {
-      case RuleViolation(stepId, violation: OptionRuleChecker.Violation[PLViolation] @unchecked) => violation match {
+    case diag: RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] => diag match {
+      case RuleBasedProofChecker.RuleViolation(stepId, violation: OptionRuleChecker.Violation[PropLogicViolation] @unchecked) => violation match {
         case MissingFormula => "missingFormula"
         case MissingRule => "missingRule"
         case MissingDetailInReference(_, _) => "missingDetailInReference"
@@ -158,8 +143,8 @@ object StandardProofValidatorService {
   }
 
   private def getViolation(diag: Diag): JsValue = diag match {
-    case diag: RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]] => diag match {
-      case RuleViolation(stepId, violation: OptionRuleChecker.Violation[PLViolation] @unchecked) => violation match {
+    case diag: RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] => diag match {
+      case RuleBasedProofChecker.RuleViolation(stepId, violation: OptionRuleChecker.Violation[PropLogicViolation] @unchecked) => violation match {
         case MissingFormula | MissingRule => JsObject()
         case v: MissingDetailInReference => jsonFormat2(MissingDetailInReference.apply).write(v)
         case logicbox.proof.OptionRuleChecker.RuleViolation(violation) => violation match {

@@ -1,16 +1,16 @@
 package logicbox.marshal
 
-import logicbox.formula.PLFormula
-import logicbox.formula.PLFormula.Contradiction
-import logicbox.formula.PLFormula.Tautology
-import logicbox.formula.PLFormula.Atom
-import logicbox.formula.PLFormula.And
-import logicbox.formula.PLFormula.Or
-import logicbox.formula.PLFormula.Implies
-import logicbox.formula.PLFormula.Not
+import logicbox.formula.PropLogicFormula
+import logicbox.formula.PropLogicFormula.Contradiction
+import logicbox.formula.PropLogicFormula.Tautology
+import logicbox.formula.PropLogicFormula.Atom
+import logicbox.formula.PropLogicFormula.And
+import logicbox.formula.PropLogicFormula.Or
+import logicbox.formula.PropLogicFormula.Implies
+import logicbox.formula.PropLogicFormula.Not
 
 object PrettyPLFormula {
-  private def withBracks(formula: PLFormula, inner: PLFormula => String, l: String, r: String): String = {
+  private def withBracks(formula: PropLogicFormula, inner: PropLogicFormula => String, l: String, r: String): String = {
     formula match {
       // don't add brackets to atoms, simple formulas
       case Contradiction() | Tautology() | Atom(_) | Not(_) => inner(formula)
@@ -18,8 +18,8 @@ object PrettyPLFormula {
     }
   }
 
-  def asLaTeX(formula: PLFormula): String = {
-    def b(f: PLFormula) = withBracks(f, asLaTeX, "(", ")")
+  def asLaTeX(formula: PropLogicFormula): String = {
+    def b(f: PropLogicFormula) = withBracks(f, asLaTeX, "(", ")")
     formula match {
       case Contradiction() => "\\bot"
       case Tautology() => "\\top"
@@ -31,8 +31,8 @@ object PrettyPLFormula {
     }
   }
 
-  def asASCII(formula: PLFormula): String = {
-    def b(f: PLFormula) = withBracks(f, asASCII, "(", ")")
+  def asASCII(formula: PropLogicFormula): String = {
+    def b(f: PropLogicFormula) = withBracks(f, asASCII, "(", ")")
     formula match {
       case Contradiction() => "false"
       case Tautology() => "true"

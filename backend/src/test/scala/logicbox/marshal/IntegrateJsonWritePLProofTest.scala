@@ -10,12 +10,12 @@ import logicbox.proof._
 import logicbox.formula._
 import spray.json._
 import logicbox.framework.ModifiableProof.ProofTop
-import logicbox.formula.PLFormula.Contradiction
+import logicbox.formula.PropLogicFormula.Contradiction
 
 
 class IntegrateJsonWritePLProofTest extends AnyFunSpec {
-  private type F = IncompleteFormula[PLFormula]
-  private type R = Option[PLRule]
+  private type F = IncompleteFormula[PropLogicFormula]
+  private type R = Option[PropLogicRule]
   private type B = PLBoxInfo
   private type Id = String
 
@@ -35,11 +35,11 @@ class IntegrateJsonWritePLProofTest extends AnyFunSpec {
   }
 
   describe("integration between json writers, plformula/plrule and proof impl") {
-    import PLFormula._
+    import PropLogicFormula._
 
     val writer: JsonWriter[Proof[F, R, B, Id]] = SimpleProofJsonWriter[F, R, B, Id](
       idWriter, 
-      IncompleteFormulaWriter[PLFormula](PrettyPLFormula.asLaTeX, PrettyPLFormula.asASCII), 
+      IncompleteFormulaWriter[PropLogicFormula](PrettyPLFormula.asLaTeX, PrettyPLFormula.asASCII), 
       JustificationWriter(ruleWriter, idWriter)
     )
 
@@ -66,7 +66,7 @@ class IntegrateJsonWritePLProofTest extends AnyFunSpec {
         IncompleteFormula("USER INPUT", Some(And(Atom('p'), Or(Atom('q'), Contradiction()))))
       ).getOrElse(???)
 
-      proof = proof.updateRule("l1", Some(PLRule.AndIntro())).getOrElse(???)
+      proof = proof.updateRule("l1", Some(PropLogicRule.AndIntro())).getOrElse(???)
     }
 
     it("should correctly json write small proof") {
@@ -81,10 +81,10 @@ class IntegrateJsonWritePLProofTest extends AnyFunSpec {
       
       import ModifiableProof._
       var proof: ModifiableProof[F, R, B, Id] = ProofImpl.empty(stepStrategy)
-      def line(id: Id, pos: ModifiableProof.Pos[Id], f: String, rule: Option[PLRule], refs: Seq[Id]): Unit = {
+      def line(id: Id, pos: ModifiableProof.Pos[Id], f: String, rule: Option[PropLogicRule], refs: Seq[Id]): Unit = {
         proof = proof.addLine(id, pos).getOrElse(???)
         val optF = try {
-          Some(PLParser()(PLLexer()(f)))
+          Some(PropLogicParser()(PropLogicLexer()(f)))
         } catch {
           case _ => None
         }
@@ -93,14 +93,14 @@ class IntegrateJsonWritePLProofTest extends AnyFunSpec {
         proof = proof.updateReferences(id, refs).getOrElse(???)
       }
 
-      line("1", ProofTop, "", Some(PLRule.Premise()), Seq())
+      line("1", ProofTop, "", Some(PropLogicRule.Premise()), Seq())
       line("2", AtLine("1", Direction.Below), "q -> s", None, Seq())
 
       proof = proof.addBox("box", AtLine("2", Direction.Below)).getOrElse(???)
-      line("3", BoxTop("box"), "", Some(PLRule.Assumption()), Seq())
+      line("3", BoxTop("box"), "", Some(PropLogicRule.Assumption()), Seq())
       line("4", AtLine("3", Direction.Below), "q", None, Seq("3", "1"))
-      line("5", AtLine("4", Direction.Below), "s", Some(PLRule.ImplicationElim()), Seq("4", "3"))
-      line("6", AtLine("box", Direction.Below), "p implies  s", Some(PLRule.ImplicationIntro()), Seq("box"))
+      line("5", AtLine("4", Direction.Below), "s", Some(PropLogicRule.ImplicationElim()), Seq("4", "3"))
+      line("6", AtLine("box", Direction.Below), "p implies  s", Some(PropLogicRule.ImplicationIntro()), Seq("box"))
 
       val result = writer.write(proof)
       val exp = JsArray(
