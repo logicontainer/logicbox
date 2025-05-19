@@ -37,10 +37,10 @@ class PredLogicParser extends PackratParsers {
     case t1 ~ _ ~ t2 => PredLogicFormula.Equals(t1, t2)
   }
 
-  private def simpleexps: Parser[PredLogicFormula] = tautexp | contrexp | equalityexp | predexp
+  private def atomicexps: Parser[PredLogicFormula] = tautexp | contrexp | equalityexp | predexp
 
   private def c: Parser[PredLogicFormula] = 
-    simpleexps |
+    atomicexps |
     ((PredLogicToken.Not() ~ c) ^^ { case _ ~ phi => Not(phi) }) |
     ((PredLogicToken.Exists() ~ varexp ~ c) ^^ { 
       case _ ~ x ~ phi => Exists(x, phi)

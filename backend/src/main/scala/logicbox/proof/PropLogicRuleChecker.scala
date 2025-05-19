@@ -3,22 +3,22 @@ package logicbox.proof
 import logicbox.framework.RuleChecker
 import logicbox.framework.Reference
 
-import logicbox.proof.PLRule
-import logicbox.proof.PLRule._
+import logicbox.proof.PropLogicRule
+import logicbox.proof.PropLogicRule._
 
 import logicbox.formula.FormulaBase
 import logicbox.formula.FormulaBase._
 
-class PLRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PLRule, PLBoxInfo, PLViolation] {
+class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogicRule, PLBoxInfo, PropLogicViolation] {
   private type Ref = Reference[F, PLBoxInfo]
-  private type Viol = PLViolation
+  private type Viol = PropLogicViolation
 
-  import PLViolation._
+  import PropLogicViolation._
 
   private enum BoxOrFormula { case Box; case Formula }
 
   import Reference._
-  import PLRule._
+  import PropLogicRule._
 
   private def extractAndThen(refs: List[Ref], pattern: Seq[BoxOrFormula]) 
     (func: PartialFunction[List[Ref], List[Viol]]): List[Viol] = 
@@ -82,7 +82,7 @@ class PLRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PLRule, PLBoxInf
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: PLRule, formula: F, refs: List[Ref]): List[Viol] = rule match {
+  override def check(rule: PropLogicRule, formula: F, refs: List[Ref]): List[Viol] = rule match {
     case Premise() | Assumption() => Nil
 
     case AndElim(side) => extractNFormulasAndThen(refs, 1) {

@@ -13,8 +13,8 @@ import logicbox.framework.RuleChecker
 import logicbox.framework.IncompleteFormula
 
 class IntegrateVerifyPLProofTest extends AnyFunSpec {
-  private type F = IncompleteFormula[PLFormula]
-  private type R = Option[PLRule]
+  private type F = IncompleteFormula[PropLogicFormula]
+  private type R = Option[PropLogicRule]
   private type B = PLBoxInfo
   private type Id = String
   
@@ -38,10 +38,10 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
       // 6: p and p       ∧i 3 3    // scope violation
       // 7: p implies r   ->i box   // wrong conclusion
       
-      def line(id: Id, pos: ModifiableProof.Pos[Id], f: String, rule: Option[PLRule], refs: Seq[Id]): Unit = {
+      def line(id: Id, pos: ModifiableProof.Pos[Id], f: String, rule: Option[PropLogicRule], refs: Seq[Id]): Unit = {
         proof = proof.addLine(id, pos).getOrElse(???)
         val optF = try {
-          Some(PLParser()(PLLexer()(f)))
+          Some(PropLogicParser()(PropLogicLexer()(f)))
         } catch {
           case _ => None
         }
@@ -50,17 +50,17 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
         proof = proof.updateReferences(id, refs).getOrElse(???)
       }
 
-      line("1", ProofTop, "p -> q", Some(PLRule.Premise()), Seq())
+      line("1", ProofTop, "p -> q", Some(PropLogicRule.Premise()), Seq())
       line("2", AtLine("1", Direction.Below), "q -> s", None, Seq())
 
       proof = proof.addBox("box", AtLine("2", Direction.Below)).getOrElse(???)
-      line("3", BoxTop("box"), "p", Some(PLRule.Assumption()), Seq())
-      line("4", AtLine("3", Direction.Below), "q", Some(PLRule.ImplicationElim()), Seq("1", "3"))
-      line("5", AtLine("4", Direction.Below), "s", Some(PLRule.ImplicationElim()), Seq("4", "2"))
-      line("6", AtLine("box", Direction.Below), "p and p", Some(PLRule.AndIntro()), Seq("3", "3"))
-      line("7", AtLine("6", Direction.Below), "p implies  r", Some(PLRule.ImplicationIntro()), Seq("box"))
+      line("3", BoxTop("box"), "p", Some(PropLogicRule.Assumption()), Seq())
+      line("4", AtLine("3", Direction.Below), "q", Some(PropLogicRule.ImplicationElim()), Seq("1", "3"))
+      line("5", AtLine("4", Direction.Below), "s", Some(PropLogicRule.ImplicationElim()), Seq("4", "2"))
+      line("6", AtLine("box", Direction.Below), "p and p", Some(PropLogicRule.AndIntro()), Seq("3", "3"))
+      line("7", AtLine("6", Direction.Below), "p implies  r", Some(PropLogicRule.ImplicationIntro()), Seq("box"))
 
-      val optProofView: Proof[Option[PLFormula], Option[PLRule], Option[PLBoxInfo], Id] = ProofView(proof,
+      val optProofView: Proof[Option[PropLogicFormula], Option[PropLogicRule], Option[PLBoxInfo], Id] = ProofView(proof,
         { case (_, Proof.Line(IncompleteFormula(_, optF), optR, refs)) => 
             ProofLineImpl(optF, optR, refs)
           case (_, Proof.Box(info, steps)) => 
@@ -69,9 +69,9 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
       )
 
       val scopedChecker = ScopedProofChecker[Id]()
-      val optionRuleChecker: RuleChecker[Option[PLFormula], Option[PLRule], Option[PLBoxInfo], OptionRuleChecker.Violation[PLViolation]] = 
-        OptionRuleChecker(PLRuleChecker())
-      val ruleBasedProofChecker: ProofChecker[Option[PLFormula], Option[PLRule], Option[PLBoxInfo], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PLViolation]]] = 
+      val optionRuleChecker: RuleChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[PLBoxInfo], OptionRuleChecker.Violation[PropLogicViolation]] = 
+        OptionRuleChecker(PropLogicRuleChecker())
+      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[PLBoxInfo], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]]] = 
         RuleBasedProofChecker(optionRuleChecker)
 
       val scopedResult = scopedChecker.check(proof)

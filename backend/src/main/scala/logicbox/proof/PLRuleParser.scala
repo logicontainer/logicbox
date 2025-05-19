@@ -1,10 +1,10 @@
 package logicbox.proof
 
 object PLRuleParser {
-  import logicbox.proof.PLRule
-  import logicbox.proof.PLRule._
+  import logicbox.proof.PropLogicRule
+  import logicbox.proof.PropLogicRule._
 
-  def parse(rule: String): Option[PLRule] = rule match {
+  def parse(rule: String): Option[PropLogicRule] = rule match {
     case "assumption" => Some(Assumption())
     case "premise" => Some(Premise())
     case "and_elim_1" => Some(AndElim(Side.Left))

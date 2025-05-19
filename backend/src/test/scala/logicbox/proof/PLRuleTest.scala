@@ -7,34 +7,34 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 class PLRuleTest extends AnyFunSpec {
-  import PLRule._
-  import PLViolation._
+  import PropLogicRule._
+  import PropLogicViolation._
   import logicbox.formula._
 
-  private val lexer = PLLexer()
-  private val parser = PLParser()
-  private def parse(str: String): PLFormula = parser(lexer(str))
+  private val lexer = PropLogicLexer()
+  private val parser = PropLogicParser()
+  private def parse(str: String): PropLogicFormula = parser(lexer(str))
 
   // fake things so tests still work (a little hacky, i admit)
-  private case class Line(formula: PLFormula, rule: PLRule, refs: List[Reference[PLFormula, PLBoxInfo]])
-    extends Reference.Line[PLFormula]
-  private case class Box(fst: PLFormula, lst: PLFormula) extends Reference.Box[PLFormula, PLBoxInfo] {
+  private case class Line(formula: PropLogicFormula, rule: PropLogicRule, refs: List[Reference[PropLogicFormula, PLBoxInfo]])
+    extends Reference.Line[PropLogicFormula]
+  private case class Box(fst: PropLogicFormula, lst: PropLogicFormula) extends Reference.Box[PropLogicFormula, PLBoxInfo] {
     override def info = ()
     override def assumption = fst
     override def conclusion = lst
   }
 
-  private def stub(str: String): Reference[PLFormula, PLBoxInfo] = new Reference.Line[PLFormula] {
+  private def stub(str: String): Reference[PropLogicFormula, PLBoxInfo] = new Reference.Line[PropLogicFormula] {
     def formula = parse(str)
   }
 
-  private def boxStub(ass: String, concl: String): Reference.Box[PLFormula, PLBoxInfo] =
+  private def boxStub(ass: String, concl: String): Reference.Box[PropLogicFormula, PLBoxInfo] =
     Box(parse(ass), parse(concl))
 
-  private def line(fml: String, rl: PLRule, refs: List[Reference[PLFormula, PLBoxInfo]]): Line =
+  private def line(fml: String, rl: PropLogicRule, refs: List[Reference[PropLogicFormula, PLBoxInfo]]): Line =
     Line(parse(fml), rl, refs)
 
-  private val checker = PLRuleChecker[PLFormula]()
+  private val checker = PropLogicRuleChecker[PropLogicFormula]()
 
   describe("AndElim") {
     val leftRule = AndElim(Side.Left)

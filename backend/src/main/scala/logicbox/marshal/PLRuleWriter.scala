@@ -1,16 +1,16 @@
 package logicbox.marshal
 
 import spray.json._
-import logicbox.proof.PLRule
-import logicbox.proof.PLRule._
+import logicbox.proof.PropLogicRule
+import logicbox.proof.PropLogicRule._
 
-class PLRuleWriter extends JsonWriter[PLRule] {
-  private def toStr(rule: PLRule): String = rule match {
+class PLRuleWriter extends JsonWriter[PropLogicRule] {
+  private def toStr(rule: PropLogicRule): String = rule match {
     case Assumption() => "assumption"
     case Premise() => "premise"
-    case AndElim(side) => s"and_elim_${if (side == PLRule.Side.Left) then 1 else 2}"
+    case AndElim(side) => s"and_elim_${if (side == PropLogicRule.Side.Left) then 1 else 2}"
     case AndIntro() => "and_intro"
-    case OrIntro(side) => s"or_intro_${if (side == PLRule.Side.Left) then 1 else 2}"
+    case OrIntro(side) => s"or_intro_${if (side == PropLogicRule.Side.Left) then 1 else 2}"
     case OrElim() => "or_elim"
     case ImplicationIntro() => "implies_intro"
     case ImplicationElim() => "implies_elim"
@@ -25,5 +25,5 @@ class PLRuleWriter extends JsonWriter[PLRule] {
     case Copy() => "copy"
   }
 
-  override def write(rule: PLRule): JsValue = JsString(toStr(rule))
+  override def write(rule: PropLogicRule): JsValue = JsString(toStr(rule))
 }

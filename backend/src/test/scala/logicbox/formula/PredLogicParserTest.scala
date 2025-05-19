@@ -82,11 +82,30 @@ class PredLogicParserTest extends AnyFunSpec {
       val ts2 = List(
         PredLogicToken.ForAll(), Ident('x'), Ident('P'), LeftParen(), Ident('x'), RightParen(),
       )
+      val ts3 = List(
+        PredLogicToken.ForAll(), Ident('x'), PredLogicToken.Exists(), Ident('y'), PredLogicToken.ForAll(), Ident('z'), 
+          Ident('P'), LeftParen(),
+            Ident('x'), Comma(), Ident('y'), Comma(), Ident('z'),
+          RightParen()
+      )
 
       PredLogicParser()(ts1) shouldBe 
         PredLogicFormula.Exists(Var('x'), Predicate('P', List(Var('x'))))
       PredLogicParser()(ts2) shouldBe 
         PredLogicFormula.ForAll(Var('x'), Predicate('P', List(Var('x'))))
+
+      PredLogicParser()(ts3) shouldBe
+        PredLogicFormula.ForAll(Var('x'), 
+          PredLogicFormula.Exists(Var('y'), 
+            PredLogicFormula.ForAll(Var('z'),
+              Predicate('P', List(
+                Var('x'),
+                Var('y'),
+                Var('z')
+              ))
+            )
+          )
+        )
     }
     
     it("should parse equality of terms") {

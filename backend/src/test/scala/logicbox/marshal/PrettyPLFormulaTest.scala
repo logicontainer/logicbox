@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 class PrettyPLFormulaTest extends AnyFunSpec {
-  import logicbox.formula.PLFormula._
+  import logicbox.formula.PropLogicFormula._
   describe("PrettyPLFormula::asLaTeX") {
     import PrettyPLFormula.asLaTeX
     it("should do bot/top/atoms") {
