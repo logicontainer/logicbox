@@ -9,7 +9,6 @@ sealed trait PropLogicRule
 
 object PropLogicRule {
   import PropLogicFormula.*
-  import PropLogicViolation._
 
   enum Side { case Left; case Right }
   case class Premise() extends PropLogicRule

@@ -1,6 +1,8 @@
 package logicbox
 
 import logicbox.framework._
+import logicbox.framework.Violation.MissingFormula
+import logicbox.framework.Violation.MiscellaneousViolation
 
 object ProofStubs {
   case class StubFormula(i: Int = 0)
@@ -10,12 +12,10 @@ object ProofStubs {
   case class Bad() extends StubRule
 
   case class StubBoxInfo(info: String = "")
-  case class StubViolation()
 
   type F = StubFormula
   type R = StubRule
   type B = StubBoxInfo
-  type V = StubViolation
   type Id = String
 
   case class StubLine(
@@ -40,14 +40,14 @@ object ProofStubs {
       }
   }
 
-  case class StubRuleChecker() extends RuleChecker[F, R, B, V] {
+  case class StubRuleChecker() extends RuleChecker[F, R, B] {
     var refsCalledWith: Option[List[Reference[StubFormula, StubBoxInfo]]] = None
 
-    override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[StubViolation] = 
+    override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[Violation] = 
       refsCalledWith = Some(refs)
       rule match {
         case Good() => Nil
-        case Bad() => List(StubViolation())
+        case Bad() => List(MiscellaneousViolation("test"))
       }
   }
 }

@@ -8,6 +8,7 @@ import org.scalatest.Inspectors
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
+import logicbox.framework.Violation._
 
 class OptionRuleCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._
@@ -45,7 +46,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         
       val badResult = checker.check(badRule, formula, refs)
       badResult.length shouldBe 1
-      badResult shouldBe List(RuleViolation(StubViolation()))
+      badResult shouldBe List(MiscellaneousViolation("test"))
     }
 
     it("should report missing formula") {

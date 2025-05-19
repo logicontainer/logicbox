@@ -16,7 +16,6 @@ import logicbox.proof.ScopedProofChecker
 import logicbox.framework.RuleChecker
 import logicbox.rule.OptionRuleChecker
 import logicbox.rule.PropLogicRuleChecker
-import logicbox.rule.PropLogicViolation
 import logicbox.proof.RuleBasedProofChecker
 import logicbox.proof.ProofView
 import logicbox.proof.ProofLineImpl
@@ -40,9 +39,10 @@ import spray.json.DefaultJsonProtocol._
 import logicbox.proof.RuleBasedProofChecker._
 import logicbox.rule.PropLogicRuleParser
 import logicbox.rule.OptionRuleChecker._
-import logicbox.rule.PropLogicViolation._
 
 import logicbox.proof.ScopedProofChecker._
+import logicbox.framework.Violation
+import logicbox.framework.Violation._
 
 
 // 'factory'
@@ -52,7 +52,7 @@ object StandardProofValidatorService {
   private type B = Unit
   private type Id = String
   private type Err = ProofJsonReader.Err
-  private type Diag = RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] | ScopedProofChecker.Diagnostic[Id]
+  private type Diag = RuleBasedProofChecker.Diagnostic[Id] | ScopedProofChecker.Diagnostic[Id]
 
   private def formulaParser(userInput: String): IncompleteFormula[F] = IncompleteFormula(
     userInput, optFormula = try {
@@ -69,9 +69,9 @@ object StandardProofValidatorService {
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id, Diag] = {
     val scopedChecker = ScopedProofChecker[Id]()
-    val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B], OptionRuleChecker.Violation[PropLogicViolation]] = 
+    val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B]] = 
       OptionRuleChecker(PropLogicRuleChecker[PropLogicFormula]())
-    val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]]] = 
+    val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id, RuleBasedProofChecker.Diagnostic[Id]] = 
       RuleBasedProofChecker(optionRuleChecker)
 
     new ProofChecker[IncompleteFormula[F], Option[R], B, Id, Diag] {
@@ -112,23 +112,19 @@ object StandardProofValidatorService {
   )
 
   private def getViolationType(diag: Diag): String = diag match {
-    case diag: RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] => diag match {
-      case RuleBasedProofChecker.RuleViolation(stepId, violation: OptionRuleChecker.Violation[PropLogicViolation] @unchecked) => violation match {
+    case diag: RuleBasedProofChecker.Diagnostic[Id] => diag match {
+      case RuleBasedProofChecker.RuleViolation(stepId, violation: Violation) => violation match {
         case MissingFormula => "missingFormula"
         case MissingRule => "missingRule"
         case MissingDetailInReference(_, _) => "missingDetailInReference"
-        case logicbox.rule.OptionRuleChecker.RuleViolation(violation) => 
-          val shortName = violation match {
-            case WrongNumberOfReferences(_, _, _) => "wrongNumberOfReferences"
-            case ReferenceShouldBeBox(_, _) => "referenceShouldBeBox"
-            case ReferenceShouldBeLine(_, _) => "referenceShouldBeLine"
-            case ReferenceDoesntMatchRule(_, _) => "referenceDoesntMatchRule"
-            case ReferencesMismatch(_, _) => "referencesMismatch"
-            case FormulaDoesntMatchReference(_, _) => "formulaDoesntMatchReference"
-            case FormulaDoesntMatchRule(_) => "formulaDoesntMatchRule"
-            case MiscellaneousViolation(_) => "miscellaneousViolation"
-          }
-          s"propositionalLogic:$shortName"
+        case WrongNumberOfReferences(_, _, _) => "propositionalLogic:wrongNumberOfReferences"
+        case ReferenceShouldBeBox(_, _) => "propositionalLogic:referenceShouldBeBox"
+        case ReferenceShouldBeLine(_, _) => "propositionalLogic:referenceShouldBeLine"
+        case ReferenceDoesntMatchRule(_, _) => "propositionalLogic:referenceDoesntMatchRule"
+        case ReferencesMismatch(_, _) => "propositionalLogic:referencesMismatch"
+        case FormulaDoesntMatchReference(_, _) => "propositionalLogic:formulaDoesntMatchReference"
+        case FormulaDoesntMatchRule(_) => "propositionalLogic:formulaDoesntMatchRule"
+        case MiscellaneousViolation(_) => "propositionalLogic:miscellaneousViolation"
       }
       case StepNotFound(_, _) => "stepNotFound"
       case ReferenceIdNotFound(_, _, _, _) => "referenceIdNotFound"
@@ -142,20 +138,18 @@ object StandardProofValidatorService {
   }
 
   private def getViolation(diag: Diag): JsValue = diag match {
-    case diag: RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]] => diag match {
-      case RuleBasedProofChecker.RuleViolation(stepId, violation: OptionRuleChecker.Violation[PropLogicViolation] @unchecked) => violation match {
+    case diag: RuleBasedProofChecker.Diagnostic[Id] => diag match {
+      case RuleBasedProofChecker.RuleViolation(stepId, violation) => violation match {
         case MissingFormula | MissingRule => JsObject()
         case v: MissingDetailInReference => jsonFormat2(MissingDetailInReference.apply).write(v)
-        case logicbox.rule.OptionRuleChecker.RuleViolation(violation) => violation match {
-          case v: WrongNumberOfReferences => jsonFormat3(WrongNumberOfReferences.apply).write(v)
-          case v: ReferenceShouldBeBox => jsonFormat2(ReferenceShouldBeBox.apply).write(v)
-          case v: ReferenceShouldBeLine => jsonFormat2(ReferenceShouldBeLine.apply).write(v)
-          case v: ReferenceDoesntMatchRule => jsonFormat2(ReferenceDoesntMatchRule.apply).write(v)
-          case v: ReferencesMismatch => jsonFormat2(ReferencesMismatch.apply).write(v)
-          case v: FormulaDoesntMatchReference => jsonFormat2(FormulaDoesntMatchReference.apply).write(v)
-          case v: FormulaDoesntMatchRule => jsonFormat1(FormulaDoesntMatchRule.apply).write(v)
-          case v: MiscellaneousViolation => jsonFormat1(MiscellaneousViolation.apply).write(v)
-        }
+        case v: WrongNumberOfReferences => jsonFormat3(WrongNumberOfReferences.apply).write(v)
+        case v: ReferenceShouldBeBox => jsonFormat2(ReferenceShouldBeBox.apply).write(v)
+        case v: ReferenceShouldBeLine => jsonFormat2(ReferenceShouldBeLine.apply).write(v)
+        case v: ReferenceDoesntMatchRule => jsonFormat2(ReferenceDoesntMatchRule.apply).write(v)
+        case v: ReferencesMismatch => jsonFormat2(ReferencesMismatch.apply).write(v)
+        case v: FormulaDoesntMatchReference => jsonFormat2(FormulaDoesntMatchReference.apply).write(v)
+        case v: FormulaDoesntMatchRule => jsonFormat1(FormulaDoesntMatchRule.apply).write(v)
+        case v: MiscellaneousViolation => jsonFormat1(MiscellaneousViolation.apply).write(v)
       }
       case d: StepNotFound[Id] => jsonFormat2(StepNotFound[Id].apply).write(d)
       case d: ReferenceIdNotFound[Id] => jsonFormat4(ReferenceIdNotFound[Id].apply).write(d)

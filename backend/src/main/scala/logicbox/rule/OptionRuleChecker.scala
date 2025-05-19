@@ -5,22 +5,16 @@ import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
 
-object OptionRuleChecker {
-  sealed trait Violation[+V]
-  case object MissingFormula extends Violation[Nothing]
-  case object MissingRule extends Violation[Nothing]
-  case class MissingDetailInReference(refIdx: Int, expl: String) extends Violation[Nothing]
-  case class RuleViolation[+V](violation: V) extends Violation[V]
-}
+import logicbox.framework.Violation
+import logicbox.framework.Violation._
 
 case class OptionRuleChecker[F, R, B, V](
-  ruleChecker: RuleChecker[F, R, B, V]
-) extends RuleChecker[Option[F], Option[R], Option[B], OptionRuleChecker.Violation[V]] {
-  import OptionRuleChecker._
+  ruleChecker: RuleChecker[F, R, B]
+) extends RuleChecker[Option[F], Option[R], Option[B]] {
 
   private def computeConcreteReferences(
     optRefs: List[Reference[Option[F], Option[B]]]
-  ): Either[List[Violation[V]], List[Reference[F, B]]] = {
+  ): Either[List[Violation], List[Reference[F, B]]] = {
     val init: (List[Reference[F, B]], List[MissingDetailInReference]) = (Nil, Nil)
     val (refs, missingIdxs) = optRefs.zipWithIndex.foldRight(init) {
       case ((optRef, refIdx), (refs, missingIdxs)) => (optRef: @unchecked) match {
@@ -60,7 +54,7 @@ case class OptionRuleChecker[F, R, B, V](
   
   private def computeArgumentViolations(
     rule: Option[R], formula: Option[F]
-  ): List[Violation[V]] = {
+  ): List[Violation] = {
     { 
       if (formula.isEmpty) List(
         MissingFormula
@@ -75,14 +69,14 @@ case class OptionRuleChecker[F, R, B, V](
   override def check(
     rule: Option[R], formula: Option[F], 
     optRefs: List[Reference[Option[F], Option[B]]]
-  ): List[Violation[V]] = {
+  ): List[Violation] = {
     val refsOrMissingRefs = computeConcreteReferences(optRefs)
     val argViolations = computeArgumentViolations(rule, formula)
 
     argViolations ++ { (rule, formula, refsOrMissingRefs) match {
       case (Some(rule), Some(formula), Right(refs)) => 
         // delegate
-        ruleChecker.check(rule, formula, refs).map { RuleViolation(_) }
+        ruleChecker.check(rule, formula, refs)
       
       case (_, _, Left(missingRefs)) => missingRefs
       case _ => Nil

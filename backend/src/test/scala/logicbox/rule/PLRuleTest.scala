@@ -1,6 +1,7 @@
 package logicbox.rule
 
-import logicbox.framework.{Reference}
+import logicbox.framework.{Reference, Violation}
+import logicbox.framework.Violation._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
@@ -8,7 +9,6 @@ import org.scalatest.Inspectors
 
 class PLRuleTest extends AnyFunSpec {
   import logicbox.rule.PropLogicRule._
-  import logicbox.rule.PropLogicViolation._
   import logicbox.formula._
 
   private val lexer = PropLogicLexer()

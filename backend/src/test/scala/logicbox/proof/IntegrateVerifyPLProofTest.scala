@@ -13,7 +13,6 @@ import logicbox.framework.RuleChecker
 import logicbox.framework.IncompleteFormula
 import logicbox.rule.PropLogicRule
 import logicbox.rule.OptionRuleChecker
-import logicbox.rule.PropLogicViolation
 import logicbox.rule.PropLogicRuleChecker
 
 class IntegrateVerifyPLProofTest extends AnyFunSpec {
@@ -73,9 +72,9 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
       )
 
       val scopedChecker = ScopedProofChecker[Id]()
-      val optionRuleChecker: RuleChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], OptionRuleChecker.Violation[PropLogicViolation]] = 
+      val optionRuleChecker: RuleChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit]] = 
         OptionRuleChecker(PropLogicRuleChecker())
-      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]]] = 
+      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], Id, RuleBasedProofChecker.Diagnostic[Id]] = 
         RuleBasedProofChecker(optionRuleChecker)
 
       val scopedResult = scopedChecker.check(proof)
