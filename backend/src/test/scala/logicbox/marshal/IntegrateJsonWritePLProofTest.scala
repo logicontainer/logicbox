@@ -27,7 +27,7 @@ class IntegrateJsonWritePLProofTest extends AnyFunSpec {
   val idWriter = JsonWriter.func2Writer { (id: Id) => JsString(id) }
 
   val ruleWriter: JsonWriter[R] = {
-    val inner = PLRuleWriter()
+    val inner = PropLogicRuleWriter()
     JsonWriter.func2Writer {
       case Some(value) => inner.write(value)
       case None => JsNull

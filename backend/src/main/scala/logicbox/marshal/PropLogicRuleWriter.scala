@@ -4,7 +4,7 @@ import spray.json._
 import logicbox.proof.PropLogicRule
 import logicbox.proof.PropLogicRule._
 
-class PLRuleWriter extends JsonWriter[PropLogicRule] {
+class PropLogicRuleWriter extends JsonWriter[PropLogicRule] {
   private def toStr(rule: PropLogicRule): String = rule match {
     case Assumption() => "assumption"
     case Premise() => "premise"
