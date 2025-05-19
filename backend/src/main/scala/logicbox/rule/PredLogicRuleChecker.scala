@@ -4,13 +4,14 @@ import logicbox.framework.RuleChecker
 import logicbox.formula.PredLogicFormula
 import logicbox.framework.Reference
 import logicbox.framework.Violation
-import logicbox.rule.PredLogicRule.ForAllElim
 import logicbox.formula.QuantifierFormula
 
 import logicbox.rule.ReferenceUtil._
 import QuantifierFormula._
-import logicbox.rule.PredLogicRule.ForAllIntro
+import logicbox.rule.PredLogicRule._
 import logicbox.framework.Violation._
+import logicbox.framework.Reference.Line
+import logicbox.framework.Reference.Box
 
 class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   substitutor: Substitutor[F, T, V]
@@ -51,6 +52,20 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
         }
 
       }
+    }
+    case ExistsElim() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
+      case List(Line(Exists(x, phi)), Box(info, ass, concl)) => info.freshVar match {
+        case Some(x0) =>
+          failIf(
+            ass != substitutor.substitute(phi, x0, x),
+            ReferencesMismatch(List(0, 1), "assumption of box should match formula within exists-quantifier")
+          ) ++ 
+          failIf(formula != concl, FormulaDoesntMatchReference(1, "conclusion of box should match formula"))
+
+        case None => 
+          fail(ReferenceDoesntMatchRule(1, "box does not contain fresh variable"))
+      }
+      case _ => ???
     }
   }
 }
