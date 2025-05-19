@@ -11,11 +11,15 @@ import logicbox.framework.ProofChecker
 import logicbox.framework.Proof
 import logicbox.framework.RuleChecker
 import logicbox.framework.IncompleteFormula
+import logicbox.rule.PropLogicRule
+import logicbox.rule.OptionRuleChecker
+import logicbox.rule.PropLogicViolation
+import logicbox.rule.PropLogicRuleChecker
 
 class IntegrateVerifyPLProofTest extends AnyFunSpec {
   private type F = IncompleteFormula[PropLogicFormula]
   private type R = Option[PropLogicRule]
-  private type B = PLBoxInfo
+  private type B = Unit
   private type Id = String
   
   val stepStrategy: ProofStepStrategy[F, R, B, Id] = StandardStepStrategy(
@@ -60,7 +64,7 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
       line("6", AtLine("box", Direction.Below), "p and p", Some(PropLogicRule.AndIntro()), Seq("3", "3"))
       line("7", AtLine("6", Direction.Below), "p implies  r", Some(PropLogicRule.ImplicationIntro()), Seq("box"))
 
-      val optProofView: Proof[Option[PropLogicFormula], Option[PropLogicRule], Option[PLBoxInfo], Id] = ProofView(proof,
+      val optProofView: Proof[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], Id] = ProofView(proof,
         { case (_, Proof.Line(IncompleteFormula(_, optF), optR, refs)) => 
             ProofLineImpl(optF, optR, refs)
           case (_, Proof.Box(info, steps)) => 
@@ -69,9 +73,9 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
       )
 
       val scopedChecker = ScopedProofChecker[Id]()
-      val optionRuleChecker: RuleChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[PLBoxInfo], OptionRuleChecker.Violation[PropLogicViolation]] = 
+      val optionRuleChecker: RuleChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], OptionRuleChecker.Violation[PropLogicViolation]] = 
         OptionRuleChecker(PropLogicRuleChecker())
-      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[PLBoxInfo], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]]] = 
+      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], Id, RuleBasedProofChecker.Diagnostic[Id, OptionRuleChecker.Violation[PropLogicViolation]]] = 
         RuleBasedProofChecker(optionRuleChecker)
 
       val scopedResult = scopedChecker.check(proof)

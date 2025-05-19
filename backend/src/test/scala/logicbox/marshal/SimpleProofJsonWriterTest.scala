@@ -14,7 +14,7 @@ import spray.json._
 import logicbox.framework.Justification
 
 class SimpleProofJsonWriterTest extends AnyFunSpec {
-  import logicbox.proof.ProofStubs._
+  import logicbox.ProofStubs._
 
   private type W = JsonWriter[Proof[StubFormula, StubRule, ?, Id]]
   describe("SimpleProofJsonWriter::write") {

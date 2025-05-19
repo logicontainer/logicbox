@@ -1,16 +1,16 @@
-package logicbox.proof
+package logicbox.rule
 
 import logicbox.framework.RuleChecker
 import logicbox.framework.Reference
 
-import logicbox.proof.PropLogicRule
-import logicbox.proof.PropLogicRule._
+import logicbox.rule.PropLogicRule
+import logicbox.rule.PropLogicRule._
 
 import logicbox.formula.FormulaBase
 import logicbox.formula.FormulaBase._
 
-class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogicRule, PLBoxInfo, PropLogicViolation] {
-  private type Ref = Reference[F, PLBoxInfo]
+class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogicRule, Unit, PropLogicViolation] {
+  private type Ref = Reference[F, Unit]
   private type Viol = PropLogicViolation
 
   import PropLogicViolation._
@@ -35,7 +35,7 @@ class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogic
       val result = zp.map {
         // matches
         case (_, BoxOrFormula.Formula, f: Line[F] @unchecked) => Right(f)
-        case (_, BoxOrFormula.Box, b: Box[F, PLBoxInfo]) => Right(b)
+        case (_, BoxOrFormula.Box, b: Box[F, Unit]) => Right(b)
 
         // violations
         case (idx, BoxOrFormula.Box, _) => Left(ReferenceShouldBeBox(idx))
@@ -167,7 +167,7 @@ class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogic
     }
 
     case NotIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(Box[F, PLBoxInfo](_, asmp, concl)) => 
+      case List(Box[F, Unit](_, asmp, concl)) => 
         { concl match {
           case Contradiction() => Nil
           case _ => fail(ReferenceDoesntMatchRule(0, "last line of box must be contradiction"))

@@ -11,12 +11,13 @@ import logicbox.formula._
 import spray.json._
 import logicbox.framework.ModifiableProof.ProofTop
 import logicbox.formula.PropLogicFormula.Contradiction
+import logicbox.rule.PropLogicRule
 
 
 class IntegrateJsonWritePLProofTest extends AnyFunSpec {
   private type F = IncompleteFormula[PropLogicFormula]
   private type R = Option[PropLogicRule]
-  private type B = PLBoxInfo
+  private type B = Unit
   private type Id = String
 
   val stepStrategy: ProofStepStrategy[F, R, B, Id] = StandardStepStrategy(

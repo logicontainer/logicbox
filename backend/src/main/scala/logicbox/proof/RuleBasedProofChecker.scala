@@ -2,6 +2,7 @@ package logicbox.proof
 
 import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference}
 import logicbox.framework.StepDiagnostic
+import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
 
 object RuleBasedProofChecker {
   sealed trait Diagnostic[+Id, +V] extends StepDiagnostic[Id]
