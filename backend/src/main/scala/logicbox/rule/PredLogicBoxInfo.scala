@@ -1,3 +1,3 @@
 package logicbox.rule
 
-case class PredLogicBoxInfo()
+case class PredLogicBoxInfo(freshVar: Option[Char])

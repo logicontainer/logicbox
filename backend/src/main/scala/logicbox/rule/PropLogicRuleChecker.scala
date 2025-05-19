@@ -88,8 +88,8 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(box: Reference.Box[F, _]) => formula match {
         case Implies(phi, psi) =>
-          failIf(phi != box.assumption, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
-          failIf(psi != box.conclusion, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
+          failIf(phi != box.first, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
+          failIf(psi != box.last, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
 
         case _ => 
           fail(FormulaDoesntMatchRule("must be an implication (->)"))

@@ -27,7 +27,7 @@ object QuantifierFormula {
 
   object ForAll {
     def unapply[F, T, V <: T](f: QuantifierFormula[F, T, V]): Option[(V, F)] = f match {
-      case f: Exists[F, T, V] => Some(f.x, f.phi)
+      case f: ForAll[F, T, V] => Some(f.x, f.phi)
       case _ => None
     }
   }

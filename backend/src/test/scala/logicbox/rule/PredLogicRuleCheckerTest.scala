@@ -9,8 +9,11 @@ import org.scalatest.Inspectors
 
 import logicbox.formula.{PredLogicLexer, PredLogicParser, PredLogicFormula}
 import logicbox.rule.PredLogicRuleChecker
+
+import logicbox.formula.PredLogicFormula._
 import logicbox.formula.PredLogicTerm
-import logicbox.rule.PredLogicRule.ForAllElim
+import logicbox.formula.PredLogicTerm._
+import logicbox.rule.PredLogicRule._
 
 class PredLogicRuleCheckerTest extends AnyFunSpec {
   private val lexer = PredLogicLexer()
@@ -21,18 +24,18 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
   private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, PredLogicBoxInfo]])
     extends Reference.Line[PredLogicFormula]
 
-  private case class Box(fst: PredLogicFormula, lst: PredLogicFormula) extends Reference.Box[PredLogicFormula, PredLogicBoxInfo] {
-    override def info = PredLogicBoxInfo()
-    override def assumption = fst
-    override def conclusion = lst
+  private case class Box(fst: PredLogicFormula, lst: PredLogicFormula, freshVar: Option[Char]) extends Reference.Box[PredLogicFormula, PredLogicBoxInfo] {
+    override def info = PredLogicBoxInfo(freshVar)
+    override def first = fst
+    override def last = lst
   }
 
   private def refLine(str: String): Reference[PredLogicFormula, PredLogicBoxInfo] = new Reference.Line[PredLogicFormula] {
     def formula = parse(str)
   }
 
-  private def refBox(ass: String, concl: String): Reference.Box[PredLogicFormula, PredLogicBoxInfo] =
-    Box(parse(ass), parse(concl))
+  private def refBox(ass: String, concl: String, fresh: Char = '\u0000'): Reference.Box[PredLogicFormula, PredLogicBoxInfo] =
+    Box(parse(ass), parse(concl), if fresh === '\u0000' then None else Some(fresh))
 
   private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var]()
 
@@ -48,6 +51,42 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(x)")
       checker.check(ForAllElim(), f, List(refLine("P(x)"))) should matchPattern {
         case List(ReferenceDoesntMatchRule(0, _)) =>
+      }
+    }
+
+    it("should reject if inner formula is not the same with replacement") {
+      val f = parse("Q(a)")
+      println(parse("forall x P(x)"))
+      checker.check(ForAllElim(), f, List(refLine("forall x P(x)"))) should matchPattern {
+        case List(FormulaDoesntMatchReference(0, _)) =>
+      }
+    }
+
+    it("should allow correct usage") {
+      val f = parse("P(f(f(a)))")
+      checker.check(ForAllElim(), f, List(refLine("forall x P(f(x))"))) shouldBe Nil
+    }
+  }
+
+  describe("ForAllIntro") {
+    it("should reject when ref is not a box") {
+      val f = parse("forall x P(x)")
+      checker.check(ForAllIntro(), f, List(refLine("P(x)"))) should matchPattern {
+        case List(ReferenceShouldBeBox(0, _)) =>
+      }
+    }
+
+    it("should reject when box info has no variable") {
+      val f = parse("forall x P(x)")
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)"))) should matchPattern {
+        case List(ReferenceDoesntMatchRule(0, _)) =>
+      }
+    }
+
+    it("should reject when formula is not forall") {
+      val f = parse("P(x)")
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", 'a'))) should matchPattern {
+        case List(FormulaDoesntMatchRule(_)) =>
       }
     }
   }

@@ -83,8 +83,8 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(formula = StubFormula(38)),
         ReferenceBoxImpl(
           info = StubBoxInfo("some info"), 
-          assumption = StubFormula(11), 
-          conclusion = StubFormula(12)
+          first = StubFormula(11), 
+          last = StubFormula(12)
         )
       ))
     }

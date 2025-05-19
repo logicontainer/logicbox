@@ -15,5 +15,4 @@ object Violation {
   case class FormulaDoesntMatchReference(refs: Int, expl: String = "") extends Violation
   case class FormulaDoesntMatchRule(expl: String = "") extends Violation
   case class MiscellaneousViolation(expl: String = "") extends Violation
-
 }

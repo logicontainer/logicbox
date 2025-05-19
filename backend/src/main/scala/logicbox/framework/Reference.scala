@@ -9,8 +9,8 @@ object Reference {
 
   trait Box[+Formula, +BoxInfo] extends Reference[Formula, BoxInfo] {
     def info: BoxInfo
-    def assumption: Formula
-    def conclusion: Formula
+    def first: Formula
+    def last: Formula
   }
 
   object Line {
@@ -22,7 +22,7 @@ object Reference {
 
   object Box {
     def unapply[F, I](ref: Reference[F, I]): Option[(I, F, F)] = ref match {
-      case b: Box[F, I] => Some(b.info, b.assumption, b.conclusion)
+      case b: Box[F, I] => Some(b.info, b.first, b.last)
       case _ => None
     }
   }
