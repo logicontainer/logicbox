@@ -60,7 +60,14 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
             ass != substitutor.substitute(phi, x0, x),
             ReferencesMismatch(List(0, 1), "assumption of box should match formula within exists-quantifier")
           ) ++ 
-          failIf(formula != concl, FormulaDoesntMatchReference(1, "conclusion of box should match formula"))
+          failIf(
+            formula != concl, 
+            FormulaDoesntMatchReference(1, "conclusion of box should match formula")
+          ) ++
+          failIf(
+            substitutor.hasFreeOccurance(formula, x0),
+            FormulaDoesntMatchRule(s"the formula contains a free ocurrance of $x0")
+          )
 
         case None => 
           fail(ReferenceDoesntMatchRule(1, "box does not contain fresh variable"))

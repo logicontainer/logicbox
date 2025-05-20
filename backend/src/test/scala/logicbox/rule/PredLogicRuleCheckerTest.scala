@@ -108,12 +108,6 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
   }
 
   describe("ExistsElim") {
-    // tests:
-    //  - X first line must be phi but substituted as specified
-    //  - X last line must be equal to conclusion
-    //  - last line must not have free occurance of x0
-    //  - first line must be assumption
-
     it("should reject when first line doesn't match ref 1") {
       val f = parse("false")
       val refs = List(
@@ -144,6 +138,17 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
         case List(ReferenceDoesntMatchRule(1, _)) => 
+      }
+    }
+
+    it("should not allow when fresh variable is used in conclusion") {
+      val f = parse("P(a) and P(a)")
+      val refs = List(
+        refLine("exists x P(x)"),
+        refBox("P(a)", "P(a) and P(a)", 'a')
+      )
+      checker.check(ExistsElim(), f, refs) should matchPattern {
+        case List(_) =>
       }
     }
   }

@@ -86,5 +86,78 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
 
       substitutor.substitute(f, Var('y'), Var('x')) shouldBe exp
     }
+
+    it("should find occurance within predicate") {
+      val f = parse("P(a)")
+      substitutor.hasFreeOccurance(f, Var('a')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('b')) shouldBe false
+    }
+
+    it("should find occurance within function") {
+      val f = parse("P(f(a))")
+      substitutor.hasFreeOccurance(f, Var('a')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('b')) shouldBe false
+
+      val g = parse("P(f(f(b)))")
+      substitutor.hasFreeOccurance(g, Var('b')) shouldBe true
+      substitutor.hasFreeOccurance(g, Var('a')) shouldBe false
+    }
+
+    it("should find occurances of functions") {
+      val f = parse("P(f(f(a)))")
+      substitutor.hasFreeOccurance(f, FunAppl('f', Var('a') :: Nil)) shouldBe true
+      substitutor.hasFreeOccurance(f, FunAppl('f', FunAppl('f', Var('a') :: Nil) :: Nil)) shouldBe true
+    }
+
+    it("should find occurances within connectives and equality") {
+      val f = parse("P(a) and P(b) or Q(c) implies Q(d) and not G(f)")
+      substitutor.hasFreeOccurance(f, Var('a')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('b')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('c')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('d')) shouldBe true
+
+      substitutor.hasFreeOccurance(f, Var('g')) shouldBe false
+      substitutor.hasFreeOccurance(f, Var('h')) shouldBe false
+      substitutor.hasFreeOccurance(f, Var('k')) shouldBe false
+      substitutor.hasFreeOccurance(f, Var('v')) shouldBe false
+    }
+
+    it("should find occurances with equality") {
+      val f = parse("a = b")
+      substitutor.hasFreeOccurance(f, Var('a')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('b')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('c')) shouldBe false
+    }
+
+    it("should not find any free occurances in false/true") {
+      substitutor.hasFreeOccurance(Contradiction(), Var('a')) shouldBe false
+      substitutor.hasFreeOccurance(Contradiction(), Var('z')) shouldBe false
+      substitutor.hasFreeOccurance(Tautology(), Var('a')) shouldBe false
+      substitutor.hasFreeOccurance(Tautology(), Var('z')) shouldBe false
+    }
+    
+    it("should find free occurances within forall") {
+      val f = parse("forall x P(y, z)")
+      substitutor.hasFreeOccurance(f, Var('y')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('z')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('a')) shouldBe false
+    }
+
+    it("should not find bound occurances within forall") {
+      val f = parse("forall x P(y, x)")
+      substitutor.hasFreeOccurance(f, Var('x')) shouldBe false
+    }
+
+    it("should find free occurances within exists") {
+      val f = parse("exists x P(y, z)")
+      substitutor.hasFreeOccurance(f, Var('y')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('z')) shouldBe true
+      substitutor.hasFreeOccurance(f, Var('a')) shouldBe false
+    }
+
+    it("should not find bound occurances within exists") {
+      val f = parse("exists x P(y, x)")
+      substitutor.hasFreeOccurance(f, Var('x')) shouldBe false
+    }
   }
 }
