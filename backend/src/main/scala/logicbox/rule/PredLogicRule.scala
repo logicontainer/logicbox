@@ -6,4 +6,5 @@ object PredLogicRule {
   case class ForAllElim() extends PredLogicRule
   case class ForAllIntro() extends PredLogicRule
   case class ExistsElim() extends PredLogicRule
+  case class ExistsIntro() extends PredLogicRule
 }

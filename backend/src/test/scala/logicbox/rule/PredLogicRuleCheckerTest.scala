@@ -140,14 +140,44 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       }
     }
 
-    it("should not allow when fresh variable is used in conclusion") {
+    it("should not allow when fresh variable is used in formula") {
       val f = parse("P(a) and P(a)")
       val refs = List(
         refLine("exists x P(x)"),
         refBox("P(a)", "P(a) and P(a)", 'a')
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
-        case List(_) =>
+        case List(FormulaDoesntMatchRule(_)) =>
+      }
+    }
+  }
+
+  describe("ExistsIntro") {
+    it("should not allow when formula is not exists") {
+      val f = parse("P(x)")
+      val refs = List(refLine("P(a)"))
+      checker.check(ExistsIntro(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchRule(_)) =>
+      }
+    }
+
+    it("should allow copy when no occurance of quantified variable") {
+      val f = parse("exists y P(x)")
+      val refs = List(refLine("P(x)"))
+      checker.check(ExistsIntro(), f, refs) shouldBe Nil
+    }
+
+    it("should allow correct replacement") {
+      val f = parse("exists y P(f(y))")
+      val refs = List(refLine("P(f(f(x)))"))
+      checker.check(ExistsIntro(), f, refs) shouldBe Nil
+    }
+
+    it("should not allow incorrect replacement") {
+      val f = parse("exists y Q(y)")
+      val refs = List(refLine("P(x)"))
+      checker.check(ExistsIntro(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchReference(0, _)) => 
       }
     }
   }
