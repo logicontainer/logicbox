@@ -50,7 +50,8 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
               FormulaDoesntMatchReference(0, "last line of box must match formula")
             )
 
-          case _ => fail(FormulaDoesntMatchRule("must be forall"))
+          case _ => 
+            fail(FormulaDoesntMatchRule("must be forall"))
         }
       }
     }
@@ -74,7 +75,8 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
         case None => 
           fail(ReferenceDoesntMatchRule(1, "box does not contain fresh variable"))
       }
-      case _ => ???
+      case _ => 
+        fail(ReferenceDoesntMatchRule(0, "must be exists"))
     }
     
     case ExistsIntro() => extractNFormulasAndThen(refs, 1) {
@@ -85,8 +87,21 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
             FormulaDoesntMatchReference(0, "reference must be equal to formula, with variable replaced by a term")
           )
 
-        case _ => fail(FormulaDoesntMatchRule("must be exists"))
+        case _ => 
+          fail(FormulaDoesntMatchRule("must be exists"))
       }
     }
+
+    case EqualityIntro() => extractNFormulasAndThen(refs, 0) {
+      case _ => formula match {
+        case Equals(t1, t2) => 
+          failIf(t1 != t2, FormulaDoesntMatchRule("sides of equality must be the same"))
+
+        case _ => 
+          fail(FormulaDoesntMatchRule("must be equals"))
+      }
+    }
+
+    case EqualityElim() => ???
   }
 }

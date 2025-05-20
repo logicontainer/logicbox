@@ -150,6 +150,17 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         case List(FormulaDoesntMatchRule(_)) =>
       }
     }
+
+    it("should reject when first ref is not exists") {
+      val f = parse("P(a)")
+      val refs = List(
+        refLine("forall x P(x)"),
+        refBox("P(a)", "P(a)", 'a')
+      )
+      checker.check(ExistsElim(), f, refs) should matchPattern {
+        case List(ReferenceDoesntMatchRule(0, _)) =>
+      }
+    }
   }
 
   describe("ExistsIntro") {
@@ -178,6 +189,30 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("P(x)"))
       checker.check(ExistsIntro(), f, refs) should matchPattern {
         case List(FormulaDoesntMatchReference(0, _)) => 
+      }
+    }
+  }
+
+  describe("EqualityIntro") {
+    it("should reject when there is a reference") {
+      val f = parse("a = a")
+      val refs = List(refLine("a = a"))
+      checker.check(EqualityIntro(), f, refs) should matchPattern { 
+        case List(WrongNumberOfReferences(0, 1, _)) => 
+      }
+    }
+
+    it("should reject when formula is not equality") {
+      val f = parse("P(a)")
+      checker.check(EqualityIntro(), f, Nil) should matchPattern { 
+        case List(FormulaDoesntMatchRule(_)) => 
+      }
+    }
+
+    it("should reject when lhs and rhs are not equal") {
+      val f = parse("a = b")
+      checker.check(EqualityIntro(), f, Nil) should matchPattern {
+        case List(FormulaDoesntMatchRule(_)) => 
       }
     }
   }
