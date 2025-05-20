@@ -8,6 +8,7 @@ import org.scalatest.Inspectors
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
+import logicbox.framework.Violation._
 
 class OptionRuleCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._
@@ -26,8 +27,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(Some(StubFormula(2))),
         ReferenceBoxImpl(
           info = Some(StubBoxInfo("hello")), 
-          assumption = Some(StubFormula(3)), 
-          conclusion = Some(StubFormula(4))
+          first = Some(StubFormula(3)), 
+          last = Some(StubFormula(4))
         )
       )
 
@@ -36,8 +37,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(StubFormula(2)),
         ReferenceBoxImpl(
           info = StubBoxInfo("hello"),
-          assumption = StubFormula(3),
-          conclusion = StubFormula(4)
+          first = StubFormula(3),
+          last = StubFormula(4)
         )
       ))
 
@@ -45,7 +46,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         
       val badResult = checker.check(badRule, formula, refs)
       badResult.length shouldBe 1
-      badResult shouldBe List(RuleViolation(StubViolation()))
+      badResult shouldBe List(MiscellaneousViolation("test"))
     }
 
     it("should report missing formula") {
@@ -90,8 +91,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       val refs = List(
         ReferenceBoxImpl(
           info = Some(StubBoxInfo()), 
-          assumption = Some(StubFormula()), 
-          conclusion = None
+          first = Some(StubFormula()), 
+          last = None
         ),
         ReferenceLineImpl(Some(StubFormula(1)))
       )
@@ -108,8 +109,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(Some(StubFormula(1))),
         ReferenceBoxImpl(
           info = Some(StubBoxInfo()), 
-          assumption = None,
-          conclusion = Some(StubFormula())
+          first = None,
+          last = Some(StubFormula())
         )
       )
 
@@ -125,8 +126,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(Some(StubFormula(1))),
         ReferenceBoxImpl(
           info = None,
-          assumption = Some(StubFormula()),
-          conclusion = Some(StubFormula())
+          first = Some(StubFormula()),
+          last = Some(StubFormula())
         )
       )
 

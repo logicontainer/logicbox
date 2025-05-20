@@ -2,87 +2,28 @@ package logicbox.rule
 
 import logicbox.framework.RuleChecker
 import logicbox.framework.Reference
+import logicbox.framework.Violation
 
 import logicbox.rule.PropLogicRule
 import logicbox.rule.PropLogicRule._
 
-import logicbox.formula.FormulaBase
-import logicbox.formula.FormulaBase._
+import logicbox.formula.ConnectiveFormula
+import logicbox.formula.ConnectiveFormula._
+import logicbox.framework.Violation._
 
-class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogicRule, Unit, PropLogicViolation] {
+class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, PropLogicRule, Unit] {
   private type Ref = Reference[F, Unit]
-  private type Viol = PropLogicViolation
-
-  import PropLogicViolation._
-
-  private enum BoxOrFormula { case Box; case Formula }
 
   import Reference._
   import PropLogicRule._
+  import ReferenceUtil._
 
-  private def extractAndThen(refs: List[Ref], pattern: Seq[BoxOrFormula]) 
-    (func: PartialFunction[List[Ref], List[Viol]]): List[Viol] = 
-  {
-    def checkLengthMatches(refs: Seq[?], pattern: Seq[?]): List[Viol] = {
-      if (refs.length != pattern.length) List(
-        WrongNumberOfReferences(pattern.length, refs.length)
-      ) else Nil
-    }
-
-    def extract(refs: List[Ref], pattern: Seq[BoxOrFormula]): Either[List[Viol], List[Ref]] = {
-      val zp = refs.zipWithIndex.zip(pattern).map { case ((ref, idx), pattern) => (idx, pattern, ref)}
-
-      val result = zp.map {
-        // matches
-        case (_, BoxOrFormula.Formula, f: Line[F] @unchecked) => Right(f)
-        case (_, BoxOrFormula.Box, b: Box[F, Unit]) => Right(b)
-
-        // violations
-        case (idx, BoxOrFormula.Box, _) => Left(ReferenceShouldBeBox(idx))
-        case (idx, BoxOrFormula.Formula, _) => Left(ReferenceShouldBeLine(idx))
-      }
-
-      val good = result.forall {
-        case Right(_) => true
-        case Left(_) => false
-      }
-
-      if (good) {
-        // collect steps 
-        Right(result.collect { case Right(step) => step }) 
-      } else {
-        // collect violations
-        Left(result.collect { case Left(mm) => mm })
-      }
-    }
-
-    checkLengthMatches(refs, pattern) ++ { 
-      extract(refs, pattern) match {
-        case Right(ls: List[Ref]) =>
-          assert(func.isDefinedAt(ls), s"Partial function is defined on given pattern $pattern")
-          func.apply(ls)
-        case Left(mismatches) => mismatches
-      }
-    }
-  }
-
-  // try to extract a list of `n` formulas from `refs` (only if there are `n`).
-  // otherwise report mismatches
-  private def extractNFormulasAndThen(refs: List[Ref], n: Int)
-    (func: PartialFunction[List[F], List[Viol]]): List[Viol] = 
-  {
-    extractAndThen(refs, (1 to n).map { _ => BoxOrFormula.Formula }) {
-      case lines: List[Reference.Line[F]] @unchecked =>
-        func.apply(lines.map(_.formula))
-    }
-  }
-
-  private def fail(v: => Viol, vs: => Viol*): List[Viol] = (v +: vs).toList
-  private def failIf(b: Boolean, v: => Viol, vs: => Viol*): List[Viol] = {
+  private def fail(v: => Violation, vs: => Violation*): List[Violation] = (v +: vs).toList
+  private def failIf(b: Boolean, v: => Violation, vs: => Violation*): List[Violation] = {
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: PropLogicRule, formula: F, refs: List[Ref]): List[Viol] = rule match {
+  override def check(rule: PropLogicRule, formula: F, refs: List[Ref]): List[Violation] = rule match {
     case Premise() | Assumption() => Nil
 
     case AndElim(side) => extractNFormulasAndThen(refs, 1) {
@@ -147,8 +88,8 @@ class PropLogicRuleChecker[F <: FormulaBase[F]] extends RuleChecker[F, PropLogic
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(box: Reference.Box[F, _]) => formula match {
         case Implies(phi, psi) =>
-          failIf(phi != box.assumption, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
-          failIf(psi != box.conclusion, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
+          failIf(phi != box.first, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
+          failIf(psi != box.last, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
 
         case _ => 
           fail(FormulaDoesntMatchRule("must be an implication (->)"))

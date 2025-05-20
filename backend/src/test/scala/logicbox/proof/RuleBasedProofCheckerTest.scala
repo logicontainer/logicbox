@@ -9,11 +9,12 @@ import org.scalatest.funspec.AnyFunSpec
 import logicbox.framework.Proof.Step
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
+import logicbox.framework.Violation.MiscellaneousViolation
 
 class RuleBasedProofCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._
 
-  def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id, V]] = 
+  def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id]] = 
     RuleBasedProofChecker(ruleChecker)
 
   describe("RuledBasedProofChecker::check") {
@@ -57,7 +58,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
       val result = checker.check(proof)
       Inspectors.forAtLeast(1, result) {
         _ should matchPattern {
-          case RuleViolation("id1", StubViolation()) =>
+          case RuleViolation("id1", MiscellaneousViolation("test")) =>
         }
       }
     }
@@ -82,8 +83,8 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(formula = StubFormula(38)),
         ReferenceBoxImpl(
           info = StubBoxInfo("some info"), 
-          assumption = StubFormula(11), 
-          conclusion = StubFormula(12)
+          first = StubFormula(11), 
+          last = StubFormula(12)
         )
       ))
     }
@@ -102,7 +103,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
 
       Inspectors.forAtLeast(1, checker.check(proof)) {
         _ should matchPattern {
-          case RuleViolation("ass", StubViolation()) =>
+          case RuleViolation("ass", MiscellaneousViolation("test")) =>
         }
       }
     }

@@ -1,6 +1,7 @@
 package logicbox.rule
 
-import logicbox.framework.{Reference}
+import logicbox.framework.{Reference, Violation}
+import logicbox.framework.Violation._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
@@ -8,7 +9,6 @@ import org.scalatest.Inspectors
 
 class PLRuleTest extends AnyFunSpec {
   import logicbox.rule.PropLogicRule._
-  import logicbox.rule.PropLogicViolation._
   import logicbox.formula._
 
   private val lexer = PropLogicLexer()
@@ -20,8 +20,8 @@ class PLRuleTest extends AnyFunSpec {
     extends Reference.Line[PropLogicFormula]
   private case class Box(fst: PropLogicFormula, lst: PropLogicFormula) extends Reference.Box[PropLogicFormula, PLBoxInfo] {
     override def info = ()
-    override def assumption = fst
-    override def conclusion = lst
+    override def first = fst
+    override def last = lst
   }
 
   private def stub(str: String): Reference[PropLogicFormula, PLBoxInfo] = new Reference.Line[PropLogicFormula] {

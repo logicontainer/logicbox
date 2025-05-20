@@ -1,25 +1,25 @@
 package logicbox.proof
 
-import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference}
+import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference, Violation}
 import logicbox.framework.StepDiagnostic
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
 
 object RuleBasedProofChecker {
-  sealed trait Diagnostic[+Id, +V] extends StepDiagnostic[Id]
+  sealed trait Diagnostic[+Id] extends StepDiagnostic[Id]
 
-  case class RuleViolation[Id, V](stepId: Id, violation: V) extends Diagnostic[Id, V]
-  case class StepNotFound[Id](stepId: Id, expl: String) extends Diagnostic[Id, Nothing]
-  case class ReferenceIdNotFound[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id, Nothing]
-  case class MalformedReference[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id, Nothing]
+  case class RuleViolation[Id](stepId: Id, violation: Violation) extends Diagnostic[Id]
+  case class StepNotFound[Id](stepId: Id, expl: String) extends Diagnostic[Id]
+  case class ReferenceIdNotFound[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id]
+  case class MalformedReference[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id]
 }
 
-class RuleBasedProofChecker[F, R, B, V, Id](
-  val ruleChecker: RuleChecker[F, R, B, V]
-) extends ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id, V]] {
+class RuleBasedProofChecker[F, R, B, Id](
+  val ruleChecker: RuleChecker[F, R, B]
+) extends ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id]] {
 
   import RuleBasedProofChecker._
   
-  type Diagnostic = RuleBasedProofChecker.Diagnostic[Id, V]
+  type Diagnostic = RuleBasedProofChecker.Diagnostic[Id]
 
   type Pf = Proof[F, R, B, Id]
   private def resolveBoxReference(proof: Pf, stepId: Id, refIdx: Int, boxId: Id, box: Proof.Box[B, Id]): Either[List[Diagnostic], Reference.Box[F, B]] =

@@ -1,1 +1,12 @@
 package logicbox.rule
+
+sealed trait PredLogicRule
+
+object PredLogicRule {
+  case class ForAllElim() extends PredLogicRule
+  case class ForAllIntro() extends PredLogicRule
+  case class ExistsElim() extends PredLogicRule
+  case class ExistsIntro() extends PredLogicRule
+  case class EqualityIntro() extends PredLogicRule
+  case class EqualityElim() extends PredLogicRule
+}
