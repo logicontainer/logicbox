@@ -382,4 +382,258 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
   }
+
+  describe("equalExcept") {
+    it("should be true if no occurance of t1 and f1 = f2") {
+      val f1 = parse("P(a)")
+      val f2 = parse("P(a)")
+      val t1 = Var('b')
+      val t2 = Var('c')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+    
+    it("should be false t1 is replaced by other than t2") {
+      val f1 = parse("P(a)")
+      val f2 = parse("P(b)")
+      val t1 = Var('a')
+      val t2 = Var('c')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should allow good replacement P(x) -> P(y)") {
+      val f1 = parse("P(x)")
+      val f2 = parse("P(y)")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should not allow when replacement is not correct") {
+      val f1 = parse("P(x)")
+      val f2 = parse("P(y)")
+      val t1 = Var('z')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should not allow when predicate symbols are not equal") {
+      val f1 = parse("P(x)")
+      val f2 = parse("Q(x)")
+      val t1 = Var('z')
+      val t2 = Var('z')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should work on predicates with multiple args") {
+      val f1 = parse("P(x, y, x)")
+      val f2 = parse("P(y, y, x)")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be true when variable inside function is replaced") {
+      val f1 = parse("P(f(x))")
+      val f2 = parse("P(f(y))")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be false when invalid replacement inside function") {
+      val f1 = parse("P(f(x))")
+      val f2 = parse("P(f(z))")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should work with multiple function args") {
+      val f1 = parse("P(f(x, z, x))")
+      val f2 = parse("P(f(y, z, x))")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should reject when function symbols are not equal") {
+      val f1 = parse("P(g(x, z, x))")
+      val f2 = parse("P(f(y, z, x))")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should allow equality with repl on lhs") {
+      val f1 = parse("x = z")
+      val f2 = parse("y = z")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should not allow invalid repl on lhs in equality") {
+      val f1 = parse("x = z")
+      val f2 = parse("z = z")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should allow equality with repl on rhs") {
+      val f1 = parse("z = x")
+      val f2 = parse("z = y")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should not allow invalid repl on rhs in equality") {
+      val f1 = parse("z = x")
+      val f2 = parse("z = z")
+      val t1 = Var('x') 
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should be true if function is replaced with variable") {
+      val f1 = parse("z = f(x)")
+      val f2 = parse("z = y")
+      val t1 = FunAppl('f', Var('x') :: Nil)
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be false if function is invalidly replaced with variable") {
+      val f1 = parse("z = f(y)")
+      val f2 = parse("z = y")
+      val t1 = FunAppl('f', Var('x') :: Nil)
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should work with stuff") {
+      val f1 = parse("z = f(f(x))")
+      val f2 = parse("z = f(f(f(x)))")
+      val t1 = FunAppl('f', Var('x') :: Nil)
+      val t2 = FunAppl('f', FunAppl('f', Var('x') :: Nil) :: Nil)
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should work inside connectives 1") {
+      val f1 = parse("x = x and x = x or x = x implies x = x and not x = x")
+      val f2 = parse("x = y and y = x or y = x implies x = y and not y = y")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should work inside connectives 2") {
+      val f1 = parse("x = x and x = x or f(x) = x implies x = x and not x = x")
+      val f2 = parse("x = y and y = x or f(z) = x implies x = y and not y = y") // invalid
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should be true if happens on free occur. inside forall") {
+      val f1 = parse("forall x (x = f(z))")
+      val f2 = parse("forall x (x = f(y))")
+      val t1 = Var('z')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be true if nothing happens and forall-quantified variable is t1") {
+      val f1 = parse("forall x (x = f(x))")
+      val f2 = parse("forall x (x = f(x))")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be false if replacement happens on forall-bound var") {
+      val f1 = parse("forall x (x = f(x))")
+      val f2 = parse("forall x (x = f(y))")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should not allow forall-quantified variable to change") {
+      val f1 = parse("forall x (x = f(x))")
+      val f2 = parse("forall y (x = f(y))")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should be true if happens on free occur. inside exists") {
+      val f1 = parse("exists x (x = f(z))")
+      val f2 = parse("exists x (x = f(y))")
+      val t1 = Var('z')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be true if nothing happens and exists-quantified variable is t1") {
+      val f1 = parse("exists x (x = f(x))")
+      val f2 = parse("exists x (x = f(x))")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+
+    it("should be false if replacement happens on exists-bound var") {
+      val f1 = parse("exists x (x = f(x))")
+      val f2 = parse("exists x (x = f(y))")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should not allow exists-quantified variable to change") {
+      val f1 = parse("exists x (x = f(x))")
+      val f2 = parse("exists y (x = f(y))")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe false
+    }
+
+    it("should be happy with simple things") {
+      val f1 = parse("false and not true -> false or false and not true")
+      val f2 = parse("false and not true -> false or false and not true")
+      val t1 = Var('x')
+      val t2 = Var('y')
+
+      substitutor.equalExcept(f1, f2, t1, t2) shouldBe true
+    }
+  }
 }

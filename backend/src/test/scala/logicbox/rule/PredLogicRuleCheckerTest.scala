@@ -14,6 +14,7 @@ import logicbox.formula.PredLogicFormula._
 import logicbox.formula.PredLogicTerm
 import logicbox.formula.PredLogicTerm._
 import logicbox.rule.PredLogicRule._
+import org.scalactic.Equality
 
 class PredLogicRuleCheckerTest extends AnyFunSpec {
   private val lexer = PredLogicLexer()
@@ -214,6 +215,34 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       checker.check(EqualityIntro(), f, Nil) should matchPattern {
         case List(FormulaDoesntMatchRule(_)) => 
       }
+    }
+  }
+
+  describe("EqualityElim") {
+    it("should reject if first reference is not equality") {
+      val f = parse("P(b)")
+      val refs = List(refLine("P(b)"), refLine("P(a)"))
+      checker.check(EqualityElim(), f, refs) should matchPattern {
+        case List(_) => 
+      }
+    }
+
+    it("should reject if replacement doesn't not match ref 1") {
+      val eq = refLine("a = b")
+      val from = refLine("P(a)")
+      val to = parse("P(c)") // should be P(b)
+
+      checker.check(EqualityElim(), to, List(eq, from)) should matchPattern {
+        case List(FormulaDoesntMatchReference(1, _)) => 
+      }
+    }
+
+    it("should allow correct usage") {
+      val eq = refLine("a = b")
+      val from = refLine("a = a")
+      val to = parse("b = a")
+
+      checker.check(EqualityElim(), to, List(eq, from)) shouldBe Nil
     }
   }
 }

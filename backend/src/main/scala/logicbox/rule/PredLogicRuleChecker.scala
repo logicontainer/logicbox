@@ -102,6 +102,17 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
       }
     }
 
-    case EqualityElim() => ???
+    case EqualityElim() => extractNFormulasAndThen(refs, 2) {
+      case List(r0, r1) => r0 match {
+        case Equals(t1, t2) => 
+          failIf(
+            !substitutor.equalExcept(r1, formula, t1, t2),
+            FormulaDoesntMatchReference(1, "Invalid substitution")
+          )
+
+        case _ => 
+          fail(ReferenceDoesntMatchRule(0, "must be equality"))
+      }
+    }
   }
 }

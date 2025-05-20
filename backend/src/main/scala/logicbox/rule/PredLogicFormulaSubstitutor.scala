@@ -4,8 +4,10 @@ import logicbox.formula.PredLogicTerm
 import logicbox.formula.PredLogicFormula
 import logicbox.formula.PredLogicTerm._
 import logicbox.formula.PredLogicFormula._
+import scala.compiletime.ops.boolean
 
 class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var] {
+
   private def substitute(src: PredLogicTerm, t: PredLogicTerm, x: Var): PredLogicTerm = src match {
     case y: Var if y == x => t
     case y: Var => y
@@ -151,6 +153,58 @@ class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogi
       case (Tautology(), Tautology()) => Some(())
 
       case _ => None
+    }
+  }
+
+  private def equalExcept(vs1: List[PredLogicTerm], vs2: List[PredLogicTerm], t1: PredLogicTerm, t2: PredLogicTerm): Boolean = {
+    vs1.zip(vs2).forall((x, y) => equalExcept(x, y, t1, t2))
+  }
+
+  private def equalExcept(v1: PredLogicTerm, v2: PredLogicTerm, t1: PredLogicTerm, t2: PredLogicTerm): Boolean = {
+    v1 == v2 || (v1 == t1 && v2 == t2) || ((v1, v2) match {
+      case (FunAppl(f, xs), FunAppl(g, ys)) if f == g =>
+        equalExcept(xs, ys, t1, t2)
+
+      case _ => false
+    })
+  }
+
+  override def equalExcept(f1: PredLogicFormula, f2: PredLogicFormula, t1: PredLogicTerm, t2: PredLogicTerm): Boolean = {
+    (f1, f2) match {
+      case (Predicate(p, xs), Predicate(q, ys)) if p == q =>
+        equalExcept(xs, ys, t1, t2)
+
+      case (Equals(l1, r1), Equals(l2, r2)) =>
+        equalExcept(l1, l2, t1, t2) && equalExcept(r1, r2, t1, t2)
+
+      case (And(phi1, psi1), And(phi2, psi2)) => 
+        equalExcept(phi1, phi2, t1, t2) && equalExcept(psi1, psi2, t1, t2)
+
+      case (Or(phi1, psi1), Or(phi2, psi2)) => 
+        equalExcept(phi1, phi2, t1, t2) && equalExcept(psi1, psi2, t1, t2)
+
+      case (Implies(phi1, psi1), Implies(phi2, psi2)) => 
+        equalExcept(phi1, phi2, t1, t2) && equalExcept(psi1, psi2, t1, t2)
+
+      case (Not(phi1), Not(phi2)) =>
+        equalExcept(phi1, phi2, t1, t2)
+
+      case (ForAll(x, phi1), ForAll(y, phi2)) if x == y =>
+        if x == t1 then 
+          phi1 == phi2
+        else
+          equalExcept(phi1, phi2, t1, t2)
+
+      case (Exists(x, phi1), Exists(y, phi2)) if x == y =>
+        if x == t1 then 
+          phi1 == phi2
+        else
+          equalExcept(phi1, phi2, t1, t2)
+
+      case (Contradiction(), Contradiction()) => true
+      case (Tautology(), Tautology()) => true
+
+      case _ => false
     }
   }
 }
