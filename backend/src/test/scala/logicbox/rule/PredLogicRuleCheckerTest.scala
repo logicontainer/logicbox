@@ -60,7 +60,6 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
 
     it("should reject if inner formula is not the same with replacement") {
       val f = parse("Q(a)")
-      println(parse("forall x P(x)"))
       checker.check(ForAllElim(), f, List(refLine("forall x P(x)"))) should matchPattern {
         case List(FormulaDoesntMatchReference(0, _)) =>
       }

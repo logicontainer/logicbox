@@ -28,8 +28,10 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
     case ForAllElim() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
         case ForAll(x, phi) => 
-          // TODO: fake
-          failIf(phi != formula, FormulaDoesntMatchReference(0, "must be equal to reference"))
+          failIf(
+            substitutor.findReplacement(phi, formula, x).isEmpty, 
+            FormulaDoesntMatchReference(0, "resulting formula must be the result of substituting ")
+          )
 
         case _ => 
           fail(ReferenceDoesntMatchRule(0, "must be forall"))
@@ -50,9 +52,9 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
 
           case _ => fail(FormulaDoesntMatchRule("must be forall"))
         }
-
       }
     }
+
     case ExistsElim() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
       case List(Line(Exists(x, phi)), Box(info, ass, concl)) => info.freshVar match {
         case Some(x0) =>

@@ -86,7 +86,9 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
 
       substitutor.substitute(f, Var('y'), Var('x')) shouldBe exp
     }
+  }
 
+  describe("hasFreeOccurance") {
     it("should find occurance within predicate") {
       val f = parse("P(a)")
       substitutor.hasFreeOccurance(f, Var('a')) shouldBe true
@@ -158,6 +160,226 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
     it("should not find bound occurances within exists") {
       val f = parse("exists x P(y, x)")
       substitutor.hasFreeOccurance(f, Var('x')) shouldBe false
+    }
+  }
+
+  describe("findReplacement") {
+    it("should find replacement in equality 1") {
+      val src = parse("x = x")
+      val dst = parse("y = y")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacement in equality 2") {
+      val src = parse("x = z")
+      val dst = parse("z = z")
+      val x = Var('x')
+
+      val exp = Some(Var('z'))
+
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacement in f(x) -> f(y)") {
+      val src = parse("f(x) = z")
+      val dst = parse("f(y) = z")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacement in f(x, z, x) -> f(y, z, y)") {
+      val src = parse("f(x, z) = z")
+      val dst = parse("f(y, z) = z")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should disallow conflicting replacements") {
+      val src = parse("x = x")
+      val dst = parse("y = z")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should work with equality that has no replacements") {
+      val src = parse("a = b")
+      val dst = parse("a = b")
+      val x = Var('x')
+
+      val exp = Some(())
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should disallow structurally different formulas") {
+      val src = parse("f(x) = b")
+      val dst = parse("y = b")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should not replace when function symbols differ") {
+      val src = parse("f(x) = b")
+      val dst = parse("g(y) = b")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacements when nothing happens but there are occurances of x") {
+      val f = parse("f(g(x, x)) = f(f(g(x, x), x))")
+      val x = Var('x')
+
+      val exp = Some(x) // x replaced with itself
+      substitutor.findReplacement(f, f, x) shouldBe exp
+    }
+
+    it("should disallow repl. when other variables are not equal") {
+      val src = parse("x = b")
+      val dst = parse("y = c")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacement in predicate 1") {
+      val src = parse("P(x)")
+      val dst = parse("P(y)")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacement in predicate 2") {
+      val src = parse("P(x, z, x)")
+      val dst = parse("P(y, z, y)")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacements inside connectives") {
+      val src = parse("P(x) and P(x) or P(x) implies P(x) and not P(x)")
+      val dst = parse("P(y) and P(y) or P(y) implies P(y) and not P(y)")
+      val x = Var('x')
+
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacements inside forall") {
+      val src = parse("forall z P(x)")
+      val dst = parse("forall z P(y)")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should not allow replacements of forall-bound occurances") {
+      val src = parse("forall x P(x)")
+      val dst = parse("forall x P(y)")
+
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should allow no replacements inside forall bound by replacement var") {
+      val src = parse("forall x P(z)")
+      val dst = parse("forall x P(z)")
+
+      val x = Var('x')
+
+      val exp = Some(())
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should find replacements inside exists") {
+      val src = parse("exists z P(x)")
+      val dst = parse("exists z P(y)")
+      val x = Var('x')
+
+      val exp = Some(Var('y'))
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should not allow replacements of exists-bound occurances") {
+      val src = parse("exists x P(x)")
+      val dst = parse("exists x P(y)")
+
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should allow no replacements inside exists bound by replacement var") {
+      val src = parse("exists x P(z)")
+      val dst = parse("exists x P(z)")
+
+      val x = Var('x')
+
+      val exp = Some(())
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should disallow replacement when forall-quantified vars are not equal") {
+      val src = parse("forall x P(z)")
+      val dst = parse("forall y P(z)")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should disallow replacement when exists-quantified vars are not equal") {
+      val src = parse("exists x P(z)")
+      val dst = parse("exists y P(z)")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
+    }
+
+    it("should work with contr./taut.") {
+      val src1 = parse("true")
+      val dst1 = parse("true")
+      val src2 = parse("false")
+      val dst2 = parse("false")
+
+
+      val x = Var('x')
+
+      val exp = Some(())
+      substitutor.findReplacement(src1, dst1, x) shouldBe exp
+      substitutor.findReplacement(src2, dst2, x) shouldBe exp
+    }
+
+    it("should not allow replacement when predicate symbols do not match") {
+      val src = parse("P(x)")
+      val dst = parse("Q(y)")
+      val x = Var('x')
+
+      val exp = None
+      substitutor.findReplacement(src, dst, x) shouldBe exp
     }
   }
 }

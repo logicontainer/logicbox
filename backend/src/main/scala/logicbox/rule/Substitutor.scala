@@ -6,4 +6,10 @@ trait Substitutor[F, T, V] {
 
   // returns true iff `t` occurs in `f`
   def hasFreeOccurance(f: F, t: T): Boolean
+
+  // returns
+  //  - Some(t) for the `t` for which dst = src[t/x]
+  //  - Some(()) if dst = src[t/x]
+  //  - None if no replace exists, such that 
+  def findReplacement(src: F, dst: F, x: V): Option[T | Unit]
 }
