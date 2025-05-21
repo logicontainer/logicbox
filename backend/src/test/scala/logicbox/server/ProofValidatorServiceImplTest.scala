@@ -17,14 +17,17 @@ import logicbox.proof.StandardStepStrategy
 import logicbox.proof.{ProofImpl, ProofLineImpl, ProofBoxImpl}
 import logicbox.framework.AddLine
 import logicbox.framework.ModifiableProof.ProofTop
+import logicbox.framework.Diagnostic
+import logicbox.framework.Diagnostic.RuleViolationAtStep
+import logicbox.framework.RuleViolation.MiscellaneousViolation
 
 class ProofValidatorServiceImplTest extends AnyFunSpec {
   def ident(str: String) = str
 
-  case class Diag(i: Int)
+  def stubDiag(i: Int) = RuleViolationAtStep(i.toString, MiscellaneousViolation(i.toString))
   case class ReaderErr()
 
-  def getService(commands: List[ModifyProofCommand[String, String, String]] = Nil, diagnostics: List[Diag] = Nil): ProofValidatorService[ReaderErr | ModifiableProof.Error[String]] = { 
+  def getService(commands: List[ModifyProofCommand[String, String, String]] = Nil, diagnostics: List[Diagnostic[String]] = Nil): ProofValidatorService[ReaderErr | ModifiableProof.Error[String]] = { 
     case object Reader extends JsonReader[Either[ReaderErr, List[ModifyProofCommand[String, String, String]]]] {
       override def read(json: JsValue): Either[ReaderErr, List[ModifyProofCommand[String, String, String]]] = json match {
         case JsString("happy reader") => Right(commands)
@@ -32,12 +35,13 @@ class ProofValidatorServiceImplTest extends AnyFunSpec {
       }
     }
 
-    case object Checker extends ProofChecker[String, String, String, String, Diag] {
-      override def check(proof: Proof[String, String, String, String]): List[Diag] = diagnostics
+    case object Checker extends ProofChecker[String, String, String, String] {
+      override def check(proof: Proof[String, String, String, String]): List[Diagnostic[String]] = diagnostics
     }
 
-    def errToJson(err: Diag): JsValue = err match {
-      case Diag(i) => JsString(s"diag_$i")
+    def errToJson(err: Diagnostic[String]): JsValue = err match {
+      case RuleViolationAtStep(i, _) => JsString(s"diag_$i")
+      case _ => ???
     }
 
     // technically depending on proof impl here - oops
@@ -89,7 +93,7 @@ class ProofValidatorServiceImplTest extends AnyFunSpec {
     it("should diagnostics for proof that does not check") {
       val validator = getService(
         commands = Nil, // empty proof
-        diagnostics = List(Diag(2))
+        diagnostics = List(stubDiag(2))
       )
 
       validator.validateProof(JsString("happy reader")) shouldBe Right(JsObject(

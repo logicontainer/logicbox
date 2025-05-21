@@ -9,9 +9,11 @@ import org.scalatest.funspec.AnyFunSpec
 import logicbox.framework.Proof.Step
 import logicbox.ProofStubs
 
+import logicbox.framework.Diagnostic
+import logicbox.framework.Diagnostic._
+
 class ScopedProofCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._
-  import ScopedProofChecker._
 
   describe("ScopedProofCheckerTest::check") {
     val checker = ScopedProofChecker[Id]()

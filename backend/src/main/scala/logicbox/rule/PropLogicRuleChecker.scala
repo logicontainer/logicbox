@@ -2,14 +2,14 @@ package logicbox.rule
 
 import logicbox.framework.RuleChecker
 import logicbox.framework.Reference
-import logicbox.framework.Violation
+import logicbox.framework.RuleViolation
 
 import logicbox.rule.PropLogicRule
 import logicbox.rule.PropLogicRule._
 
 import logicbox.formula.ConnectiveFormula
 import logicbox.formula.ConnectiveFormula._
-import logicbox.framework.Violation._
+import logicbox.framework.RuleViolation._
 
 class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, PropLogicRule, Unit] {
   private type Ref = Reference[F, Unit]
@@ -18,12 +18,12 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
   import PropLogicRule._
   import ReferenceUtil._
 
-  private def fail(v: => Violation, vs: => Violation*): List[Violation] = (v +: vs).toList
-  private def failIf(b: Boolean, v: => Violation, vs: => Violation*): List[Violation] = {
+  private def fail(v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = (v +: vs).toList
+  private def failIf(b: Boolean, v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = {
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: PropLogicRule, formula: F, refs: List[Ref]): List[Violation] = rule match {
+  override def check(rule: PropLogicRule, formula: F, refs: List[Ref]): List[RuleViolation] = rule match {
     case Premise() | Assumption() => Nil
 
     case AndElim(side) => extractNFormulasAndThen(refs, 1) {

@@ -9,17 +9,16 @@ import org.scalatest.funspec.AnyFunSpec
 import logicbox.framework.Proof.Step
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
-import logicbox.framework.Violation.MiscellaneousViolation
+import logicbox.framework.RuleViolation.MiscellaneousViolation
+import logicbox.framework.Diagnostic._
 
 class RuleBasedProofCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._
 
-  def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id]] = 
+  def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id] = 
     RuleBasedProofChecker(ruleChecker)
 
   describe("RuledBasedProofChecker::check") {
-    import RuleBasedProofChecker._
-
     it("should be fine with empty proof") {  
       val checker = proofChecker()
       val proof = StubProof()
@@ -58,7 +57,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
       val result = checker.check(proof)
       Inspectors.forAtLeast(1, result) {
         _ should matchPattern {
-          case RuleViolation("id1", MiscellaneousViolation("test")) =>
+          case RuleViolationAtStep("id1", MiscellaneousViolation("test")) =>
         }
       }
     }
@@ -103,7 +102,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
 
       Inspectors.forAtLeast(1, checker.check(proof)) {
         _ should matchPattern {
-          case RuleViolation("ass", MiscellaneousViolation("test")) =>
+          case RuleViolationAtStep("ass", MiscellaneousViolation("test")) =>
         }
       }
     }

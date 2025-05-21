@@ -1,22 +1,22 @@
 package logicbox.rule
 
 import logicbox.framework.Reference
-import logicbox.framework.Violation
-import logicbox.framework.Violation._
+import logicbox.framework.RuleViolation
+import logicbox.framework.RuleViolation._
 
 object ReferenceUtil {
   enum BoxOrFormula { case Box; case Formula }
 
   def extractAndThen[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]) 
-    (func: PartialFunction[List[Reference[F, I]], List[Violation]]): List[Violation] = 
+    (func: PartialFunction[List[Reference[F, I]], List[RuleViolation]]): List[RuleViolation] = 
   {
-    def checkLengthMatches(refs: Seq[?], pattern: Seq[?]): List[Violation] = {
+    def checkLengthMatches(refs: Seq[?], pattern: Seq[?]): List[RuleViolation] = {
       if (refs.length != pattern.length) List(
         WrongNumberOfReferences(pattern.length, refs.length)
       ) else Nil
     }
 
-    def extract[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]): Either[List[Violation], List[Reference[F, I]]] = {
+    def extract[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]): Either[List[RuleViolation], List[Reference[F, I]]] = {
       val zp = refs.zipWithIndex.zip(pattern).map { case ((ref, idx), pattern) => (idx, pattern, ref)}
 
       import Reference._
@@ -61,7 +61,7 @@ object ReferenceUtil {
   // try to extract a list of `n` formulas from `refs` (only if there are `n`).
   // otherwise report mismatches
   def extractNFormulasAndThen[F, I](refs: List[Reference[F, I]], n: Int)
-    (func: PartialFunction[List[F], List[Violation]]): List[Violation] = 
+    (func: PartialFunction[List[F], List[RuleViolation]]): List[RuleViolation] = 
   {
     extractAndThen(refs, (1 to n).map { _ => BoxOrFormula.Formula }) {
       case lines: List[Reference.Line[F]] @unchecked =>

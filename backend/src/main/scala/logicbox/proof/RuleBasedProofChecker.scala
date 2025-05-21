@@ -1,28 +1,19 @@
 package logicbox.proof
 
-import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference, Violation}
+import logicbox.framework.{RuleChecker, Proof, ProofChecker, Reference, RuleViolation}
 import logicbox.framework.StepDiagnostic
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
-
-object RuleBasedProofChecker {
-  sealed trait Diagnostic[+Id] extends StepDiagnostic[Id]
-
-  case class RuleViolation[Id](stepId: Id, violation: Violation) extends Diagnostic[Id]
-  case class StepNotFound[Id](stepId: Id, expl: String) extends Diagnostic[Id]
-  case class ReferenceIdNotFound[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id]
-  case class MalformedReference[Id](stepId: Id, whichRef: Int, refId: Id, expl: String) extends Diagnostic[Id]
-}
+import logicbox.framework.Diagnostic
+import logicbox.framework.Diagnostic._
 
 class RuleBasedProofChecker[F, R, B, Id](
   val ruleChecker: RuleChecker[F, R, B]
-) extends ProofChecker[F, R, B, Id, RuleBasedProofChecker.Diagnostic[Id]] {
+) extends ProofChecker[F, R, B, Id] {
 
-  import RuleBasedProofChecker._
-  
-  type Diagnostic = RuleBasedProofChecker.Diagnostic[Id]
+  private type D = Diagnostic[Id]
+  private type Pf = Proof[F, R, B, Id]
 
-  type Pf = Proof[F, R, B, Id]
-  private def resolveBoxReference(proof: Pf, stepId: Id, refIdx: Int, boxId: Id, box: Proof.Box[B, Id]): Either[List[Diagnostic], Reference.Box[F, B]] =
+  private def resolveBoxReference(proof: Pf, stepId: Id, refIdx: Int, boxId: Id, box: Proof.Box[B, Id]): Either[List[D], Reference.Box[F, B]] =
     for {
       ids <- box.steps match {
         case Seq() => Left(List(MalformedReference(stepId, refIdx, boxId, "box is empty")))
@@ -47,7 +38,7 @@ class RuleBasedProofChecker[F, R, B, Id](
       }
     } yield ReferenceBoxImpl(box.info, ass, concl)
 
-  private def resolveReferences(proof: Pf, stepId: Id, refIds: Seq[Id]): Either[List[Diagnostic], List[Reference[F, B]]] = {
+  private def resolveReferences(proof: Pf, stepId: Id, refIds: Seq[Id]): Either[List[D], List[Reference[F, B]]] = {
     for {
       refIds <- Right(refIds.toList)
       refSteps = refIds.map(proof.getStep)
@@ -73,19 +64,19 @@ class RuleBasedProofChecker[F, R, B, Id](
     } yield refs
   }
 
-  private def checkStep(proof: Proof[F, R, B, Id], id: Id, step: Proof.Step[F, R, B, Id]): List[Diagnostic] = 
+  private def checkStep(proof: Proof[F, R, B, Id], id: Id, step: Proof.Step[F, R, B, Id]): List[D] = 
     (step: @unchecked) match {
       case Proof.Line(formula: F @unchecked, rule: R @unchecked, ids: Seq[Id] @unchecked) =>
         resolveReferences(proof, id, ids) match {
           case Right(refs) => 
-            ruleChecker.check(rule, formula, refs).map { v => RuleViolation(id, v) }
+            ruleChecker.check(rule, formula, refs).map { v => RuleViolationAtStep(id, v) }
 
           case Left(diagnostics) => diagnostics
         }
       case Proof.Box(_, ids: Seq[Id] @unchecked) => checkSteps(proof, ids)
     }
 
-  private def checkSteps(proof: Proof[F, R, B, Id], stepIds: Seq[Id]): List[Diagnostic] =
+  private def checkSteps(proof: Proof[F, R, B, Id], stepIds: Seq[Id]): List[D] =
     val ids = stepIds.toList
     for {
       (either, id) <- ids.map(proof.getStep).zip(ids)
@@ -96,6 +87,6 @@ class RuleBasedProofChecker[F, R, B, Id](
     } yield res
 
   
-  override def check(proof: Proof[F, R, B, Id]): List[Diagnostic] = 
+  override def check(proof: Proof[F, R, B, Id]): List[D] = 
     checkSteps(proof, proof.rootSteps)
 }

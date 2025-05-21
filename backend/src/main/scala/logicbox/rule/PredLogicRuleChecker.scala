@@ -3,13 +3,13 @@ package logicbox.rule
 import logicbox.framework.RuleChecker
 import logicbox.formula.PredLogicFormula
 import logicbox.framework.Reference
-import logicbox.framework.Violation
+import logicbox.framework.RuleViolation
 import logicbox.formula.QuantifierFormula
 
 import logicbox.rule.ReferenceUtil._
 import QuantifierFormula._
 import logicbox.rule.PredLogicRule._
-import logicbox.framework.Violation._
+import logicbox.framework.RuleViolation._
 import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
 
@@ -19,12 +19,12 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   private type R = PredLogicRule
   private type B = PredLogicBoxInfo[V]
 
-  private def fail(v: => Violation, vs: => Violation*): List[Violation] = (v +: vs).toList
-  private def failIf(b: Boolean, v: => Violation, vs: => Violation*): List[Violation] = {
+  private def fail(v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = (v +: vs).toList
+  private def failIf(b: Boolean, v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = {
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: R, formula: F, refs: List[Reference[F, B]]): List[Violation] = rule match {
+  override def check(rule: R, formula: F, refs: List[Reference[F, B]]): List[RuleViolation] = rule match {
     case ForAllElim() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
         case ForAll(x, phi) => 

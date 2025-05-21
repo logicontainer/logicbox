@@ -1,8 +1,8 @@
 package logicbox
 
 import logicbox.framework._
-import logicbox.framework.Violation.MissingFormula
-import logicbox.framework.Violation.MiscellaneousViolation
+import logicbox.framework.RuleViolation.MissingFormula
+import logicbox.framework.RuleViolation.MiscellaneousViolation
 
 object ProofStubs {
   case class StubFormula(i: Int = 0)
@@ -43,7 +43,7 @@ object ProofStubs {
   case class StubRuleChecker() extends RuleChecker[F, R, B] {
     var refsCalledWith: Option[List[Reference[StubFormula, StubBoxInfo]]] = None
 
-    override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[Violation] = 
+    override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[RuleViolation] = 
       refsCalledWith = Some(refs)
       rule match {
         case Good() => Nil

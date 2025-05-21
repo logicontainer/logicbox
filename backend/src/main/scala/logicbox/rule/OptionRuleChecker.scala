@@ -5,8 +5,8 @@ import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
 
-import logicbox.framework.Violation
-import logicbox.framework.Violation._
+import logicbox.framework.RuleViolation
+import logicbox.framework.RuleViolation._
 
 case class OptionRuleChecker[F, R, B, V](
   ruleChecker: RuleChecker[F, R, B]
@@ -14,7 +14,7 @@ case class OptionRuleChecker[F, R, B, V](
 
   private def computeConcreteReferences(
     optRefs: List[Reference[Option[F], Option[B]]]
-  ): Either[List[Violation], List[Reference[F, B]]] = {
+  ): Either[List[RuleViolation], List[Reference[F, B]]] = {
     val init: (List[Reference[F, B]], List[MissingDetailInReference]) = (Nil, Nil)
     val (refs, missingIdxs) = optRefs.zipWithIndex.foldRight(init) {
       case ((optRef, refIdx), (refs, missingIdxs)) => (optRef: @unchecked) match {
@@ -54,7 +54,7 @@ case class OptionRuleChecker[F, R, B, V](
   
   private def computeArgumentViolations(
     rule: Option[R], formula: Option[F]
-  ): List[Violation] = {
+  ): List[RuleViolation] = {
     { 
       if (formula.isEmpty) List(
         MissingFormula
@@ -69,7 +69,7 @@ case class OptionRuleChecker[F, R, B, V](
   override def check(
     rule: Option[R], formula: Option[F], 
     optRefs: List[Reference[Option[F], Option[B]]]
-  ): List[Violation] = {
+  ): List[RuleViolation] = {
     val refsOrMissingRefs = computeConcreteReferences(optRefs)
     val argViolations = computeArgumentViolations(rule, formula)
 
