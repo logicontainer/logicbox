@@ -8,7 +8,7 @@ import org.scalatest.Inspectors
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
-import logicbox.framework.Violation._
+import logicbox.framework.RuleViolation._
 
 class OptionRuleCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._

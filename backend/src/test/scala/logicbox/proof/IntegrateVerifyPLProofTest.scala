@@ -74,7 +74,7 @@ class IntegrateVerifyPLProofTest extends AnyFunSpec {
       val scopedChecker = ScopedProofChecker[Id]()
       val optionRuleChecker: RuleChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit]] = 
         OptionRuleChecker(PropLogicRuleChecker())
-      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], Id, RuleBasedProofChecker.Diagnostic[Id]] = 
+      val ruleBasedProofChecker: ProofChecker[Option[PropLogicFormula], Option[PropLogicRule], Option[Unit], Id] = 
         RuleBasedProofChecker(optionRuleChecker)
 
       val scopedResult = scopedChecker.check(proof)

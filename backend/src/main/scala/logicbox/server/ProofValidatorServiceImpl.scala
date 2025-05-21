@@ -9,13 +9,14 @@ import spray.json._
 import logicbox.framework.ModifiableProof
 import logicbox.framework.Proof
 import logicbox.proof.ProofModifier
+import logicbox.framework.Diagnostic
 
-class ProofValidatorServiceImpl[F, R, B, Id, E, D](
+class ProofValidatorServiceImpl[F, R, B, Id, E](
   val proofReader: JsonReaderWithErr[List[ModifyProofCommand[F, R, Id]], E],
-  val proofChecker: ProofChecker[F, R, B, Id, D],
+  val proofChecker: ProofChecker[F, R, B, Id],
   val proofWriter: JsonWriter[Proof[F, R, B, Id]],
   val getEmptyProof: () => ModifiableProof[F, R, B, Id],
-  val diagnosticWriter: JsonWriter[D]
+  val diagnosticWriter: JsonWriter[Diagnostic[Id]]
 ) extends ProofValidatorService[E | ModifiableProof.Error[Id]] {
   private type Err = E | ModifiableProof.Error[Id]
 

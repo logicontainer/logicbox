@@ -1,5 +1,5 @@
 package logicbox.framework
 
-trait ProofChecker[F, R, B, Id, D] {
-  def check(proof: Proof[F, R, B, Id]): List[D]
+trait ProofChecker[F, R, B, Id] {
+  def check(proof: Proof[F, R, B, Id]): List[Diagnostic[Id]]
 }

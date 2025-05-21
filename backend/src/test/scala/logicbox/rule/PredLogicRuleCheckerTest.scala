@@ -1,7 +1,7 @@
 package logicbox.rule
 
-import logicbox.framework.{Reference, Violation}
-import logicbox.framework.Violation._
+import logicbox.framework.{Reference, RuleViolation}
+import logicbox.framework.RuleViolation._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*

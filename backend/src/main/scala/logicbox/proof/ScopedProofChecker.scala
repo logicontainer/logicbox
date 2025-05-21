@@ -1,28 +1,13 @@
 package logicbox.proof
 
-import logicbox.framework.ProofChecker
-import logicbox.framework.Proof
-import logicbox.proof.ScopedProofChecker.Diagnostic
-import logicbox.framework.StepDiagnostic
-
-object ScopedProofChecker {
-  sealed trait Diagnostic[+Id] extends StepDiagnostic[Id]
-
-  case object Root
-  type Scope[+Id] = Root.type | Id
-
-  case class ReferenceToLaterStep[+Id](stepId: Id, refIdx: Int, refId: Id) extends Diagnostic[Id]
-  case class ScopeViolation[+Id](stepId: Id, stepScope: Scope[Id], refIdx: Int, refId: Id, refScope: Scope[Id]) extends Diagnostic[Id]
-  case class ReferenceToUnclosedBox[+Id](stepId: Id, refIdx: Int, boxId: Id) extends Diagnostic[Id]
-}
+import logicbox.framework.{ProofChecker, StepDiagnostic, Proof, Scope, Root, Diagnostic}
+import logicbox.framework.Diagnostic._
 
 // note: only scope violations, doesn't report steps/reference/boxes inwhich
 // the id points to something invalid
 class ScopedProofChecker[Id] 
-  extends ProofChecker[Any, Any, Any, Id, ScopedProofChecker.Diagnostic[Id]] 
+  extends ProofChecker[Any, Any, Any, Id] 
 {
-  import ScopedProofChecker._
-
   // for every reachable id from `steps`, add entry id -> its scope in result
   private def collectScopes(proof: Proof[Any, Any, Any, Id], steps: Seq[Id], currentScope: Scope[Id] = Root): Map[Id, Scope[Id]] =
     steps.map {
