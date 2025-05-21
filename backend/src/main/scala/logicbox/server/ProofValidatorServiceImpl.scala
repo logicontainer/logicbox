@@ -1,31 +1,33 @@
 package logicbox.server
 
 import logicbox.framework.ProofValidatorService
-import logicbox.framework.ModifyProofCommand
-import logicbox.framework.JsonReaderWithErr
 import logicbox.framework.ProofChecker
 
 import spray.json._
-import logicbox.framework.ModifiableProof
 import logicbox.framework.Proof
-import logicbox.proof.ProofModifier
 import logicbox.framework.Diagnostic
+import scala.util.Try
+import spray.json.JsonParser.ParsingException
 
-class ProofValidatorServiceImpl[F, R, B, Id, E](
-  val proofReader: JsonReaderWithErr[List[ModifyProofCommand[F, R, Id]], E],
+private type SprayErr = DeserializationException | SerializationException | ParsingException
+
+class ProofValidatorServiceImpl[F, R, B, Id](
+  val proofFormat: JsonFormat[Proof[F, R, B, Id]],
   val proofChecker: ProofChecker[F, R, B, Id],
-  val proofWriter: JsonWriter[Proof[F, R, B, Id]],
-  val getEmptyProof: () => ModifiableProof[F, R, B, Id],
   val diagnosticWriter: JsonWriter[Diagnostic[Id]]
-) extends ProofValidatorService[E | ModifiableProof.Error[Id]] {
-  private type Err = E | ModifiableProof.Error[Id]
+) extends ProofValidatorService[SprayErr] {
+  private def safeSpray[T](f: => T): Either[SprayErr, T] = try {
+    Right(f)
+  } catch {
+    case e: SprayErr => Left(e)
+  }
 
-  override def validateProof(proofJson: JsValue): Either[Err, JsValue] = for {
-    cmds <- proofReader.read(proofJson)
-    proof <- ProofModifier.modify(getEmptyProof(), cmds)
+  override def validateProof(proofJson: JsValue): Either[SprayErr, JsValue] = for {
+    proof <- safeSpray { proofFormat.read(proofJson) }
     diagnostics = proofChecker.check(proof).map(diagnosticWriter.write)
+    cleanedProof <- safeSpray { proofFormat.write(proof) }
   } yield JsObject(
-    "proof" -> proofWriter.write(proof),
+    "proof" -> cleanedProof,
     "diagnostics" -> JsArray(diagnostics)
   )
 }

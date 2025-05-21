@@ -6,9 +6,7 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
-import logicbox.framework.ModifiableProof._
 import logicbox.framework.Proof
-import logicbox.framework.ModifiableProof
 
 import spray.json._
 import logicbox.framework.Justification

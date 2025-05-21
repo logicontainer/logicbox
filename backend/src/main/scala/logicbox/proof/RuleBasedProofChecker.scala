@@ -22,7 +22,7 @@ class RuleBasedProofChecker[F, R, B, Id](
 
       names = List("assumption", "conclusion")
       (ass, concl) <- (names, ids, ids.map(proof.getStep)).zipped.toList.collect {
-        case (which, refId, Left(Proof.StepNotFound(_, expl))) => 
+        case (which, refId, Left(Proof.StepNotFound(_))) => 
           Left(MalformedReference(stepId, refIdx, boxId, s"$which in box has invalid id (id: $refId)"))
         case (which, refId, Right(Proof.Box(_, _))) => 
           Left(MalformedReference(stepId, refIdx, boxId, s"$which in box is itself a box"))
@@ -45,8 +45,8 @@ class RuleBasedProofChecker[F, R, B, Id](
       refIdxs = (0 until refIds.length)
 
       mixed = (refIds, refIdxs, refSteps).zipped.toList.collect {
-        case (refId, refIdx, Left(Proof.StepNotFound(_, expl))) => 
-          Left(List(ReferenceIdNotFound(stepId, refIdx, refId, expl)))
+        case (refId, refIdx, Left(Proof.StepNotFound(_))) => 
+          Left(List(ReferenceIdNotFound(stepId, refIdx, refId)))
 
         case (refId, refIdx, Right(b: Proof.Box[B, Id])) => 
           resolveBoxReference(proof, stepId, refIdx, refId, b)
@@ -82,7 +82,7 @@ class RuleBasedProofChecker[F, R, B, Id](
       (either, id) <- ids.map(proof.getStep).zip(ids)
       res <- either match {
         case Right(step) => checkStep(proof, id, step)
-        case Left(Proof.StepNotFound(id, expl)) => List(StepNotFound(id, expl))
+        case Left(Proof.StepNotFound(id)) => List(StepNotFound(id))
       }
     } yield res
 

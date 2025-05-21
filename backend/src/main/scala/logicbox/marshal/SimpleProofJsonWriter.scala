@@ -32,6 +32,7 @@ case class SimpleProofJsonWriter[F, R, B, Id](
 
   private def writeStep(id: Id, proof: Proof[F, R, B, Id]): JsValue = {
     val step = proof.getStep(id)
+    // TODO: this is a bit agressive
     assert(step.isRight, s"attempt to marshal incomplete proof. on id: $id")
     val Right(s) = step: @unchecked
     s match {

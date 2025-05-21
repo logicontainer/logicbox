@@ -28,7 +28,7 @@ object Proof {
     }
   }
 
-  case class StepNotFound[Id](id: Id, expl: String)
+  case class StepNotFound[Id](id: Id)
 }
 
 trait Proof[+F, +R, +B, Id] {

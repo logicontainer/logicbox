@@ -31,7 +31,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
       val result = checker.check(proof)
 
       Inspectors.forAtLeast(1, result) {
-        _ should matchPattern { case StepNotFound("id", _) => }
+        _ should matchPattern { case StepNotFound("id") => }
       }
     }
 
@@ -44,7 +44,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
 
       Inspectors.forAtLeast(1, result) {
         _ should matchPattern {
-          case ReferenceIdNotFound("id", 0, "something that doesn't exist", _) => 
+          case ReferenceIdNotFound("id", 0, "something that doesn't exist") => 
         }
       }
     }

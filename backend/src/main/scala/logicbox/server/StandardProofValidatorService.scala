@@ -1,7 +1,5 @@
 package logicbox.server
 
-import logicbox.framework.JsonReaderWithErr
-import logicbox.framework.ModifyProofCommand
 import logicbox.formula.PropLogicFormula
 import logicbox.rule.PropLogicRule
 import logicbox.demarshal.ProofJsonReader
@@ -21,7 +19,6 @@ import logicbox.proof.ProofView
 import logicbox.proof.ProofLineImpl
 import logicbox.proof.ProofBoxImpl
 import spray.json.JsonWriter
-import logicbox.framework.ModifiableProof
 import spray.json.JsValue
 import spray.json.JsString
 import logicbox.marshal.SimpleProofJsonWriter
@@ -29,7 +26,6 @@ import logicbox.marshal.PrettyPLFormula
 import logicbox.marshal.IncompleteFormulaWriter
 import logicbox.framework.Justification
 import logicbox.proof.ProofImpl
-import logicbox.proof.StandardStepStrategy
 import logicbox.marshal.PropLogicRuleWriter
 import logicbox.marshal.JustificationWriter
 
@@ -44,6 +40,7 @@ import logicbox.framework.RuleViolation._
 import logicbox.framework.Diagnostic
 import logicbox.framework.Diagnostic._
 import logicbox.framework.Root
+import logicbox.framework.Scope
 
 
 // 'factory'
@@ -52,7 +49,6 @@ object StandardProofValidatorService {
   private type R = PropLogicRule
   private type B = Unit
   private type Id = String
-  private type Err = ProofJsonReader.Err
 
   private def formulaParser(userInput: String): IncompleteFormula[F] = IncompleteFormula(
     userInput, optFormula = try {
@@ -63,9 +59,6 @@ object StandardProofValidatorService {
   private def ruleParser(rule: String): Option[R] = PropLogicRuleParser.parse(rule)
 
   private def idParser(str: String): Id = str
-
-  private def proofReader: JsonReaderWithErr[List[ModifyProofCommand[IncompleteFormula[F], Option[R], Id]], ProofJsonReader.Err] = 
-    ProofJsonReader(formulaParser, ruleParser, idParser)
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
@@ -104,13 +97,6 @@ object StandardProofValidatorService {
   private def proofWriter: JsonWriter[Proof[IncompleteFormula[F], Option[R], B, Id]] = 
     SimpleProofJsonWriter(idWriter, formulaWriter, justificationWriter)
 
-  private def getEmptyProof(): ModifiableProof[IncompleteFormula[F], Option[R], B, Id] = ProofImpl.empty(
-    StandardStepStrategy(
-      ProofLineImpl(IncompleteFormula("", None), None, Seq()),
-      ProofBoxImpl((), Seq())
-    )
-  )
-
   private def getViolationType(diag: Diagnostic[Id]): String = diag match {
     case RuleViolationAtStep(stepId, violation: RuleViolation) => violation match {
       case MissingFormula => "missingFormula"
@@ -125,12 +111,26 @@ object StandardProofValidatorService {
       case FormulaDoesntMatchRule(_) => "propositionalLogic:formulaDoesntMatchRule"
       case MiscellaneousViolation(_) => "propositionalLogic:miscellaneousViolation"
     }
-    case StepNotFound(_, _) => "stepNotFound"
-    case ReferenceIdNotFound(_, _, _, _) => "referenceIdNotFound"
+    case StepNotFound(_) => "stepNotFound"
+    case ReferenceIdNotFound(_, _, _) => "referenceIdNotFound"
     case MalformedReference(_, _, _, _) => "malformedReference"
     case ReferenceToLaterStep(_, _, _) => "referenceToLaterStep" 
     case ScopeViolation(_, _, _, _, _) => "scopeViolation"
     case ReferenceToUnclosedBox(_, _, _) => "referenceToUnclosedBox"
+  }
+
+
+  implicit object scopeWriter extends JsonFormat[Scope[Id]] {
+    override def read(json: JsValue): Scope[String] = json match {
+      case JsString("root") => Root
+      case JsString(id) => id
+      case _ => throw DeserializationException(s"${json.prettyPrint} is not a valid scope")
+    }
+
+    override def write(obj: Scope[String]): JsValue = obj match {
+      case scope: String => JsString(scope)
+      case Root => JsString("root")
+    }
   }
 
   private def getViolation(diag: Diagnostic[Id]): JsValue = diag match {
@@ -146,17 +146,11 @@ object StandardProofValidatorService {
       case v: FormulaDoesntMatchRule => jsonFormat1(FormulaDoesntMatchRule.apply).write(v)
       case v: MiscellaneousViolation => jsonFormat1(MiscellaneousViolation.apply).write(v)
     }
-    case d: StepNotFound[Id] => jsonFormat2(StepNotFound[Id].apply).write(d)
-    case d: ReferenceIdNotFound[Id] => jsonFormat4(ReferenceIdNotFound[Id].apply).write(d)
+    case d: StepNotFound[Id] => jsonFormat1(StepNotFound[Id].apply).write(d)
+    case d: ReferenceIdNotFound[Id] => jsonFormat3(ReferenceIdNotFound[Id].apply).write(d)
     case d: MalformedReference[Id] => jsonFormat4(MalformedReference[Id].apply).write(d)
     case d: ReferenceToLaterStep[Id] => jsonFormat3(ReferenceToLaterStep[Id].apply).write(d)
-    case ScopeViolation(stepId, stepScope, refIdx, refId, refScope) => JsObject(
-      "stepId" -> JsString(stepId),
-      "stepScope" -> JsString(stepScope match { case s: String => s ; case Root => "root" }),
-      "refIdx" -> JsNumber(refIdx),
-      "refId" -> JsString(refId),
-      "refScope" -> JsString(refScope match { case s: String => s ; case Root => "root" })
-    )
+    case d: ScopeViolation[Id] => jsonFormat5(ScopeViolation[Id].apply).write(d)
     case d: ReferenceToUnclosedBox[Id] => jsonFormat3(ReferenceToUnclosedBox[Id].apply).write(d)
   }
 
@@ -172,5 +166,5 @@ object StandardProofValidatorService {
 
 import StandardProofValidatorService._
 class StandardProofValidatorService extends ProofValidatorServiceImpl[
-  IncompleteFormula[F], Option[R], B, Id, Err
-](proofReader, proofChecker, proofWriter, getEmptyProof, diagnosticWriter)
+  IncompleteFormula[F], Option[R], B, Id
+](???, ???, ???)
