@@ -13,48 +13,34 @@ class RuleBasedProofChecker[F, R, B, Id](
   private type D = Diagnostic[Id]
   private type Pf = Proof[F, R, B, Id]
 
-  private def resolveBoxReference(proof: Pf, stepId: Id, refIdx: Int, boxId: Id, box: Proof.Box[B, Id]): Either[List[D], Reference.Box[F, B]] =
-    for {
-      ids <- box.steps match {
-        case Seq() => Left(List(MalformedReference(stepId, refIdx, boxId, "box is empty")))
-        case steps => Right(List(steps.head, steps.last))
-      }
+  private def resolveBoxReference(proof: Pf, stepId: Id, refIdx: Int, boxId: Id, box: Proof.Box[B, Id]): Reference.Box[F, B] = {
+    val ids = List(box.steps.headOption, box.steps.lastOption)
+    val List(assRef, conclRef) = ids.map(_.flatMap { 
+      ref => resolveReference(proof, boxId, ref, 0).toOption
+    })
+    ReferenceBoxImpl(box.info, assRef, conclRef)
+  }
 
-      names = List("assumption", "conclusion")
-      (ass, concl) <- (names, ids, ids.map(proof.getStep)).zipped.toList.collect {
-        case (which, refId, Left(Proof.StepNotFound(_))) => 
-          Left(MalformedReference(stepId, refIdx, boxId, s"$which in box has invalid id (id: $refId)"))
-        case (which, refId, Right(Proof.Box(_, _))) => 
-          Left(MalformedReference(stepId, refIdx, boxId, s"$which in box is itself a box"))
-        case (_, _, Right(Proof.Line(formula: F @unchecked, _, _))) => Right(formula)
-      } match {
-        case List(Right(ass), Right(concl)) => Right(ass, concl)
-        case ls => 
-          // if box only contains one line, don't have duplicate diagnostics
-          val dgns = ls.collect { case Left(d) => d }
-          val assumptionAndConclusionAreTheSame = ids(0) == ids(1)
-          if (assumptionAndConclusionAreTheSame) Left(dgns.take(1))
-          else Left(dgns)
-      }
-    } yield ReferenceBoxImpl(box.info, ass, concl)
+  private def resolveReference(proof: Pf, stepId: Id, refId: Id, refIdx: Int): Either[List[D], Reference[F, B]] = {
+    (proof.getStep(refId): @unchecked) match {
+      case Left(Proof.StepNotFound(_)) => 
+        Left(List(ReferenceIdNotFound(stepId, refIdx, refId)))
+
+      case Right(Proof.Line(formula, _, _)) => 
+        Right(ReferenceLineImpl(formula))
+
+      case Right(b: Proof.Box[B, Id]) => 
+        Right(resolveBoxReference(proof, stepId, refIdx, refId, b))
+    }
+  }
 
   private def resolveReferences(proof: Pf, stepId: Id, refIds: Seq[Id]): Either[List[D], List[Reference[F, B]]] = {
+    val refIdxs = (0 until refIds.length)
+    val mixed = (refIds.toList, refIdxs).zipped.map { 
+      case (id, idx) => resolveReference(proof, stepId, id, idx)
+    }
+
     for {
-      refIds <- Right(refIds.toList)
-      refSteps = refIds.map(proof.getStep)
-      refIdxs = (0 until refIds.length)
-
-      mixed = (refIds, refIdxs, refSteps).zipped.toList.collect {
-        case (refId, refIdx, Left(Proof.StepNotFound(_))) => 
-          Left(List(ReferenceIdNotFound(stepId, refIdx, refId)))
-
-        case (refId, refIdx, Right(b: Proof.Box[B, Id])) => 
-          resolveBoxReference(proof, stepId, refIdx, refId, b)
-
-        case (_, _, Right(Proof.Line(formula: F @unchecked, _, _))) => 
-          Right(ReferenceLineImpl(formula))
-      }
-
       _ <- mixed.collect { case Left(dgn) => dgn }.flatten match {
         case Nil => Right(())
         case dgns => Left(dgns)
@@ -66,14 +52,14 @@ class RuleBasedProofChecker[F, R, B, Id](
 
   private def checkStep(proof: Proof[F, R, B, Id], id: Id, step: Proof.Step[F, R, B, Id]): List[D] = 
     (step: @unchecked) match {
-      case Proof.Line(formula: F @unchecked, rule: R @unchecked, ids: Seq[Id] @unchecked) =>
+      case Proof.Line(formula, rule, ids) =>
         resolveReferences(proof, id, ids) match {
           case Right(refs) => 
             ruleChecker.check(rule, formula, refs).map { v => RuleViolationAtStep(id, v) }
 
           case Left(diagnostics) => diagnostics
         }
-      case Proof.Box(_, ids: Seq[Id] @unchecked) => checkSteps(proof, ids)
+      case Proof.Box(_, ids) => checkSteps(proof, ids)
     }
 
   private def checkSteps(proof: Proof[F, R, B, Id], stepIds: Seq[Id]): List[D] =

@@ -20,8 +20,8 @@ class PLRuleTest extends AnyFunSpec {
     extends Reference.Line[PropLogicFormula]
   private case class Box(fst: PropLogicFormula, lst: PropLogicFormula) extends Reference.Box[PropLogicFormula, PLBoxInfo] {
     override def info = ()
-    override def first = fst
-    override def last = lst
+    override def first = Some(ReferenceLineImpl(fst))
+    override def last = Some(ReferenceLineImpl(lst))
   }
 
   private def stub(str: String): Reference[PropLogicFormula, PLBoxInfo] = new Reference.Line[PropLogicFormula] {

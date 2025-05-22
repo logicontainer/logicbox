@@ -7,6 +7,16 @@ import logicbox.framework.RuleViolation._
 object ReferenceUtil {
   enum BoxOrFormula { case Box; case Formula }
 
+  def extractFirstLine[F, I](ref: Reference.Box[F, I]): Option[F] = ref match {
+    case Reference.Box(_, Some(Reference.Line(first)), _) => Some(first)
+    case _ => None
+  }
+
+  def extractLastLine[F, I](ref: Reference.Box[F, I]): Option[F] = ref match {
+    case Reference.Box(_, _, Some(Reference.Line(last))) => Some(last)
+    case _ => None
+  }
+
   def extractAndThen[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]) 
     (func: PartialFunction[List[Reference[F, I]], List[RuleViolation]]): List[RuleViolation] = 
   {
