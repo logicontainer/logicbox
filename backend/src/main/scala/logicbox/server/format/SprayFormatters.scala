@@ -17,7 +17,29 @@ object SprayFormatters extends DefaultJsonProtocol {
   implicit val rawJustificationFormat: JsonFormat[RawJustification] = jsonFormat2(RawJustification.apply)
   implicit val rawProofLineFormat: JsonFormat[RawProofLine] = jsonFormat4(RawProofLine.apply)
   implicit val rawBoxInfoFormat: JsonFormat[RawBoxInfo] = jsonFormat1(RawBoxInfo.apply)
-  implicit val rawProofBoxFormat: JsonFormat[RawProofBox] = lazyFormat(jsonFormat4(RawProofBox.apply))
+
+  implicit object rawProofBoxFormat extends JsonFormat[RawProofBox] {
+    private def asString(js: JsValue): Option[String] = js match {
+      case JsString(s) => Some(s)
+      case _ => None
+    }
+    override def read(json: JsValue): RawProofBox = (json match {
+      case JsObject(fields) => for {
+        uuid <- fields.get("uuid").flatMap(asString)
+        stepType <- fields.get("stepType").flatMap(asString)
+        proof <- fields.get("proof")
+        boxInfo = fields.get("boxInfo").map(rawBoxInfoFormat.read)
+      } yield RawProofBox(
+        uuid = uuid,
+        stepType = stepType,
+        proof = rawProofFormat.read(proof),
+        boxInfo = boxInfo.getOrElse(RawBoxInfo(None))
+      )
+      case _ => None
+    }).getOrElse(throw DeserializationException(s"${json.prettyPrint} is not a valid proof box"))
+
+    override def write(obj: RawProofBox): JsValue = jsonFormat4(RawProofBox.apply).write(obj)
+  }
 
   implicit object rawProofStepFormat extends RootJsonFormat[RawProofStep] {
     def write(obj: RawProofStep): JsValue = obj match {

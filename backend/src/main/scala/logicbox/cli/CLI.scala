@@ -66,7 +66,7 @@ object CLIMain {
             RawProofBox(
               uuid = id,
               stepType = "box",
-              boxInfo = Some(RawBoxInfo(freshVar)),
+              boxInfo = RawBoxInfo(freshVar),
               proof = inner
             )
           ) ++ parseRawProof(endd)
