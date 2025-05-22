@@ -19,13 +19,8 @@ import logicbox.proof.ProofBoxImpl
 import spray.json.JsonWriter
 import spray.json.JsValue
 import spray.json.JsString
-import logicbox.marshal.SimpleProofJsonWriter
-import logicbox.marshal.PrettyPLFormula
-import logicbox.marshal.IncompleteFormulaWriter
 import logicbox.framework.Justification
 import logicbox.proof.ProofImpl
-import logicbox.marshal.PropLogicRuleWriter
-import logicbox.marshal.JustificationWriter
 
 import spray.json._
 import spray.json.DefaultJsonProtocol._
@@ -39,6 +34,7 @@ import logicbox.framework.Diagnostic
 import logicbox.framework.Diagnostic._
 import logicbox.framework.Root
 import logicbox.framework.Scope
+import logicbox.rule.PropLogicRuleParser.parse
 
 // 'factory'
 object StandardProofValidatorService {
@@ -49,15 +45,7 @@ object StandardProofValidatorService {
 
   import logicbox.server.format.SprayFormatters._
 
-  private def formulaParser(userInput: String): IncompleteFormula[F] = IncompleteFormula(
-    userInput, optFormula = try {
-      Some(PropLogicParser()(PropLogicLexer()(userInput)))
-    } catch { case _ => None }
-  )
 
-  private def ruleParser(rule: String): Option[R] = PropLogicRuleParser.parse(rule)
-
-  private def idParser(str: String): Id = str
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
@@ -81,23 +69,30 @@ object StandardProofValidatorService {
     }
   }
 
-  private def idWriter: JsonWriter[Id] = JsonWriter.func2Writer(JsString(_))
-  private def ruleWriter: JsonWriter[Option[R]] = JsonWriter.func2Writer {
-    case None => JsNull
-    case Some(value) => PropLogicRuleWriter().write(value)
+  private def parseFormula(userInput: String): Option[F] = {
+    try {
+      Some(PropLogicParser()(PropLogicLexer()(userInput)))
+    } catch { case _ => None }
   }
 
-  private def formulaWriter: JsonWriter[IncompleteFormula[F]] = IncompleteFormulaWriter(
-    PrettyPLFormula.asLaTeX, PrettyPLFormula.asASCII
+  private def ruleParser(rule: String): Option[R] = PropLogicRuleParser.parse(rule)
+  private val formulaToAscii = format.Stringifiers.propLogicFormulaAsASCII
+  private val formulaToLatex = format.Stringifiers.propLogicFormulaAsLaTeX
+  private val ruleToString   = format.Stringifiers.propLogicRuleAsString
+
+  val rawProofConverter = RawProofToIncompleteProofConverter(
+    parseFormula = parseFormula,
+    parseRule = ruleParser,
+    formulaToLatex = formulaToLatex,
+    formulaToAscii = formulaToAscii,
+    ruleToString = ruleToString,
   )
-
-  private def justificationWriter: JsonWriter[Justification[Option[R], Id]] = JustificationWriter(ruleWriter, idWriter)
-
-  private def proofWriter: JsonWriter[Proof[IncompleteFormula[F], Option[R], B, Id]] = 
-    SimpleProofJsonWriter(idWriter, formulaWriter, justificationWriter)
 }
 
 import StandardProofValidatorService._
 class StandardProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], B
-](???, ???)
+](
+  rawProofConverter = rawProofConverter, 
+  proofChecker = proofChecker
+)

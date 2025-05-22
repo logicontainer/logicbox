@@ -10,11 +10,11 @@ import logicbox.proof.ProofBoxImpl
 import logicbox.proof.ProofImpl
 
 class RawProofToIncompleteProofConverter[F, R](
-  parseFormula: String => Option[F], 
-  parseRule: String => Option[R],
-  formulaToAscii: F => String,
-  formulaToLatex: F => String,
-  ruleToString: R => String,
+  val parseFormula: String => Option[F], 
+  val parseRule: String => Option[R],
+  val formulaToAscii: F => String,
+  val formulaToLatex: F => String,
+  val ruleToString: R => String,
 ) extends RawProofConverter[IncompleteProof[F, R, Unit, String]] {
 
   private def convertLineToRaw(id: String, line: Proof.Line[IncompleteFormula[F], Option[R], String]): RawProofLine = {
