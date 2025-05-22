@@ -102,7 +102,7 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\chi"), box("\\varphi\\\\ \\vdots \\\\ \\chi")],
+          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\chi"), box("\\psi\\\\ \\vdots \\\\ \\chi")],
           conclusion: "\\chi",
         },
         numPremises: 3,

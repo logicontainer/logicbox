@@ -57,7 +57,7 @@ function WrongNumberOfReferencesDiagnostic({
   exp,
   actual,
 }: ViolationWithUuid & { 
-  violationType: "propositionalLogic:wrongNumberOfReferences",
+  violationType: "wrongNumberOfReferences",
 }) {
   return <div>Expected {exp} references but found {actual}</div>;
 }
@@ -65,7 +65,7 @@ function WrongNumberOfReferencesDiagnostic({
 function ReferenceShouldBeBoxDiagnostic({
   uuid,
   ref,
-}: ViolationWithUuid & { violationType: "propositionalLogic:referenceShouldBeBox" }) {
+}: ViolationWithUuid & { violationType: "referenceShouldBeBox" }) {
   const refLineNumber = useDiagnostics().getRefString(uuid, ref)
   return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a box.</div>;
 }
@@ -73,7 +73,7 @@ function ReferenceShouldBeBoxDiagnostic({
 function ReferenceShouldBeLineDiagnostic({
   uuid,
   ref,
-}: ViolationWithUuid & { violationType: "propositionalLogic:referenceShouldBeLine" }) {
+}: ViolationWithUuid & { violationType: "referenceShouldBeLine" }) {
   const refLineNumber = useDiagnostics().getRefString(uuid, ref)
   return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a line.</div>;
 }
@@ -82,7 +82,7 @@ function ReferenceDoesntMatchRuleDiagnostic({
   uuid,
   ref,
   expl,
-}: ViolationWithUuid & { violationType: "propositionalLogic:referenceDoesntMatchRule" }) {
+}: ViolationWithUuid & { violationType: "referenceDoesntMatchRule" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, ref)
   const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [ref], false)
 
@@ -100,7 +100,7 @@ function ReferencesMismatchDiagnostic({
   uuid,
   refs,
   expl,
-}: ViolationWithUuid & { violationType: "propositionalLogic:referencesMismatch" }) {
+}: ViolationWithUuid & { violationType: "referencesMismatch" }) {
   const refLatexes = useDiagnostics().getLatexForMultipleRefs(uuid, refs)
   return <div>
    {refs.map((r, i) => refIdxToString(r, i === 0)).join(' and ')}{" "}
@@ -115,7 +115,7 @@ function FormulaDoesntMatchReferenceDiagnostic({
   uuid,
   refs,
   expl,
-}: ViolationWithUuid & { violationType: "propositionalLogic:formulaDoesntMatchReference" }) {
+}: ViolationWithUuid & { violationType: "formulaDoesntMatchReference" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refs)
 
@@ -133,7 +133,7 @@ function FormulaDoesntMatchReferenceDiagnostic({
 function FormulaDoesntMatchRuleDiagnostic({
   uuid,
   expl,
-}: ViolationWithUuid & { violationType: "propositionalLogic:formulaDoesntMatchRule" }) {
+}: ViolationWithUuid & { violationType: "formulaDoesntMatchRule" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
   const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [], true)
   return <div>
@@ -148,7 +148,7 @@ function FormulaDoesntMatchRuleDiagnostic({
 
 function MiscellaneousViolationDiagnostic({
   expl,
-}: ViolationWithUuid & { violationType: "propositionalLogic:miscellaneousViolation" }) {
+}: ViolationWithUuid & { violationType: "miscellaneousViolation" }) {
   return <div>
     <ServerMsg>{expl}</ServerMsg>
   </div>;
@@ -260,21 +260,21 @@ export function DiagnosticMessage({ diagnostic }: {
       return <MissingRuleDiagnostic {...v} />;
     case "missingDetailInReference":
       return <MissingDetailInReferenceDiagnostic {...v}/>;
-    case "propositionalLogic:wrongNumberOfReferences":
+    case "wrongNumberOfReferences":
       return <WrongNumberOfReferencesDiagnostic {...v}/>;
-    case "propositionalLogic:referenceShouldBeBox":
+    case "referenceShouldBeBox":
       return <ReferenceShouldBeBoxDiagnostic {...v}/>;
-    case "propositionalLogic:referenceShouldBeLine":
+    case "referenceShouldBeLine":
       return <ReferenceShouldBeLineDiagnostic {...v}/>;
-    case "propositionalLogic:referenceDoesntMatchRule":
+    case "referenceDoesntMatchRule":
       return <ReferenceDoesntMatchRuleDiagnostic {...v}/>;
-    case "propositionalLogic:referencesMismatch":
+    case "referencesMismatch":
       return <ReferencesMismatchDiagnostic {...v}/>;
-    case "propositionalLogic:formulaDoesntMatchReference":
+    case "formulaDoesntMatchReference":
       return <FormulaDoesntMatchReferenceDiagnostic {...v}/>;
-    case "propositionalLogic:formulaDoesntMatchRule":
+    case "formulaDoesntMatchRule":
       return <FormulaDoesntMatchRuleDiagnostic {...v} />;
-    case "propositionalLogic:miscellaneousViolation":
+    case "miscellaneousViolation":
       return <MiscellaneousViolationDiagnostic {...v} />;
     case "stepNotFound":
       return <StepNotFoundDiagnostic {...v} />;
