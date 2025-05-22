@@ -1,0 +1,8 @@
+10: forall x P(x)           : premise
+15: forall x (P(x) -> Q(x)) : premise
+b1 a ------------------------
+  20: P(a)                  : forall_elim 10
+  30: P(a) -> Q(a)          : forall_elim 15
+  40: Q(a)                  : implies_elim 20, 30
+-----------------------------
+50: forall y Q(y)           : forall_intro b1

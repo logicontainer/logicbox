@@ -1,0 +1,5 @@
+10: forall x P(x)    : premise
+b1 a ----------------
+  20: Q(a)           : forall_elim 10
+---------------------
+30: forall x Q(x)    : forall_intro b1

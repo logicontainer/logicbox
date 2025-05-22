@@ -18,6 +18,7 @@ object PredLogicProofValidatorService {
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
 
+    val boxAssumptionProofChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
     val boxContraintsProofChecker = PredLogicBoxConstraintsProofChecker[R, Id](PropLogicRule.Assumption())
 
     val predLogicChecker = PredLogicRuleChecker[F, PredLogicTerm, PredLogicTerm.Var](
@@ -28,7 +29,7 @@ object PredLogicProofValidatorService {
 
     val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B]] = 
       OptionRuleChecker(UnionRuleChecker(predLogicChecker, propLogicChecker, isR1 = {
-        case r: PropLogicRule => true
+        case r: PredLogicRule => true
         case _ => false
       }))
 
@@ -54,7 +55,8 @@ object PredLogicProofValidatorService {
         })
 
         ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof) ++
-        boxContraintsProofChecker.check(cleanRulesProofView)
+        boxContraintsProofChecker.check(cleanRulesProofView) ++
+        boxAssumptionProofChecker.check(cleanRulesProofView)
       }
     }
   }
@@ -65,7 +67,9 @@ object PredLogicProofValidatorService {
     } catch { case _ => None }
   }
 
-  private def ruleParser(rule: String): Option[R] = PropLogicRuleParser.parse(rule)
+  private def ruleParser(rule: String): Option[R] = 
+    PropLogicRuleParser.parse(rule).orElse(PredLogicRuleParser.parse(rule))
+
   private val formulaToAscii = format.Stringifiers.propLogicFormulaAsASCII
   private val formulaToLatex = format.Stringifiers.propLogicFormulaAsLaTeX
   private val ruleToString   = format.Stringifiers.propLogicRuleAsString

@@ -18,7 +18,7 @@ object PropLogicProofValidatorService {
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
 
-    val boxFirstRuleIsAssumptionChecker = PropLogicBoxAssumptionsProofChecker[Id]()
+    val boxFirstRuleIsAssumptionChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
 
     val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B]] = 
       OptionRuleChecker(PropLogicRuleChecker[PropLogicFormula]())
@@ -31,8 +31,8 @@ object PropLogicProofValidatorService {
           case (id, line: Proof.Line[IncompleteFormula[F], Option[R], Id]) => 
             ProofLineImpl(line.formula.optFormula, line.rule, line.refs)
 
-          case (_, box: Proof.Box[B, Id]) => 
-            ProofBoxImpl(Some(box.info), box.steps)
+          case (_, box: Proof.Box[Option[B], Id]) => 
+            ProofBoxImpl(box.info, box.steps)
         })
 
         val cleanRulesProofView: Proof[?, R, ?, Id] = OptionProofView(optProofView, {

@@ -118,8 +118,8 @@ object Stringifiers {
   }
 
   def predLogicRuleAsString(rule: PredLogicRule): String = rule match {
-    case ForAllElim() => "for_all_elim"
-    case ForAllIntro() => "for_all_intro"
+    case ForAllElim() => "forall_elim"
+    case ForAllIntro() => "forall_intro"
     case ExistsElim() => "exists_elim"
     case ExistsIntro() => "exists_intro"
     case EqualityIntro() => "equality_intro"
