@@ -35,7 +35,7 @@ object ProofStubs {
   ) extends Proof[F, R, B, Id] {
     override def getStep(id: Id): Either[Proof.StepNotFound[Id], Proof.Step[F, R, B, Id]] = 
       map.get(id) match {
-        case None => Left(Proof.StepNotFound(id, s"STUB THING $id"))
+        case None => Left(Proof.StepNotFound(id))
         case Some(value) => Right(value)
       }
   }

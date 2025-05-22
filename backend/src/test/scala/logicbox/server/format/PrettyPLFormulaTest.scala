@@ -1,4 +1,4 @@
-package logicbox.marshal
+package logicbox.server.format
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
@@ -7,8 +7,8 @@ import org.scalatest.Inspectors
 
 class PrettyPLFormulaTest extends AnyFunSpec {
   import logicbox.formula.PropLogicFormula._
-  describe("PrettyPLFormula::asLaTeX") {
-    import PrettyPLFormula.asLaTeX
+  describe("Stringifiers::propLogicFormulaAsLaTeX") {
+    import Stringifiers.propLogicFormulaAsLaTeX => asLaTeX
     it("should do bot/top/atoms") {
       asLaTeX(Contradiction()) shouldBe "\\bot"
       asLaTeX(Tautology()) shouldBe "\\top"
@@ -28,8 +28,8 @@ class PrettyPLFormulaTest extends AnyFunSpec {
     }
   }
 
-  describe("PrettyPLFormula::asASCII") {
-    import PrettyPLFormula.asASCII
+  describe("Stringifiers.propLogicFormulaAsASCII") {
+    import Stringifiers.propLogicFormulaAsASCII => asASCII
     it("should do bot/top/atoms") {
       asASCII(Contradiction()) shouldBe "false"
       asASCII(Tautology()) shouldBe "true"

@@ -1,31 +1,39 @@
 package logicbox.server
 
 import logicbox.framework.ProofValidatorService
-import logicbox.framework.ModifyProofCommand
-import logicbox.framework.JsonReaderWithErr
 import logicbox.framework.ProofChecker
 
 import spray.json._
-import logicbox.framework.ModifiableProof
 import logicbox.framework.Proof
-import logicbox.proof.ProofModifier
 import logicbox.framework.Diagnostic
+import scala.util.Try
+import spray.json.JsonParser.ParsingException
 
-class ProofValidatorServiceImpl[F, R, B, Id, E](
-  val proofReader: JsonReaderWithErr[List[ModifyProofCommand[F, R, Id]], E],
-  val proofChecker: ProofChecker[F, R, B, Id],
-  val proofWriter: JsonWriter[Proof[F, R, B, Id]],
-  val getEmptyProof: () => ModifiableProof[F, R, B, Id],
-  val diagnosticWriter: JsonWriter[Diagnostic[Id]]
-) extends ProofValidatorService[E | ModifiableProof.Error[Id]] {
-  private type Err = E | ModifiableProof.Error[Id]
+import logicbox.server.format.RawProofConverter
+import logicbox.server.format.SprayFormatters
 
-  override def validateProof(proofJson: JsValue): Either[Err, JsValue] = for {
-    cmds <- proofReader.read(proofJson)
-    proof <- ProofModifier.modify(getEmptyProof(), cmds)
-    diagnostics = proofChecker.check(proof).map(diagnosticWriter.write)
+private type SprayErr = DeserializationException | SerializationException | ParsingException
+
+class ProofValidatorServiceImpl[F, R, B](
+  val rawProofConverter: RawProofConverter[Proof[F, R, B, String]],
+  val proofChecker: ProofChecker[F, R, B, String],
+) extends ProofValidatorService[SprayErr] {
+
+  import logicbox.server.format.SprayFormatters._
+
+  private def safeSpray[T](f: => T): Either[SprayErr, T] = try {
+    Right(f)
+  } catch {
+    case e: SprayErr => Left(e)
+  }
+
+  override def validateProof(proofJson: JsValue): Either[SprayErr, JsValue] = for {
+    rawProof <- safeSpray { rawProofFormat.read(proofJson) }
+    proof = rawProofConverter.convertFromRaw(rawProof)
+    diagnostics = proofChecker.check(proof).map(writeDiagnostic(_))
+    outputRawProof <- safeSpray { rawProofFormat.write(rawProofConverter.convertToRaw(proof)) }
   } yield JsObject(
-    "proof" -> proofWriter.write(proof),
+    "proof" -> outputRawProof,
     "diagnostics" -> JsArray(diagnostics)
   )
 }
