@@ -11,8 +11,8 @@ import logicbox.formula.ConnectiveFormula
 import logicbox.formula.ConnectiveFormula._
 import logicbox.framework.RuleViolation._
 
-class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, PropLogicRule, Unit] {
-  private type Ref = Reference[F, Unit]
+class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, PropLogicRule, Any] {
+  private type Ref = Reference[F, Any]
 
   import Reference._
   import PropLogicRule._

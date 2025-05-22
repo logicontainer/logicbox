@@ -16,7 +16,8 @@ object SprayFormatters extends DefaultJsonProtocol {
   implicit val rawFormulaFormat: JsonFormat[RawFormula] = jsonFormat3(RawFormula.apply)
   implicit val rawJustificationFormat: JsonFormat[RawJustification] = jsonFormat2(RawJustification.apply)
   implicit val rawProofLineFormat: JsonFormat[RawProofLine] = jsonFormat4(RawProofLine.apply)
-  implicit val rawProofBoxFormat: JsonFormat[RawProofBox] = lazyFormat(jsonFormat3(RawProofBox.apply))
+  implicit val rawBoxInfoFormat: JsonFormat[RawBoxInfo] = jsonFormat1(RawBoxInfo.apply)
+  implicit val rawProofBoxFormat: JsonFormat[RawProofBox] = lazyFormat(jsonFormat4(RawProofBox.apply))
 
   implicit object rawProofStepFormat extends RootJsonFormat[RawProofStep] {
     def write(obj: RawProofStep): JsValue = obj match {

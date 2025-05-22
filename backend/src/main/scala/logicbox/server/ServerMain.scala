@@ -4,7 +4,7 @@ import zio._
 import zio.http._
 
 import spray.json.JsonParser
-import logicbox.server.StandardProofValidatorService
+import logicbox.server.PropLogicProofValidatorService
 import zio.http.Middleware.{CorsConfig, cors}
 
 object GreetingRoutes {
@@ -26,7 +26,7 @@ object GreetingRoutes {
           (for {
             body <- req.body.asString
             json = JsonParser(body)
-            res = StandardProofValidatorService().validateProof(json) match {
+            res = PropLogicProofValidatorService().validateProof(json) match {
               case Left(value) => Response.text(value.toString)
               case Right(value) => Response.text(value.prettyPrint).updateHeaders(
                 headers => headers.addHeader(Header.ContentType(MediaType.application.json))

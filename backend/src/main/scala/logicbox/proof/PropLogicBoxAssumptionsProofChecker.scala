@@ -9,10 +9,10 @@ import logicbox.framework.Diagnostic.RuleViolationAtStep
 import logicbox.framework.RuleViolation.ReferenceDoesntMatchRule
 import ProofCheckUtil.{checkRefHasAssumptionOnFirstLine, checkForEveryLine}
 
-class PropLogicBoxAssumptionsProofChecker[Id] 
-  extends ProofChecker[Any, PropLogicRule, Any, Id]
+class PropLogicBoxAssumptionsProofChecker[R >: PropLogicRule, Id] 
+  extends ProofChecker[Any, R, Any, Id]
 {
-  private type Pf = Proof[Any, PropLogicRule, Any, Id]
+  private type Pf = Proof[Any, R, Any, Id]
 
   override def check(proof: Pf): List[Diagnostic[Id]] = checkForEveryLine(proof, {
     case (id, line) => line.rule match {

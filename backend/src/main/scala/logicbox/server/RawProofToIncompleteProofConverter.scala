@@ -1,7 +1,5 @@
 package logicbox.server
 
-import logicbox.server.format.RawProofConverter
-import logicbox.server.format.{RawProof, RawProofStep, RawProofLine, RawProofBox, RawFormula, RawJustification}
 import logicbox.framework._
 import logicbox.framework.Proof.Line
 import logicbox.framework.Proof.Box
@@ -9,13 +7,17 @@ import logicbox.proof.ProofLineImpl
 import logicbox.proof.ProofBoxImpl
 import logicbox.proof.ProofImpl
 
-class RawProofToIncompleteProofConverter[F, R](
+import logicbox.server.format._
+
+class RawProofToIncompleteProofConverter[F, R, B](
   val parseFormula: String => Option[F], 
   val parseRule: String => Option[R],
+  val parseRawBoxInfo: RawBoxInfo => Option[B],
   val formulaToAscii: F => String,
   val formulaToLatex: F => String,
   val ruleToString: R => String,
-) extends RawProofConverter[IncompleteProof[F, R, Unit, String]] {
+  val boxInfoToRaw: B => RawBoxInfo,
+) extends RawProofConverter[IncompleteProof[F, R, B, String]] {
 
   private def convertLineToRaw(id: String, line: Proof.Line[IncompleteFormula[F], Option[R], String]): RawProofLine = {
     RawProofLine(
@@ -33,28 +35,29 @@ class RawProofToIncompleteProofConverter[F, R](
     )
   }
 
-  private def convertBoxToRaw(id: String, box: Proof.Box[Unit, String], pf: IncompleteProof[F, R, Unit, String]): RawProofBox = {
+  private def convertBoxToRaw(id: String, box: Proof.Box[Option[B], String], pf: IncompleteProof[F, R, B, String]): RawProofBox = {
     RawProofBox(
      uuid = id,
       stepType = "box",
+      boxInfo = box.info.map(boxInfoToRaw).getOrElse(RawBoxInfo(None)),
       proof = convertStepsToRaw(pf, box.steps)
     )
   }
 
-  private def convertStepsToRaw(pf: IncompleteProof[F, R, Unit, String], steps: Seq[String]): List[RawProofStep] = for {
+  private def convertStepsToRaw(pf: IncompleteProof[F, R, B, String], steps: Seq[String]): List[RawProofStep] = for {
     id <- steps.toList
     step <- pf.getStep(id).toOption.toList
     rawStep = step match {
       case l: Line[IncompleteFormula[F], Option[R], String] => convertLineToRaw(id, l)
-      case b: Box[Unit, String] => convertBoxToRaw(id, b, pf)
+      case b: Box[Option[B], String] => convertBoxToRaw(id, b, pf)
     }
   } yield rawStep
 
-  override def convertToRaw(proof: IncompleteProof[F, R, Unit, String]): RawProof = {
+  override def convertToRaw(proof: IncompleteProof[F, R, B, String]): RawProof = {
     convertStepsToRaw(proof, proof.rootSteps)
   }
 
-  private def convertStepsFromRaw(steps: List[RawProofStep]): Map[String, Proof.Step[IncompleteFormula[F], Option[R], Unit, String]] = {
+  private def convertStepsFromRaw(steps: List[RawProofStep]): Map[String, Proof.Step[IncompleteFormula[F], Option[R], Option[B], String]] = {
     val mappings = for {
       rawStep <- steps
       newMapping <- rawStep match {
@@ -69,9 +72,9 @@ class RawProofToIncompleteProofConverter[F, R](
           )
         )
   
-        case RawProofBox(uuid, _, innerProof) => {
+        case RawProofBox(uuid, _, info, innerProof) => {
           val ms = convertStepsFromRaw(innerProof)
-          (uuid -> ProofBoxImpl((), innerProof.map(_.uuid).toSeq)) :: ms.toList
+          (uuid -> ProofBoxImpl(parseRawBoxInfo(info), innerProof.map(_.uuid).toSeq)) :: ms.toList
         }
       }
     } yield newMapping
@@ -79,7 +82,7 @@ class RawProofToIncompleteProofConverter[F, R](
     mappings.toMap
   }
 
-  override def convertFromRaw(rawProof: RawProof): IncompleteProof[F, R, Unit, String] = {
+  override def convertFromRaw(rawProof: RawProof): IncompleteProof[F, R, B, String] = {
     ProofImpl(
       map = convertStepsFromRaw(rawProof),
       rawProof.map(_.uuid)

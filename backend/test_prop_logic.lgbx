@@ -1,0 +1,10 @@
+1: p or q : premise
+2: p -> q : premise
+b1 ----------------
+  3: p    : assumption
+  4: q    : implies_elim 3, 2
+-------------------
+b2 ----------------
+  5: q    : assumption
+-------------------
+6: q      : or_elim 1, b1, b2
