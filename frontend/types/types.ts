@@ -68,19 +68,18 @@ export type ProofStepPosition = {
 
 type UUID = string;
 
-
 export type Violation =
   | { violationType: "missingFormula" }
   | { violationType: "missingRule" }
   | { violationType: "missingDetailInReference"; refIdx: number; expl: string }
-  | { violationType: "propositionalLogic:wrongNumberOfReferences"; exp: number; actual: number; }
-  | { violationType: "propositionalLogic:referenceShouldBeBox"; ref: number; }
-  | { violationType: "propositionalLogic:referenceShouldBeLine"; ref: number; }
-  | { violationType: "propositionalLogic:referenceDoesntMatchRule"; ref: number; expl: string }
-  | { violationType: "propositionalLogic:referencesMismatch"; refs: number[]; expl: string }
-  | { violationType: "propositionalLogic:formulaDoesntMatchReference"; refs: number; expl: string }
-  | { violationType: "propositionalLogic:formulaDoesntMatchRule"; expl: string }
-  | { violationType: "propositionalLogic:miscellaneousViolation"; expl: string }
+  | { violationType: "wrongNumberOfReferences"; exp: number; actual: number; }
+  | { violationType: "referenceShouldBeBox"; ref: number; }
+  | { violationType: "referenceShouldBeLine"; ref: number; }
+  | { violationType: "referenceDoesntMatchRule"; ref: number; expl: string }
+  | { violationType: "referencesMismatch"; refs: number[]; expl: string }
+  | { violationType: "formulaDoesntMatchReference"; refs: number; expl: string }
+  | { violationType: "formulaDoesntMatchRule"; expl: string }
+  | { violationType: "miscellaneousViolation"; expl: string }
   | { violationType: "stepNotFound"; stepId: string; expl: string }
   | { violationType: "referenceIdNotFound"; stepId: string; whichRef: number; refId: string; expl: string }
   | { violationType: "malformedReference"; stepId: string; whichRef: number; refId: string; expl: string }
