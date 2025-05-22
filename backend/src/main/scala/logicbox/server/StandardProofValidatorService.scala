@@ -35,6 +35,8 @@ import logicbox.framework.Diagnostic._
 import logicbox.framework.Root
 import logicbox.framework.Scope
 import logicbox.rule.PropLogicRuleParser.parse
+import logicbox.proof.PropLogicBoxAssumptionsProofChecker
+import logicbox.proof.OptionProofView
 
 // 'factory'
 object StandardProofValidatorService {
@@ -49,6 +51,9 @@ object StandardProofValidatorService {
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
+
+    val boxFirstRuleIsAssumptionChecker = PropLogicBoxAssumptionsProofChecker[Id]()
+
     val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B]] = 
       OptionRuleChecker(PropLogicRuleChecker[PropLogicFormula]())
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
@@ -64,7 +69,16 @@ object StandardProofValidatorService {
             ProofBoxImpl(Some(box.info), box.steps)
         })
 
-        ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof)
+        val cleanRulesProofView: Proof[?, R, ?, Id] = OptionProofView(optProofView, {
+          case (_, Proof.Line(f, Some(r), refs)) => 
+            Some(ProofLineImpl(f, r, refs))
+          case (_, Proof.Box(Some(info), steps)) => 
+            Some(ProofBoxImpl(info, steps))
+          case _ => None
+        })
+
+        ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof) ++
+        boxFirstRuleIsAssumptionChecker.check(cleanRulesProofView)
       }
     }
   }
