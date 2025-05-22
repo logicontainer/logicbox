@@ -1,45 +1,13 @@
 package logicbox.server
 
-import logicbox.formula.PropLogicFormula
-import logicbox.rule.PropLogicRule
-import logicbox.framework.Proof
-import logicbox.formula.PropLogicLexer
-import logicbox.formula.PropLogicParser
-
-import logicbox.framework.IncompleteFormula
-import logicbox.framework.ProofChecker
-import logicbox.proof.ScopedProofChecker
-import logicbox.framework.RuleChecker
-import logicbox.rule.OptionRuleChecker
-import logicbox.rule.PropLogicRuleChecker
-import logicbox.proof.RuleBasedProofChecker
-import logicbox.proof.ProofView
-import logicbox.proof.ProofLineImpl
-import logicbox.proof.ProofBoxImpl
-import spray.json.JsonWriter
-import spray.json.JsValue
-import spray.json.JsString
-import logicbox.framework.Justification
-import logicbox.proof.ProofImpl
-
-import spray.json._
-import spray.json.DefaultJsonProtocol._
-
-import logicbox.rule.PropLogicRuleParser
-import logicbox.rule.OptionRuleChecker._
-
-import logicbox.framework.RuleViolation
-import logicbox.framework.RuleViolation._
-import logicbox.framework.Diagnostic
-import logicbox.framework.Diagnostic._
-import logicbox.framework.Root
-import logicbox.framework.Scope
-import logicbox.rule.PropLogicRuleParser.parse
-import logicbox.proof.PropLogicBoxAssumptionsProofChecker
-import logicbox.proof.OptionProofView
+import logicbox.formula._
+import logicbox.rule._
+import logicbox.framework._
+import logicbox.proof._
+import logicbox.server.format._
 
 // 'factory'
-object StandardProofValidatorService {
+object PropLogicProofValidatorService {
   private type F = PropLogicFormula
   private type R = PropLogicRule
   private type B = Unit
@@ -47,9 +15,7 @@ object StandardProofValidatorService {
 
   import logicbox.server.format.SprayFormatters._
 
-
-
-  private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], B, Id] = {
+  private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
 
     val boxFirstRuleIsAssumptionChecker = PropLogicBoxAssumptionsProofChecker[Id]()
@@ -59,8 +25,8 @@ object StandardProofValidatorService {
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
 
-    new ProofChecker[IncompleteFormula[F], Option[R], B, Id] {
-      override def check(proof: Proof[IncompleteFormula[F], Option[R], B, Id]): List[Diagnostic[Id]] = {
+    new ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] {
+      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[Diagnostic[Id]] = {
         val optProofView = ProofView(proof, { 
           case (id, line: Proof.Line[IncompleteFormula[F], Option[R], Id]) => 
             ProofLineImpl(line.formula.optFormula, line.rule, line.refs)
@@ -72,7 +38,7 @@ object StandardProofValidatorService {
         val cleanRulesProofView: Proof[?, R, ?, Id] = OptionProofView(optProofView, {
           case (_, Proof.Line(f, Some(r), refs)) => 
             Some(ProofLineImpl(f, r, refs))
-          case (_, Proof.Box(Some(info), steps)) => 
+          case (_, Proof.Box(info, steps)) => 
             Some(ProofBoxImpl(info, steps))
           case _ => None
         })
@@ -94,18 +60,20 @@ object StandardProofValidatorService {
   private val formulaToLatex = format.Stringifiers.propLogicFormulaAsLaTeX
   private val ruleToString   = format.Stringifiers.propLogicRuleAsString
 
-  val rawProofConverter = RawProofToIncompleteProofConverter(
+  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, Unit](
     parseFormula = parseFormula,
     parseRule = ruleParser,
+    parseRawBoxInfo = _ => Some(()),
     formulaToLatex = formulaToLatex,
     formulaToAscii = formulaToAscii,
     ruleToString = ruleToString,
+    boxInfoToRaw = _ => RawBoxInfo(None)
   )
 }
 
-import StandardProofValidatorService._
-class StandardProofValidatorService extends ProofValidatorServiceImpl[
-  IncompleteFormula[F], Option[R], B
+import PropLogicProofValidatorService._
+class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
+  IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker

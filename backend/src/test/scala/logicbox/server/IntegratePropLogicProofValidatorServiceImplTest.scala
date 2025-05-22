@@ -10,11 +10,11 @@ import org.scalatest.Inspectors
 import spray.json._
 
 
-class IntegrateStandardProofValidatorServiceImplTest extends AnyFunSpec {
+class IntegratePropLogicProofValidatorServiceImplTest extends AnyFunSpec {
 
   describe("validateProof") {
     it("should work fine on a small example") {
-      val service = StandardProofValidatorService()
+      val service = PropLogicProofValidatorService()
 
       val json = JsonParser("""[{
         |  "formula": {

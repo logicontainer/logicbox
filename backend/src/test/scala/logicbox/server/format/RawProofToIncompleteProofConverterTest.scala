@@ -16,11 +16,22 @@ import logicbox.server.format.RawFormula
 import logicbox.server.format.RawJustification
 
 class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
+
+  val conv = RawProofToIncompleteProofConverter[String, String, Unit](
+    parseFormula = f => Some(f),
+    parseRule = r => Some(r),
+    parseRawBoxInfo = _ => Some(()),
+    formulaToAscii = s => s,
+    formulaToLatex = s => s"${s}_LATEX",
+    ruleToString = r => r,
+    boxInfoToRaw = _ => RawBoxInfo(None),
+  )
+
   describe("convertToRaw") {
     it("should work with boxes") {
       val proof: IncompleteProof[String, String, Unit, String] = ProofImpl(
         map = Map(
-          "b" -> ProofBoxImpl((), Seq("l1", "l2")),
+          "b" -> ProofBoxImpl(Some(()), Seq("l1", "l2")),
           "l1" -> ProofLineImpl(
             IncompleteFormula("p", Some("p")),
             Some("r1"),
@@ -34,19 +45,11 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
         ),
         rootSteps = Seq("b")
       )
-
-      val conv = RawProofToIncompleteProofConverter[String, String](
-        parseFormula = f => Some(f),
-        parseRule = r => Some(r),
-        formulaToAscii = s => s,
-        formulaToLatex = s => s"${s}_LATEX",
-        ruleToString = r => r
-      )
-
       conv.convertToRaw(proof) shouldBe List(
         RawProofBox(
           uuid = "b",
           stepType = "box",
+          boxInfo = RawBoxInfo(None),
           proof = List(
             RawProofLine(
               uuid = "l1",
@@ -84,22 +87,17 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
 
   describe("convertFromRaw") {
     it("should work with nested boxes") {
-      val conv = RawProofToIncompleteProofConverter[String, String](
-        parseFormula = f => Some(f),
-        parseRule = r => Some(r),
-        formulaToAscii = s => s,
-        formulaToLatex = s => s"${s}_LATEX",
-        ruleToString = r => r
-      )
 
       val rawPf: RawProof = List(
         RawProofBox(
           uuid = "b",
           stepType = "box",
+          boxInfo = RawBoxInfo(None),
           proof = List(
             RawProofBox(
               uuid = "b1",
               stepType = "box",
+              boxInfo = RawBoxInfo(None),
               proof = List(
                 RawProofLine(
                   uuid = "l2",
@@ -122,8 +120,8 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
 
       conv.convertFromRaw(rawPf) shouldBe ProofImpl(
         map = Map(
-          "b" -> ProofBoxImpl((), Seq("b1")),
-          "b1" -> ProofBoxImpl((), Seq("l2")),
+          "b" -> ProofBoxImpl(Some(()), Seq("b1")),
+          "b1" -> ProofBoxImpl(Some(()), Seq("l2")),
           "l2" -> ProofLineImpl(
             IncompleteFormula("q", Some("q")),
             Some("r2"),

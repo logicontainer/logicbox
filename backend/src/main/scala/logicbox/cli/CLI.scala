@@ -2,15 +2,11 @@ package logicbox.cli
 
 import scala.io.Source
 import scala.util.Try
-import logicbox.server.format.RawProof
-import logicbox.server.format.RawProofLine
-import logicbox.server.format.RawProofBox
-import logicbox.server.format.RawProofBox
-import logicbox.server.format.RawFormula
-import logicbox.server.format.RawJustification
-import logicbox.server.StandardProofValidatorService
+import logicbox.server.format._
+import logicbox.server.PropLogicProofValidatorService
 import spray.json.JsObject
 import spray.json.JsArray
+import logicbox.server.PredLogicProofValidatorService
 
 object CLIMain {
   private def isAProofLine(line: String): Boolean = {
@@ -60,12 +56,17 @@ object CLIMain {
     splitOnFirst(lines, isABoxStart(ident)) match {
       case Some(begin, startLine :: aft) => splitOnFirst(aft, isABoxStop(ident)) match {
         case Some(mid, _ :: endd) => 
-          val id = startLine.takeWhile(_ != '-').trim
+          val (id, freshVar) = startLine.takeWhile(_ != '-').trim.split(" ") match {
+            case Array(id) => (id, None)
+            case Array(id, freshVar) => (id, Some(freshVar))
+            case _ => ???
+          }
           val inner = parseRawProof(mid, ident + 2)
           begin.map(parseRawProofLine) ++ List(
             RawProofBox(
               uuid = id,
               stepType = "box",
+              boxInfo = RawBoxInfo(freshVar),
               proof = inner
             )
           ) ++ parseRawProof(endd)
@@ -78,12 +79,19 @@ object CLIMain {
 
   def main(args: Array[String]): Unit = {
     import logicbox.server.format.SprayFormatters._
+
+    val validator = args.headOption match {
+      case Some("prop") => PropLogicProofValidatorService()
+      case Some("pred") => PredLogicProofValidatorService()
+      case _ => ???
+    }
+
     for {
       inputFile <- args.tail.headOption
       _ = println(s"Running on $inputFile")
       lines <- Try { Source.fromFile(inputFile).getLines() }.toOption
       proof = parseRawProof(lines.toList)
-      ds = StandardProofValidatorService().validateProof(rawProofFormat.write(proof)) match {
+      ds = validator.validateProof(rawProofFormat.write(proof)) match {
         case Left(value) => List(value.toString)
         case Right(value) => value.asInstanceOf[JsObject].getFields("diagnostics").head.asInstanceOf[JsArray].elements.toList.map(_.prettyPrint)
       }

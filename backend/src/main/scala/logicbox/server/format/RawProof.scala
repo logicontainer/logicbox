@@ -12,6 +12,10 @@ case class RawJustification(
   rule: Option[String]
 )
 
+case class RawBoxInfo(
+  freshVar: Option[String]
+)
+
 sealed trait RawProofStep {
   def uuid: String
   def stepType: String
@@ -27,6 +31,7 @@ final case class RawProofLine(
 final case class RawProofBox(
   uuid: String,
   stepType: String,
+  boxInfo: RawBoxInfo,
   proof: List[RawProofStep]
 ) extends RawProofStep
 
