@@ -174,5 +174,23 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       
       checker.check(proof) shouldBe Nil
     }
+
+    it("should notice when it happens inside box...") {
+      val proof = ProofImpl(
+        map = Map(
+          "l1" -> ProofLineImpl((), Premise(), Seq()), // should be assumption
+          "innerbox" -> ProofBoxImpl((), Seq("l1")),
+
+          "l2" -> ProofLineImpl((), ImplicationIntro(), Seq("innerbox")),
+          "box" -> ProofBoxImpl((), Seq("innerbox", "l2")),
+
+        ),
+        rootSteps = Seq("box")
+      )
+      
+      checker.check(proof) should matchPattern {
+        case List(RuleViolationAtStep("l2", ReferenceDoesntMatchRule(0, _))) =>
+      }
+    }
   }
 }

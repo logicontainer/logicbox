@@ -52,11 +52,14 @@ class PropLogicBoxAssumptionsProofChecker[Id]
     case _ => Nil
   }
 
-  override def check(proof: Pf): List[Diagnostic[Id]] = (for {
-    stepId <- proof.rootSteps
+  private def checkSteps(proof: Pf, steps: Seq[Id]): List[Diagnostic[Id]] = for {
+    stepId <- steps.toList
     diag <- proof.getStep(stepId) match {
       case Right(l: Proof.Line[Any, PropLogicRule, Id]) => checkLine(proof, stepId, l)
+      case Right(b: Proof.Box[Any, Id]) => checkSteps(proof, b.steps)
       case _ => Nil
     }
-  } yield diag).toList
+  } yield diag
+
+  override def check(proof: Pf): List[Diagnostic[Id]] = checkSteps(proof, proof.rootSteps)
 }
