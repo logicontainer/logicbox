@@ -49,7 +49,7 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
         RawProofBox(
           uuid = "b",
           stepType = "box",
-          boxInfo = Some(RawBoxInfo(None)),
+          boxInfo = RawBoxInfo(None),
           proof = List(
             RawProofLine(
               uuid = "l1",
@@ -91,12 +91,12 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
         RawProofBox(
           uuid = "b",
           stepType = "box",
-          boxInfo = Some(RawBoxInfo(None)),
+          boxInfo = RawBoxInfo(None),
           proof = List(
             RawProofBox(
               uuid = "b1",
               stepType = "box",
-              boxInfo = Some(RawBoxInfo(None)),
+              boxInfo = RawBoxInfo(None),
               proof = List(
                 RawProofLine(
                   uuid = "l2",
