@@ -49,7 +49,7 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
         RawProofBox(
           uuid = "b",
           stepType = "box",
-          boxInfo = RawBoxInfo(None),
+          boxInfo = Some(RawBoxInfo(None)),
           proof = List(
             RawProofLine(
               uuid = "l1",
@@ -87,17 +87,16 @@ class RawProofToIncompleteProofConverterTest extends AnyFunSpec {
 
   describe("convertFromRaw") {
     it("should work with nested boxes") {
-
       val rawPf: RawProof = List(
         RawProofBox(
           uuid = "b",
           stepType = "box",
-          boxInfo = RawBoxInfo(None),
+          boxInfo = Some(RawBoxInfo(None)),
           proof = List(
             RawProofBox(
               uuid = "b1",
               stepType = "box",
-              boxInfo = RawBoxInfo(None),
+              boxInfo = Some(RawBoxInfo(None)),
               proof = List(
                 RawProofLine(
                   uuid = "l2",

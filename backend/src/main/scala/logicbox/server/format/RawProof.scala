@@ -31,7 +31,7 @@ final case class RawProofLine(
 final case class RawProofBox(
   uuid: String,
   stepType: String,
-  boxInfo: RawBoxInfo,
+  boxInfo: Option[RawBoxInfo],
   proof: List[RawProofStep]
 ) extends RawProofStep
 
