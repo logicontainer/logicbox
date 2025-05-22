@@ -79,7 +79,7 @@ object PredLogicProofValidatorService {
     parseRule = ruleParser,
     parseRawBoxInfo = {
       case RawBoxInfo(Some(x)) => x.headOption.map(c => PredLogicBoxInfo(Some(PredLogicTerm.Var(c))))
-      case _ => None
+      case _ => Some(PredLogicBoxInfo(None))
     },
     formulaToLatex = Stringifiers.predLogicFormulaAsLaTeX, 
     formulaToAscii = Stringifiers.predLogicFormulaAsASCII,

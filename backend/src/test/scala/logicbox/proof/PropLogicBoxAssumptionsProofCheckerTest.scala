@@ -18,7 +18,7 @@ import logicbox.framework.Diagnostic.RuleViolationAtStep
 class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
 
   describe("check") {
-    val checker = PropLogicBoxAssumptionsProofChecker[String]()
+    val checker = PropLogicBoxAssumptionsProofChecker[PropLogicRule, String]()
     it("should reject if ImplIntro doesn't have assumption on first line") {
       val proof = ProofImpl(
         map = Map(
