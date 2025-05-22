@@ -71,7 +71,7 @@ class RawProofToIncompleteProofConverter[F, R](
   
         case RawProofBox(uuid, _, innerProof) => {
           val ms = convertStepsFromRaw(innerProof)
-          (uuid -> ProofBoxImpl((), ms.map(_._1).toSeq)) :: ms.toList
+          (uuid -> ProofBoxImpl((), innerProof.map(_.uuid).toSeq)) :: ms.toList
         }
       }
     } yield newMapping
