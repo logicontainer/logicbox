@@ -28,3 +28,4 @@ dockerRepository := sys.props.get("docker.registry")
 
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
+Compile / run / mainClass := Some("logicbox.Main")
