@@ -8,7 +8,7 @@ import logicbox.rule.PropLogicRule._
 import logicbox.framework.Diagnostic.RuleViolationAtStep
 import logicbox.framework.RuleViolation.ReferenceDoesntMatchRule
 
-class PropLogicBoxAssumptionsProofChecker[Any, Id] 
+class PropLogicBoxAssumptionsProofChecker[Id] 
   extends ProofChecker[Any, PropLogicRule, Any, Id]
 {
   private type Pf = Proof[Any, PropLogicRule, Any, Id]
@@ -19,7 +19,7 @@ class PropLogicBoxAssumptionsProofChecker[Any, Id]
       firstStep <- proof.getStep(firstStepId).toOption
       line <- firstStep match {
         case l: Proof.Line[Any, PropLogicRule, Id] => Some(l)
-        case _ => ??? // TODO: fix
+        case _ => None
       }
     } yield line
   }

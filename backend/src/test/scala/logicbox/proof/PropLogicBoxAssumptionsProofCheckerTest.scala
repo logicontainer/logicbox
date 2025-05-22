@@ -18,7 +18,7 @@ import logicbox.framework.Diagnostic.RuleViolationAtStep
 class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
 
   describe("check") {
-    val checker = PropLogicBoxAssumptionsProofChecker[Unit, String]()
+    val checker = PropLogicBoxAssumptionsProofChecker[String]()
     it("should reject if ImplIntro doesn't have assumption on first line") {
       val proof = ProofImpl(
         map = Map(
@@ -160,6 +160,19 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       checker.check(proof) should matchPattern {
         case List(RuleViolationAtStep("l4", ReferenceDoesntMatchRule(2, _))) =>
       }
+    }
+
+    it("should say nothing if first step in box is box") {
+      val proof = ProofImpl(
+        map = Map(
+          "box1" -> ProofBoxImpl((), Seq()),
+          "box2" -> ProofBoxImpl((), Seq("box1")),
+          "l" -> ProofLineImpl((), ImplicationIntro(), Seq("box2")),
+        ),
+        rootSteps = Seq("l")
+      )
+      
+      checker.check(proof) shouldBe Nil
     }
   }
 }
