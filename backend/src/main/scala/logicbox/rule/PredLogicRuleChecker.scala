@@ -39,32 +39,35 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
     }
 
     case ForAllIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(Reference.Box(info, _, lst)) => info.freshVar match {
+      case List(b: Box[F, B]) => b.info.freshVar match {
         case None => 
           fail(ReferenceDoesntMatchRule(0, "box does not contain fresh variable"))
 
-        case Some(x0) => formula match {
-          case ForAll(x, phi) =>
-            failIf(
-              lst != substitutor.substitute(phi, x0, x),
-              FormulaDoesntMatchReference(0, "last line of box must match formula")
-            )
+        case Some(x0) => 
+          val lst = extractLastLine(b)
+          formula match {
+            case ForAll(x, phi) =>
+              failIf(
+                lst != Some(substitutor.substitute(phi, x0, x)),
+                FormulaDoesntMatchReference(0, "last line of box must match formula")
+              )
 
-          case _ => 
-            fail(FormulaDoesntMatchRule("must be forall"))
-        }
+            case _ => 
+              fail(FormulaDoesntMatchRule("must be forall"))
+          }
       }
     }
 
     case ExistsElim() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
-      case List(Line(Exists(x, phi)), Box(info, ass, concl)) => info.freshVar match {
+      case List(Line(Exists(x, phi)), b: Box[F, B]) => b.info.freshVar match {
         case Some(x0) =>
+          val (ass, concl) = (extractFirstLine(b), extractLastLine(b))
           failIf(
-            ass != substitutor.substitute(phi, x0, x),
+            ass != Some(substitutor.substitute(phi, x0, x)),
             ReferencesMismatch(List(0, 1), "assumption of box should match formula within exists-quantifier")
           ) ++ 
           failIf(
-            formula != concl, 
+            concl != Some(formula), 
             FormulaDoesntMatchReference(1, "conclusion of box should match formula")
           ) ++
           failIf(

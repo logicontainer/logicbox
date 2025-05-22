@@ -27,7 +27,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
   private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, BI]])
     extends Reference.Line[PredLogicFormula]
 
-  private case class Box(fst: PredLogicFormula, lst: PredLogicFormula, freshVar: Option[Char]) extends Reference.Box[PredLogicFormula, BI] {
+  private case class Box(fst: Option[Reference[PredLogicFormula, BI]], lst: Option[Reference[PredLogicFormula, BI]], freshVar: Option[Char]) extends Reference.Box[PredLogicFormula, BI] {
     override def info = PredLogicBoxInfo(freshVar.map(Var(_)))
     override def first = fst
     override def last = lst
@@ -38,7 +38,11 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
   }
 
   private def refBox(ass: String, concl: String, fresh: Char = '\u0000'): Reference.Box[PredLogicFormula, BI] =
-    Box(parse(ass), parse(concl), if fresh === '\u0000' then None else Some(fresh))
+    Box(
+      Some(ReferenceLineImpl(parse(ass))), 
+      Some(ReferenceLineImpl(parse(concl))), 
+      if fresh === '\u0000' then None else Some(fresh)
+    )
 
   private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var](
     PredLogicFormulaSubstitutor()

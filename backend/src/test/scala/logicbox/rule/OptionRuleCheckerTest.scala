@@ -27,8 +27,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(Some(StubFormula(2))),
         ReferenceBoxImpl(
           info = Some(StubBoxInfo("hello")), 
-          first = Some(StubFormula(3)), 
-          last = Some(StubFormula(4))
+          first = Some(ReferenceLineImpl(Some(StubFormula(3)))), 
+          last = Some(ReferenceLineImpl(Some(StubFormula(4))))
         )
       )
 
@@ -37,8 +37,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(StubFormula(2)),
         ReferenceBoxImpl(
           info = StubBoxInfo("hello"),
-          first = StubFormula(3),
-          last = StubFormula(4)
+          first = Some(ReferenceLineImpl(StubFormula(3))),
+          last = Some(ReferenceLineImpl(StubFormula(4)))
         )
       ))
 
@@ -85,40 +85,6 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       }
     }
 
-    it("should report missing conclusion in box") {
-      val formula = Some(StubFormula())
-      val rule = Some(Good())
-      val refs = List(
-        ReferenceBoxImpl(
-          info = Some(StubBoxInfo()), 
-          first = Some(StubFormula()), 
-          last = None
-        ),
-        ReferenceLineImpl(Some(StubFormula(1)))
-      )
-
-      checker.check(rule, formula, refs) should matchPattern {
-        case List(MissingDetailInReference(0, expl)) if expl.contains("conclusion") =>
-      }
-    }
-
-    it("should report missing assumption in box") {
-      val formula = Some(StubFormula())
-      val rule = Some(Good())
-      val refs = List(
-        ReferenceLineImpl(Some(StubFormula(1))),
-        ReferenceBoxImpl(
-          info = Some(StubBoxInfo()), 
-          first = None,
-          last = Some(StubFormula())
-        )
-      )
-
-      checker.check(rule, formula, refs) should matchPattern {
-        case List(MissingDetailInReference(1, expl)) if expl.contains("assumption") =>
-      }
-    }
-
     it("should report missing info in box") {
       val formula = Some(StubFormula())
       val rule = Some(Good())
@@ -126,8 +92,8 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(Some(StubFormula(1))),
         ReferenceBoxImpl(
           info = None,
-          first = Some(StubFormula()),
-          last = Some(StubFormula())
+          first = Some(ReferenceLineImpl(Some(StubFormula()))),
+          last = Some(ReferenceLineImpl(Some(StubFormula()))),
         )
       )
 

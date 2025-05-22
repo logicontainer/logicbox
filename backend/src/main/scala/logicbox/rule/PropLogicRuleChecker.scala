@@ -68,16 +68,19 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
       extractAndThen(refs, pattern)  {
         case List(
           Reference.Line(r0: F),
-          Reference.Box(_, as1, cl1),
-          Reference.Box(_, as2, cl2),
+          b1: Reference.Box[F, Any],
+          b2: Reference.Box[F, Any],
         ) => {
-          failIf(formula != cl1, FormulaDoesntMatchReference(1, "must match last line of box")) ++
-          failIf(formula != cl2, FormulaDoesntMatchReference(2, "must match last line of box")) ++
+          val (as1, cl1) = (extractFirstLine(b1), extractLastLine(b1))
+          val (as2, cl2) = (extractFirstLine(b2), extractLastLine(b2))
+
+          failIf(Some(formula) != cl1, FormulaDoesntMatchReference(1, "must match last line of box")) ++
+          failIf(Some(formula) != cl2, FormulaDoesntMatchReference(2, "must match last line of box")) ++
           failIf(cl1 != cl2, ReferencesMismatch(List(1, 2), "last lines of boxes must match")) ++
           { r0 match {
             case Or(lhs, rhs) =>
-              failIf(as1 != lhs, ReferencesMismatch(List(0, 1), "left-hand side must match assumption")) ++
-              failIf(as2 != rhs, ReferencesMismatch(List(0, 2), "right-hand side must match assumption"))
+              failIf(as1 != Some(lhs), ReferencesMismatch(List(0, 1), "left-hand side must match assumption")) ++
+              failIf(as2 != Some(rhs), ReferencesMismatch(List(0, 2), "right-hand side must match assumption"))
 
             case _ => 
               fail(ReferenceDoesntMatchRule(0, "must be a disjunction (or)"))
@@ -88,8 +91,9 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(box: Reference.Box[F, _]) => formula match {
         case Implies(phi, psi) =>
-          failIf(phi != box.first, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
-          failIf(psi != box.last, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
+          val (ass, concl) = (extractFirstLine(box), extractLastLine(box))
+          failIf(Some(phi) != ass, FormulaDoesntMatchReference(0, "left-hand side  must match assumption of box")) ++
+          failIf(Some(psi) != concl, FormulaDoesntMatchReference(0, "right-hand side must match conclusion of box"))
 
         case _ => 
           fail(FormulaDoesntMatchRule("must be an implication (->)"))
@@ -108,17 +112,19 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     }
 
     case NotIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
-      case List(Box[F, Unit](_, asmp, concl)) => 
-        { concl match {
-          case Contradiction() => Nil
+      case List(b: Box[F, ?]) => 
+        { extractLastLine(b) match {
+          case Some(Contradiction()) => Nil
           case _ => fail(ReferenceDoesntMatchRule(0, "last line of box must be contradiction"))
-        }} ++ { formula match {
-          case Not(phi) => 
-            failIf(phi != asmp, FormulaDoesntMatchReference(0, "must be the negation of the assumption in the box"))
+        }} ++ { 
+          formula match {
+            case Not(phi) => 
+              failIf(Some(phi) != extractFirstLine(b), FormulaDoesntMatchReference(0, "must be the negation of the assumption in the box"))
 
-          case _ => 
-            fail(FormulaDoesntMatchRule("must be a negation"))
-        }}
+            case _ => 
+              fail(FormulaDoesntMatchRule("must be a negation"))
+          }
+        }
     }
 
     case NotElim() => extractNFormulasAndThen(refs, 2) {
@@ -181,7 +187,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case ProofByContradiction() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(Reference.Box(_, ass, concl)) => { 
         ass match {
-          case Not(phi) => 
+          case Some(Reference.Line(Not(phi))) => 
             failIf(formula != phi, FormulaDoesntMatchReference(0, "must be assumption without negation"))
 
           case _ => 
@@ -189,7 +195,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
         }
       } ++ { 
         concl match {
-          case Contradiction() => Nil
+          case Some(Reference.Line(Contradiction())) => Nil
           case _ => fail(ReferenceDoesntMatchRule(0, "last line in box must be a contradiction"))
         }
       }

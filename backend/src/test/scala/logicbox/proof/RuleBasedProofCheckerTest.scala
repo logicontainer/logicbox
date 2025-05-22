@@ -18,7 +18,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
   def proofChecker(ruleChecker: StubRuleChecker = StubRuleChecker()): ProofChecker[F, R, B, Id] = 
     RuleBasedProofChecker(ruleChecker)
 
-  describe("RuledBasedProofChecker::check") {
+  describe("RuleBasedProofChecker::check") {
     it("should be fine with empty proof") {  
       val checker = proofChecker()
       val proof = StubProof()
@@ -82,8 +82,8 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
         ReferenceLineImpl(formula = StubFormula(38)),
         ReferenceBoxImpl(
           info = StubBoxInfo("some info"), 
-          first = StubFormula(11), 
-          last = StubFormula(12)
+          first = Some(ReferenceLineImpl(StubFormula(11))), 
+          last = Some(ReferenceLineImpl(StubFormula(12))),
         )
       ))
     }
@@ -104,60 +104,6 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
         _ should matchPattern {
           case RuleViolationAtStep("ass", MiscellaneousViolation("test")) =>
         }
-      }
-    }
-
-    it("should not allow box as ref when first line in box is box") {
-      val checker = proofChecker()
-      val proof = StubProof(
-        rootSteps = Seq("box", "line"),
-        map = Map(
-          "line" -> StubLine(refs = Seq("box")),
-          "box" -> StubBox(steps = Seq("assBox", "concl")),
-          "assBox" -> StubBox(steps = Seq()),
-          "concl" -> StubLine()
-        )
-      )
-
-      val result = checker.check(proof)
-      Inspectors.forAtLeast(1, result) {
-        case MalformedReference("line", 0, "box", expl) => 
-      }
-    }
-
-    it("should not allow box with undefined reference (in concl)") {
-      val checker = proofChecker()
-      val proof = StubProof(
-        rootSteps = Seq("box", "line"),
-        map = Map(
-          "line" -> StubLine(refs = Seq("box")),
-          "box" -> StubBox(steps = Seq("ass", "concl")),
-          "ass" -> StubLine(),
-        )
-      )
-
-      val result = checker.check(proof)
-      Inspectors.forAtLeast(1, result) {
-        case MalformedReference("line", 0, "box", expl) => 
-          expl should include("conclusion")
-      }
-    }
-
-    it("should not allow box with undefined reference (in assumption)") {
-      val checker = proofChecker()
-      val proof = StubProof(
-        rootSteps = Seq("box", "line"),
-        map = Map(
-          "line" -> StubLine(refs = Seq("box")),
-          "box" -> StubBox(steps = Seq("ass", "concl")),
-          "concl" -> StubLine(),
-        )
-      )
-
-      val result = checker.check(proof)
-      Inspectors.forAtLeast(1, result) {
-        case MalformedReference("line", 0, "box", expl) => 
-          expl should include("assumption")
       }
     }
 

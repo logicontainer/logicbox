@@ -12,42 +12,41 @@ case class OptionRuleChecker[F, R, B, V](
   ruleChecker: RuleChecker[F, R, B]
 ) extends RuleChecker[Option[F], Option[R], Option[B]] {
 
+  private def computeConcreteReference(optRef: Reference[Option[F], Option[B]], refIdx: Int): Either[RuleViolation, Reference[F, B]] = {
+    optRef match {
+      case Line(Some(formula)) => 
+        Right(ReferenceLineImpl(formula))
+
+      case Box(Some(info), ass, concl) => 
+        val List(optAssRef, optConclRef) = List(ass, concl).map {
+          case None => None
+          case Some(ref) => computeConcreteReference(ref, -1).toOption
+        }
+
+        Right(ReferenceBoxImpl(info, optAssRef, optConclRef))
+
+      case Line(None) =>
+        Left(MissingDetailInReference(refIdx, "missing formula"))
+
+      case Box(None, _, _) => 
+        Left(MissingDetailInReference(refIdx, "missing box info"))
+    }
+  }
+
   private def computeConcreteReferences(
     optRefs: List[Reference[Option[F], Option[B]]]
   ): Either[List[RuleViolation], List[Reference[F, B]]] = {
-    val init: (List[Reference[F, B]], List[MissingDetailInReference]) = (Nil, Nil)
-    val (refs, missingIdxs) = optRefs.zipWithIndex.foldRight(init) {
-      case ((optRef, refIdx), (refs, missingIdxs)) => (optRef: @unchecked) match {
-        case Line(Some(formula: F @unchecked)) => 
-          (ReferenceLineImpl(formula) :: refs, missingIdxs)
-
-        case Box(Some(info: B @unchecked), Some(ass: F @unchecked), Some(concl: F @unchecked)) => 
-          (ReferenceBoxImpl(info, ass, concl) :: refs, missingIdxs)
-        
-        case Line(None) => 
-          (refs, MissingDetailInReference(refIdx, "missing formula") :: missingIdxs)
-
-        case Box(
-          info: Option[B] @unchecked, 
-          ass: Option[F] @unchecked, 
-          concl: Option[F] @unchecked
-        ) => 
-          val ms = { if (ass.isEmpty) List(
-              MissingDetailInReference(refIdx, "missing assumption")
-            ) else Nil
-          } ++ { if (concl.isEmpty) List(
-              MissingDetailInReference(refIdx, "missing conclusion")
-            ) else Nil
-          } ++ { if (info.isEmpty) List(
-              MissingDetailInReference(refIdx, "missing box info")
-            ) else Nil
-          }
-          (refs, ms ++ missingIdxs)
-      }
+    val init: (List[Reference[F, B]], List[RuleViolation]) = (Nil, Nil)
+    val (refs, vs) = optRefs.zipWithIndex.foldRight(init) {
+      case ((optRef, refIdx), (refs, missingIdxs)) => 
+        computeConcreteReference(optRef, refIdx) match {
+          case Right(ref) => (ref :: refs, missingIdxs)
+          case Left(viol) => (refs, viol :: missingIdxs)
+        }
     }
 
-    if (missingIdxs.nonEmpty)
-      Left(missingIdxs)
+    if (vs.nonEmpty)
+      Left(vs)
     else
       Right(refs)
   }
