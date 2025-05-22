@@ -28,7 +28,7 @@ export default function NavigationSidebar() {
       </Card>
       <Card className="p-0">
         <div className="p-4 flex items-baseline justify-between">
-          <h2 className="text-left text-xl pb-2">Proofs</h2>
+          <h2 className="text-left text-lg font-bold">Proofs</h2>
           <Button
             size="icon"
             variant="outline"
