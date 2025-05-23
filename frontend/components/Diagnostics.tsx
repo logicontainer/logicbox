@@ -249,7 +249,6 @@ export function DiagnosticMessage({ diagnostic }: {
     ...diagnostic.violation
   } as (ViolationWithUuid | undefined) // TODO: better checking
 
-
   if (!v)
     return "Something went wrong when rendering violation"
 

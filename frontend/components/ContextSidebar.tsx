@@ -11,32 +11,33 @@ import { InlineMath } from "react-katex";
 import RulePanel from "./RulePanel";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { useLines } from "@/contexts/LinesProvider";
-import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
+import { getSelectedStep } from "@/lib/state-helpers";
+
+function SelectRuleSidebar() {
+
+}
 
 export default function ContextSidebar() {
-  const { lineInFocus } = useProof();
   const { lines, getReferenceString } = useLines();
   const { getRuleAtStepAsLatex } = useDiagnostics();
   const { interactionState } = useInteractionState();
 
-  const line = lines.find((line) => line.uuid === lineInFocus);
+  const stepInFocus = getSelectedStep(interactionState)
+  const line = lines.find((line) => line.uuid === stepInFocus);
 
   const { proofDiagnostics } = useServer();
-  const errors = proofDiagnostics.filter((d) => d.uuid === lineInFocus);
+  const errors = proofDiagnostics.filter((d) => d.uuid === stepInFocus);
 
   const lineOrBox = line?.stepType === "box" ? "Box" : "Line";
-  const refStr = lineInFocus && getReferenceString(lineInFocus);
-
-  const ruleLatex = lineInFocus && getRuleAtStepAsLatex(lineInFocus, [], false);
-
-  const isEditingRule =
-    interactionState.enum === InteractionStateEnum.EDITING_RULE;
+  const refStr = stepInFocus && getReferenceString(stepInFocus);
+  const ruleLatex = stepInFocus && getRuleAtStepAsLatex(stepInFocus, [], false);
+  const isEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
   return (
     <div className="  sm:h-screen p-2">
-      {line && (
-        <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
+        {(line && !isEditingRule) && (
           <Card>
             <h2 className="text-left text-lg font-bold pb-2">
               {lineOrBox} {refStr} in focus
@@ -58,13 +59,13 @@ export default function ContextSidebar() {
               );
             })}
           </Card>
-          {isEditingRule && (
-            <Card>
-              <RulePanel />
-            </Card>
-          )}
-        </div>
-      )}
+        )}
+        {isEditingRule && (
+          <Card>
+            <RulePanel />
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

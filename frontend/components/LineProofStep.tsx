@@ -20,9 +20,10 @@ import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { formulaIsWrong } from "@/lib/diagnostic-helpers";
+import { getSelectedStep } from "@/lib/state-helpers";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
-import { useProof } from "@/contexts/ProofProvider";
-import { useState } from "react";
+import { useHovering } from "@/contexts/HoveringProvider";
+import { getStepHighlight } from "@/lib/proof-step-highlight";
 
 export function LineProofStep({
   ...props
@@ -31,40 +32,45 @@ export function LineProofStep({
   diagnosticsForLine: Diagnostic[];
   isOuterProofStep?: boolean;
 }) {
-  const { setStepInFocus: setLineInFocus, isFocused } = useProof();
   const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
-  const [tooltipContent, setTooltipContent] = useState<string>("");
+  const { interactionState } = useInteractionState();
+  const { currentlyHoveredUuid, onHoverStep } = useHovering()
 
-  const handleOnHoverJustification = (highlightedLatex: string | null) => {
-    setTooltipContent(highlightedLatex || "");
-  };
-
-  const currentlyBeingHovered = isFocused(props.uuid);
+  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState)
 
   return (
     <ProofStepWrapper
-      currentlyBeingHovered={currentlyBeingHovered}
+      highlight={highlight}
       isOuterProofStep={props.isOuterProofStep}
     >
       <div
+        key={props.uuid}
         className={cn(
           "text-nowrap pointer-events-auto",
           "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
-          currentlyBeingHovered && "bg-slate-50"
         )}
-        onMouseOver={(_) => setLineInFocus(props.uuid)}
         onClick={(e) => {
-          if (e.target !== e.currentTarget) {
-            return;
-          }
+          e.stopPropagation();
           return doTransition({
             enum: TransitionEnum.CLICK_LINE,
             lineUuid: props.uuid,
           });
         }}
-        onContextMenuCapture={(e) => {
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          return doTransition({
+            enum: TransitionEnum.DOUBLE_CLICK_LINE,
+            lineUuid: props.uuid,
+          });
+        }}
+        onMouseMove={(e) => {
+          e.stopPropagation();
+          onHoverStep(props.uuid)
+        }}
+        onContextMenu={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           setContextMenuPosition({ x: e.pageX, y: e.pageY });
           doTransition({
             enum: TransitionEnum.RIGHT_CLICK_STEP,
@@ -82,8 +88,6 @@ export function LineProofStep({
         />
 
         <div
-          data-tooltip-id={`tooltip-id-${props.uuid}`}
-          data-tooltip-content={tooltipContent}
           title="Select a rule"
           className="flex items-center gap-2 whitespace-nowrap"
         >
@@ -91,20 +95,19 @@ export function LineProofStep({
             uuid={props.uuid}
             justification={props.justification}
             lines={props.lines}
-            onHover={handleOnHoverJustification}
-            onClickRule={() =>
+            onClickRule={() => {
               doTransition({
                 enum: TransitionEnum.CLICK_RULE,
                 lineUuid: props.uuid,
-              })
-            }
-            onClickRef={(refIdx) =>
+              });
+            }}
+            onClickRef={(refIdx) => {
               doTransition({
                 enum: TransitionEnum.CLICK_REF,
                 lineUuid: props.uuid,
                 refIdx,
-              })
-            }
+              });
+            }}
           />
         </div>
       </div>
@@ -180,17 +183,14 @@ function Formula({
         "shrink",
         formulaIsWrong && "text-red-500 underline underline-offset-2"
       )}
-      onClick={() =>
-        doTransition({
-          enum: TransitionEnum.CLICK_LINE,
-          lineUuid,
-        })
-      }
+      onClickCapture={e => e.preventDefault()}
     >
       {!isSyncedWithServer || formulaIsWrong ? (
         currentFormulaValue
       ) : (
-        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
+        <InlineMath 
+          math={formulaLatexContentWithUnderline}
+        ></InlineMath>
       )}
     </p>
   );

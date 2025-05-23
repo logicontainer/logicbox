@@ -8,24 +8,24 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import Footer from "@/components/Footer";
-import { InlineMath } from "react-katex";
 import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
 import Toolbar from "@/components/Toolbar";
-import { Tooltip } from "react-tooltip";
 import { useCurrentProofId } from "@/contexts/CurrentProofIdProvider";
 import { useEffect } from "react";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
+import { useHovering } from "@/contexts/HoveringProvider";
 
 export default function Client({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
+  const { onHoverStep: setCurrentlyHoveredUuid } = useHovering()
 
   const { setProofId } = useCurrentProofId();
 
@@ -72,6 +72,11 @@ export default function Client({ proofId }: { proofId: string | null }) {
             <div
               className="flex box-content gap-2 mt-[64px] w-full"
               onClick={(e) => e.stopPropagation()}
+              onMouseLeave={e => {
+                e.stopPropagation()
+                doTransition({ enum: TransitionEnum.HOVER, stepUuid: null })
+                setCurrentlyHoveredUuid(null)
+              }}
             >
               <LineNumbers lines={lines} />
               <Proof
@@ -80,18 +85,6 @@ export default function Client({ proofId }: { proofId: string | null }) {
                 diagnostics={proofDiagnostics}
                 isOuterProof
               />
-              <Tooltip
-                id={`tooltip-id-${proofContext.lineInFocus}`}
-                place="right"
-                render={
-                  ({ content }) =>
-                    content ? (
-                      <p className="text-md">
-                        <InlineMath math={content}></InlineMath>
-                      </p>
-                    ) : null // don't show if content is null
-                }
-              ></Tooltip>
               {/*<ProofStepContextMenu />*/}
             </div>
           </div>

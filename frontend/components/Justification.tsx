@@ -5,16 +5,14 @@ import {
   TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
-import Select, { SingleValue, Theme } from "react-select";
 import {
   Justification as TJustification,
   TLineNumber,
-  LineProofStep as TLineProofStep,
 } from "@/types/types";
 
 import { InlineMath } from "react-katex";
 import { RefSelect } from "./RefSelect";
-import { createHighlightedLatexRule } from "@/lib/rules";
+import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 
@@ -22,18 +20,16 @@ export function Justification({
   uuid,
   justification,
   lines,
-  onHover,
   onClickRule,
   onClickRef,
 }: {
   uuid: string;
   justification: TJustification;
   lines: TLineNumber[];
-  onHover: (highlightedLatex: string | null) => void;
   onClickRule: () => void;
   onClickRef: (idx: number) => void;
 }) {
-  const { ruleset, rulesetDropdownOptions } = useRuleset();
+  const { ruleset } = useRuleset();
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
@@ -43,108 +39,29 @@ export function Justification({
   const rule = ruleset.rules.find(
     (rule) => rule.ruleName == justification.rule
   );
-  const ruleNameLatex = rule?.latex.ruleName
+  const ruleNameLatex = rule?.latex.ruleName;
 
   if (currLineProofStepDetails?.proofStep.stepType !== "line") {
     return null;
   }
 
-  const currLineProofStep =
-    currLineProofStepDetails.proofStep as TLineProofStep;
-
   const isEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE &&
     interactionState.lineUuid === uuid;
 
-  const rulesetDropdownValue = rulesetDropdownOptions.find(
-    (option) => option.value === currLineProofStep.justification.rule
-  );
-
-  const handleChangeRule = (
-    newValue: SingleValue<{ value: string; label: string }>
-  ) => {
-    if (newValue == null) {
-      return;
-    }
-
-    doTransition({
-      enum: TransitionEnum.UPDATE_RULE,
-      ruleName: newValue.value,
-    });
-  };
-
-  const dropdownTheme = (theme: Theme) => ({
-    ...theme,
-    spacing: {
-      ...theme.spacing,
-      controlHeight: 30,
-      baseUnit: 0,
-    },
-  });
   return (
     <>
-      {isEditingRule ? (
-        <Select
-          instanceId={uuid}
-          value={rulesetDropdownValue}
-          onChange={handleChangeRule}
-          menuIsOpen={isEditingRule}
-          onMenuOpen={() =>
-            doTransition({
-              enum: TransitionEnum.CLICK_RULE,
-              lineUuid: uuid,
-            })
-          }
-          closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
-          options={rulesetDropdownOptions}
-          components={{
-            Menu: CustomMenu,
-            Option: CustomOption,
-            ValueContainer: CustomValueContainer,
-          }}
-          menuPosition="fixed"
-          theme={dropdownTheme}
-          styles={{
-            singleValue: (base) => ({
-              ...base,
-              paddingLeft: "8px",
-              paddingRight: "8px",
-            }),
-            input(base) {
-              return {
-                ...base,
-                paddingLeft: "8px",
-                paddingRight: "8px",
-              };
-            },
-            menuPortal: (base) => ({
-              ...base,
-              width: 100,
-            }),
-          }}
-        />
-      ) : (
-        <span
-          className="hover:text-red-500"
-          onMouseOver={() =>
-            onHover(
-              rule ? createHighlightedLatexRule(
-                rule.latex.ruleName,
-                rule.latex.premises,
-                rule.latex.conclusion,
-                [],
-                false
-              ) : null
-            )
-          }
-          onClick={(e) => {
-            onClickRule();
-            e.stopPropagation();
-          }}
-        >
-          <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
-        </span>
-      )}
+      <span
+        className={cn(
+          isEditingRule ? "bg-blue-400 text-white" : "hover:text-blue-600"
+        )}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClickRule();
+        }}
+      >
+        <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
+      </span>
       {justification.refs && (
         <>
           <InlineMath math={`\\,`} />
@@ -165,13 +82,14 @@ export function Justification({
                     interactionState.lineUuid === uuid &&
                     interactionState.refIdx === i
                   }
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation();
                     doTransition({
                       enum: TransitionEnum.CLICK_REF,
                       lineUuid: uuid,
                       refIdx: i,
-                    })
-                  }
+                    });
+                  }}
                 ></RefSelect>
               );
             } else {
@@ -189,20 +107,10 @@ export function Justification({
                   key={i}
                   className="hover:text-slate-600"
                   onClick={(e) => {
-                    onClickRef(i);
                     e.stopPropagation();
+                    e.preventDefault();
+                    onClickRef(i);
                   }}
-                  onMouseOver={() =>
-                    onHover(
-                      rule ? createHighlightedLatexRule(
-                        rule.latex.ruleName,
-                        rule.latex.premises,
-                        rule.latex.conclusion,
-                        [i],
-                        false
-                      ) : null
-                    )
-                  }
                 >
                   <InlineMath math={`${refLatex || "?"}${comma}`} />
                 </span>
@@ -212,46 +120,5 @@ export function Justification({
         </>
       )}
     </>
-  );
-}
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function CustomMenu(props: any) {
-  const { innerProps, innerRef } = props;
-  return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="bg-white border border-slate-300 rounded-md shadow-lg z-10 overflow-visible"
-    >
-      {props.children}
-    </div>
-  );
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function CustomOption(props: any) {
-  const { data, innerRef, innerProps } = props;
-  return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="text-slate-800 hover:bg-slate-100 cursor-pointer px-2"
-    >
-      <InlineMath math={data?.latexRuleName || ""}></InlineMath>
-    </div>
-  );
-}
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function CustomValueContainer(props: any) {
-  const { getValue, innerRef, innerProps } = props;
-  const value = getValue()[0];
-  return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="flex items-center gap-2 px-2"
-    >
-      <InlineMath math={value?.latexRuleName || ""}></InlineMath>
-    </div>
   );
 }
