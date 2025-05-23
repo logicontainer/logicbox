@@ -1,0 +1,164 @@
+{
+  "logicName": "predicateLogic",
+  "proof": [{
+    "formula": {
+      "ascii": "exists x P(x) or exists x Q(x)",
+      "latex": "\\exists x P(x) \\lor \\exists x Q(x)",
+      "userInput": "exists x P(x) or exists x Q(x)"
+    },
+    "justification": {
+      "refs": [],
+      "rule": "premise"
+    },
+    "stepType": "line",
+    "uuid": "10"
+  }, {
+    "boxInfo": {
+
+    },
+    "proof": [{
+      "formula": {
+        "ascii": "exists x P(x)",
+        "latex": "\\exists x P(x)",
+        "userInput": "exists x P(x)"
+      },
+      "justification": {
+        "refs": [],
+        "rule": "premise"
+      },
+      "stepType": "line",
+      "uuid": "20"
+    }, {
+      "boxInfo": {
+        "freshVar": "a"
+      },
+      "proof": [{
+        "formula": {
+          "ascii": "P(a)",
+          "latex": "P(a)",
+          "userInput": "P(a)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "assumption"
+        },
+        "stepType": "line",
+        "uuid": "30"
+      }, {
+        "formula": {
+          "ascii": "P(a) or Q(a)",
+          "latex": "P(a) \\lor Q(a)",
+          "userInput": "P(a) or Q(a)"
+        },
+        "justification": {
+          "refs": ["30"],
+          "rule": "or_intro_1"
+        },
+        "stepType": "line",
+        "uuid": "40"
+      }, {
+        "formula": {
+          "ascii": "exists x (P(x) or Q(x))",
+          "latex": "\\exists x (P(x) \\lor Q(x))",
+          "userInput": "exists x (P(x) or Q(x))"
+        },
+        "justification": {
+          "refs": ["40"],
+          "rule": "exists_intro"
+        },
+        "stepType": "line",
+        "uuid": "45"
+      }],
+      "stepType": "box",
+      "uuid": "ba"
+    }, {
+      "formula": {
+        "ascii": "exists x (P(x) or Q(x))",
+        "latex": "\\exists x (P(x) \\lor Q(x))",
+        "userInput": "exists x (P(x) or Q(x))"
+      },
+      "justification": {
+        "refs": ["20", "ba"],
+        "rule": "exists_elim"
+      },
+      "stepType": "line",
+      "uuid": "50"
+    }],
+    "stepType": "box",
+    "uuid": "bp"
+  }, {
+    "boxInfo": {
+
+    },
+    "proof": [{
+      "formula": {
+        "ascii": "exists x Q(x)",
+        "latex": "\\exists x Q(x)",
+        "userInput": "exists x Q(x)"
+      },
+      "justification": {
+        "refs": [],
+        "rule": "assumption"
+      },
+      "stepType": "line",
+      "uuid": "60"
+    }, {
+      "boxInfo": {
+        "freshVar": "a"
+      },
+      "proof": [{
+        "formula": {
+          "ascii": "P(a)",
+          "latex": "P(a)",
+          "userInput": "P(a)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "70"
+      }, {
+        "formula": {
+          "ascii": "P(a) or Q(a)",
+          "latex": "P(a) \\lor Q(a)",
+          "userInput": "P(a) or Q(a)"
+        },
+        "justification": {
+          "refs": ["70"],
+          "rule": "or_intro_1"
+        },
+        "stepType": "line",
+        "uuid": "80"
+      }],
+      "stepType": "box",
+      "uuid": "bb"
+    }, {
+      "formula": {
+        "ascii": "exists x (P(x) or R(x))",
+        "latex": "\\exists x (P(x) \\lor R(x))",
+        "userInput": "exists x (P(x) or R(x))"
+      },
+      "justification": {
+        "refs": ["60", "bb"],
+        "rule": "exists_elim"
+      },
+      "stepType": "line",
+      "uuid": "90"
+    }],
+    "stepType": "box",
+    "uuid": "bq"
+  }, {
+    "formula": {
+      "ascii": "exists x (P(x) or Q(x))",
+      "latex": "\\exists x (P(x) \\lor Q(x))",
+      "userInput": "exists x (P(x) or Q(x))"
+    },
+    "justification": {
+      "refs": ["10", "bp", "bq"],
+      "rule": "or_elim"
+    },
+    "stepType": "line",
+    "uuid": "100"
+  }]
+}
