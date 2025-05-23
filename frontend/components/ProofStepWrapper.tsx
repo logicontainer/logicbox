@@ -19,7 +19,8 @@ export function ProofStepWrapper({
         !isOuterProofStep && "px-3 pointer-events-none bg-none",
         !isBox && highlight === Highlight.HOVERED  && "bg-slate-50",
         !isBox && highlight === Highlight.SELECTED && "bg-slate-100",
-        !isBox && highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200"
+        !isBox && highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200",
+        !isBox && highlight === Highlight.REFERRED && "bg-blue-200"
       )}
     >
       {children}

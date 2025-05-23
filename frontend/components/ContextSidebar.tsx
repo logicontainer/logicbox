@@ -14,10 +14,6 @@ import { useLines } from "@/contexts/LinesProvider";
 import { useServer } from "@/contexts/ServerProvider";
 import { getSelectedStep } from "@/lib/state-helpers";
 
-function SelectRuleSidebar() {
-
-}
-
 export default function ContextSidebar() {
   const { lines, getReferenceString } = useLines();
   const { getRuleAtStepAsLatex } = useDiagnostics();
@@ -35,7 +31,7 @@ export default function ContextSidebar() {
   const isEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
   return (
-    <div className="  sm:h-screen p-2">
+    <div className="sm:h-screen p-2">
       <div className="flex flex-col gap-2">
         {(line && !isEditingRule) && (
           <Card>

@@ -18,6 +18,7 @@ import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import React from "react";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { getStepHighlight } from "@/lib/proof-step-highlight";
+import { useProof } from "@/contexts/ProofProvider";
 
 export function BoxProofStep({
   ...props
@@ -28,9 +29,9 @@ export function BoxProofStep({
 }) {
   const { doTransition, interactionState } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
-  const { currentlyHoveredUuid, onHoverStep } = useHovering()
+  const { currentlyHoveredUuid, handleHoverStep } = useHovering()
 
-  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState)
+  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState, useProof())
 
   return (
     <ProofStepWrapper
@@ -46,7 +47,8 @@ export function BoxProofStep({
 
           highlight === Highlight.SELECTED && "bg-slate-100",
           highlight === Highlight.HOVERED && "bg-slate-50",
-          highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200"
+          highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200",
+          highlight === Highlight.REFERRED && "bg-blue-200",
         )}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -67,7 +69,7 @@ export function BoxProofStep({
         }}
         onMouseMove={e => {
           e.stopPropagation()
-          onHoverStep(props.uuid)
+          handleHoverStep(props.uuid, null, false)
         }}
       >
         <Proof

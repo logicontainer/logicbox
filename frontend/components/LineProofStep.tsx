@@ -23,6 +23,7 @@ import { formulaIsWrong } from "@/lib/diagnostic-helpers";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { getStepHighlight } from "@/lib/proof-step-highlight";
+import { useProof } from "@/contexts/ProofProvider";
 
 export function LineProofStep({
   ...props
@@ -34,9 +35,9 @@ export function LineProofStep({
   const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const { interactionState } = useInteractionState();
-  const { currentlyHoveredUuid, onHoverStep } = useHovering()
+  const { currentlyHoveredUuid, handleHoverStep } = useHovering()
 
-  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState)
+  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState, useProof())
 
   return (
     <ProofStepWrapper
@@ -65,7 +66,10 @@ export function LineProofStep({
         }}
         onMouseMove={(e) => {
           e.stopPropagation();
-          onHoverStep(props.uuid)
+          if (e.currentTarget !== e.target)
+            return;
+          console.log("balls")
+          handleHoverStep(props.uuid, null, false)
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -160,6 +164,8 @@ function Formula({
     <AutosizeInput
       inputRef={handleInputRefChange}
       value={currentFormulaValue}
+      onClickCapture={e => e.stopPropagation()}
+      onDoubleClickCapture={e => e.stopPropagation()}
       onChange={(e) => {
         console.log(e);
         doTransition({
@@ -187,9 +193,13 @@ function Formula({
       {!isSyncedWithServer || formulaIsWrong ? (
         currentFormulaValue
       ) : (
+        <span onClick={e => {
+          e.stopPropagation()
+        }}>
         <InlineMath 
           math={formulaLatexContentWithUnderline}
         ></InlineMath>
+        </span>
       )}
     </p>
   );

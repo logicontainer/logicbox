@@ -16,6 +16,7 @@ import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
 import { v4 as uuidv4 } from "uuid";
+import { Clicker_Script } from "next/font/google";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -54,6 +55,8 @@ export type InteractionState = { enum: InteractionStateEnum } & (
       enum: InteractionStateEnum.IDLE;
       selectedProofStepUuid: string | null;
       sticky: boolean;
+      hoveredRefIdx: number | null;
+      ruleIsHovered: boolean;
     }
   | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string }
   | {
@@ -72,7 +75,12 @@ export type InteractionState = { enum: InteractionStateEnum } & (
 export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
   | { enum: TransitionEnum.DOUBLE_CLICK_LINE; lineUuid: string }
-  | { enum: TransitionEnum.HOVER; stepUuid: string | null }
+  | { 
+      enum: TransitionEnum.HOVER;
+      stepUuid: string | null
+      refIdx: number | null
+      ruleIsHovered: boolean
+    }
   | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
   | {
       enum: TransitionEnum.RIGHT_CLICK_STEP;
@@ -112,14 +120,7 @@ export interface InteractionStateContextProps {
 }
 // Context Setup
 const InteractionStateContext =
-  React.createContext<InteractionStateContextProps>({
-    interactionState: {
-      enum: InteractionStateEnum.IDLE,
-      selectedProofStepUuid: null,
-      sticky: false,
-    },
-    doTransition: () => {},
-  });
+  React.createContext<InteractionStateContextProps | null>(null)
 
 export function useInteractionState() {
   const context = React.useContext(InteractionStateContext);
@@ -139,6 +140,8 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
       sticky: false,
+      hoveredRefIdx: null,
+      ruleIsHovered: false,
     });
 
   const serverContext = useServer();
@@ -280,11 +283,13 @@ export function InteractionStateProvider({
     } satisfies InteractionState;
   };
 
-  const fullyIdle = (): InteractionState => {
+  const fullyIdle = (): InteractionState & { enum: InteractionStateEnum.IDLE } => {
     return {
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
       sticky: false,
+      hoveredRefIdx: null,
+      ruleIsHovered: false,
     };
   };
 
@@ -293,14 +298,10 @@ export function InteractionStateProvider({
     clickedUuid: string
   ): InteractionState => {
     if (!state.sticky) {
-      return { enum: IDLE, selectedProofStepUuid: clickedUuid, sticky: true };
+      return { ...fullyIdle(), selectedProofStepUuid: clickedUuid, sticky: true };
     }
 
-    return {
-      enum: IDLE,
-      selectedProofStepUuid: clickedUuid,
-      sticky: clickedUuid !== state.selectedProofStepUuid,
-    };
+    return { ...fullyIdle(), selectedProofStepUuid: clickedUuid, sticky: clickedUuid !== state.selectedProofStepUuid };
   };
 
   const {
@@ -335,15 +336,17 @@ export function InteractionStateProvider({
       [CLICK_LINE]: (state, { lineUuid }) =>
         handleClickStepInIdle(state, lineUuid),
       [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
-      [HOVER]: (state, { stepUuid: lineUuid }) => {
+      [HOVER]: (state, { stepUuid: lineUuid, refIdx, ruleIsHovered }) => {
         if (state.sticky) {
-          return state;
+          return { ... state, refIdx, ruleIsHovered };
         }
         return {
           enum: IDLE,
           selectedProofStepUuid: lineUuid,
           sticky: false,
-        };
+          hoveredRefIdx: refIdx,
+          ruleIsHovered
+        }
       },
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
       [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
@@ -419,7 +422,7 @@ export function InteractionStateProvider({
 
       [CLICK_LINE]: (state, { lineUuid }) => {
         if (state.lineUuid === lineUuid) {
-          return { enum: IDLE, selectedProofStepUuid: lineUuid, sticky: false };
+          return { ...fullyIdle(), selectedProofStepUuid: lineUuid };
         } else {
           return fullyIdle();
         }
@@ -463,9 +466,8 @@ export function InteractionStateProvider({
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
           updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
-          return fullyIdle();
         }
-        return startEditingFormula(clickedLineUuid);
+        return { ...fullyIdle(), selectedProofStepUuid: editedLineUuid }
       },
 
       [HOVER]: doNothing,
@@ -528,8 +530,8 @@ export function InteractionStateProvider({
 
       [HOVER]: doNothing,
 
-      [CLICK_LINE]: (_, { lineUuid }) => ({ enum: IDLE, selectedProofStepUuid: lineUuid, sticky: false }),
-      [CLICK_BOX]: (_, { boxUuid }) => ({ enum: IDLE, selectedProofStepUuid: boxUuid, sticky: false }),
+      [CLICK_LINE]: (_, { lineUuid }) => ({ ...fullyIdle(), selectedProofStepUuid: lineUuid }),
+      [CLICK_BOX]: (_, { boxUuid }) => ({ ...fullyIdle(), selectedProofStepUuid: boxUuid }),
 
       [CLICK_RULE]: (state, { lineUuid }) => {
         return { enum: EDITING_RULE, lineUuid };
