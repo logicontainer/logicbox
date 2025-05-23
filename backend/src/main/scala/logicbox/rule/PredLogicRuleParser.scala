@@ -9,5 +9,6 @@ object PredLogicRuleParser {
     case "exists_intro" => Some(ExistsIntro())
     case "equality_intro" => Some(EqualityIntro())
     case "equality_elim" => Some(EqualityElim())
+    case _ => None
   }
 }
