@@ -8,10 +8,10 @@ import Link from "next/link";
 import { ProofMetadata } from "@/types/types";
 import { cn } from "@/lib/utils";
 // import examples from "@/examples/proof-examples";
-import { useCurrentProofId } from "@/contexts/CurrentProofIdProvider";
 import { useProofStore } from "@/store/proofStore";
 import { useRouter } from "next/navigation";
 import { v4 as uuid } from "uuid";
+import { useProof } from "@/contexts/ProofProvider";
 
 export default function NavigationSidebar() {
   const proofs = useProofStore((state) => state.proofs);
@@ -37,6 +37,7 @@ export default function NavigationSidebar() {
               addProof({
                 id: newProofId,
                 title: "New proof",
+                logicName: 'predicateLogic',
                 proof: [
                   {
                     formula: {
@@ -59,10 +60,6 @@ export default function NavigationSidebar() {
             <PlusIcon className="h-4 w-4"></PlusIcon>
           </Button>
         </div>
-        <ProofListItem
-          proof={{ id: "", title: "Random proof" }}
-          deletable={false}
-        />
         {proofs.map((proof) => {
           return (
             // Use the proof.id as the key
@@ -81,7 +78,7 @@ function ProofListItem({
   proof: ProofMetadata;
   deletable?: boolean;
 }) {
-  const { proofId } = useCurrentProofId();
+  const { proof: { id: proofId } } = useProof();
   const deleteProof = useProofStore((state) => state.deleteProof);
   const updateProofTitle = useProofStore((state) => state.updateProofTitle);
   const router = useRouter();

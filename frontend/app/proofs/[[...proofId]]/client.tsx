@@ -13,26 +13,22 @@ import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
 import Toolbar from "@/components/Toolbar";
-import { useCurrentProofId } from "@/contexts/CurrentProofIdProvider";
 import { useEffect } from "react";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 
-export default function Client({ proofId }: { proofId: string | null }) {
+export default function Client({ proofId } : { proofId: string | null }) {
   const proofContext = useProof();
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
   const { handleHoverStep } = useHovering()
 
-  const { setProofId } = useCurrentProofId();
-
-  useEffect(() => {
-    console.log("proofId", proofId);
-    setProofId(proofId || ""); // Set the proofId in the context
-  }, [proofId, setProofId]);
+  React.useEffect(() => {
+    proofId && proofContext.loadProofFromId(proofId)
+  }, [proofId])
 
   const [keybindTransition, setKeybindTransition] =
     React.useState<Transition | null>();
@@ -79,7 +75,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
             >
               <LineNumbers lines={lines} />
               <Proof
-                proof={proofContext.proof}
+                proof={proofContext.proof.proof}
                 lines={lines}
                 diagnostics={proofDiagnostics}
                 isOuterProof

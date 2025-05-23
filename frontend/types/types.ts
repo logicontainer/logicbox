@@ -42,7 +42,9 @@ export type Proof = ProofStep[];
 export type ProofMetadata = {
   id: string;
   title: string;
+  logicName: LogicName;
 };
+
 export type ProofWithMetadata = {
   proof: Proof;
 } & ProofMetadata;
@@ -93,6 +95,13 @@ export type Diagnostic = {
   uuid: UUID;
   violationType: string;
   violation: any;
+}
+
+export type LogicName = 'propositionalLogic' | 'predicateLogic'
+
+export type ValidationRequest = {
+  proof: Proof
+  logicName: LogicName
 }
 
 export type ValidationResponse = {

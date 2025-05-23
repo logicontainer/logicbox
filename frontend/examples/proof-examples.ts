@@ -4,6 +4,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "0",
     title: "Proof with errors",
+    logicName: 'propositionalLogic',
     proof: [
       {
         formula: {
@@ -113,6 +114,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "2",
     title: "Some example",
+    logicName: 'propositionalLogic',
     proof: [
       {
         formula: {
@@ -270,6 +272,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "3",
     title: "Example 3",
+    logicName: 'propositionalLogic',
     proof: [
       {
         formula: {
@@ -476,6 +479,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "4",
     title: "Example 4",
+    logicName: 'propositionalLogic',
     proof: [
       {
         formula: {
@@ -640,6 +644,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "5",
     title: "Another proof",
+    logicName: 'propositionalLogic',
     proof: [
       {
         formula: {
@@ -845,6 +850,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "6",
     title: "Chunky Example",
+    logicName: 'propositionalLogic',
     proof: [
       {
         formula: {
@@ -1351,6 +1357,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "7",
     title: "Deeply nested example",
+    logicName: 'propositionalLogic',
     proof: [
       {
         proof: [
