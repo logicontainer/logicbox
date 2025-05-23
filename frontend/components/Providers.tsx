@@ -1,7 +1,6 @@
 "use client";
 
 import { ContextMenuProvider } from "@/contexts/ContextMenuProvider";
-import { CurrentProofIdProvider } from "@/contexts/CurrentProofIdProvider";
 import { DiagnosticsProvider } from "@/contexts/DiagnosticsProvider";
 import { HistoryProvider } from "@/contexts/HistoryProvider";
 import { HoveringProvider } from "@/contexts/HoveringProvider";
@@ -17,26 +16,24 @@ type ProviderProps = {
 
 export function Providers({ children }: ProviderProps) {
   return (
-    <CurrentProofIdProvider>
+    <ProofProvider>
       <ServerProvider>
-        <RulesetProvider>
-          <ProofProvider>
-            <LinesProvider>
-              <DiagnosticsProvider>
-                <HistoryProvider>
-                  <InteractionStateProvider>
-                    <ContextMenuProvider>
-                      <HoveringProvider>
-                        {children}
-                      </HoveringProvider>
-                    </ContextMenuProvider>
-                  </InteractionStateProvider>
-                </HistoryProvider>
-              </DiagnosticsProvider>
-            </LinesProvider>
-          </ProofProvider>
-        </RulesetProvider>
+        <LinesProvider>
+          <RulesetProvider>
+            <DiagnosticsProvider>
+              <HistoryProvider>
+                <InteractionStateProvider>
+                  <ContextMenuProvider>
+                    <HoveringProvider>
+                      {children}
+                    </HoveringProvider>
+                  </ContextMenuProvider>
+                </InteractionStateProvider>
+              </HistoryProvider>
+            </DiagnosticsProvider>
+          </RulesetProvider>
+        </LinesProvider>
       </ServerProvider>
-    </CurrentProofIdProvider>
+    </ProofProvider>
   );
 }

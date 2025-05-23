@@ -22,10 +22,16 @@ export function ProofStepContextMenu() {
 
   const handleItemClick = (id: string) => {
     switch (id) {
-      case "edit":
+      case "edit-formula":
         doTransition({
           enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
-          option: ContextMenuOptions.EDIT,
+          option: ContextMenuOptions.EDIT_FORMULA,
+        });
+        break;
+      case "edit-fresh-var":
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.EDIT_FRESH_VAR,
         });
         break;
       case "line-above":
@@ -81,8 +87,13 @@ export function ProofStepContextMenu() {
       }}
     >
       {!interactionState.isBox && (
-        <Item id="edit" onClick={handleItemClick}>
+        <Item id="edit-formula" onClick={handleItemClick}>
           Edit
+        </Item>
+      )}
+      {interactionState.isBox && (
+        <Item id="edit-fresh-var" onClick={handleItemClick}>
+          Edit fresh variable
         </Item>
       )}
       <hr />

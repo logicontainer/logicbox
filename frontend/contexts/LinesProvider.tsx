@@ -14,7 +14,6 @@ import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import { parseLinesFromProof } from "@/lib/lines-parser";
 import { useProof } from "./ProofProvider";
-import { useServer } from "./ServerProvider";
 
 export interface LinesContextProps {
   lines: TLineNumber[];
@@ -36,7 +35,7 @@ export function useLines() {
 
 export function LinesProvider({ children }: React.PropsWithChildren<object>) {
   const { proof } = useProof();
-  const lines = parseLinesFromProof(proof);
+  const lines = parseLinesFromProof(proof.proof);
   const getReferenceString = (uuid: string) => {
     const line = lines.find((line) => line.uuid === uuid);
     if (line) {

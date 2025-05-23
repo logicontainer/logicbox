@@ -7,7 +7,7 @@ import examples from "@/examples/proof-examples";
 type ProofStore = {
   proofs: ProofWithMetadata[];
   addProof: (proof: ProofWithMetadata) => void;
-  updateProofContent: (id: string, updates: Proof) => void;
+  updateProofContent: (id: string, updater: (_: Proof) => Proof) => void;
   updateProofTitle: (id: string, title: string) => void;
   deleteProof: (id: string) => void;
   getProof: (id: string) => ProofWithMetadata | undefined;
@@ -24,13 +24,13 @@ export const useProofStore = create<ProofStore>()(
           proofs: [...state.proofs, proof],
         })),
 
-      updateProofContent: (id, updates) =>
+      updateProofContent: (id, updater) =>
         set((state) => {
           const existing = state.proofs.find((proof) => proof.id === id);
           if (!existing) return state;
           const proofs = state.proofs.map((proof) => {
             if (proof.id === id) {
-              return { ...proof, proof: updates };
+              return { ...proof, proof: updater(proof.proof) };
             }
             return proof;
           });

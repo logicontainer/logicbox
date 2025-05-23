@@ -31,7 +31,7 @@ export function Justification({
   onClickRule: () => void;
   onClickRef: (idx: number) => void;
 }) {
-  const { ruleset } = useRuleset();
+  const { rulesets } = useRuleset();
   const { handleHoverStep } = useHovering()
 
   const proofContext = useProof();
@@ -39,7 +39,7 @@ export function Justification({
 
   const { interactionState } = useInteractionState();
   const { doTransition } = useInteractionState();
-  const rule = ruleset.rules.find(
+  const rule = rulesets.map(set => set.rules).flat().find(
     (rule) => rule.ruleName == justification.rule
   );
   const ruleNameLatex = rule?.latex.ruleName;

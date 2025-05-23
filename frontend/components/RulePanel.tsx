@@ -9,11 +9,12 @@ import { useRuleset } from "@/contexts/RulesetProvider";
 import { useState } from "react";
 
 export default function RulePanel() {
-  const { ruleset } = useRuleset();
+  const { rulesets } = useRuleset();
   const { doTransition } = useInteractionState();
   const [hoveredRule, setHoveredRule] = useState<string | null>(null);
 
-  const hoveredRuleDetails = ruleset.rules.find(
+  const allRules = rulesets.map(s => s.rules).flat()
+  const hoveredRuleDetails = allRules.find(
     (rule) => rule.ruleName === hoveredRule
   );
   const hoveredRuleDetailsLatex = hoveredRuleDetails
@@ -39,8 +40,7 @@ export default function RulePanel() {
     <div className="flex flex-col gap-2">
       <h2 className="text-lg font-bold">Select a rule</h2>
       <div className="grid grid-cols-3 gap-2">
-        {ruleset &&
-          ruleset.rules.map((rule) => {
+        {allRules.map((rule) => {
             return (
               <div
                 key={rule.ruleName}

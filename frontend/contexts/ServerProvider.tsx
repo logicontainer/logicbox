@@ -1,18 +1,15 @@
 "use client";
 
-import { Diagnostic, Proof, ValidationResponse } from "@/types/types";
+import { Diagnostic, LogicName, Proof, ProofWithMetadata, ValidationRequest, ValidationResponse } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
-// import examples from "@/examples/proof-examples";
-import { useCurrentProofId } from "./CurrentProofIdProvider";
-import { useProofStore } from "@/store/proofStore";
+import { useProof } from "./ProofProvider";
 
 export interface ServerContextProps {
-  proof: Proof;
   syncingStatus: string;
   proofDiagnostics: Diagnostic[];
-  validateProof: (proof: Proof) => Promise<boolean>;
+  validateProof: (proof: ValidationRequest) => Promise<boolean>;
 }
 
 const ServerContext = React.createContext<ServerContextProps | null>(null);
@@ -27,66 +24,15 @@ export function useServer() {
 
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
-  const [proof, setProof] = useState<Proof>([]);
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
-  const { proofId } = useCurrentProofId();
-  const proofs = useProofStore((state) => state.proofs);
-  const addProof = useProofStore((state) => state.addProof);
-  const deleteProof = useProofStore((state) => state.deleteProof);
-  const getProof = useProofStore((state) => state.getProof);
-  const clearAll = useProofStore((state) => state.clearAll);
-  const prevProof = React.useRef<Proof>(proof);
-  const prevProofDiagnostics = React.useRef<Diagnostic[]>(proofDiagnostics);
 
-  const getProofById = (id: string | null): Proof => {
-    if (id) {
-      const proof = getProof(id);
-      if (proof) {
-        return proof.proof;
-      }
-    }
-    const randomIndex = Math.floor(Math.random() * proofs.length);
-    return proofs[randomIndex].proof;
-  };
-
-  React.useEffect(() => {
-    // This will only run on the client side
-    if (proofs.length === 0) {
-      console.warn("No existing proofs provided, using empty proof");
-      setProof({} as Proof);
-      return;
-    }
-    const randomIndex = Math.floor(Math.random() * proofs.length);
-
-    if (proofId === null) {
-      return;
-    }
-    if (proofId) {
-      setProof(getProofById(proofId));
-    } else {
-      console.warn("No proofId provided, using random example");
-      setProof(getProofById(null));
-    }
-  }, [proofId]);
+  const { proof, setProofContent } = useProof()
 
   useEffect(() => {
-    if (proofId == null) setProof([]);
-  }, []);
+    validateProof({ proof: proof.proof, logicName: proof.logicName });
+  }, [proof.id]);
 
-  useEffect(() => {
-    if (_.isEmpty(proof)) {
-      return;
-    }
-    if (
-      _.isEqual(proof, prevProof.current) &&
-      _.isEqual(proofDiagnostics, prevProofDiagnostics.current)
-    ) {
-      return;
-    }
-    validateProof(proof);
-  }, [proof]);
-
-  const validateProof = async (proof: Proof): Promise<boolean> => {
+  const validateProof = async (request: ValidationRequest): Promise<boolean> => {
     setServerSyncingStatus("syncing");
     console.trace(proof);
     return Promise.resolve()
@@ -97,7 +43,7 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(proof),
+          body: JSON.stringify(request),
         });
       })
       .then(async (serverResponse: Response) => {
@@ -107,11 +53,9 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         return await serverResponse.json();
       })
       .then((serverResponse: ValidationResponse) => {
-        prevProofDiagnostics.current = serverResponse.diagnostics;
-        prevProof.current = proof;
         console.log("Server response", serverResponse);
         setProofDiagnostics(serverResponse.diagnostics);
-        setProof(serverResponse.proof);
+        setProofContent(serverResponse.proof);
         return true;
       })
       .finally(() => {
@@ -127,7 +71,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   return (
     <ServerContext.Provider
       value={{
-        proof,
         syncingStatus,
         proofDiagnostics,
         validateProof,

@@ -88,6 +88,7 @@ const proofExample: ProofStep[] = [
           }
         ],
         "stepType": "box",
+        "boxInfo": { "freshVar": null },
         "uuid": "5ce3a68e-06c1-45dc-b960-9b19660fac0d"
       },
       {
@@ -122,6 +123,7 @@ const proofExample: ProofStep[] = [
       }
     ],
     "stepType": "box",
+    "boxInfo": { "freshVar": null },
     "uuid": "6c132815-cf2a-4a8f-b3b0-034bd0c6e09b"
   },
   {
@@ -187,6 +189,7 @@ const proofExample: ProofStep[] = [
           }
         ],
         "stepType": "box",
+        "boxInfo": { "freshVar": null },
         "uuid": "de93fbf7-fa0b-4af9-8214-1fc552a4f753"
       },
       {
@@ -221,6 +224,7 @@ const proofExample: ProofStep[] = [
       }
     ],
     "stepType": "box",
+    "boxInfo": { "freshVar": null },
     "uuid": "00c5489a-2ce2-4e89-a325-cf1990dc3f48"
   },
   {

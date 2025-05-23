@@ -9,7 +9,8 @@ import React, { useState } from "react";
 import _ from "lodash";
 
 export enum ContextMenuOptions {
-  EDIT,
+  EDIT_FORMULA,
+  EDIT_FRESH_VAR,
   DELETE,
   LINE_ABOVE,
   LINE_BELOW,
@@ -21,11 +22,13 @@ export type ContextMenuPosition = {
   x: number;
   y: number;
 };
+
 export interface ContextMenuContextProps {
   contextMenuShouldBeVisible: boolean;
   contextMenuPosition: ContextMenuPosition;
   setContextMenuPosition: (position: ContextMenuPosition) => void;
 }
+
 // Context Setup
 const ContextMenuContext = React.createContext<ContextMenuContextProps>({
   contextMenuShouldBeVisible: false,

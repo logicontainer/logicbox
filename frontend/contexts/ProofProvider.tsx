@@ -3,24 +3,28 @@
 import {
   BoxProofStep,
   LineProofStep,
-  Proof,
+  ProofWithMetadata,
   ProofStep,
   ProofStepDetails,
   ProofStepPosition,
+  Proof,
 } from "@/types/types";
-import React, { useEffect, useState } from "react";
+import React  from "react";
 
 import _ from "lodash";
-import { useCurrentProofId } from "./CurrentProofIdProvider";
 import { useProofStore } from "@/store/proofStore";
-import { useServer } from "./ServerProvider";
 
 export interface ProofContextProps {
-  proof: Proof;
+  proof: ProofWithMetadata;
+
+  loadProofFromId: (id: string) => void;
+  setProofContent: (proof: Proof) => void;
+
   setStringProof: (proof: string) => unknown;
   addLine: (proofStep: ProofStep, position: ProofStepPosition) => unknown;
   removeLine: (uuid: string) => unknown;
   updateLine: (uuid: string, updatedLineProofStep: LineProofStep) => unknown;
+  updateFreshVarOnBox: (uuid: string, freshVar: string | null) => unknown;
   getProofStepDetails: (
     uuid: string
   ) => (ProofStepDetails & { isOnlyChildInBox: boolean }) | null;
@@ -28,24 +32,9 @@ export interface ProofContextProps {
     proofStepDetails: ProofStepDetails | null;
     cascadeCount: number;
   };
-
-  // HANDLED BY STATE MACHINE
-  // removeIsActiveEditFromLine: (uuid: string) => unknown;
-  // setActiveEdit: (uuid: string) => unknown;
-  // isActiveEdit: (uuid: string) => boolean;
 }
 // Context Setup
-const ProofContext = React.createContext<ProofContextProps>({
-  proof: [],
-  setStringProof: () => {},
-  addLine: () => {},
-  removeLine: () => {},
-  updateLine: () => {},
-  getProofStepDetails: () => null,
-  getNearestDeletableProofStep: () => {
-    return { proofStepDetails: null, cascadeCount: 0 };
-  },
-});
+const ProofContext = React.createContext<ProofContextProps | null>(null);
 
 export function useProof() {
   const context = React.useContext(ProofContext);
@@ -55,27 +44,32 @@ export function useProof() {
   return context;
 }
 
+const FALLBACK_PROOF: ProofWithMetadata = {
+  id: "fallback_proof",
+  title: "YOU SHOULD NOT BE SEEING THIS!",
+  logicName: "propositionalLogic",
+  proof: []
+}
+
 export function ProofProvider({ children }: React.PropsWithChildren<object>) {
-  const serverContext = useServer();
-  const [proof, setProof] = useState(serverContext.proof);
-  const updateProofContent = useProofStore((state) => state.updateProofContent);
-  const { proofId } = useCurrentProofId();
+  const [proofId, setProofId] = React.useState<string | null>(null)
+  const { updateProofContent, getProof } = useProofStore()
+  const proof = ((proofId !== null) ? getProof(proofId) : null) ?? FALLBACK_PROOF
 
-  useEffect(() => {
-    setProof(serverContext.proof);
-  }, [serverContext.proof]);
-
-  useEffect(() => {
-    if (!proofId) return;
-    updateProofContent(proofId, proof);
-  }, [proof]);
+  const setProofContent = (updater: (_: Proof) => Proof) => {
+    if (!proofId) {
+      console.warn("Can't update proof content, as proofId is null")
+      return;
+    }
+    updateProofContent(proofId, updater)
+  }
 
   const setStringProof = (stringProof: string) => {
-    setProof(JSON.parse(stringProof));
+    setProofContent(JSON.parse(stringProof));
   };
 
   const interactWithProofNearUuid = (
-    proof: ProofStep[],
+    proof: Proof,
     uuid: string,
     parentBox: BoxProofStep | null,
     actionAtIndex: (
@@ -109,7 +103,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   };
 
   const addLine = (proofStep: ProofStep, position: ProofStepPosition) => {
-    setProof((prev) => {
+    setProofContent((prev) => {
       const newProof = _.cloneDeep(prev);
       const insertProofStepAtUuid = (
         proof: ProofStep[],
@@ -133,7 +127,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   };
 
   const removeLine = (uuid: string) => {
-    setProof((prev) => {
+    setProofContent((prev) => {
       const newProof = _.cloneDeep(prev);
       const removeProofStepAtUuid = (
         proof: ProofStep[],
@@ -148,7 +142,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   };
 
   const updateLine = (uuid: string, updatedLineProofStep: ProofStep) => {
-    setProof((prev) => {
+    setProofContent((prev) => {
       const newProof = _.cloneDeep(prev);
       const updateProofStepAtUuid = (
         proof: ProofStep[],
@@ -161,6 +155,24 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       return newProof;
     });
   };
+
+  const updateFreshVarOnBox = (uuid: string, freshVar: string | null) => {
+    setProofContent((prev) => {
+      const newProof = _.cloneDeep(prev);
+      const updateProofStepAtUuid = (
+        proof: ProofStep[],
+        indexInCurrLayer: number,
+        parentBox: BoxProofStep | null
+      ) => {
+        if (proof[indexInCurrLayer].stepType !== "box") 
+          throw new Error(`Attempted to update fresh var on ${uuid} - not a box`)
+
+        proof[indexInCurrLayer].boxInfo.freshVar = freshVar;
+      };
+      interactWithProofNearUuid(newProof, uuid, null, updateProofStepAtUuid);
+      return newProof;
+    });
+  }
 
   const getProofStepDetails = (
     uuid: string
@@ -200,7 +212,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       }
       return proof;
     };
-    interactWithProofNearUuid(proof, uuid, null, extractProofStepDetails);
+    interactWithProofNearUuid(proof.proof, uuid, null, extractProofStepDetails);
     return proofStepDetails;
   };
 
@@ -228,7 +240,10 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     <ProofContext.Provider
       value={{
         proof,
+        loadProofFromId: setProofId,
+        setProofContent: pf => setProofContent(_ => pf),
         setStringProof,
+        updateFreshVarOnBox,
         addLine,
         removeLine,
         updateLine,
