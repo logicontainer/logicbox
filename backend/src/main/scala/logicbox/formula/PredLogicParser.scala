@@ -5,14 +5,14 @@ import scala.util.parsing.input.Reader
 import scala.util.parsing.input.Position
 import scala.util.parsing.input.NoPosition
 
-class PredLogicParser extends PackratParsers {
-  import PredLogicFormula._
-  import PredLogicTerm._
+import PredLogicFormula._
+import PredLogicTerm._
 
+class PredLogicParser extends PackratParsers {
   override type Elem = PredLogicToken
 
   private def varexp: Parser[PredLogicTerm.Var] = accept("var", { case PredLogicToken.Ident(c) => PredLogicTerm.Var(c) })
-  private def funcsymb: Parser[Char] = accept("function symbol", { case PredLogicToken.Ident(c) => c })
+  private def funcsymb: Parser[String] = accept("function symbol", { case PredLogicToken.Ident(c) => c })
 
   private def funcexp: Parser[PredLogicTerm] = (funcsymb ~ withParens(termlistexp)) ^^ {
     case p ~ ts => FunAppl(p, ts)
@@ -29,7 +29,7 @@ class PredLogicParser extends PackratParsers {
 
   private def contrexp: Parser[Contradiction] = elem(PredLogicToken.Contradiction()) ^^^ Contradiction()
   private def tautexp: Parser[Tautology] = elem(PredLogicToken.Tautology()) ^^^ Tautology()
-  private def predsymb: Parser[Char] = accept("predicate symbol", { case PredLogicToken.Ident(c) => c })
+  private def predsymb: Parser[String] = accept("predicate symbol", { case PredLogicToken.Ident(c) => c })
   private def predexp: Parser[Predicate] = (predsymb ~ withParens(termlistexp)) ^^ {
     case p ~ ts => Predicate(p, ts)
   }
@@ -71,10 +71,19 @@ class PredLogicParser extends PackratParsers {
   
   private def formula: Parser[PredLogicFormula] = a
 
-  def apply(input: List[PredLogicToken]): PredLogicFormula =
+  def parseVariable(input: List[PredLogicToken]): PredLogicTerm.Var = {
+    phrase(varexp)(PredLogicTokenReader(input)) match {
+      case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
+        throw new RuntimeException(p.toString)
+      case Success(result, _) => result
+    }
+  }
+
+  def parseFormula(input: List[PredLogicToken]): PredLogicFormula = {
     phrase(formula)(PredLogicTokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
         throw new RuntimeException(p.toString)
       case Success(result, _) => result
     }
+  }
 }

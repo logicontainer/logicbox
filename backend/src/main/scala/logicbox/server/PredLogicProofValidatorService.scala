@@ -63,7 +63,13 @@ object PredLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(PredLogicParser()(PredLogicLexer()(userInput)))
+      Some(PredLogicParser().parseFormula(PredLogicLexer()(userInput)))
+    } catch { case _ => None }
+  }
+
+  private def parseVariable(userInput: String): Option[PredLogicTerm.Var] = {
+    try {
+      Some(PredLogicParser().parseVariable(PredLogicLexer()(userInput)))
     } catch { case _ => None }
   }
 
@@ -78,7 +84,7 @@ object PredLogicProofValidatorService {
     parseFormula = parseFormula,
     parseRule = ruleParser,
     parseRawBoxInfo = {
-      case RawBoxInfo(Some(x)) => x.headOption.map(c => PredLogicBoxInfo(Some(PredLogicTerm.Var(c))))
+      case RawBoxInfo(Some(x)) => Some(PredLogicBoxInfo(parseVariable(x)))
       case _ => Some(PredLogicBoxInfo(None))
     },
     formulaToLatex = Stringifiers.predLogicFormulaAsLaTeX, 
