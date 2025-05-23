@@ -27,7 +27,8 @@ export default function Client({ proofId } : { proofId: string | null }) {
   const { handleHoverStep } = useHovering()
 
   React.useEffect(() => {
-    proofId && proofContext.loadProofFromId(proofId)
+    if (proofId)
+      proofContext.loadProofFromId(proofId)
   }, [proofId])
 
   const [keybindTransition, setKeybindTransition] =
