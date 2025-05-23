@@ -15,7 +15,7 @@ class PredLogicLexer extends RegexParsers {
   def tautology = ("top" | "TOP" | "TRUE" | "true" | "TAUTOLOGY" | "tautology" | "⊤") ^^^ Tautology()
   def forall = ("forall" | "FORALL" | "∀") ^^^ ForAll()
   def exists = ("exists" | "EXISTS" | "∃") ^^^ Exists()
-  def ident = """[a-z|A-Z]""".r ^^ { str => Ident(str.charAt(0)) }
+  def ident = """[A-Za-z]+((_\d)|(_\{\d+\}))?""".r ^^ { str => Ident(str) }
   def equalss = "=" ^^^ Equals()
   
   def comma = "," ^^^ Comma()

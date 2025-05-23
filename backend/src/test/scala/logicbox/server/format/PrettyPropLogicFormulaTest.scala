@@ -16,9 +16,9 @@ class PrettyPropLogicFormulaTest extends AnyFunSpec {
     }
 
     it("should do predicates") {
-      asLaTeX(Predicate('P', List(Var('x')))) shouldBe "P(x)"
-      asLaTeX(Predicate('P', List(Var('x'), Var('y'), Var('z')))) shouldBe "P(x, y, z)"
-      asLaTeX(Predicate('Q', List(FunAppl('f', List(Var('x'), Var('y')))))) shouldBe "Q(f(x, y))"
+      asLaTeX(Predicate("P", List(Var("x")))) shouldBe "P(x)"
+      asLaTeX(Predicate("P", List(Var("x"), Var("y"), Var("z")))) shouldBe "P(x, y, z)"
+      asLaTeX(Predicate("Q", List(FunAppl("f", List(Var("x"), Var("y")))))) shouldBe "Q(f(x, y))"
     }
 
     it("should add brackets on binary operations") {
@@ -28,19 +28,19 @@ class PrettyPropLogicFormulaTest extends AnyFunSpec {
     }
     
     it("should not add brackets on not") {
-      asLaTeX(Not(Not(And(Contradiction(), Not(Not(Predicate('Q', List(Var('x'))))))))) shouldBe 
+      asLaTeX(Not(Not(And(Contradiction(), Not(Not(Predicate("Q", List(Var("x"))))))))) shouldBe 
         "\\lnot \\lnot (\\bot \\land \\lnot \\lnot Q(x))"
     }
 
     it("should add brackets on equality") {
-      asLaTeX(Not(Equals(Var('x'), Var('y')))) shouldBe 
+      asLaTeX(Not(Equals(Var("x"), Var("y")))) shouldBe 
         "\\lnot (x = y)"
     }
 
     it("should add brackets inside forall/exists, but not around") {
-      asLaTeX(And(ForAll(Var('x'), Equals(Var('x'), Var('y'))), ForAll(Var('y'), Predicate('P', List(Var('y')))))) shouldBe
+      asLaTeX(And(ForAll(Var("x"), Equals(Var("x"), Var("y"))), ForAll(Var("y"), Predicate("P", List(Var("y")))))) shouldBe
         "\\forall x (x = y) \\land \\forall y P(y)"
-      asLaTeX(And(Exists(Var('x'), Equals(Var('x'), Var('y'))), Exists(Var('y'), Predicate('P', List(Var('y')))))) shouldBe
+      asLaTeX(And(Exists(Var("x"), Equals(Var("x"), Var("y"))), Exists(Var("y"), Predicate("P", List(Var("y")))))) shouldBe
         "\\exists x (x = y) \\land \\exists y P(y)"
     }
   }
@@ -53,9 +53,9 @@ class PrettyPropLogicFormulaTest extends AnyFunSpec {
     }
 
     it("should do predicates") {
-      asASCII(Predicate('P', List(Var('x')))) shouldBe "P(x)"
-      asASCII(Predicate('P', List(Var('x'), Var('y'), Var('z')))) shouldBe "P(x, y, z)"
-      asASCII(Predicate('Q', List(FunAppl('f', List(Var('x'), Var('y')))))) shouldBe "Q(f(x, y))"
+      asASCII(Predicate("P", List(Var("x")))) shouldBe "P(x)"
+      asASCII(Predicate("P", List(Var("x"), Var("y"), Var("z")))) shouldBe "P(x, y, z)"
+      asASCII(Predicate("Q", List(FunAppl("f", List(Var("x"), Var("y")))))) shouldBe "Q(f(x, y))"
     }
 
     it("should add brackets on binary operations") {
@@ -65,19 +65,19 @@ class PrettyPropLogicFormulaTest extends AnyFunSpec {
     }
     
     it("should not add brackets on not") {
-      asASCII(Not(Not(And(Contradiction(), Not(Not(Predicate('Q', List(Var('x'))))))))) shouldBe 
+      asASCII(Not(Not(And(Contradiction(), Not(Not(Predicate("Q", List(Var("x"))))))))) shouldBe 
         "not not (false and not not Q(x))"
     }
 
     it("should add brackets on equality") {
-      asASCII(Not(Equals(Var('x'), Var('y')))) shouldBe 
+      asASCII(Not(Equals(Var("x"), Var("y")))) shouldBe 
         "not (x = y)"
     }
 
     it("should add brackets inside forall/exists, but not around") {
-      asASCII(And(ForAll(Var('x'), Equals(Var('x'), Var('y'))), ForAll(Var('y'), Predicate('P', List(Var('y')))))) shouldBe
+      asASCII(And(ForAll(Var("x"), Equals(Var("x"), Var("y"))), ForAll(Var("y"), Predicate("P", List(Var("y")))))) shouldBe
         "forall x (x = y) and forall y P(y)"
-      asASCII(And(Exists(Var('x'), Equals(Var('x'), Var('y'))), Exists(Var('y'), Predicate('P', List(Var('y')))))) shouldBe
+      asASCII(And(Exists(Var("x"), Equals(Var("x"), Var("y"))), Exists(Var("y"), Predicate("P", List(Var("y")))))) shouldBe
         "exists x (x = y) and exists y P(y)"
     }
   }

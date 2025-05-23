@@ -22,12 +22,12 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
 
   private type BI = PredLogicBoxInfo[PredLogicTerm.Var]
 
-  private def parse(str: String): PredLogicFormula = parser(lexer(str))
+  private def parse(str: String): PredLogicFormula = parser.parseFormula(lexer(str))
 
   private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, BI]])
     extends Reference.Line[PredLogicFormula]
 
-  private case class Box(fst: Option[Reference[PredLogicFormula, BI]], lst: Option[Reference[PredLogicFormula, BI]], freshVar: Option[Char]) extends Reference.Box[PredLogicFormula, BI] {
+  private case class Box(fst: Option[Reference[PredLogicFormula, BI]], lst: Option[Reference[PredLogicFormula, BI]], freshVar: Option[String]) extends Reference.Box[PredLogicFormula, BI] {
     override def info = PredLogicBoxInfo(freshVar.map(Var(_)))
     override def first = fst
     override def last = lst
@@ -37,11 +37,11 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     def formula = parse(str)
   }
 
-  private def refBox(ass: String, concl: String, fresh: Char = '\u0000'): Reference.Box[PredLogicFormula, BI] =
+  private def refBox(ass: String, concl: String, fresh: String = ""): Reference.Box[PredLogicFormula, BI] =
     Box(
       Some(ReferenceLineImpl(parse(ass))), 
       Some(ReferenceLineImpl(parse(concl))), 
-      if fresh === '\u0000' then None else Some(fresh)
+      if fresh === "" then None else Some(fresh)
     )
 
   private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var](
@@ -93,19 +93,19 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
 
     it("should reject when formula is not forall") {
       val f = parse("P(x)")
-      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", 'a'))) should matchPattern {
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", "a"))) should matchPattern {
         case List(FormulaDoesntMatchRule(_)) =>
       }
     }
 
     it("should allow correct usage") {
       val f = parse("forall x P(x)")
-      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", 'a'))) shouldBe Nil
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", "a"))) shouldBe Nil
     }
 
     it("should reject when last line doesn't match") {
       val f = parse("forall x P(x)")
-      checker.check(ForAllIntro(), f, List(refBox("P(a)", "Q(x)", 'a'))) should matchPattern {
+      checker.check(ForAllIntro(), f, List(refBox("P(a)", "Q(x)", "a"))) should matchPattern {
         case List(FormulaDoesntMatchReference(0, _)) =>
       }
     }
@@ -116,7 +116,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("false")
       val refs = List(
         refLine("exists x P(x)"),
-        refBox("Q(a)", "false", 'a')
+        refBox("Q(a)", "false", "a")
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
         case List(ReferencesMismatch(List(0, 1), _)) => 
@@ -127,7 +127,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("Q(c)")
       val refs = List(
         refLine("exists x P(x)"),
-        refBox("P(a)", "Q(b)", 'a')
+        refBox("P(a)", "Q(b)", "a")
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
         case List(FormulaDoesntMatchReference(1, _)) =>
@@ -149,7 +149,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(a) and P(a)")
       val refs = List(
         refLine("exists x P(x)"),
-        refBox("P(a)", "P(a) and P(a)", 'a')
+        refBox("P(a)", "P(a) and P(a)", "a")
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
         case List(FormulaDoesntMatchRule(_)) =>
@@ -160,7 +160,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(a)")
       val refs = List(
         refLine("forall x P(x)"),
-        refBox("P(a)", "P(a)", 'a')
+        refBox("P(a)", "P(a)", "a")
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
         case List(ReferenceDoesntMatchRule(0, _)) =>
