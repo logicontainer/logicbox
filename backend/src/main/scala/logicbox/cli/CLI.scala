@@ -4,8 +4,6 @@ import scala.io.Source
 import scala.util.Try
 import logicbox.server.format._
 import logicbox.server.PropLogicProofValidatorService
-import spray.json.JsObject
-import spray.json.JsArray
 import logicbox.server.PredLogicProofValidatorService
 
 object CLIMain {
@@ -91,9 +89,11 @@ object CLIMain {
       _ = println(s"Running on $inputFile")
       lines <- Try { Source.fromFile(inputFile).getLines() }.toOption
       proof = parseRawProof(lines.toList)
-      ds = validator.validateProof(rawProofFormat.write(proof)) match {
+      ds = validator.validateProof(proof) match {
         case Left(value) => List(value.toString)
-        case Right(value) => value.asInstanceOf[JsObject].getFields("diagnostics").head.asInstanceOf[JsArray].elements.toList.map(_.prettyPrint)
+        case Right(value) => 
+          println(logicbox.server.format.SprayFormatters.rawProofFormat.write(value.proof).prettyPrint)
+          value.diagnostics
       }
     } yield ds.foreach(println)
   }
