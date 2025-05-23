@@ -88,7 +88,7 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
 
   const validateProof = async (proof: Proof): Promise<boolean> => {
     setServerSyncingStatus("syncing");
-    console.log(proof);
+    console.trace(proof);
     return Promise.resolve()
       .then(async () => {
         console.log("Calling server");

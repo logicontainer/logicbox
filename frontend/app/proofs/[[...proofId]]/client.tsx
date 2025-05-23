@@ -40,7 +40,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
   React.useEffect(() => {
     const listener = (e: KeyboardEvent) => {
       if (
-        (e.key === "r" || e.key === "Enter") &&
+        (e.key === "r") &&
         interactionState.enum === InteractionStateEnum.IDLE
       )
         setKeybindTransition({ enum: TransitionEnum.VALIDATE_PROOF });
@@ -85,7 +85,6 @@ export default function Client({ proofId }: { proofId: string | null }) {
                 diagnostics={proofDiagnostics}
                 isOuterProof
               />
-              {/*<ProofStepContextMenu />*/}
             </div>
           </div>
         </div>

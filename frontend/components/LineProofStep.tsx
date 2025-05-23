@@ -20,7 +20,6 @@ import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { formulaIsWrong } from "@/lib/diagnostic-helpers";
-import { getSelectedStep } from "@/lib/state-helpers";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { getStepHighlight } from "@/lib/proof-step-highlight";
