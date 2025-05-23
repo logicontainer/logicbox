@@ -80,6 +80,7 @@ const examples: ProofWithMetadata[] = [
             uuid: "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8g9h",
           },
         ],
+        boxInfo: { freshVar: null },
         stepType: "box",
         uuid: "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8g9h0i",
       },
@@ -174,6 +175,7 @@ const examples: ProofWithMetadata[] = [
             uuid: "b06aa72f-2679-4431-9702-c17fb3b11ef6",
           },
         ],
+        boxInfo: { freshVar: null },
         stepType: "box",
         uuid: "27d558d0-26ca-42b0-ab45-f6e6b2a317dc",
       },
@@ -235,6 +237,7 @@ const examples: ProofWithMetadata[] = [
             uuid: "1ecb02c9-93b0-4fd8-a56d-396f3f4b371f",
           },
         ],
+        boxInfo: { freshVar: null },
         stepType: "box",
         uuid: "2712afba-e726-48a4-919a-cc41085fe690",
       },
@@ -331,6 +334,7 @@ const examples: ProofWithMetadata[] = [
                 uuid: "e179f6c7-7c6c-40bd-9674-dea19a249716",
               },
             ],
+        boxInfo: { freshVar: null },
             stepType: "box",
             uuid: "5ce3a68e-06c1-45dc-b960-9b19660fac0d",
           },
@@ -362,6 +366,7 @@ const examples: ProofWithMetadata[] = [
           },
         ],
         stepType: "box",
+        boxInfo: { freshVar: null },
         uuid: "6c132815-cf2a-4a8f-b3b0-034bd0c6e09b",
       },
       {
@@ -424,6 +429,7 @@ const examples: ProofWithMetadata[] = [
                 uuid: "7e416170-eac3-46c0-8b11-937da2c782e4",
               },
             ],
+            boxInfo: { freshVar: null },
             stepType: "box",
             uuid: "de93fbf7-fa0b-4af9-8214-1fc552a4f753",
           },
@@ -454,6 +460,7 @@ const examples: ProofWithMetadata[] = [
             uuid: "c6cc534f-4eb1-439a-a67f-0663ca3fc9e3",
           },
         ],
+        boxInfo: { freshVar: null },
         stepType: "box",
         uuid: "00c5489a-2ce2-4e89-a325-cf1990dc3f48",
       },
@@ -555,6 +562,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "d62046aa-1f0f-41e9-90fe-6efd82d43257",
           },
           {
@@ -603,6 +611,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "4dccce80-d117-483b-be7e-44e5679818bb",
           },
           {
@@ -624,6 +633,7 @@ const examples: ProofWithMetadata[] = [
           },
         ],
         stepType: "box",
+        boxInfo: { freshVar: null },
         uuid: "5603913b-ffe8-423d-b981-3b086dbc05f4",
       },
       {
@@ -720,6 +730,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "f096cb90-0c6c-4c51-aaf6-25efe74762f6",
           },
           {
@@ -797,6 +808,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "28c23021-8b01-412d-b4d2-49bb5225a9d0",
           },
           {
@@ -830,6 +842,7 @@ const examples: ProofWithMetadata[] = [
           },
         ],
         stepType: "box",
+        boxInfo: { freshVar: null },
         uuid: "540d0506-ee84-413b-9712-a159704af2b6",
       },
       {
@@ -938,6 +951,7 @@ const examples: ProofWithMetadata[] = [
                   },
                 ],
                 stepType: "box",
+                boxInfo: { freshVar: null },
                 uuid: "06e5fe7b-c179-4a05-a64a-5487ccc10ed6",
               },
               {
@@ -968,6 +982,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "f6dc188a-ba3d-4100-83b5-e90c6909ce7e",
           },
           {
@@ -1047,6 +1062,7 @@ const examples: ProofWithMetadata[] = [
                   },
                 ],
                 stepType: "box",
+                boxInfo: { freshVar: null },
                 uuid: "205d6948-bd5e-4018-bd10-c111f36b0556",
               },
               {
@@ -1077,6 +1093,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "35568d80-49d7-435a-acc1-77f80af42155",
           },
           {
@@ -1098,6 +1115,7 @@ const examples: ProofWithMetadata[] = [
           },
         ],
         stepType: "box",
+        boxInfo: { freshVar: null },
         uuid: "761c4eed-3ac7-4e59-8a95-6fe9d3f21f8c",
       },
       {
@@ -1173,6 +1191,7 @@ const examples: ProofWithMetadata[] = [
                   },
                 ],
                 stepType: "box",
+                boxInfo: { freshVar: null },
                 uuid: "5f71d499-4698-4671-af34-4d57df485b3a",
               },
               {
@@ -1203,6 +1222,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "ffa62b01-cc2e-47ae-a3b7-b8d8b546679d",
           },
           {
@@ -1282,6 +1302,7 @@ const examples: ProofWithMetadata[] = [
                   },
                 ],
                 stepType: "box",
+                boxInfo: { freshVar: null },
                 uuid: "211f7763-a91d-4b38-827f-10fbb4498fba",
               },
               {
@@ -1312,6 +1333,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "8336d04f-1cd5-45e3-b0ef-9433195a92ed",
           },
           {
@@ -1333,6 +1355,7 @@ const examples: ProofWithMetadata[] = [
           },
         ],
         stepType: "box",
+        boxInfo: { freshVar: null },
         uuid: "9457f8b5-7dc2-4e30-9837-9f8497bf941b",
       },
       {
@@ -1467,6 +1490,7 @@ const examples: ProofWithMetadata[] = [
                   },
                 ],
                 stepType: "box",
+                boxInfo: { freshVar: null },
                 uuid: "678269ac-8f46-4cac-a605-fe71034ffdd7",
               },
               {
@@ -1484,6 +1508,7 @@ const examples: ProofWithMetadata[] = [
               },
             ],
             stepType: "box",
+            boxInfo: { freshVar: null },
             uuid: "4389ef78-0d1f-4004-b5fe-1a0897cc81f8",
           },
           {
@@ -1501,6 +1526,7 @@ const examples: ProofWithMetadata[] = [
           },
         ],
         stepType: "box",
+        boxInfo: { freshVar: null },
         uuid: "33a5fe1a-497d-4feb-954f-5f2cb2c76288",
       },
       {
@@ -1518,7 +1544,125 @@ const examples: ProofWithMetadata[] = [
         uuid: "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
       },
     ],
+
   },
+  {
+    "id": "some-id",
+    "title": "predicate logic proof",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "formula": {
+          "ascii": "exists x P(x)",
+          "latex": "\\exists x P(x)",
+          "userInput": "exists x P(x)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "225552eb-45ec-4fb3-9287-1b0402946d20"
+      },
+      {
+        "formula": {
+          "ascii": "forall x (P(x) -> Q(x))",
+          "latex": "\\forall x (P(x) \\rightarrow Q(x))",
+          "userInput": "forall x (P(x) -> Q(x))"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "4d31bf2e-31f1-495d-a68d-3b71813c1f9d"
+      },
+      {
+        "boxInfo": {
+          "freshVar": "a"
+        },
+        "proof": [
+          {
+            "formula": {
+              "ascii": "P(a)",
+              "latex": "P(a)",
+              "userInput": "P(a)"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "bb8bd992-3801-4594-9532-4988cd98bafd"
+          },
+          {
+            "formula": {
+              "ascii": "P(a) -> Q(a)",
+              "latex": "P(a) \\rightarrow Q(a)",
+              "userInput": "P(a) -> Q(a)"
+            },
+            "justification": {
+              "refs": [
+                "4d31bf2e-31f1-495d-a68d-3b71813c1f9d"
+              ],
+              "rule": "forall_elim"
+            },
+            "stepType": "line",
+            "uuid": "a4443463-684d-44db-aa6d-6d166486dd51"
+          },
+          {
+            "formula": {
+              "ascii": "Q(a)",
+              "latex": "Q(a)",
+              "userInput": "Q(a)"
+            },
+            "justification": {
+              "refs": [
+                "bb8bd992-3801-4594-9532-4988cd98bafd",
+                "a4443463-684d-44db-aa6d-6d166486dd51"
+              ],
+              "rule": "implies_elim"
+            },
+            "stepType": "line",
+            "uuid": "eb6b17c5-15fa-41b3-994b-da1e61bf284f"
+          },
+          {
+            "formula": {
+              "ascii": "exists x Q(x)",
+              "latex": "\\exists x Q(x)",
+              "userInput": "exists x Q(x)"
+            },
+            "justification": {
+              "refs": [
+                "eb6b17c5-15fa-41b3-994b-da1e61bf284f"
+              ],
+              "rule": "exists_intro"
+            },
+            "stepType": "line",
+            "uuid": "2fd37b95-e5c7-4ec5-958f-085470f7a6b5"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "bb9e59d0-8f4d-41ad-b43c-657e58ecbed8"
+      },
+      {
+        "formula": {
+          "ascii": "exists x Q(x)",
+          "latex": "\\exists x Q(x)",
+          "userInput": "exists x Q(x)"
+        },
+        "justification": {
+          "refs": [
+            "225552eb-45ec-4fb3-9287-1b0402946d20",
+            "bb9e59d0-8f4d-41ad-b43c-657e58ecbed8"
+          ],
+          "rule": "exists_elim"
+        },
+        "stepType": "line",
+        "uuid": "308557d4-6509-43c2-9424-92fdde3be6e8"
+      }
+    ]
+  }
 ];
 
 export default examples;

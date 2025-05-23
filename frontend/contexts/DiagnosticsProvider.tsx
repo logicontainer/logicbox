@@ -38,7 +38,8 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
   const { proofDiagnostics: diagnostics } = useServer()
   const { getReferenceString } = useLines()
   const { getProofStepDetails } = useProof()
-  const { ruleset } = useRuleset()
+  const { rulesets } = useRuleset()
+  const allRules = rulesets.map(s => s.rules).flat()
 
   const getStep = (stepUuid: string) => {
     return getProofStepDetails(stepUuid)?.proofStep ?? null
@@ -110,14 +111,14 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
     const step = getStep(stepUuid)
     if (!step || step.stepType !== "line")
       return null
-    return ruleset.rules.filter(s => s.ruleName === step.justification.rule).map(s => s.latex.ruleName).at(0) ?? null
+    return allRules.filter(s => s.ruleName === step.justification.rule).map(s => s.latex.ruleName).at(0) ?? null
   }
 
   const getRuleAtStepAsLatex = (stepUuid: string, highlightedPremises: number[] = [], conclusionIsHighlighted: boolean = false) => {
     const step = getStep(stepUuid)
     if (!step || step.stepType !== "line")
       return null
-    return ruleset.rules
+    return allRules
       .filter(s => s.ruleName === step.justification.rule)
       .map(s => createHighlightedLatexRule(s.latex.ruleName, s.latex.premises, s.latex.conclusion, highlightedPremises, conclusionIsHighlighted))
       .at(0) ?? null

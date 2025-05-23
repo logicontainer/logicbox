@@ -20,11 +20,11 @@ export function createHighlightedLatexRule(
   return `\\cfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }
 
-const box = (str: string) => `\\begin{array}{|c|} \\hline ${str} \\\\ \\hline \\end{array}`
+const box = (str: string, columns: number = 1) => `\\begin{array}{|${"c".repeat(columns)}|} \\hline ${str} \\\\ \\hline \\end{array}`
 
 export const rulesets = [
   {
-    rulesetName: "propositional-logic",
+    rulesetName: "propositionalLogicRules",
     rules: [
       {
         ruleName: "premise",
@@ -199,4 +199,67 @@ export const rulesets = [
       },
     ],
   },
-] as Ruleset[];
+  {
+    rulesetName: "predicateLogicRules",
+    rules: [
+      {
+        ruleName: "forall_intro",
+        latex: {
+          ruleName: "\\forall i.",
+          premises: [
+            box("x_0 & \\\\ & \\vdots \\\\ & \\varphi[x_0/x]", 2)
+          ],
+          conclusion: "\\forall x \\varphi",
+        },
+        numPremises: 1,
+      },
+      {
+        ruleName: "forall_elim",
+        latex: {
+          ruleName: "\\forall e.",
+          premises: ["\\forall x \\varphi"],
+          conclusion: "\\varphi[t/x]",
+        },
+        numPremises: 1,
+      },
+      {
+        ruleName: "exists_intro",
+        latex: {
+          ruleName: "\\exists i.",
+          premises: ["\\varphi[x_0/x]"],
+          conclusion: "\\exists x \\varphi",
+        },
+        numPremises: 1,
+      },
+      {
+        ruleName: "exists_elim",
+        latex: {
+          ruleName: "\\exists e.",
+          premises: ["\\exists x \\varphi", box("x_0 & \\varphi[x_0/x] \\\\ & \\vdots \\\\ & \\chi", 2)],
+          conclusion: "\\chi",
+        },
+        numPremises: 2,
+      },
+      {
+        ruleName: "equality_intro",
+        latex: {
+          ruleName: "= i.",
+          premises: [],
+          conclusion: "t = t",
+        },
+        numPremises: 0,
+      },
+      {
+        ruleName: "equality_elim",
+        latex: {
+          ruleName: "= e.",
+          premises: ["t_1 = t_2", "\\varphi[t_1/x]"],
+          conclusion: "\\varphi[t_2/x]",
+        },
+        numPremises: 2,
+      },
+    ],
+  },
+] as const satisfies Ruleset[]
+
+export type RulesetName = (typeof rulesets)[number]["rulesetName"]

@@ -92,6 +92,9 @@ export class AddBoxedLineCommand extends Command {
       {
         stepType: "box",
         uuid: this.newBoxUuid,
+        boxInfo: {
+          freshVar: null
+        },
         proof: [
           {
             stepType: "line",
@@ -229,5 +232,34 @@ export class UpdateLineProofStepCommand extends Command {
   }
   getDescription(): string {
     return `Remove line with uuid ${this.proofStepUuid}`;
+  }
+}
+
+export class SetFreshVarOnBoxCommand extends Command {
+  private boxUuid: string
+  private freshVar: string
+  private prevFreshVar: string | null = null
+
+  constructor(uuid: string, freshVar: string) {
+    super();
+    this.boxUuid = uuid
+    this.freshVar = freshVar
+  }
+
+  execute(proofContext: ProofContextProps): void {
+    const details = proofContext.getProofStepDetails(this.boxUuid)
+    if (details?.proofStep.stepType !== "box") {
+      throw new Error("Cannot set freshVar on a step that is not a box")
+    }
+    this.prevFreshVar = details.proofStep.stepType
+    proofContext.updateFreshVarOnBox(this.boxUuid, this.freshVar);
+  }
+
+  undo(proofContext: ProofContextProps): void {
+    proofContext.updateFreshVarOnBox(this.boxUuid, this.prevFreshVar);
+  }
+
+  getDescription(): string {
+    return `Set freshVar to ${this.freshVar} on box ${this.boxUuid}`;
   }
 }

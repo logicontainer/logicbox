@@ -16,10 +16,10 @@ type ProviderProps = {
 
 export function Providers({ children }: ProviderProps) {
   return (
-    <RulesetProvider>
-      <ProofProvider>
-        <ServerProvider>
-          <LinesProvider>
+    <ProofProvider>
+      <ServerProvider>
+        <LinesProvider>
+          <RulesetProvider>
             <DiagnosticsProvider>
               <HistoryProvider>
                 <InteractionStateProvider>
@@ -31,9 +31,9 @@ export function Providers({ children }: ProviderProps) {
                 </InteractionStateProvider>
               </HistoryProvider>
             </DiagnosticsProvider>
-          </LinesProvider>
-        </ServerProvider>
-      </ProofProvider>
-    </RulesetProvider>
+          </RulesetProvider>
+        </LinesProvider>
+      </ServerProvider>
+    </ProofProvider>
   );
 }

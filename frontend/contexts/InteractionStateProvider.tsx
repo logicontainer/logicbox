@@ -1,7 +1,7 @@
 "use client";
 
 import { LineProofStep } from "@/types/types";
-import React, { useCallback } from "react";
+import React from "react";
 
 import { useProof } from "./ProofProvider";
 import {
@@ -9,6 +9,7 @@ import {
   AddLineCommand,
   Command,
   RemoveProofStepCommand,
+  SetFreshVarOnBoxCommand,
   UpdateLineProofStepCommand,
 } from "@/lib/commands";
 import { useHistory } from "./HistoryProvider";
@@ -16,7 +17,6 @@ import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
 import { v4 as uuidv4 } from "uuid";
-import { Clicker_Script } from "next/font/google";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -146,7 +146,7 @@ export function InteractionStateProvider({
 
   const serverContext = useServer();
   const proofContext = useProof();
-  const { ruleset } = useRuleset();
+  const { rulesets } = useRuleset();
   const historyContext = useHistory();
 
   // keep command queue of state modifying things which must be executed fully in order
@@ -196,10 +196,11 @@ export function InteractionStateProvider({
   const updateRuleAndValidate = (lineUuid: string, newRule: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
-    const ruleSetEntry = ruleset.rules.find((r) => r.ruleName === newRule);
+    const allRules = rulesets.flatMap(s => s.rules)
+    const ruleSetEntry = allRules.find((r) => r.ruleName === newRule);
     if (ruleSetEntry === undefined)
       throw new Error(
-        `Updating rule, but could not find rule with name ${newRule} in ruleset ${ruleset}`
+        `Updating rule, but could not find rule with name ${newRule} in rulesets ${rulesets}`
       );
 
     const newNumPremises = ruleSetEntry.numPremises;
@@ -517,14 +518,14 @@ export function InteractionStateProvider({
 
       [CLOSE]: () => fullyIdle(),
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
+      [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
     [VIEWING_CONTEXT_MENU]: {
       [CLICK_OUTSIDE]: () => fullyIdle(),
 
-      [DOUBLE_CLICK_LINE]: (state, { lineUuid }) => {
+      [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => {
         return startEditingFormula(lineUuid);
       },
 
@@ -533,17 +534,17 @@ export function InteractionStateProvider({
       [CLICK_LINE]: (_, { lineUuid }) => ({ ...fullyIdle(), selectedProofStepUuid: lineUuid }),
       [CLICK_BOX]: (_, { boxUuid }) => ({ ...fullyIdle(), selectedProofStepUuid: boxUuid }),
 
-      [CLICK_RULE]: (state, { lineUuid }) => {
+      [CLICK_RULE]: (_, { lineUuid }) => {
         return { enum: EDITING_RULE, lineUuid };
       },
 
-      [CLICK_REF]: (state, { lineUuid, refIdx }) => ({
+      [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
         enum: EDITING_REF,
         lineUuid,
         refIdx,
       }),
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
+      [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
 
@@ -556,7 +557,7 @@ export function InteractionStateProvider({
 
       [CLICK_CONTEXT_MENU_OPTION]: (state, { option }) => {
         switch (option) {
-          case ContextMenuOptions.EDIT:
+          case ContextMenuOptions.EDIT_FORMULA:
             if (state.isBox) {
               throw new Error(
                 "Editing a box is not implemented yet. Why are you here?"
@@ -571,8 +572,21 @@ export function InteractionStateProvider({
               currentFormula: line.formula.userInput,
             };
 
+          case ContextMenuOptions.EDIT_FRESH_VAR:
+            if (!state.isBox) {
+              throw new Error("Editing fresh var of line. Why are you here?")
+            }
+
+            let fv = prompt("Enter fresh var")
+            if (fv === "") fv = null
+            fv && enqueueCommand(new SetFreshVarOnBoxCommand(state.proofStepUuid, fv))
+            fv && enqueueCommand(Validate.VALIDATE)
+            
+            return fullyIdle()
+
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
+            enqueueCommand(Validate.VALIDATE)
             return fullyIdle();
 
           case ContextMenuOptions.LINE_ABOVE:
@@ -585,6 +599,7 @@ export function InteractionStateProvider({
                 newLineUuid
               )
             );
+            enqueueCommand(Validate.VALIDATE)
             return {
               enum: EDITING_FORMULA,
               lineUuid: newLineUuid,
@@ -602,6 +617,7 @@ export function InteractionStateProvider({
                 newLineUuid
               )
             );
+            enqueueCommand(Validate.VALIDATE)
             return {
               enum: EDITING_FORMULA,
               lineUuid: newLineUuid,

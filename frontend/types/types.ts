@@ -32,6 +32,9 @@ export type LineProofStep = {
 export type BoxProofStep = {
   uuid: string;
   stepType: 'box';
+  boxInfo: {
+    freshVar: string | null;
+  };
   proof: Proof;
 };
 

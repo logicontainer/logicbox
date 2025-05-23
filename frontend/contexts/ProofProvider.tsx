@@ -24,6 +24,7 @@ export interface ProofContextProps {
   addLine: (proofStep: ProofStep, position: ProofStepPosition) => unknown;
   removeLine: (uuid: string) => unknown;
   updateLine: (uuid: string, updatedLineProofStep: LineProofStep) => unknown;
+  updateFreshVarOnBox: (uuid: string, freshVar: string | null) => unknown;
   getProofStepDetails: (
     uuid: string
   ) => (ProofStepDetails & { isOnlyChildInBox: boolean }) | null;
@@ -155,6 +156,24 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     });
   };
 
+  const updateFreshVarOnBox = (uuid: string, freshVar: string | null) => {
+    setProofContent((prev) => {
+      const newProof = _.cloneDeep(prev);
+      const updateProofStepAtUuid = (
+        proof: ProofStep[],
+        indexInCurrLayer: number,
+        parentBox: BoxProofStep | null
+      ) => {
+        if (proof[indexInCurrLayer].stepType !== "box") 
+          throw new Error(`Attempted to update fresh var on ${uuid} - not a box`)
+
+        proof[indexInCurrLayer].boxInfo.freshVar = freshVar;
+      };
+      interactWithProofNearUuid(newProof, uuid, null, updateProofStepAtUuid);
+      return newProof;
+    });
+  }
+
   const getProofStepDetails = (
     uuid: string
   ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
@@ -224,6 +243,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         loadProofFromId: setProofId,
         setProofContent: pf => setProofContent(_ => pf),
         setStringProof,
+        updateFreshVarOnBox,
         addLine,
         removeLine,
         updateLine,

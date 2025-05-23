@@ -3,21 +3,15 @@
 import React, { useState } from "react";
 
 import { Ruleset } from "@/types/types";
-import { rulesets } from "@/lib/rules";
+import { RulesetName, rulesets } from "@/lib/rules";
+import { useProof } from "./ProofProvider";
+import { logicConfig } from "@/lib/logic-config";
 
 export interface RulesetContextProps {
-  rulesetName: string;
-  rulesetDropdownOptions: { value: string; label: string }[];
-  ruleset: Ruleset;
+  rulesets: Ruleset[];
 }
 
-const DEFAULT_RULESET_NAME = "propositional-logic";
-
-const RulesetContext = React.createContext<RulesetContextProps>({
-  rulesetName: DEFAULT_RULESET_NAME,
-  rulesetDropdownOptions: [],
-  ruleset: findRulesetFromName(DEFAULT_RULESET_NAME),
-});
+const RulesetContext = React.createContext<RulesetContextProps | null>(null);
 
 export function useRuleset() {
   const context = React.useContext(RulesetContext);
@@ -28,24 +22,18 @@ export function useRuleset() {
 }
 
 export function RulesetProvider({ children }: React.PropsWithChildren<object>) {
-  const [rulesetName] = useState(DEFAULT_RULESET_NAME);
-  const ruleset = findRulesetFromName(rulesetName);
-
-  const rulesetDropdownOptions = ruleset.rules.map((rule) => ({
-    value: rule.ruleName,
-    label: rule.ruleName,
-    latexRuleName: rule.latex.ruleName,
-  }));
+  const { proof } = useProof()
+  const rulesets: Ruleset[] = logicConfig[proof.logicName].rulesets.map(findRulesetFromName)
 
   return (
     <RulesetContext.Provider
-      value={{ rulesetName, rulesetDropdownOptions, ruleset }}
+      value={{ rulesets }}
     >
       {children}
     </RulesetContext.Provider>
   );
 }
 
-function findRulesetFromName(rulesetName: string) {
+function findRulesetFromName(rulesetName: RulesetName) {
   return rulesets.find((ruleset) => ruleset.rulesetName == rulesetName)!;
 }
