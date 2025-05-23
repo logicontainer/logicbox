@@ -1,0 +1,19 @@
+{
+  "logicName": "predicateLogic",
+  "proof": [
+    {
+      "stepType": "line",
+      "uuid": "29813ef5-90cf-493e-b005-53b8b1f2e764",
+      "formula": {
+        "userInput": "forall y Q(y)",
+        "unsynced": true,
+        "latex": null,
+        "ascii": null
+      },
+      "justification": {
+        "rule": "no_rule",
+        "refs": []
+      }
+    }
+  ]
+}
