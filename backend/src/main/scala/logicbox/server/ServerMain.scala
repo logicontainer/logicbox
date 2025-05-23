@@ -3,36 +3,36 @@ package logicbox.server
 import zio._
 import zio.http._
 
-import spray.json.JsonParser
+import spray.json._
 import logicbox.server.PropLogicProofValidatorService
 import zio.http.Middleware.{CorsConfig, cors}
+import logicbox.server.format.RawProof
+
+case class VerifyBody(
+  proof: RawProof,
+  ruleset: String,
+)
 
 object GreetingRoutes {
+  import logicbox.server.format.SprayFormatters._
   val config: CorsConfig = CorsConfig()
+
+  implicit val bodyFormat: JsonFormat[VerifyBody] = jsonFormat2(VerifyBody.apply)
 
   def apply(): Routes[Any, Nothing] =
     Routes(
-      // GET /greet
-      Method.GET / "greet" -> handler(Response.text(s"Hello World!")),
-
-      // GET /greet/:name
-      Method.GET / "greet" / string("name") -> handler {
-        (name: String, _: Request) =>
-          Response.text(s"Hello $name!")
-      },
-
       Method.POST / "verify" -> handler {
         (req: Request) => 
           (for {
             body <- req.body.asString
-            json = JsonParser(body)
-            res = PropLogicProofValidatorService().validateProof(json) match {
-              case Left(value) => Response.text(value.toString)
-              case Right(value) => Response.text(value.prettyPrint).updateHeaders(
-                headers => headers.addHeader(Header.ContentType(MediaType.application.json))
-              )
-            }
-          } yield res).catchAll(err => ZIO.succeed(Response.status(Status.InternalServerError)))
+            json = bodyFormat.read(JsonParser(body))
+            // res = PropLogicProofValidatorService().validateProof(json) match {
+            //   case Left(value) => Response.text(value.toString)
+            //   case Right(value) => Response.text(value.prettyPrint).updateHeaders(
+            //     headers => headers.addHeader(Header.ContentType(MediaType.application.json))
+            //   )
+            // }
+          } yield ???).catchAll(err => ZIO.succeed(Response.status(Status.InternalServerError)))
       }
     ) @@ cors(config)
 }
