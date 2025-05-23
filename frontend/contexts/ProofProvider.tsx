@@ -28,11 +28,6 @@ export interface ProofContextProps {
     proofStepDetails: ProofStepDetails | null;
     cascadeCount: number;
   };
-  removeFocusFromLine: (uuid: string) => unknown;
-  lineInFocus: string | null;
-  isFocused: (uuid: string) => boolean;
-  isUnfocused: (uuid: string) => boolean;
-  setStepInFocus: (uuid: string) => void;
 
   // HANDLED BY STATE MACHINE
   // removeIsActiveEditFromLine: (uuid: string) => unknown;
@@ -50,17 +45,6 @@ const ProofContext = React.createContext<ProofContextProps>({
   getNearestDeletableProofStep: () => {
     return { proofStepDetails: null, cascadeCount: 0 };
   },
-
-  lineInFocus: null,
-  isFocused: () => false,
-  isUnfocused: () => false,
-  setStepInFocus: () => {},
-  removeFocusFromLine: () => {},
-
-  // HANDLED BY STATE MACHINE
-  // isActiveEdit: () => false,
-  // removeIsActiveEditFromLine: () => {},
-  // setActiveEdit: () => {},
 });
 
 export function useProof() {
@@ -88,14 +72,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
 
   const setStringProof = (stringProof: string) => {
     setProof(JSON.parse(stringProof));
-  };
-
-  const [lineInFocus, setLineInFocus] = useState<string | null>(null);
-
-  const removeFocusFromLine = (uuid: string) => {
-    if (lineInFocus == uuid) {
-      setLineInFocus(null);
-    }
   };
 
   const interactWithProofNearUuid = (
@@ -186,17 +162,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     });
   };
 
-  const isFocused = (uuid: string) => {
-    if (!uuid) return false;
-    return uuid == lineInFocus;
-  };
-
-  const isUnfocused = (uuid: string) => {
-    if (!uuid) return false;
-    if (!lineInFocus) return false;
-    return uuid != lineInFocus;
-  };
-
   const getProofStepDetails = (
     uuid: string
   ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
@@ -263,15 +228,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     <ProofContext.Provider
       value={{
         proof,
-        lineInFocus,
-        isFocused,
-        isUnfocused,
-        setStepInFocus: setLineInFocus,
-        removeFocusFromLine,
         setStringProof,
-        // removeIsActiveEditFromLine,
-        // isActiveEdit,
-        // setActiveEdit: setActiveEdit,
         addLine,
         removeLine,
         updateLine,

@@ -4,16 +4,20 @@ import {
   TLineNumber,
 } from "@/types/types";
 import {
+    InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
+import { Highlight } from "@/lib/proof-step-highlight";
 
 import { Proof } from "./Proof";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import { cn } from "@/lib/utils";
-import { getSelectedLine } from "@/lib/state-helpers";
+import { getSelectedStep } from "@/lib/state-helpers";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
-import { useProof } from "@/contexts/ProofProvider";
+import React from "react";
+import { useHovering } from "@/contexts/HoveringProvider";
+import { getStepHighlight } from "@/lib/proof-step-highlight";
 
 export function BoxProofStep({
   ...props
@@ -22,24 +26,27 @@ export function BoxProofStep({
   diagnostics: Diagnostic[];
   isOuterProofStep?: boolean;
 }) {
-  const { setStepInFocus, isFocused } = useProof();
   const { doTransition, interactionState } = useInteractionState();
-
   const { setContextMenuPosition } = useContextMenu();
+  const { currentlyHoveredUuid, onHoverStep } = useHovering()
 
-  const currentlySelected = getSelectedLine(interactionState) == props.uuid;
+  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState)
 
   return (
     <ProofStepWrapper
-      currentlyBeingHovered={currentlySelected}
-      currentlySelected={currentlySelected}
       isOuterProofStep={props.isOuterProofStep}
       isBox={true}
     >
       <div
         className={cn(
-          "pointer-events-auto relative border-2 border-black my-[1px] overflow-hidden",
-          currentlySelected && "bg-slate-50"
+          "pointer-events-auto relative my-[1px] border-2 overflow-hidden",
+          "border-black",
+
+          highlight === Highlight.SELECTED && "border-red-500",
+
+          highlight === Highlight.SELECTED && "bg-slate-100",
+          highlight === Highlight.HOVERED && "bg-slate-50",
+          highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200"
         )}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -57,6 +64,10 @@ export function BoxProofStep({
             enum: TransitionEnum.CLICK_BOX,
             boxUuid: props.uuid,
           });
+        }}
+        onMouseMove={e => {
+          e.stopPropagation()
+          onHoverStep(props.uuid)
         }}
       >
         <Proof

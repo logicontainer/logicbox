@@ -12,6 +12,8 @@ import { LineProofStep } from "@/components/LineProofStep";
 import { ProofStep } from "@/types/types";
 import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
+import { stepIsSelected } from "@/lib/state-helpers";
+import { useInteractionState } from "@/contexts/InteractionStateProvider";
 
 export function Proof({
   ...props
@@ -22,8 +24,8 @@ export function Proof({
   uuid?: string;
   isOuterProof?: boolean;
 }) {
-  const { isFocused } = useProof();
-  const isInFocus = isFocused(props.uuid || "");
+  const { interactionState } = useInteractionState()
+  const isInFocus = props.uuid && stepIsSelected(props.uuid, interactionState)
 
   return (
     <div className={cn("cursor-pointer text-slate-800 w-full -my-[3px]")}>

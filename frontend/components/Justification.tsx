@@ -5,17 +5,14 @@ import {
   TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
-import Select, { SingleValue, Theme } from "react-select";
 import {
   Justification as TJustification,
   TLineNumber,
-  LineProofStep as TLineProofStep,
 } from "@/types/types";
 
 import { InlineMath } from "react-katex";
 import { RefSelect } from "./RefSelect";
 import { cn } from "@/lib/utils";
-import { createHighlightedLatexRule } from "@/lib/rules";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 
@@ -32,11 +29,10 @@ export function Justification({
   onClickRule: () => void;
   onClickRef: (idx: number) => void;
 }) {
-  const { ruleset, rulesetDropdownOptions } = useRuleset();
+  const { ruleset } = useRuleset();
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
-  const { setStepInFocus: setLineInFocus } = useProof();
 
   const { interactionState } = useInteractionState();
   const { doTransition } = useInteractionState();
@@ -49,54 +45,18 @@ export function Justification({
     return null;
   }
 
-  const currLineProofStep =
-    currLineProofStepDetails.proofStep as TLineProofStep;
-
   const isEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE &&
     interactionState.lineUuid === uuid;
 
-  const rulesetDropdownValue = rulesetDropdownOptions.find(
-    (option) => option.value === currLineProofStep.justification.rule
-  );
-
-  const handleChangeRule = (
-    newValue: SingleValue<{ value: string; label: string }>
-  ) => {
-    if (newValue == null) {
-      return;
-    }
-
-    doTransition({
-      enum: TransitionEnum.UPDATE_RULE,
-      ruleName: newValue.value,
-    });
-  };
-
-  const dropdownTheme = (theme: Theme) => ({
-    ...theme,
-    spacing: {
-      ...theme.spacing,
-      controlHeight: 30,
-      baseUnit: 0,
-    },
-  });
   return (
     <>
       <span
         className={cn(
           isEditingRule ? "bg-blue-400 text-white" : "hover:text-blue-600"
         )}
-        onMouseMove={() =>
-          doTransition({
-            enum: TransitionEnum.HOVER_LINE,
-            lineUuid: uuid,
-          })
-        }
         onClick={(e) => {
-          console.log("onClickRule");
           e.stopPropagation();
-          setLineInFocus(uuid);
           onClickRule();
         }}
       >
@@ -150,14 +110,7 @@ export function Justification({
                     e.stopPropagation();
                     e.preventDefault();
                     onClickRef(i);
-                    setLineInFocus(uuid);
                   }}
-                  onMouseMove={() =>
-                    doTransition({
-                      enum: TransitionEnum.HOVER_LINE,
-                      lineUuid: uuid,
-                    })
-                  }
                 >
                   <InlineMath math={`${refLatex || "?"}${comma}`} />
                 </span>
@@ -167,46 +120,5 @@ export function Justification({
         </>
       )}
     </>
-  );
-}
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function CustomMenu(props: any) {
-  const { innerProps, innerRef } = props;
-  return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="bg-white border border-slate-300 rounded-md shadow-lg z-10 overflow-visible"
-    >
-      {props.children}
-    </div>
-  );
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function CustomOption(props: any) {
-  const { data, innerRef, innerProps } = props;
-  return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="text-slate-800 hover:bg-slate-100 cursor-pointer px-2"
-    >
-      <InlineMath math={data?.latexRuleName || ""}></InlineMath>
-    </div>
-  );
-}
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function CustomValueContainer(props: any) {
-  const { getValue, innerRef, innerProps } = props;
-  const value = getValue()[0];
-  return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className="flex items-center gap-2 px-2"
-    >
-      <InlineMath math={value?.latexRuleName || ""}></InlineMath>
-    </div>
   );
 }

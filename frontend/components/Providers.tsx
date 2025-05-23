@@ -4,6 +4,7 @@ import { ContextMenuProvider } from "@/contexts/ContextMenuProvider";
 import { CurrentProofIdProvider } from "@/contexts/CurrentProofIdProvider";
 import { DiagnosticsProvider } from "@/contexts/DiagnosticsProvider";
 import { HistoryProvider } from "@/contexts/HistoryProvider";
+import { HoveringProvider } from "@/contexts/HoveringProvider";
 import { InteractionStateProvider } from "@/contexts/InteractionStateProvider";
 import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
@@ -24,7 +25,11 @@ export function Providers({ children }: ProviderProps) {
               <DiagnosticsProvider>
                 <HistoryProvider>
                   <InteractionStateProvider>
-                    <ContextMenuProvider>{children}</ContextMenuProvider>
+                    <ContextMenuProvider>
+                      <HoveringProvider>
+                        {children}
+                      </HoveringProvider>
+                    </ContextMenuProvider>
                   </InteractionStateProvider>
                 </HistoryProvider>
               </DiagnosticsProvider>

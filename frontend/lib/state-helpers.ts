@@ -21,7 +21,7 @@ export function lineIsBeingEdited(
   return lineUuid === getLineBeingEdited(state);
 }
 
-export function getSelectedLine(state: InteractionState): string | null {
+export function getSelectedStep(state: InteractionState): string | null {
   if (
     state.enum === InteractionStateEnum.EDITING_REF ||
     state.enum === InteractionStateEnum.EDITING_RULE ||
@@ -32,4 +32,8 @@ export function getSelectedLine(state: InteractionState): string | null {
     return state.selectedProofStepUuid;
   }
   return null;
+}
+
+export function stepIsSelected(stepUuid: string, state: InteractionState): boolean {
+  return stepUuid === getSelectedStep(state)
 }
