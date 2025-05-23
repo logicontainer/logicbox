@@ -15,6 +15,8 @@ import { RefSelect } from "./RefSelect";
 import { cn } from "@/lib/utils";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
+import { useHovering } from "@/contexts/HoveringProvider";
+import { refIsBeingHovered, ruleIsBeingHovered } from "@/lib/state-helpers";
 
 export function Justification({
   uuid,
@@ -30,6 +32,7 @@ export function Justification({
   onClickRef: (idx: number) => void;
 }) {
   const { ruleset } = useRuleset();
+  const { handleHoverStep } = useHovering()
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
@@ -53,11 +56,16 @@ export function Justification({
     <>
       <span
         className={cn(
-          isEditingRule ? "bg-blue-400 text-white" : "hover:text-blue-600"
+          isEditingRule && "bg-blue-400 text-white",
+          ruleIsBeingHovered(uuid, interactionState) && "text-blue-600"
         )}
         onClick={(e) => {
           e.stopPropagation();
           onClickRule();
+        }}
+        onMouseOver={e => {
+          e.stopPropagation()
+          handleHoverStep(uuid, null, true)
         }}
       >
         <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
@@ -105,11 +113,15 @@ export function Justification({
               return (
                 <span
                   key={i}
-                  className="hover:text-slate-600"
+                  className={cn(refIsBeingHovered(uuid, i, interactionState) && "text-blue-600")}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
                     onClickRef(i);
+                  }}
+                  onMouseOver={e => {
+                    e.stopPropagation()
+                    handleHoverStep(uuid, i, false)
                   }}
                 >
                   <InlineMath math={`${refLatex || "?"}${comma}`} />

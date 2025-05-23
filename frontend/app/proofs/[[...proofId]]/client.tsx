@@ -25,7 +25,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
-  const { onHoverStep: setCurrentlyHoveredUuid } = useHovering()
+  const { handleHoverStep } = useHovering()
 
   const { setProofId } = useCurrentProofId();
 
@@ -70,12 +70,11 @@ export default function Client({ proofId }: { proofId: string | null }) {
           <div></div>
           <div className="p-4 flex flex-col justify-between items-center rounded-sm">
             <div
-              className="flex box-content gap-2 mt-[64px] w-full"
+              className="flex box-content gap-2 mt-[64px] w-full select-none"
               onClick={(e) => e.stopPropagation()}
               onMouseLeave={e => {
                 e.stopPropagation()
-                doTransition({ enum: TransitionEnum.HOVER, stepUuid: null })
-                setCurrentlyHoveredUuid(null)
+                handleHoverStep(null, null, false)
               }}
             >
               <LineNumbers lines={lines} />
