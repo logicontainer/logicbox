@@ -16,8 +16,6 @@ import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
 import { v4 as uuidv4 } from "uuid";
-import { stat } from "fs";
-import { getSelectedStep } from "@/lib/state-helpers";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -192,7 +190,7 @@ export function InteractionStateProvider({
     return currLineProofStep;
   };
 
-  const updateRule = (lineUuid: string, newRule: string) => {
+  const updateRuleAndValidate = (lineUuid: string, newRule: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
     const ruleSetEntry = ruleset.rules.find((r) => r.ruleName === newRule);
@@ -223,9 +221,10 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
     );
+    enqueueCommand(Validate.VALIDATE)
   };
 
-  const updateRef = (lineUuid: string, refIdx: number, newRefUuid: string) => {
+  const updateRefAndValidate = (lineUuid: string, refIdx: number, newRefUuid: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
     const newRefs = currLineProofStep.justification.refs.map((ref, i) => {
@@ -247,9 +246,10 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
     );
+    enqueueCommand(Validate.VALIDATE)
   };
 
-  const updateFormulaInProof = (lineUuid: string, formula: string) => {
+  const updateFormulaInProofAndValidate = (lineUuid: string, formula: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
     // if nothing change, don't add to history
@@ -268,6 +268,7 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
     );
+    enqueueCommand(Validate.VALIDATE)
   };
 
   const startEditingFormula = (lineUuid: string) => {
@@ -354,7 +355,7 @@ export function InteractionStateProvider({
       [CLICK_BOX]: (state, { boxUuid }) =>
         handleClickStepInIdle(state, boxUuid),
 
-      [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
+      [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
 
@@ -366,7 +367,7 @@ export function InteractionStateProvider({
 
     [EDITING_FORMULA]: {
       [CLICK_OUTSIDE]: (state, _) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return fullyIdle();
       },
 
@@ -375,19 +376,19 @@ export function InteractionStateProvider({
 
       [DOUBLE_CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
         // we are exiting this state, so update formula in proof
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
 
         // go to editing mode on the clicked line
         return startEditingFormula(clickedLineUuid);
       },
 
       [CLICK_RULE]: (state, { lineUuid: clickedLineUuid }) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return { enum: EDITING_RULE, lineUuid: clickedLineUuid };
       },
 
       [CLICK_REF]: (state, { lineUuid: clickedLineUuid, refIdx }) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx };
       },
 
@@ -398,18 +399,17 @@ export function InteractionStateProvider({
       },
 
       [VALIDATE_PROOF]: (state, _) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
-        enqueueCommand(Validate.VALIDATE);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return fullyIdle();
       },
 
       [CLOSE]: (state, _) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return fullyIdle();
       },
 
       [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
-        updateFormulaInProof(state.lineUuid, state.currentFormula);
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
@@ -438,7 +438,7 @@ export function InteractionStateProvider({
       [CLICK_BOX]: doNothing,
 
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
-        updateRule(lineUuid, ruleName);
+        updateRuleAndValidate(lineUuid, ruleName);
         return fullyIdle();
       },
 
@@ -462,7 +462,7 @@ export function InteractionStateProvider({
         { lineUuid: clickedLineUuid }
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
-          updateRef(editedLineUuid, refIdx, clickedLineUuid);
+          updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
           return fullyIdle();
         }
         return startEditingFormula(clickedLineUuid);
@@ -475,7 +475,7 @@ export function InteractionStateProvider({
         { refIdx, lineUuid: editedLineUuid },
         { boxUuid: clickedBoxUuid }
       ) => {
-        updateRef(editedLineUuid, refIdx, clickedBoxUuid);
+        updateRefAndValidate(editedLineUuid, refIdx, clickedBoxUuid);
         return fullyIdle();
       },
 
@@ -484,7 +484,7 @@ export function InteractionStateProvider({
         { lineUuid: clickedLineUuid }
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
-          updateRef(editedLineUuid, refIdx, clickedLineUuid);
+          updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
           return fullyIdle();
         }
         return { enum: EDITING_RULE, lineUuid: clickedLineUuid };
@@ -492,7 +492,7 @@ export function InteractionStateProvider({
 
       [CLICK_REF]: (state, trans) => {
         if (trans.lineUuid !== state.lineUuid) {
-          updateRef(state.lineUuid, state.refIdx, trans.lineUuid);
+          updateRefAndValidate(state.lineUuid, state.refIdx, trans.lineUuid);
           return fullyIdle();
         }
 
