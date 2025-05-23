@@ -5,11 +5,13 @@ export function ProofStepWrapper({
   isBox,
   isOuterProofStep,
   currentlyBeingHovered,
+  currentlySelected,
 }: {
   children: React.ReactNode;
   isBox?: boolean;
   isOuterProofStep?: boolean;
   currentlyBeingHovered?: boolean;
+  currentlySelected?: boolean;
 }) {
   if (isOuterProofStep) {
     return children;
@@ -18,7 +20,8 @@ export function ProofStepWrapper({
       <div
         className={cn(
           "px-3 pointer-events-none bg-none",
-          !isBox && currentlyBeingHovered && "bg-slate-50"
+          !isBox && currentlyBeingHovered && "bg-slate-50",
+          !isBox && currentlySelected && "bg-slate-100"
         )}
       >
         {children}

@@ -5,7 +5,7 @@ import React, { useCallback } from "react";
 
 import { useProof } from "./ProofProvider";
 import {
-    AddBoxedLineCommand,
+  AddBoxedLineCommand,
   AddLineCommand,
   Command,
   RemoveProofStepCommand,
@@ -15,7 +15,8 @@ import { useHistory } from "./HistoryProvider";
 import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
+import { stat } from "fs";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -23,6 +24,8 @@ export enum TransitionEnum {
   RIGHT_CLICK_STEP,
 
   CLICK_LINE,
+  DOUBLE_CLICK_LINE,
+  HOVER_LINE,
   CLICK_RULE,
   CLICK_REF,
 
@@ -47,7 +50,11 @@ export enum InteractionStateEnum {
 }
 
 export type InteractionState = { enum: InteractionStateEnum } & (
-  | { enum: InteractionStateEnum.IDLE }
+  | {
+      enum: InteractionStateEnum.IDLE;
+      selectedProofStepUuid: string | null;
+      sticky: boolean;
+    }
   | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string }
   | {
       enum: InteractionStateEnum.EDITING_FORMULA;
@@ -64,6 +71,8 @@ export type InteractionState = { enum: InteractionStateEnum } & (
 
 export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
+  | { enum: TransitionEnum.DOUBLE_CLICK_LINE; lineUuid: string }
+  | { enum: TransitionEnum.HOVER_LINE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
   | {
       enum: TransitionEnum.RIGHT_CLICK_STEP;
@@ -104,7 +113,11 @@ export interface InteractionStateContextProps {
 // Context Setup
 const InteractionStateContext =
   React.createContext<InteractionStateContextProps>({
-    interactionState: { enum: InteractionStateEnum.IDLE },
+    interactionState: {
+      enum: InteractionStateEnum.IDLE,
+      selectedProofStepUuid: null,
+      sticky: false,
+    },
     doTransition: () => {},
   });
 
@@ -124,6 +137,8 @@ export function InteractionStateProvider({
   const [interactionState, setInteractionStateValue] =
     React.useState<InteractionState>({
       enum: InteractionStateEnum.IDLE,
+      selectedProofStepUuid: null,
+      sticky: false,
     });
 
   const serverContext = useServer();
@@ -236,8 +251,7 @@ export function InteractionStateProvider({
     const currLineProofStep = getLineProofStep(lineUuid);
 
     // if nothing change, don't add to history
-    if (currLineProofStep.formula.userInput === formula)
-      return;
+    if (currLineProofStep.formula.userInput === formula) return;
 
     const updatedLineProofStep: LineProofStep = {
       ...currLineProofStep,
@@ -245,7 +259,7 @@ export function InteractionStateProvider({
         userInput: formula,
         unsynced: true,
         latex: null,
-        ascii: null
+        ascii: null,
       },
     };
 
@@ -263,6 +277,29 @@ export function InteractionStateProvider({
     } satisfies InteractionState;
   };
 
+  const fullyIdle = (): InteractionState => {
+    return {
+      enum: InteractionStateEnum.IDLE,
+      selectedProofStepUuid: null,
+      sticky: false,
+    };
+  };
+
+  const handleClickStepInIdle = (
+    state: InteractionState & { enum: InteractionStateEnum.IDLE },
+    clickedUuid: string
+  ): InteractionState => {
+    if (!state.sticky) {
+      return { enum: IDLE, selectedProofStepUuid: clickedUuid, sticky: true };
+    }
+
+    return {
+      enum: IDLE,
+      selectedProofStepUuid: clickedUuid,
+      sticky: clickedUuid !== state.selectedProofStepUuid,
+    };
+  };
+
   const {
     IDLE,
     EDITING_REF,
@@ -274,6 +311,8 @@ export function InteractionStateProvider({
     CLICK_REF,
     CLICK_RULE,
     CLICK_LINE,
+    DOUBLE_CLICK_LINE,
+    HOVER_LINE,
     CLICK_BOX,
     RIGHT_CLICK_STEP,
     UPDATE_RULE,
@@ -290,7 +329,19 @@ export function InteractionStateProvider({
     [IDLE]: {
       [CLICK_OUTSIDE]: doNothing,
 
-      [CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
+      [CLICK_LINE]: (state, { lineUuid }) =>
+        handleClickStepInIdle(state, lineUuid),
+      [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
+      [HOVER_LINE]: (state, { lineUuid }) => {
+        if (state.sticky) {
+          return state;
+        }
+        return {
+          enum: IDLE,
+          selectedProofStepUuid: lineUuid,
+          sticky: false,
+        };
+      },
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
       [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
         enum: EDITING_REF,
@@ -298,7 +349,8 @@ export function InteractionStateProvider({
         refIdx,
       }),
 
-      [CLICK_BOX]: doNothing,
+      [CLICK_BOX]: (state, { boxUuid }) =>
+        handleClickStepInIdle(state, boxUuid),
 
       [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
@@ -313,10 +365,14 @@ export function InteractionStateProvider({
     [EDITING_FORMULA]: {
       [CLICK_OUTSIDE]: (state, _) => {
         updateFormulaInProof(state.lineUuid, state.currentFormula);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
       [CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
+        return fullyIdle();
+      },
+      [HOVER_LINE]: doNothing,
+      [DOUBLE_CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
         // we are exiting this state, so update formula in proof
         updateFormulaInProof(state.lineUuid, state.currentFormula);
 
@@ -343,12 +399,12 @@ export function InteractionStateProvider({
       [VALIDATE_PROOF]: (state, _) => {
         updateFormulaInProof(state.lineUuid, state.currentFormula);
         enqueueCommand(Validate.VALIDATE);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
       [CLOSE]: (state, _) => {
         updateFormulaInProof(state.lineUuid, state.currentFormula);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
       [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
@@ -358,9 +414,16 @@ export function InteractionStateProvider({
     },
 
     [EDITING_RULE]: {
-      [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
+      [CLICK_OUTSIDE]: () => fullyIdle(),
 
-      [CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
+      [CLICK_LINE]: (state, { lineUuid }) => {
+        if (state.lineUuid === lineUuid) {
+          return { enum: IDLE, selectedProofStepUuid: lineUuid, sticky: false };
+        } else {
+          return fullyIdle();
+        }
+      },
+      [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
       [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
         enum: EDITING_REF,
@@ -372,15 +435,15 @@ export function InteractionStateProvider({
 
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
         updateRule(lineUuid, ruleName);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
       [VALIDATE_PROOF]: () => {
         enqueueCommand(Validate.VALIDATE);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
-      [CLOSE]: () => ({ enum: IDLE }),
+      [CLOSE]: () => fullyIdle(),
 
       [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
@@ -388,15 +451,15 @@ export function InteractionStateProvider({
     },
 
     [EDITING_REF]: {
-      [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
+      [CLICK_OUTSIDE]: () => fullyIdle(),
 
-      [CLICK_LINE]: (
+      [DOUBLE_CLICK_LINE]: (
         { refIdx, lineUuid: editedLineUuid },
         { lineUuid: clickedLineUuid }
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
           updateRef(editedLineUuid, refIdx, clickedLineUuid);
-          return { enum: IDLE };
+          return fullyIdle();
         }
         return startEditingFormula(clickedLineUuid);
       },
@@ -406,7 +469,7 @@ export function InteractionStateProvider({
         { boxUuid: clickedBoxUuid }
       ) => {
         updateRef(editedLineUuid, refIdx, clickedBoxUuid);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
       [CLICK_RULE]: (
@@ -415,7 +478,7 @@ export function InteractionStateProvider({
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
           updateRef(editedLineUuid, refIdx, clickedLineUuid);
-          return { enum: IDLE };
+          return fullyIdle();
         }
         return { enum: EDITING_RULE, lineUuid: clickedLineUuid };
       },
@@ -423,12 +486,12 @@ export function InteractionStateProvider({
       [CLICK_REF]: (state, trans) => {
         if (trans.lineUuid !== state.lineUuid) {
           updateRef(state.lineUuid, state.refIdx, trans.lineUuid);
-          return { enum: IDLE };
+          return fullyIdle();
         }
 
         if (trans.refIdx === state.refIdx) {
           // unselect
-          return { enum: IDLE };
+          return fullyIdle();
         }
 
         return {
@@ -440,24 +503,24 @@ export function InteractionStateProvider({
 
       [VALIDATE_PROOF]: () => {
         enqueueCommand(Validate.VALIDATE);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
-      [CLOSE]: () => ({ enum: IDLE }),
+      [CLOSE]: () => fullyIdle(),
 
       [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
     [VIEWING_CONTEXT_MENU]: {
-      [CLICK_OUTSIDE]: () => ({ enum: IDLE }),
+      [CLICK_OUTSIDE]: () => fullyIdle(),
 
-      [CLICK_LINE]: (state, { lineUuid }) => {
+      [DOUBLE_CLICK_LINE]: (state, { lineUuid }) => {
         return startEditingFormula(lineUuid);
       },
 
       [CLICK_BOX]: (state, {}) => {
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
       [CLICK_RULE]: (state, { lineUuid }) => {
@@ -476,10 +539,10 @@ export function InteractionStateProvider({
 
       [VALIDATE_PROOF]: () => {
         enqueueCommand(Validate.VALIDATE);
-        return { enum: IDLE };
+        return fullyIdle();
       },
 
-      [CLOSE]: () => ({ enum: IDLE }),
+      [CLOSE]: () => fullyIdle(),
 
       [CLICK_CONTEXT_MENU_OPTION]: (state, { option }) => {
         switch (option) {
@@ -500,18 +563,40 @@ export function InteractionStateProvider({
 
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
-            return { enum: IDLE };
+            return fullyIdle();
 
-          case ContextMenuOptions.LINE_ABOVE: case ContextMenuOptions.LINE_BELOW: {
-            const newLineUuid = uuidv4()
-            enqueueCommand(new AddLineCommand(state.proofStepUuid, option === ContextMenuOptions.LINE_ABOVE, newLineUuid))
-            return { enum: EDITING_FORMULA, lineUuid: newLineUuid, currentFormula: "" }
+          case ContextMenuOptions.LINE_ABOVE:
+          case ContextMenuOptions.LINE_BELOW: {
+            const newLineUuid = uuidv4();
+            enqueueCommand(
+              new AddLineCommand(
+                state.proofStepUuid,
+                option === ContextMenuOptions.LINE_ABOVE,
+                newLineUuid
+              )
+            );
+            return {
+              enum: EDITING_FORMULA,
+              lineUuid: newLineUuid,
+              currentFormula: "",
+            };
           }
 
-          case ContextMenuOptions.BOX_ABOVE: case ContextMenuOptions.BOX_BELOW: {
-            const newLineUuid = uuidv4()
-            enqueueCommand(new AddBoxedLineCommand(state.proofStepUuid, option === ContextMenuOptions.BOX_ABOVE, newLineUuid))
-            return { enum: EDITING_FORMULA, lineUuid: newLineUuid, currentFormula: "" }
+          case ContextMenuOptions.BOX_ABOVE:
+          case ContextMenuOptions.BOX_BELOW: {
+            const newLineUuid = uuidv4();
+            enqueueCommand(
+              new AddBoxedLineCommand(
+                state.proofStepUuid,
+                option === ContextMenuOptions.BOX_ABOVE,
+                newLineUuid
+              )
+            );
+            return {
+              enum: EDITING_FORMULA,
+              lineUuid: newLineUuid,
+              currentFormula: "",
+            };
           }
         }
       },
@@ -543,7 +628,12 @@ export function InteractionStateProvider({
             InteractionStateEnum[prevState.enum]
           } -> ${InteractionStateEnum[newState.enum]}`
         );
-        return newState;
+
+        if (JSON.stringify(prevState) === JSON.stringify(newState)) {
+          return prevState;
+        } else {
+          return newState;
+        }
       }
     });
 

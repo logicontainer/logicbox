@@ -14,6 +14,7 @@ import {
 
 import { InlineMath } from "react-katex";
 import { RefSelect } from "./RefSelect";
+import { cn } from "@/lib/utils";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
@@ -22,14 +23,12 @@ export function Justification({
   uuid,
   justification,
   lines,
-  onHover,
   onClickRule,
   onClickRef,
 }: {
   uuid: string;
   justification: TJustification;
   lines: TLineNumber[];
-  onHover: (highlightedLatex: string | null) => void;
   onClickRule: () => void;
   onClickRef: (idx: number) => void;
 }) {
@@ -37,13 +36,14 @@ export function Justification({
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
+  const { setStepInFocus: setLineInFocus } = useProof();
 
   const { interactionState } = useInteractionState();
   const { doTransition } = useInteractionState();
   const rule = ruleset.rules.find(
     (rule) => rule.ruleName == justification.rule
   );
-  const ruleNameLatex = rule?.latex.ruleName
+  const ruleNameLatex = rule?.latex.ruleName;
 
   if (currLineProofStepDetails?.proofStep.stepType !== "line") {
     return null;
@@ -83,68 +83,25 @@ export function Justification({
   });
   return (
     <>
-      {isEditingRule ? (
-        <Select
-          instanceId={uuid}
-          value={rulesetDropdownValue}
-          onChange={handleChangeRule}
-          menuIsOpen={isEditingRule}
-          onMenuOpen={() =>
-            doTransition({
-              enum: TransitionEnum.CLICK_RULE,
-              lineUuid: uuid,
-            })
-          }
-          closeMenuOnSelect={false} // ensure that CLOSE is not sent when we select something
-          options={rulesetDropdownOptions}
-          components={{
-            Menu: CustomMenu,
-            Option: CustomOption,
-            ValueContainer: CustomValueContainer,
-          }}
-          menuPosition="fixed"
-          theme={dropdownTheme}
-          styles={{
-            singleValue: (base) => ({
-              ...base,
-              paddingLeft: "8px",
-              paddingRight: "8px",
-            }),
-            input(base) {
-              return {
-                ...base,
-                paddingLeft: "8px",
-                paddingRight: "8px",
-              };
-            },
-            menuPortal: (base) => ({
-              ...base,
-              width: 100,
-            }),
-          }}
-        />
-      ) : (
-        <span
-          className="hover:text-red-500"
-          onMouseOver={() =>
-            onHover(
-              rule ? createHighlightedLatexRule(
-                rule.latex.ruleName,
-                rule.latex.premises,
-                rule.latex.conclusion,
-                [],
-                false
-              ) : null
-            )
-          }
-          onClick={(e) => {
-            onClickRule();
-            e.stopPropagation();
-          }}
-        >
-          <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
-        </span>
-      )}
+      <span
+        className={cn(
+          isEditingRule ? "bg-blue-400 text-white" : "hover:text-blue-600"
+        )}
+        onMouseMove={() =>
+          doTransition({
+            enum: TransitionEnum.HOVER_LINE,
+            lineUuid: uuid,
+          })
+        }
+        onClick={(e) => {
+          console.log("onClickRule");
+          e.stopPropagation();
+          setLineInFocus(uuid);
+          onClickRule();
+        }}
+      >
+        <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
+      </span>
       {justification.refs && (
         <>
           <InlineMath math={`\\,`} />
@@ -165,13 +122,14 @@ export function Justification({
                     interactionState.lineUuid === uuid &&
                     interactionState.refIdx === i
                   }
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation();
                     doTransition({
                       enum: TransitionEnum.CLICK_REF,
                       lineUuid: uuid,
                       refIdx: i,
-                    })
-                  }
+                    });
+                  }}
                 ></RefSelect>
               );
             } else {
@@ -189,19 +147,16 @@ export function Justification({
                   key={i}
                   className="hover:text-slate-600"
                   onClick={(e) => {
-                    onClickRef(i);
                     e.stopPropagation();
+                    e.preventDefault();
+                    onClickRef(i);
+                    setLineInFocus(uuid);
                   }}
-                  onMouseOver={() =>
-                    onHover(
-                      rule ? createHighlightedLatexRule(
-                        rule.latex.ruleName,
-                        rule.latex.premises,
-                        rule.latex.conclusion,
-                        [i],
-                        false
-                      ) : null
-                    )
+                  onMouseMove={() =>
+                    doTransition({
+                      enum: TransitionEnum.HOVER_LINE,
+                      lineUuid: uuid,
+                    })
                   }
                 >
                   <InlineMath math={`${refLatex || "?"}${comma}`} />

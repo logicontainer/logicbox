@@ -1,4 +1,7 @@
-import { InteractionState, InteractionStateEnum } from "@/contexts/InteractionStateProvider"
+import {
+  InteractionState,
+  InteractionStateEnum,
+} from "@/contexts/InteractionStateProvider";
 
 export function getLineBeingEdited(state: InteractionState): string | null {
   if (
@@ -6,11 +9,27 @@ export function getLineBeingEdited(state: InteractionState): string | null {
     state.enum === InteractionStateEnum.EDITING_RULE ||
     state.enum === InteractionStateEnum.EDITING_FORMULA
   ) {
-    return state.lineUuid
+    return state.lineUuid;
   }
-  return null
+  return null;
 }
 
-export function lineIsBeingEdited(lineUuid: string, state: InteractionState): boolean {
-  return lineUuid === getLineBeingEdited(state)
+export function lineIsBeingEdited(
+  lineUuid: string,
+  state: InteractionState
+): boolean {
+  return lineUuid === getLineBeingEdited(state);
+}
+
+export function getSelectedLine(state: InteractionState): string | null {
+  if (
+    state.enum === InteractionStateEnum.EDITING_REF ||
+    state.enum === InteractionStateEnum.EDITING_RULE ||
+    state.enum === InteractionStateEnum.EDITING_FORMULA
+  ) {
+    return state.lineUuid;
+  } else if (state.enum === InteractionStateEnum.IDLE) {
+    return state.selectedProofStepUuid;
+  }
+  return null;
 }
