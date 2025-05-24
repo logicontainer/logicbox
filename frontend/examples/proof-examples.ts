@@ -2181,6 +2181,408 @@ const examples: ProofWithMetadata[] = [
         "uuid": "1498fb5d-d567-4828-ad5e-214b93182f70"
       }
     ]
+  },
+  {
+    "id": "c6d62cf0-dc60-4817-ae0b-6670872cc003",
+    "title": "Drinker paradox",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "formula": {
+          "ascii": "forall y D(y) or not forall y D(y)",
+          "latex": "\\forall y D(y) \\lor \\lnot \\forall y D(y)",
+          "userInput": "forall y D(y) or not forall y D(y)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "law_of_excluded_middle"
+        },
+        "stepType": "line",
+        "uuid": "d2a52f76-2bda-4e41-b6d4-2286e74250c5"
+      },
+      {
+        "boxInfo": {freshVar: null},
+        "proof": [
+          {
+            "formula": {
+              "ascii": "forall y D(y)",
+              "latex": "\\forall y D(y)",
+              "userInput": "forall y D(y)"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "fcc2095e-6e6e-4c5b-bb93-d96fb8184f10"
+          },
+          {
+            "boxInfo": {freshVar: null},
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "D(x_0)",
+                  "latex": "D(x_0)",
+                  "userInput": "D(x_0)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "9ae6f0fb-22a7-4914-9b70-debc518dd6a4"
+              },
+              {
+                "formula": {
+                  "ascii": "forall y D(y)",
+                  "latex": "\\forall y D(y)",
+                  "userInput": "forall y D(y)"
+                },
+                "justification": {
+                  "refs": [
+                    "fcc2095e-6e6e-4c5b-bb93-d96fb8184f10"
+                  ],
+                  "rule": "copy"
+                },
+                "stepType": "line",
+                "uuid": "82c5025d-7e5a-424f-9a6a-9283f758a91c"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "f79565be-3013-4ab7-8c89-6a2e6fdf27f0"
+          },
+          {
+            "formula": {
+              "ascii": "D(x_0) -> forall y D(y)",
+              "latex": "D(x_0) \\rightarrow \\forall y D(y)",
+              "userInput": "D(x_0) -> forall y D(y)"
+            },
+            "justification": {
+              "refs": [
+                "f79565be-3013-4ab7-8c89-6a2e6fdf27f0"
+              ],
+              "rule": "implies_intro"
+            },
+            "stepType": "line",
+            "uuid": "10d04be4-b32f-45b3-bc24-12d4c1c9959d"
+          },
+          {
+            "formula": {
+              "ascii": "exists x (D(x) -> forall y D(y))",
+              "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+              "userInput": "exists x (D(x) -> forall y D(y))"
+            },
+            "justification": {
+              "refs": [
+                "10d04be4-b32f-45b3-bc24-12d4c1c9959d"
+              ],
+              "rule": "exists_intro"
+            },
+            "stepType": "line",
+            "uuid": "b7bd91d9-b3d0-408a-8b14-96b1e257239e"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "0e322c9b-4aa1-4f11-aa36-fc7c221ef588"
+      },
+      {
+        "boxInfo": {freshVar: null},
+        "proof": [
+          {
+            "formula": {
+              "ascii": "not forall y D(y)",
+              "latex": "\\lnot \\forall y D(y)",
+              "userInput": "not forall y D(y)"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "a8cf33c1-d032-41e3-99dd-0f70a186bb03"
+          },
+          {
+            "boxInfo": {freshVar: null},
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "not exists x not D(x)",
+                  "latex": "\\lnot \\exists x \\lnot D(x)",
+                  "userInput": "not exists x not D(x)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "ce303b39-0441-424c-801d-5b0005580ed5"
+              },
+              {
+                "boxInfo": {
+                  "freshVar": "y_0"
+                },
+                "proof": [
+                  {
+                    "boxInfo": {freshVar: null},
+                    "proof": [
+                      {
+                        "formula": {
+                          "ascii": "not D(y_0)",
+                          "latex": "\\lnot D(y_0)",
+                          "userInput": "not D(y_0)"
+                        },
+                        "justification": {
+                          "refs": [],
+                          "rule": "assumption"
+                        },
+                        "stepType": "line",
+                        "uuid": "689a8d80-4628-4936-a513-d8b374450ae8"
+                      },
+                      {
+                        "formula": {
+                          "ascii": "exists x not D(x)",
+                          "latex": "\\exists x \\lnot D(x)",
+                          "userInput": "exists x not D(x)"
+                        },
+                        "justification": {
+                          "refs": [
+                            "689a8d80-4628-4936-a513-d8b374450ae8"
+                          ],
+                          "rule": "exists_intro"
+                        },
+                        "stepType": "line",
+                        "uuid": "71a27271-bec1-48c2-bf61-06e8e1cb92d4"
+                      },
+                      {
+                        "formula": {
+                          "ascii": "false",
+                          "latex": "\\bot",
+                          "userInput": "false"
+                        },
+                        "justification": {
+                          "refs": [
+                            "71a27271-bec1-48c2-bf61-06e8e1cb92d4",
+                            "ce303b39-0441-424c-801d-5b0005580ed5"
+                          ],
+                          "rule": "not_elim"
+                        },
+                        "stepType": "line",
+                        "uuid": "2d6c0783-05ca-42cd-9ecd-9c81c7a36f0c"
+                      }
+                    ],
+                    "stepType": "box",
+                    "uuid": "77a31330-80d0-4dab-9b11-42737be973d7"
+                  },
+                  {
+                    "formula": {
+                      "ascii": "D(y_0)",
+                      "latex": "D(y_0)",
+                      "userInput": "D(y_0)"
+                    },
+                    "justification": {
+                      "refs": [
+                        "77a31330-80d0-4dab-9b11-42737be973d7"
+                      ],
+                      "rule": "proof_by_contradiction"
+                    },
+                    "stepType": "line",
+                    "uuid": "d3ea30a4-8d6e-4d45-babb-a4686aea332a"
+                  }
+                ],
+                "stepType": "box",
+                "uuid": "46a588a9-4446-409c-ae4c-37f1223a5b47"
+              },
+              {
+                "formula": {
+                  "ascii": "forall y D(y)",
+                  "latex": "\\forall y D(y)",
+                  "userInput": "forall y D(y)"
+                },
+                "justification": {
+                  "refs": [
+                    "46a588a9-4446-409c-ae4c-37f1223a5b47"
+                  ],
+                  "rule": "forall_intro"
+                },
+                "stepType": "line",
+                "uuid": "a6324ad6-2580-4002-9e3a-0159b6297400"
+              },
+              {
+                "formula": {
+                  "ascii": "false",
+                  "latex": "\\bot",
+                  "userInput": "false"
+                },
+                "justification": {
+                  "refs": [
+                    "a6324ad6-2580-4002-9e3a-0159b6297400",
+                    "a8cf33c1-d032-41e3-99dd-0f70a186bb03"
+                  ],
+                  "rule": "not_elim"
+                },
+                "stepType": "line",
+                "uuid": "1e5aea47-048a-4b9b-b5ce-0432ad41a0a4"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "2b76e60e-e957-4c34-90d1-42dc1063afe6"
+          },
+          {
+            "formula": {
+              "ascii": "exists x not D(x)",
+              "latex": "\\exists x \\lnot D(x)",
+              "userInput": "exists x not D(x)"
+            },
+            "justification": {
+              "refs": [
+                "2b76e60e-e957-4c34-90d1-42dc1063afe6"
+              ],
+              "rule": "proof_by_contradiction"
+            },
+            "stepType": "line",
+            "uuid": "8e9b5540-9315-4df7-ac32-584d7cfcb5c3"
+          },
+          {
+            "boxInfo": {
+              "freshVar": "x_0"
+            },
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "not D(x_0)",
+                  "latex": "\\lnot D(x_0)",
+                  "userInput": "not D(x_0)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "0f05950b-cd3a-4fe6-898a-74c636bdb3cf"
+              },
+              {
+                "boxInfo": {freshVar: null},
+                "proof": [
+                  {
+                    "formula": {
+                      "ascii": "D(x_0)",
+                      "latex": "D(x_0)",
+                      "userInput": "D(x_0)"
+                    },
+                    "justification": {
+                      "refs": [],
+                      "rule": "assumption"
+                    },
+                    "stepType": "line",
+                    "uuid": "9a1656cb-1129-4190-9dd0-1d89f81ce4e5"
+                  },
+                  {
+                    "formula": {
+                      "ascii": "false",
+                      "latex": "\\bot",
+                      "userInput": "false"
+                    },
+                    "justification": {
+                      "refs": [
+                        "9a1656cb-1129-4190-9dd0-1d89f81ce4e5",
+                        "0f05950b-cd3a-4fe6-898a-74c636bdb3cf"
+                      ],
+                      "rule": "not_elim"
+                    },
+                    "stepType": "line",
+                    "uuid": "78ed221c-75a6-41b2-9141-3ab7bae2da00"
+                  },
+                  {
+                    "formula": {
+                      "ascii": "forall y D(y)",
+                      "latex": "\\forall y D(y)",
+                      "userInput": "forall y D(y)"
+                    },
+                    "justification": {
+                      "refs": [
+                        "78ed221c-75a6-41b2-9141-3ab7bae2da00"
+                      ],
+                      "rule": "bot_elim"
+                    },
+                    "stepType": "line",
+                    "uuid": "dcecdcc0-838c-4d75-ba25-c79d0f886836"
+                  }
+                ],
+                "stepType": "box",
+                "uuid": "f1f57be9-b7db-4ba6-9022-399f54aaff63"
+              },
+              {
+                "formula": {
+                  "ascii": "D(x_0) -> forall y D(y)",
+                  "latex": "D(x_0) \\rightarrow \\forall y D(y)",
+                  "userInput": "D(x_0) -> forall y D(y)"
+                },
+                "justification": {
+                  "refs": [
+                    "f1f57be9-b7db-4ba6-9022-399f54aaff63"
+                  ],
+                  "rule": "implies_intro"
+                },
+                "stepType": "line",
+                "uuid": "fe3f8add-f9a8-44bd-91fd-a7d4f9a7d744"
+              },
+              {
+                "formula": {
+                  "ascii": "exists x (D(x) -> forall y D(y))",
+                  "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+                  "userInput": "exists x (D(x) -> forall y D(y))"
+                },
+                "justification": {
+                  "refs": [
+                    "fe3f8add-f9a8-44bd-91fd-a7d4f9a7d744"
+                  ],
+                  "rule": "exists_intro"
+                },
+                "stepType": "line",
+                "uuid": "415b6d3c-c386-4703-b8b0-10f8b7851dfc"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "2f514f72-e025-45ba-be92-79e94d5933c8"
+          },
+          {
+            "formula": {
+              "ascii": "exists x (D(x) -> forall y D(y))",
+              "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+              "userInput": "exists x (D(x) -> forall y D(y))"
+            },
+            "justification": {
+              "refs": [
+                "8e9b5540-9315-4df7-ac32-584d7cfcb5c3",
+                "2f514f72-e025-45ba-be92-79e94d5933c8"
+              ],
+              "rule": "exists_elim"
+            },
+            "stepType": "line",
+            "uuid": "847fe8dc-bbd5-45a2-8199-d29e8e0ddb08"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "8840ab49-e7dc-451d-a3be-427f4e536c86"
+      },
+      {
+        "formula": {
+          "ascii": "exists x (D(x) -> forall y D(y))",
+          "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+          "userInput": "exists x (D(x) -> forall y D(y))"
+        },
+        "justification": {
+          "refs": [
+            "d2a52f76-2bda-4e41-b6d4-2286e74250c5",
+            "0e322c9b-4aa1-4f11-aa36-fc7c221ef588",
+            "8840ab49-e7dc-451d-a3be-427f4e536c86"
+          ],
+          "rule": "or_elim"
+        },
+        "stepType": "line",
+        "uuid": "c089ea54-9833-441b-b7e9-fd4dbf66b75a"
+      }
+    ]
   }
 ];
 
