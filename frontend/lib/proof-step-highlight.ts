@@ -11,7 +11,6 @@ export enum Highlight {
 }
 
 export function getStepHighlight(stepUuid: string, currentlyHoveredUuid: string | null, interactionState: InteractionState, proofContext: ProofContextProps) {
-
   const currentlyBeingHovered = currentlyHoveredUuid === stepUuid
   const currentlySelected = getSelectedStep(interactionState) == stepUuid;
   const refBeingEdited = interactionState.enum === InteractionStateEnum.EDITING_REF && interactionState.lineUuid === stepUuid
