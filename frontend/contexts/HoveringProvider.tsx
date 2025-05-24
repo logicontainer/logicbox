@@ -21,15 +21,19 @@ export function HoveringProvider({ children }: React.PropsWithChildren<object>) 
   const { interactionState, doTransition } = useInteractionState()
   const [currentlyHoveredUuid, setCurrentlyHoveredUuid] = React.useState<string | null>(null);
 
+  const lastHover = React.useRef<{
+    uuid: string | null
+    refIdx: number | null
+    ruleIsHovered: boolean
+  }>(null)
+
   const handleHoverStep = (uuid: string | null, refIdx: number | null = null, ruleIsHovered: boolean = false) => {
-    const currentRefIdx = interactionState.enum === InteractionStateEnum.IDLE && interactionState.hoveredRefIdx
-    const currentRuleIsHovered = interactionState.enum === InteractionStateEnum.IDLE && interactionState.ruleIsHovered
-
-    if (uuid !== currentlyHoveredUuid || refIdx !== currentRefIdx || ruleIsHovered !== currentRuleIsHovered) {
-      doTransition({ enum: TransitionEnum.HOVER, stepUuid: uuid, refIdx, ruleIsHovered })
-    }
-
     setCurrentlyHoveredUuid(uuid)
+
+    if (uuid !== lastHover.current?.uuid || refIdx !== lastHover.current?.refIdx || ruleIsHovered !== lastHover.current?.ruleIsHovered) {
+      doTransition({ enum: TransitionEnum.HOVER, stepUuid: uuid, refIdx, ruleIsHovered })
+      lastHover.current = { uuid: uuid, refIdx, ruleIsHovered }
+    }
   }
 
   return (

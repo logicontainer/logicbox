@@ -132,6 +132,7 @@ function Formula({
   formulaIsWrong: boolean;
 }) {
   const { interactionState, doTransition } = useInteractionState();
+  const { handleHoverStep } = useHovering()
 
   const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
@@ -166,6 +167,10 @@ function Formula({
       value={currentFormulaValue}
       onClickCapture={e => e.stopPropagation()}
       onDoubleClickCapture={e => e.stopPropagation()}
+      onMouseOver={e => {
+        e.stopPropagation()
+        handleHoverStep(lineUuid, null, false)
+      }}
       onChange={(e) => {
         console.log(e);
         doTransition({
@@ -188,14 +193,17 @@ function Formula({
         "shrink",
         formulaIsWrong && "text-red-500 underline underline-offset-2"
       )}
-      onClickCapture={e => e.preventDefault()}
+      onMouseOver={e => {
+        e.stopPropagation()
+        handleHoverStep(lineUuid, null, false)
+      }}
     >
       {!isSyncedWithServer || formulaIsWrong ? (
         currentFormulaValue
       ) : (
-        <span onClick={e => {
-          e.stopPropagation()
-        }}>
+        <span
+          onClickCapture={e => e.stopPropagation()}
+        >
         <InlineMath 
           math={formulaLatexContentWithUnderline}
         ></InlineMath>

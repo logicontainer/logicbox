@@ -1579,14 +1579,14 @@ const examples: ProofWithMetadata[] = [
       },
       {
         "boxInfo": {
-          "freshVar": "a"
+          "freshVar": "x_0"
         },
         "proof": [
           {
             "formula": {
-              "ascii": "P(a)",
-              "latex": "P(a)",
-              "userInput": "P(a)"
+              "ascii": "P(x_0)",
+              "latex": "P(x_0)",
+              "userInput": "P(x_0)"
             },
             "justification": {
               "refs": [],
@@ -1597,9 +1597,9 @@ const examples: ProofWithMetadata[] = [
           },
           {
             "formula": {
-              "ascii": "P(a) -> Q(a)",
-              "latex": "P(a) \\rightarrow Q(a)",
-              "userInput": "P(a) -> Q(a)"
+              "ascii": "P(x_0) -> Q(x_0)",
+              "latex": "P(x_0) \\rightarrow Q(x_0)",
+              "userInput": "P(x_0) -> Q(x_0)"
             },
             "justification": {
               "refs": [
@@ -1612,9 +1612,9 @@ const examples: ProofWithMetadata[] = [
           },
           {
             "formula": {
-              "ascii": "Q(a)",
-              "latex": "Q(a)",
-              "userInput": "Q(a)"
+              "ascii": "Q(x_0)",
+              "latex": "Q(x_0)",
+              "userInput": "Q(x_0)"
             },
             "justification": {
               "refs": [
