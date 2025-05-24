@@ -1662,6 +1662,525 @@ const examples: ProofWithMetadata[] = [
         "uuid": "308557d4-6509-43c2-9424-92fdde3be6e8"
       }
     ]
+  },
+  {
+    "id": "a05dabc8-0a46-4501-9941-8fa47c8cf482",
+    "title": "forall/exists duality 1",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "formula": {
+          "ascii": "not forall x P(x)",
+          "latex": "\\lnot \\forall x P(x)",
+          "userInput": "not forall x P(x)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "80fec1a4-001a-4c00-8a52-daa4a3959abe"
+      },
+      {
+        "boxInfo": { freshVar: null },
+        "proof": [
+          {
+            "formula": {
+              "ascii": "not exists x not P(x)",
+              "latex": "\\lnot \\exists x \\lnot P(x)",
+              "userInput": "not exists x not P(x)"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "6d7118bf-5af8-4260-a19a-19490a622c50"
+          },
+          {
+            "boxInfo": {
+              "freshVar": "x_0"
+            },
+            "proof": [
+              {
+                "boxInfo": { freshVar: null },
+                "proof": [
+                  {
+                    "formula": {
+                      "ascii": "not P(x_0)",
+                      "latex": "\\lnot P(x_0)",
+                      "userInput": "not P(x_0)"
+                    },
+                    "justification": {
+                      "refs": [],
+                      "rule": "assumption"
+                    },
+                    "stepType": "line",
+                    "uuid": "3e2f5262-1fa4-4411-9480-8cd172cca749"
+                  },
+                  {
+                    "formula": {
+                      "ascii": "exists x not P(x)",
+                      "latex": "\\exists x \\lnot P(x)",
+                      "userInput": "exists x not P(x)"
+                    },
+                    "justification": {
+                      "refs": [
+                        "3e2f5262-1fa4-4411-9480-8cd172cca749"
+                      ],
+                      "rule": "exists_intro"
+                    },
+                    "stepType": "line",
+                    "uuid": "45ac7e84-4b5b-45e6-ba09-f446d1d2a4dc"
+                  },
+                  {
+                    "formula": {
+                      "ascii": "false",
+                      "latex": "\\bot",
+                      "userInput": "false"
+                    },
+                    "justification": {
+                      "refs": [
+                        "45ac7e84-4b5b-45e6-ba09-f446d1d2a4dc",
+                        "6d7118bf-5af8-4260-a19a-19490a622c50"
+                      ],
+                      "rule": "not_elim"
+                    },
+                    "stepType": "line",
+                    "uuid": "f68e7f39-3bcd-4587-a428-63097bec2c3f"
+                  }
+                ],
+                "stepType": "box",
+                "uuid": "128719c5-276a-4f9f-9a7c-c73bd061bac4"
+              },
+              {
+                "formula": {
+                  "ascii": "P(x_0)",
+                  "latex": "P(x_0)",
+                  "userInput": "P(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "128719c5-276a-4f9f-9a7c-c73bd061bac4"
+                  ],
+                  "rule": "proof_by_contradiction"
+                },
+                "stepType": "line",
+                "uuid": "f2c603ce-926a-42c2-9f43-57b58d8f5095"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "454eca5a-332a-4faa-b22f-fb0af218c645"
+          },
+          {
+            "formula": {
+              "ascii": "forall x P(x)",
+              "latex": "\\forall x P(x)",
+              "userInput": "forall x P(x)"
+            },
+            "justification": {
+              "refs": [
+                "454eca5a-332a-4faa-b22f-fb0af218c645"
+              ],
+              "rule": "forall_intro"
+            },
+            "stepType": "line",
+            "uuid": "cc86c523-f0fa-4985-8cfd-83ab91ab62a7"
+          },
+          {
+            "formula": {
+              "ascii": "false",
+              "latex": "\\bot",
+              "userInput": "false"
+            },
+            "justification": {
+              "refs": [
+                "cc86c523-f0fa-4985-8cfd-83ab91ab62a7",
+                "80fec1a4-001a-4c00-8a52-daa4a3959abe"
+              ],
+              "rule": "not_elim"
+            },
+            "stepType": "line",
+            "uuid": "dbedef33-657e-44bc-bca6-168186934651"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "42238cb8-518f-4d76-b5f9-88cd238be9eb"
+      },
+      {
+        "formula": {
+          "ascii": "exists x not P(x)",
+          "latex": "\\exists x \\lnot P(x)",
+          "userInput": "exists x not P(x)"
+        },
+        "justification": {
+          "refs": [
+            "42238cb8-518f-4d76-b5f9-88cd238be9eb"
+          ],
+          "rule": "proof_by_contradiction"
+        },
+        "stepType": "line",
+        "uuid": "e57b2938-a65c-40d2-b289-a529865c38c9"
+      }
+    ]
+  },
+  {
+    "id": "5d7fb9e7-db81-452a-a784-71970cacd1a5",
+    "title": "forall/exists duality 2",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "formula": {
+          "ascii": "exists x not P(x)",
+          "latex": "\\exists x \\lnot P(x)",
+          "userInput": "exists x not P(x)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "b3ffe773-e798-404b-927f-1bad4968877b"
+      },
+      {
+        "boxInfo": {freshVar: null},
+        "proof": [
+          {
+            "formula": {
+              "ascii": "forall x P(x)",
+              "latex": "\\forall x P(x)",
+              "userInput": "forall x P(x)"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "d7605135-720e-48c3-9b5a-4a3af0bf6e58"
+          },
+          {
+            "boxInfo": {
+              "freshVar": "x_0"
+            },
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "not P(x_0)",
+                  "latex": "\\lnot P(x_0)",
+                  "userInput": "not P(x_0)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "5985e9f7-b12c-4cee-b1e4-bd628735c64a"
+              },
+              {
+                "formula": {
+                  "ascii": "P(x_0)",
+                  "latex": "P(x_0)",
+                  "userInput": "P(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "d7605135-720e-48c3-9b5a-4a3af0bf6e58"
+                  ],
+                  "rule": "forall_elim"
+                },
+                "stepType": "line",
+                "uuid": "58641507-2fd0-4e9e-87da-7dfd413f82a2"
+              },
+              {
+                "formula": {
+                  "ascii": "false",
+                  "latex": "\\bot",
+                  "userInput": "false"
+                },
+                "justification": {
+                  "refs": [
+                    "58641507-2fd0-4e9e-87da-7dfd413f82a2",
+                    "5985e9f7-b12c-4cee-b1e4-bd628735c64a"
+                  ],
+                  "rule": "not_elim"
+                },
+                "stepType": "line",
+                "uuid": "446673b6-352c-4c5b-9993-5b714817818c"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "a06482a8-21e2-4494-b33e-c5ed48fe93c0"
+          },
+          {
+            "formula": {
+              "ascii": "false",
+              "latex": "\\bot",
+              "userInput": "false"
+            },
+            "justification": {
+              "refs": [
+                "b3ffe773-e798-404b-927f-1bad4968877b",
+                "a06482a8-21e2-4494-b33e-c5ed48fe93c0"
+              ],
+              "rule": "exists_elim"
+            },
+            "stepType": "line",
+            "uuid": "adff04ea-54fd-4b0e-931e-52f78a0ea531"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "3cd3c426-b387-4d6c-83c5-af01901bf4d0"
+      },
+      {
+        "formula": {
+          "ascii": "not forall x P(x)",
+          "latex": "\\lnot \\forall x P(x)",
+          "userInput": "not forall x P(x)"
+        },
+        "justification": {
+          "refs": [
+            "3cd3c426-b387-4d6c-83c5-af01901bf4d0"
+          ],
+          "rule": "not_intro"
+        },
+        "stepType": "line",
+        "uuid": "dc45982a-cac7-4a3a-90db-0adc5a5d18d3"
+      }
+    ]
+  },
+  {
+    "id": "17bbbe22-8d24-4163-be29-4afecd21d333",
+    "title": "forall/exists duality 3",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "formula": {
+          "ascii": "not exists x P(x)",
+          "latex": "\\lnot \\exists x P(x)",
+          "userInput": "not exists x P(x)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "c6f6a376-117f-4a00-8dc7-8e93e8da143b"
+      },
+      {
+        "boxInfo": {
+          "freshVar": "x_0"
+        },
+        "proof": [
+          {
+            "boxInfo": { freshVar: null },
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "P(x_0)",
+                  "latex": "P(x_0)",
+                  "userInput": "P(x_0)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "8ee79978-922b-41f7-8959-fbd716434160"
+              },
+              {
+                "formula": {
+                  "ascii": "exists x P(x)",
+                  "latex": "\\exists x P(x)",
+                  "userInput": "exists x P(x)"
+                },
+                "justification": {
+                  "refs": [
+                    "8ee79978-922b-41f7-8959-fbd716434160"
+                  ],
+                  "rule": "exists_intro"
+                },
+                "stepType": "line",
+                "uuid": "59f3b315-9987-4cfc-bfca-21e2eedd4026"
+              },
+              {
+                "formula": {
+                  "ascii": "false",
+                  "latex": "\\bot",
+                  "userInput": "false"
+                },
+                "justification": {
+                  "refs": [
+                    "59f3b315-9987-4cfc-bfca-21e2eedd4026",
+                    "c6f6a376-117f-4a00-8dc7-8e93e8da143b"
+                  ],
+                  "rule": "not_elim"
+                },
+                "stepType": "line",
+                "uuid": "379d80ee-db97-43ab-88bd-4e0e524f913b"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "79ad972e-8605-4545-9bf4-1f4a5b067878"
+          },
+          {
+            "formula": {
+              "ascii": "not P(x_0)",
+              "latex": "\\lnot P(x_0)",
+              "userInput": "not P(x_0)"
+            },
+            "justification": {
+              "refs": [
+                "79ad972e-8605-4545-9bf4-1f4a5b067878"
+              ],
+              "rule": "not_intro"
+            },
+            "stepType": "line",
+            "uuid": "b26d5d20-2569-4f78-8e13-d561f1621dcc"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "d9fd8dd6-e1bb-41e7-a04e-06e0f5f7f634"
+      },
+      {
+        "formula": {
+          "ascii": "forall x not P(x)",
+          "latex": "\\forall x \\lnot P(x)",
+          "userInput": "forall x not P(x)"
+        },
+        "justification": {
+          "refs": [
+            "d9fd8dd6-e1bb-41e7-a04e-06e0f5f7f634"
+          ],
+          "rule": "forall_intro"
+        },
+        "stepType": "line",
+        "uuid": "6497cf01-84a6-4004-b03f-98cff3286306"
+      }
+    ]
+  },
+  {
+    "id": "2d7beef5-1983-466a-935a-bfecf9d217c0",
+    "title": "forall/exists duality 4",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "formula": {
+          "ascii": "forall x not P(x)",
+          "latex": "\\forall x \\lnot P(x)",
+          "userInput": "forall x not P(x)"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        },
+        "stepType": "line",
+        "uuid": "c95c6301-4808-479e-b5e6-48ae30fff572"
+      },
+      {
+        "boxInfo": {freshVar: null},
+        "proof": [
+          {
+            "formula": {
+              "ascii": "exists x P(x)",
+              "latex": "\\exists x P(x)",
+              "userInput": "exists x P(x)"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            },
+            "stepType": "line",
+            "uuid": "8fed3078-c2f0-41ee-bea8-aa56241e1cc2"
+          },
+          {
+            "boxInfo": {
+              "freshVar": "x_0"
+            },
+            "proof": [
+              {
+                "formula": {
+                  "ascii": "P(x_0)",
+                  "latex": "P(x_0)",
+                  "userInput": "P(x_0)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                },
+                "stepType": "line",
+                "uuid": "2065b23d-d1a8-41c0-b0b9-a4f0cc90e304"
+              },
+              {
+                "formula": {
+                  "ascii": "not P(x_0)",
+                  "latex": "\\lnot P(x_0)",
+                  "userInput": "not P(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "c95c6301-4808-479e-b5e6-48ae30fff572"
+                  ],
+                  "rule": "forall_elim"
+                },
+                "stepType": "line",
+                "uuid": "d0aa5f82-dcfc-4363-8f9b-49ac66789456"
+              },
+              {
+                "formula": {
+                  "ascii": "false",
+                  "latex": "\\bot",
+                  "userInput": "false"
+                },
+                "justification": {
+                  "refs": [
+                    "2065b23d-d1a8-41c0-b0b9-a4f0cc90e304",
+                    "d0aa5f82-dcfc-4363-8f9b-49ac66789456"
+                  ],
+                  "rule": "not_elim"
+                },
+                "stepType": "line",
+                "uuid": "a514b742-f338-41f8-a2fb-b4282503ea02"
+              }
+            ],
+            "stepType": "box",
+            "uuid": "b756fd22-2adc-41c2-b044-12b1551657c2"
+          },
+          {
+            "formula": {
+              "ascii": "false",
+              "latex": "\\bot",
+              "userInput": "false"
+            },
+            "justification": {
+              "refs": [
+                "8fed3078-c2f0-41ee-bea8-aa56241e1cc2",
+                "b756fd22-2adc-41c2-b044-12b1551657c2"
+              ],
+              "rule": "exists_elim"
+            },
+            "stepType": "line",
+            "uuid": "1c6138df-57a0-4e86-abef-2d24c9efbdaa"
+          }
+        ],
+        "stepType": "box",
+        "uuid": "4dd9d26d-4fea-4189-a3cc-19f0c897b75a"
+      },
+      {
+        "formula": {
+          "ascii": "not exists x P(x)",
+          "latex": "\\lnot \\exists x P(x)",
+          "userInput": "not exists x P(x)"
+        },
+        "justification": {
+          "refs": [
+            "4dd9d26d-4fea-4189-a3cc-19f0c897b75a"
+          ],
+          "rule": "not_intro"
+        },
+        "stepType": "line",
+        "uuid": "1498fb5d-d567-4828-ad5e-214b93182f70"
+      }
+    ]
   }
 ];
 
