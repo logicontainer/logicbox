@@ -16,13 +16,14 @@ import {
 import AutosizeInput from "react-input-autosize";
 import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
+import LineNumber from "./LineNumber";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { formulaIsWrong } from "@/lib/diagnostic-helpers";
+import { getStepHighlight } from "@/lib/proof-step-highlight";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { getStepHighlight } from "@/lib/proof-step-highlight";
 import { useProof } from "@/contexts/ProofProvider";
 
 export function LineProofStep({
@@ -35,9 +36,36 @@ export function LineProofStep({
   const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const { interactionState } = useInteractionState();
-  const { currentlyHoveredUuid, handleHoverStep } = useHovering()
+  const { currentlyHoveredUuid, handleHoverStep } = useHovering();
 
-  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState, useProof())
+  const parentRef = React.useRef<HTMLDivElement>(null);
+  const lineNumberRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    // Extract height of the parent element
+    if (parentRef.current) {
+      const parentHeight = parentRef.current.offsetHeight;
+      // Set the height of the line number element
+      if (lineNumberRef.current) {
+        lineNumberRef.current.style.height = `${parentHeight}px`;
+      }
+    }
+  }, [parentRef, lineNumberRef]);
+
+  let line = props.lines.find(
+    (l) => l.uuid === props.uuid && l.stepType == "line"
+  );
+  if (line?.stepType !== "line") {
+    console.error(
+      `LineProofStep: Expected line with uuid ${props.uuid} to be of type 'line', but found ${line?.stepType}`
+    );
+    return;
+  }
+  const highlight = getStepHighlight(
+    props.uuid,
+    currentlyHoveredUuid,
+    interactionState,
+    useProof()
+  );
 
   return (
     <ProofStepWrapper
@@ -45,10 +73,11 @@ export function LineProofStep({
       isOuterProofStep={props.isOuterProofStep}
     >
       <div
+        ref={parentRef}
         key={props.uuid}
         className={cn(
           "text-nowrap pointer-events-auto",
-          "flex relative justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
+          "flex justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch"
         )}
         onClick={(e) => {
           e.stopPropagation();
@@ -66,10 +95,9 @@ export function LineProofStep({
         }}
         onMouseMove={(e) => {
           e.stopPropagation();
-          if (e.currentTarget !== e.target)
-            return;
-          console.log("balls")
-          handleHoverStep(props.uuid, null, false)
+          if (e.currentTarget !== e.target) return;
+          console.log("balls");
+          handleHoverStep(props.uuid, null, false);
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -82,6 +110,9 @@ export function LineProofStep({
           });
         }}
       >
+        <div ref={lineNumberRef} className="w-10 left-0 absolute">
+          <LineNumber line={line} />
+        </div>
         <Formula
           latexFormula={props.formula.latex ?? null}
           isSyncedWithServer={!props.formula.unsynced}
@@ -132,7 +163,7 @@ function Formula({
   formulaIsWrong: boolean;
 }) {
   const { interactionState, doTransition } = useInteractionState();
-  const { handleHoverStep } = useHovering()
+  const { handleHoverStep } = useHovering();
 
   const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
@@ -165,11 +196,11 @@ function Formula({
     <AutosizeInput
       inputRef={handleInputRefChange}
       value={currentFormulaValue}
-      onClickCapture={e => e.stopPropagation()}
-      onDoubleClickCapture={e => e.stopPropagation()}
-      onMouseOver={e => {
-        e.stopPropagation()
-        handleHoverStep(lineUuid, null, false)
+      onClickCapture={(e) => e.stopPropagation()}
+      onDoubleClickCapture={(e) => e.stopPropagation()}
+      onMouseOver={(e) => {
+        e.stopPropagation();
+        handleHoverStep(lineUuid, null, false);
       }}
       onChange={(e) => {
         console.log(e);
@@ -193,20 +224,16 @@ function Formula({
         "shrink",
         formulaIsWrong && "text-red-500 underline underline-offset-2"
       )}
-      onMouseOver={e => {
-        e.stopPropagation()
-        handleHoverStep(lineUuid, null, false)
+      onMouseOver={(e) => {
+        e.stopPropagation();
+        handleHoverStep(lineUuid, null, false);
       }}
     >
       {!isSyncedWithServer || formulaIsWrong ? (
         currentFormulaValue
       ) : (
-        <span
-          onClickCapture={e => e.stopPropagation()}
-        >
-        <InlineMath 
-          math={formulaLatexContentWithUnderline}
-        ></InlineMath>
+        <span onClickCapture={(e) => e.stopPropagation()}>
+          <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
         </span>
       )}
     </p>

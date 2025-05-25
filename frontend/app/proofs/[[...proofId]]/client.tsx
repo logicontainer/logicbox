@@ -14,32 +14,28 @@ import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
 import Toolbar from "@/components/Toolbar";
 import { useEffect } from "react";
+import { useHovering } from "@/contexts/HoveringProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
-import { useHovering } from "@/contexts/HoveringProvider";
 
-export default function Client({ proofId } : { proofId: string | null }) {
+export default function Client({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
-  const { handleHoverStep } = useHovering()
+  const { handleHoverStep } = useHovering();
 
   React.useEffect(() => {
-    if (proofId)
-      proofContext.loadProofFromId(proofId)
-  }, [proofId])
+    if (proofId) proofContext.loadProofFromId(proofId);
+  }, [proofId]);
 
   const [keybindTransition, setKeybindTransition] =
     React.useState<Transition | null>();
 
   React.useEffect(() => {
     const listener = (e: KeyboardEvent) => {
-      if (
-        (e.key === "r") &&
-        interactionState.enum === InteractionStateEnum.IDLE
-      )
+      if (e.key === "r" && interactionState.enum === InteractionStateEnum.IDLE)
         setKeybindTransition({ enum: TransitionEnum.VALIDATE_PROOF });
     };
     window.addEventListener("keydown", listener);
@@ -65,16 +61,15 @@ export default function Client({ proofId } : { proofId: string | null }) {
         </div>
         <div className="grid grid-cols-[1fr_auto_1fr] w-full">
           <div></div>
-          <div className="p-4 flex flex-col justify-between items-center rounded-sm">
+          <div className="relative pl-10 p-4 flex flex-col justify-between items-center rounded-sm">
             <div
               className="flex box-content gap-2 mt-[64px] w-full select-none"
               onClick={(e) => e.stopPropagation()}
-              onMouseLeave={e => {
-                e.stopPropagation()
-                handleHoverStep(null, null, false)
+              onMouseLeave={(e) => {
+                e.stopPropagation();
+                handleHoverStep(null, null, false);
               }}
             >
-              <LineNumbers lines={lines} />
               <Proof
                 proof={proofContext.proof.proof}
                 lines={lines}

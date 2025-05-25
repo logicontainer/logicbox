@@ -4,20 +4,20 @@ import {
   TLineNumber,
 } from "@/types/types";
 import {
-    InteractionStateEnum,
+  InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
-import { Highlight } from "@/lib/proof-step-highlight";
 
+import { Highlight } from "@/lib/proof-step-highlight";
 import { Proof } from "./Proof";
 import { ProofStepWrapper } from "./ProofStepWrapper";
+import React from "react";
 import { cn } from "@/lib/utils";
 import { getSelectedStep } from "@/lib/state-helpers";
-import { useContextMenu } from "@/contexts/ContextMenuProvider";
-import React from "react";
-import { useHovering } from "@/contexts/HoveringProvider";
 import { getStepHighlight } from "@/lib/proof-step-highlight";
+import { useContextMenu } from "@/contexts/ContextMenuProvider";
+import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
 
 export function BoxProofStep({
@@ -29,26 +29,36 @@ export function BoxProofStep({
 }) {
   const { doTransition, interactionState } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
-  const { currentlyHoveredUuid, handleHoverStep } = useHovering()
+  const { currentlyHoveredUuid, handleHoverStep } = useHovering();
 
-  const highlight = getStepHighlight(props.uuid, currentlyHoveredUuid, interactionState, useProof())
+  const highlight = getStepHighlight(
+    props.uuid,
+    currentlyHoveredUuid,
+    interactionState,
+    useProof()
+  );
+
+  const freshVar = props.boxInfo?.freshVar;
 
   return (
     <ProofStepWrapper
       isOuterProofStep={props.isOuterProofStep}
       isBox={true}
+      freshVar={freshVar ?? undefined}
     >
       <div
         className={cn(
-          "pointer-events-auto relative my-[1px] border-2 overflow-hidden",
+          "pointer-events-auto border-2 overflow-hidden pt-1 mb-1",
           "border-black",
+          freshVar && "mt-4 pt-4",
 
           highlight === Highlight.SELECTED && "border-red-500",
 
           highlight === Highlight.SELECTED && "bg-slate-100",
           highlight === Highlight.HOVERED && "bg-slate-50",
-          highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200",
-          highlight === Highlight.REFERRED && "bg-blue-200",
+          highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
+            "bg-blue-200",
+          highlight === Highlight.REFERRED && "bg-blue-200"
         )}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -67,9 +77,9 @@ export function BoxProofStep({
             boxUuid: props.uuid,
           });
         }}
-        onMouseMove={e => {
-          e.stopPropagation()
-          handleHoverStep(props.uuid, null, false)
+        onMouseMove={(e) => {
+          e.stopPropagation();
+          handleHoverStep(props.uuid, null, false);
         }}
       >
         <Proof

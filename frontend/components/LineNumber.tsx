@@ -1,35 +1,34 @@
-import { Diagnostic, TLineNumber } from "@/types/types";
-
+import { InlineMath } from "react-katex";
+import { TLineNumber } from "@/types/types";
 import { cn } from "@/lib/utils";
+import { useServer } from "@/contexts/ServerProvider";
 
-export function LineNumber({
-  line,
-  proofStepDiagnostics,
-  className,
-}: {
-  line: TLineNumber & {
-    stepType: "line";
-  };
-  proofStepDiagnostics?: Diagnostic;
-  className?: string;
-}) {
+export default function LineNumber({ line }: { line: TLineNumber }) {
+  const serverContext = useServer();
+  const proofDiagnostics = serverContext.proofDiagnostics;
+  const diagnosticMap = Object.fromEntries(
+    proofDiagnostics.map((d) => [d.uuid, d])
+  );
+
+  const proofStepDiagnostics = diagnosticMap[line.uuid];
+
+  if (!line || line.stepType !== "line") {
+    return null;
+  }
   return (
-    <>
-      <p
+    <div
+      className={cn(
+        "text-base/relaxed text-center align-baseline cursor-pointer px-1 w-full rounded-md h-full flex items-center justify-stretch"
+      )}
+    >
+      <span
         className={cn(
-          "text-sm/10 text-center text-slate-800 align-baseline cursor-pointer px-2",
-          proofStepDiagnostics
-            ? "bg-red-500 text-slate-200"
-            : "bg-green-500 text-slate-200",
-          className
+          "w-full rounded-sm",
+          proofStepDiagnostics ? "bg-red-500 text-slate-200" : ""
         )}
-        data-tooltip-content={proofStepDiagnostics?.violationType}
-        data-tooltip-id={
-          proofStepDiagnostics ? `line-number-tooltip-${line.uuid}` : ""
-        }
       >
-        <span>{line.stepType === "line" && line.lineNumber}.</span>
-      </p>
-    </>
+        <InlineMath math={line?.lineNumber.toString() + "."} />
+      </span>
+    </div>
   );
 }

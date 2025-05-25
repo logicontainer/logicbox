@@ -22,7 +22,7 @@ export function Proof({
   isOuterProof?: boolean;
 }) {
   return (
-    <div className={cn("cursor-pointer text-slate-800 w-full -my-[3px]")}>
+    <div className={cn("cursor-pointer text-slate-800 w-full")}>
       {props.proof.map((proofStep) => {
         if (proofStep.stepType == "line") {
           const lineProofStepProps = proofStep as TLineProofStep;
