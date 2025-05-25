@@ -41,6 +41,7 @@ object GreetingRoutes {
             validator <- logicName match {
               case "propositionalLogic" => ZIO.succeed(PropLogicProofValidatorService())
               case "predicateLogic" => ZIO.succeed(PredLogicProofValidatorService())
+              case "arithmetic" => ZIO.succeed(ArithLogicProofValidatorService())
               case _ => ZIO.fail(s"unknown logicName: $logicName")
             }
             res = validator.validateProof(proof) match {

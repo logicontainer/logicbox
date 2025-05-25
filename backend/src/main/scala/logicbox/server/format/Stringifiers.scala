@@ -2,12 +2,12 @@ package logicbox.server.format
 
 import logicbox.rule.PredLogicRule
 import logicbox.rule.PredLogicRule._
+import logicbox.rule.ArithLogicRule
+import logicbox.rule.ArithLogicRule._
 import logicbox.rule.PropLogicRule
 import logicbox.rule.PropLogicRule._
 
-import logicbox.formula.PredLogicFormula
-import logicbox.formula.PropLogicFormula
-import logicbox.formula.PredLogicTerm
+import logicbox.formula._
 
 object Stringifiers {
   private def propLogicFormulaWithBracks(formula: PropLogicFormula, inner: PropLogicFormula => String, l: String, r: String): String = {
@@ -124,5 +124,76 @@ object Stringifiers {
     case ExistsIntro() => "exists_intro"
     case EqualityIntro() => "equality_intro"
     case EqualityElim() => "equality_elim"
+  }
+  
+  private def arithLogicFormulaWithBracks(formula: ArithLogicFormula, inner: ArithLogicFormula => String, l: String, r: String): String = {
+    import logicbox.formula.ArithLogicFormula._
+    formula match {
+      case Contradiction() | Tautology() | Not(_) | ForAll(_, _) | Exists(_, _) => inner(formula)
+      case And(_, _) | Or(_, _) | Implies(_, _) | Equals(_, _) => s"$l${inner(formula)}$r"
+    }
+  }
+
+  private def arithLogicTermWithBracks(term: ArithLogicTerm, inner: ArithLogicTerm => String, l: String, r: String): String = {
+    import logicbox.formula.ArithLogicTerm._
+    term match {
+      case Zero() | One() | Var(_) => inner(term)
+      case Plus(_, _) | Mult(_, _) => s"$l${inner(term)}$r"
+    }
+  }
+
+  def arithLogicTermAsString(term: ArithLogicTerm): String = {
+    import logicbox.formula.ArithLogicTerm._
+    def b(f: ArithLogicTerm) = arithLogicTermWithBracks(f, arithLogicTermAsString, "(", ")")
+    term match {
+      case Var(x) => x.toString
+      case Zero() => "0"
+      case One() => "1"
+      case Plus(t1, t2) => s"${b(t1)} + ${b(t2)}"
+      case Mult(t1, t2) => s"${b(t1)} * ${b(t2)}"
+    }
+  }
+
+
+  def arithLogicFormulaAsLaTeX(formula: ArithLogicFormula): String = {
+    import ArithLogicFormula._
+    def b(f: ArithLogicFormula) = arithLogicFormulaWithBracks(f, arithLogicFormulaAsLaTeX, "(", ")")
+    formula match {
+      case Contradiction() => "\\bot"
+      case Tautology() => "\\top"
+      case Equals(t1, t2) => s"${arithLogicTermAsString(t1)} = ${arithLogicTermAsString(t2)}"
+      case And(phi, psi) => s"${b(phi)} \\land ${b(psi)}"
+      case Or(phi, psi) => s"${b(phi)} \\lor ${b(psi)}"
+      case Implies(phi, psi) => s"${b(phi)} \\rightarrow ${b(psi)}"
+      case Not(phi) => s"\\lnot ${b(phi)}"
+      case ForAll(x, phi) => s"\\forall ${arithLogicTermAsString(x)} ${b(phi)}"
+      case Exists(x, phi) => s"\\exists ${arithLogicTermAsString(x)} ${b(phi)}"
+    }
+  }
+
+  def arithLogicFormulaAsASCII(formula: ArithLogicFormula): String = {
+    import ArithLogicFormula._
+    def b(f: ArithLogicFormula) = arithLogicFormulaWithBracks(f, arithLogicFormulaAsASCII, "(", ")")
+    formula match {
+      case Contradiction() => "false"
+      case Tautology() => "true"
+      case Equals(t1, t2) => s"${arithLogicTermAsString(t1)} = ${arithLogicTermAsString(t2)}"
+      case And(phi, psi) => s"${b(phi)} and ${b(psi)}"
+      case Or(phi, psi) => s"${b(phi)} or ${b(psi)}"
+      case Implies(phi, psi) => s"${b(phi)} -> ${b(psi)}"
+      case Not(phi) => s"not ${b(phi)}"
+      case ForAll(x, phi) => s"forall ${arithLogicTermAsString(x)} ${b(phi)}"
+      case Exists(x, phi) => s"exists ${arithLogicTermAsString(x)} ${b(phi)}"
+    }
+  }
+
+  def arithLogicRuleAsString(rule: ArithLogicRule): String = rule match {
+    case Peano1() => "peano_1"
+    case Peano2() => "peano_2"
+    case Peano3() => "peano_3"
+    case Peano4() => "peano_4"
+    case Peano5() => "peano_5"
+    case Peano6() => "peano_6"
+    case Induction() => "induction"
   }
 }
