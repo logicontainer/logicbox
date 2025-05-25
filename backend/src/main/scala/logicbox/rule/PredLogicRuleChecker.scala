@@ -15,9 +15,9 @@ import logicbox.framework.Reference.Box
 
 class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   substitutor: Substitutor[F, T, V]
-) extends RuleChecker[F, PredLogicRule, PredLogicBoxInfo[V]] {
+) extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
   private type R = PredLogicRule
-  private type B = PredLogicBoxInfo[V]
+  private type B = FreshVarBoxInfo[V]
 
   private def fail(v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = (v +: vs).toList
   private def failIf(b: Boolean, v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = {

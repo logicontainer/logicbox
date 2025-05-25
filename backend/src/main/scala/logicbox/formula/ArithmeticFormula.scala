@@ -15,28 +15,37 @@ object ArithmeticTerm {
   trait One[T] extends ArithmeticTerm[T]
 
   object Plus {
-    def unapply[F, T <: ArithmeticTerm[T], V <: T](f: F): Option[(T, T)] = f match {
+    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = t match {
       case p: Plus[T] @unchecked => Some(p.t1, p.t2)
       case _ => None
     }
   }
 
+  object + {
+    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = Plus.unapply[T](t)
+  }
+
+
   object Mult {
-    def unapply[F, T <: ArithmeticTerm[T], V <: T](f: F): Option[(T, T)] = f match {
+    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = t match {
       case p: Mult[T] @unchecked => Some(p.t1, p.t2)
       case _ => None
     }
   }
 
+  object ~* {
+    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = Mult.unapply[T](t)
+  }
+
   object Zero {
-    def unapply[F, T <: ArithmeticTerm[T], V <: T](f: F): Boolean = f match {
+    def unapply[T <: ArithmeticTerm[T]](t: T): Boolean = t match {
       case p: Zero[T] @unchecked => true
       case _ => false
     }
   }
 
   object One {
-    def unapply[F, T <: ArithmeticTerm[T], V <: T](f: F): Boolean = f match {
+    def unapply[T <: ArithmeticTerm[T]](t: T): Boolean = t match {
       case p: One[T] @unchecked => true
       case _ => false
     }

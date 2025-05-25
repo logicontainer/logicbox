@@ -22,11 +22,10 @@ class ArithLogicLexer extends RegexParsers {
   def ident = """[A-Za-z]+((_\d)|(_\{\d+\}))?""".r ^^ { str => Ident(str) }
   def equalss = "=" ^^^ Equals()
   
-  def comma = "," ^^^ Comma()
   def leftParen = "(" ^^^ LeftParen()
   def rightParen = ")" ^^^ RightParen()
 
-  def token: Parser[ArithLogicToken] = and | or | not | implies | plus | mult | zero | one | contradiction | tautology | leftParen | rightParen | forall | exists | ident | comma | equalss
+  def token: Parser[ArithLogicToken] = and | or | not | implies | plus | mult | zero | one | contradiction | tautology | leftParen | rightParen | forall | exists | ident | equalss
   def tokens: Parser[List[ArithLogicToken]] = rep1(token)
 
   def apply(input: String): List[ArithLogicToken] =

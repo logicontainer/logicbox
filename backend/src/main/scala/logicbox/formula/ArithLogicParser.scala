@@ -16,7 +16,7 @@ class ArithLogicParser extends PackratParsers {
   private def termexp: Parser[ArithLogicTerm] = {
     def zeroexp: Parser[ArithLogicTerm.Zero] = accept("zero", { case ArithLogicToken.Zero() => ArithLogicTerm.Zero() })
     def oneexp: Parser[ArithLogicTerm.One] = accept("one", { case ArithLogicToken.One() => ArithLogicTerm.One() })
-    def atomictermexp: Parser[ArithLogicTerm] = varexp | zeroexp | oneexp // TODO: parens
+    def atomictermexp: Parser[ArithLogicTerm] = varexp | zeroexp | oneexp | withParens(termexp)
 
     def multexp: Parser[ArithLogicTerm] = 
       ((atomictermexp ~ rep(ArithLogicToken.Mult() ~ atomictermexp))) ^^ {
