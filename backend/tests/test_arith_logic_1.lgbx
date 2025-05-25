@@ -1,0 +1,17 @@
+10: 0 + 0 = 0 + 0                         : equality_intro
+bi n --------------------------------------
+20: n + 0 = 0 + n                         : assumption
+22: n + 0 = n + 0                         : equality_intro
+24: 0 + n = n + 0                         : equality_elim 20, 22
+25: 0 + (n + 1) = (0 + n) + 1             : peano_2
+30: 0 + (n + 1) = (n + 0) + 1             : equality_elim 24, 25
+32: n + 0 = n                             : peano_1
+34: 0 + (n + 1) = n + 1                   : equality_elim 32, 30
+36: (n + 1) + 0 = n + 1                   : peano_1
+38: (n + 1) + 0 = (n + 1) + 0             : equality_intro
+40: n + 1 = (n + 1) + 0                   : equality_elim 36, 38
+42: 0 + (n + 1) = (n + 1) + 0             : equality_elim 40, 34
+44: 0 + (n + 1) = 0 + (n + 1)             : equality_intro
+60: (n + 1) + 0 = 0 + (n + 1)             : equality_elim 42, 44
+-------------------------------------------
+100: forall k (k + 0 = 0 + k)             : induction 10, bi

@@ -7,10 +7,10 @@ import logicbox.proof._
 import logicbox.server.format._
 
 // 'factory'
-object PredLogicProofValidatorService {
-  private type F = PredLogicFormula
-  private type R = PropLogicRule | PredLogicRule
-  private type B = FreshVarBoxInfo[PredLogicTerm.Var]
+object ArithLogicProofValidatorService {
+  private type F = ArithLogicFormula
+  private type R = PropLogicRule | PredLogicRule | ArithLogicRule
+  private type B = FreshVarBoxInfo[ArithLogicTerm.Var]
   private type Id = String
 
   import logicbox.server.format.SprayFormatters._
@@ -21,16 +21,19 @@ object PredLogicProofValidatorService {
     val boxAssumptionProofChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
     val boxContraintsProofChecker = PredLogicBoxConstraintsProofChecker[R, Id](PropLogicRule.Assumption())
 
-    val predLogicChecker = PredLogicRuleChecker[F, PredLogicTerm, PredLogicTerm.Var](
-      PredLogicFormulaSubstitutor()
+    val propLogicChecker: RuleChecker[F, PropLogicRule, B] = PropLogicRuleChecker[F]()
+    val predLogicChecker = PredLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](
+      ArithLogicFormulaSubstitutor()
+    )
+    val arithLogicChecker = ArithLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](
+      ArithLogicFormulaSubstitutor()
     )
 
-    val propLogicChecker: RuleChecker[F, PropLogicRule, B] = PropLogicRuleChecker[F]()
-
     val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B]] = 
-      OptionRuleChecker(UnionRuleChecker(predLogicChecker, propLogicChecker, isR1 = {
-        case r: PredLogicRule => true
-        case _ => false
+      OptionRuleChecker(Union3RuleChecker(propLogicChecker, predLogicChecker, arithLogicChecker, which = {
+        case r: PropLogicRule => 1
+        case r: PredLogicRule => 2
+        case r: ArithLogicRule => 3
       }))
 
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
@@ -63,31 +66,34 @@ object PredLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(PredLogicParser().parseFormula(PredLogicLexer()(userInput)))
+      Some(ArithLogicParser().parseFormula(ArithLogicLexer()(userInput)))
     } catch { case _ => None }
   }
 
-  private def parseVariable(userInput: String): Option[PredLogicTerm.Var] = {
+  private def parseVariable(userInput: String): Option[ArithLogicTerm.Var] = {
     try {
-      Some(PredLogicParser().parseVariable(PredLogicLexer()(userInput)))
+      Some(ArithLogicParser().parseVariable(ArithLogicLexer()(userInput)))
     } catch { case _ => None }
   }
 
   private def ruleParser(rule: String): Option[R] = 
-    PropLogicRuleParser.parse(rule).orElse(PredLogicRuleParser.parse(rule))
+    PropLogicRuleParser.parse(rule)
+      .orElse(PredLogicRuleParser.parse(rule))
+      .orElse(ArithLogicRuleParser.parse(rule))
 
-  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[PredLogicTerm.Var]](
+  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[ArithLogicTerm.Var]](
     parseFormula = parseFormula,
     parseRule = ruleParser,
     parseRawBoxInfo = {
       case RawBoxInfo(Some(x)) => Some(FreshVarBoxInfo(parseVariable(x)))
       case _ => Some(FreshVarBoxInfo(None))
     },
-    formulaToLatex = Stringifiers.predLogicFormulaAsLaTeX, 
-    formulaToAscii = Stringifiers.predLogicFormulaAsASCII,
+    formulaToLatex = Stringifiers.arithLogicFormulaAsLaTeX, 
+    formulaToAscii = Stringifiers.arithLogicFormulaAsASCII,
     ruleToString = {
       case rule: PropLogicRule => Stringifiers.propLogicRuleAsString(rule)
       case rule: PredLogicRule => Stringifiers.predLogicRuleAsString(rule)
+      case rule: ArithLogicRule => Stringifiers.arithLogicRuleAsString(rule)
     },
     boxInfoToRaw = {
       case FreshVarBoxInfo(freshVar) => RawBoxInfo(freshVar.map(_.x.toString))
@@ -95,8 +101,8 @@ object PredLogicProofValidatorService {
   )
 }
 
-import PredLogicProofValidatorService._
-class PredLogicProofValidatorService extends ProofValidatorServiceImpl[
+import ArithLogicProofValidatorService._
+class ArithLogicProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 

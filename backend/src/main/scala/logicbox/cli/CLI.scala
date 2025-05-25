@@ -5,6 +5,7 @@ import scala.util.Try
 import logicbox.server.format._
 import logicbox.server.PropLogicProofValidatorService
 import logicbox.server.PredLogicProofValidatorService
+import logicbox.server.ArithLogicProofValidatorService
 
 object CLIMain {
   private def isAProofLine(line: String): Boolean = {
@@ -81,6 +82,7 @@ object CLIMain {
     val validator = args.headOption match {
       case Some("prop") => PropLogicProofValidatorService()
       case Some("pred") => PredLogicProofValidatorService()
+      case Some("arith") => ArithLogicProofValidatorService()
       case _ => ???
     }
 
