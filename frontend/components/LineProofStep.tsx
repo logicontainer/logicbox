@@ -37,6 +37,7 @@ export function LineProofStep({
   const { setContextMenuPosition } = useContextMenu();
   const { interactionState } = useInteractionState();
   const { currentlyHoveredUuid, handleHoverStep } = useHovering();
+  const proofContext = useProof();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
   const lineNumberRef = React.useRef<HTMLDivElement>(null);
@@ -51,7 +52,7 @@ export function LineProofStep({
     }
   }, [parentRef, lineNumberRef]);
 
-  let line = props.lines.find(
+  const line = props.lines.find(
     (l) => l.uuid === props.uuid && l.stepType == "line"
   );
   if (line?.stepType !== "line") {
@@ -64,7 +65,7 @@ export function LineProofStep({
     props.uuid,
     currentlyHoveredUuid,
     interactionState,
-    useProof()
+    proofContext
   );
 
   return (

@@ -8,7 +8,6 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import Footer from "@/components/Footer";
-import { LineNumbers } from "@/components/LineNumbers";
 import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
