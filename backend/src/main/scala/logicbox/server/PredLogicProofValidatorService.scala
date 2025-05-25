@@ -10,7 +10,7 @@ import logicbox.server.format._
 object PredLogicProofValidatorService {
   private type F = PredLogicFormula
   private type R = PropLogicRule | PredLogicRule
-  private type B = PredLogicBoxInfo[PredLogicTerm.Var]
+  private type B = FreshVarBoxInfo[PredLogicTerm.Var]
   private type Id = String
 
   import logicbox.server.format.SprayFormatters._
@@ -80,12 +80,12 @@ object PredLogicProofValidatorService {
   private val formulaToLatex = format.Stringifiers.propLogicFormulaAsLaTeX
   private val ruleToString   = format.Stringifiers.propLogicRuleAsString
 
-  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, PredLogicBoxInfo[PredLogicTerm.Var]](
+  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[PredLogicTerm.Var]](
     parseFormula = parseFormula,
     parseRule = ruleParser,
     parseRawBoxInfo = {
-      case RawBoxInfo(Some(x)) => Some(PredLogicBoxInfo(parseVariable(x)))
-      case _ => Some(PredLogicBoxInfo(None))
+      case RawBoxInfo(Some(x)) => Some(FreshVarBoxInfo(parseVariable(x)))
+      case _ => Some(FreshVarBoxInfo(None))
     },
     formulaToLatex = Stringifiers.predLogicFormulaAsLaTeX, 
     formulaToAscii = Stringifiers.predLogicFormulaAsASCII,
@@ -94,7 +94,7 @@ object PredLogicProofValidatorService {
       case rule: PredLogicRule => Stringifiers.predLogicRuleAsString(rule)
     },
     boxInfoToRaw = {
-      case PredLogicBoxInfo(freshVar) => RawBoxInfo(freshVar.map(_.x.toString))
+      case FreshVarBoxInfo(freshVar) => RawBoxInfo(freshVar.map(_.x.toString))
     }
   )
 }

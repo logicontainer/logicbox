@@ -4,7 +4,6 @@ sealed abstract class ArithLogicToken
 object ArithLogicToken {
   case class LeftParen() extends ArithLogicToken
   case class RightParen() extends ArithLogicToken
-  case class Comma() extends ArithLogicToken
 
   case class And() extends ArithLogicToken
   case class Or() extends ArithLogicToken

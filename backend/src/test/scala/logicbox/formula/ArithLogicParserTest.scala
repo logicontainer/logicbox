@@ -149,5 +149,37 @@ class ArithLogicParserTest extends AnyFunSpec {
         ArithLogicTerm.Zero()
       )
     }
+
+    it("should allow parens on +, *") {
+      val ts = {
+        import ArithLogicToken.Plus => P
+        import ArithLogicToken.Mult => M
+        List(
+          Ident("x"), M(), Ident("y"), P(),
+          Ident("x"), M(), 
+            LeftParen(), Ident("y"), P(), Ident("y"), RightParen(),
+          P(), Ident("y"),
+          
+          ArithLogicToken.Equals(), 
+          ArithLogicToken.Zero()
+        )
+      }
+      
+      import ArithLogicTerm.Plus => P
+      import ArithLogicTerm.Mult => M
+      ArithLogicParser().parseFormula(ts) shouldBe ArithLogicFormula.Equals(
+        P(
+          P(
+            M(Var("x"), Var("y")),
+            M(
+              Var("x"),
+              P(Var("y"), Var("y"))
+            )
+          ),
+          Var("y")
+        ),
+        ArithLogicTerm.Zero()
+      )
+    }
   }
 }

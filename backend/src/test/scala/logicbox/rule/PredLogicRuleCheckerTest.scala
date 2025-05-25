@@ -20,7 +20,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
   private val lexer = PredLogicLexer()
   private val parser = PredLogicParser()
 
-  private type BI = PredLogicBoxInfo[PredLogicTerm.Var]
+  private type BI = FreshVarBoxInfo[PredLogicTerm.Var]
 
   private def parse(str: String): PredLogicFormula = parser.parseFormula(lexer(str))
 
@@ -28,7 +28,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     extends Reference.Line[PredLogicFormula]
 
   private case class Box(fst: Option[Reference[PredLogicFormula, BI]], lst: Option[Reference[PredLogicFormula, BI]], freshVar: Option[String]) extends Reference.Box[PredLogicFormula, BI] {
-    override def info = PredLogicBoxInfo(freshVar.map(Var(_)))
+    override def info = FreshVarBoxInfo(freshVar.map(Var(_)))
     override def first = fst
     override def last = lst
   }

@@ -38,4 +38,8 @@ object QuantifierFormula {
       case _ => None
     }
   }
+
+  object ~= {
+    def unapply[F, T, V <: T](f: QuantifierFormula[F, T, V]): Option[(T, T)] = Equals.unapply[F, T, V](f)
+  }
 }
