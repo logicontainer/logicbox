@@ -23,7 +23,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     ArithLogicFormula,
     ArithLogicTerm,
     ArithLogicTerm.Var
-  ]()
+  ](ArithLogicFormulaSubstitutor())
 
   private type BI = FreshVarBoxInfo[ArithLogicTerm.Var]
 
@@ -407,6 +407,123 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("m = k")
       checker.check(Peano6(), f, refs) should matchPattern {
         case List(FormulaDoesntMatchReference(0, _)) =>
+      }
+    }
+  }
+
+  describe("Inducation") {
+    it("should fail if there are no refs") {
+      val f = parse("forall x 1 = 1")
+      checker.check(Induction(), f, Nil) should matchPattern {
+        case List(WrongNumberOfReferences(2, 0, _)) =>
+      }
+    }
+
+    it("should fail if only lines as refs") {
+      val refs = List(
+        refLine("1 = 1"),
+        refLine("1 = 1 -> 1 = 1")
+      )
+      val f = parse("forall x 1 = 1")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(ReferenceShouldBeBox(1, _)) => 
+      }
+    }
+
+    it("should fail if box has no fresh") {
+      val refs = List(
+        refLine("0 = 0"),
+        refBox("n = n", "n + 1 = n + 1") // no fresh
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(ReferenceDoesntMatchRule(1, _)) => 
+      }
+    }
+
+    it("should match if formula is not forall") {
+      val refs = List(
+        refLine("0 = 0"),
+        refBox("n = n", "n + 1 = n + 1", "n")
+      )
+      val f = parse("x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchRule(_)) => 
+      }
+    }
+
+    it("should match if first ref doesn't match inside of forall") {
+      val refs = List(
+        refLine("0 = 1"),
+        refBox("m = m", "m + 1 = m + 1", "m")
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchReference(0, _)) => 
+      }
+    }
+
+    it("should be fine if first ref matches formula but there is no occ. of x") {
+      val refs = List(
+        refLine("0 = 0"),
+        refBox("0 = 0", "0 = 0", "m")
+      )
+      val f = parse("forall x 0 = 0")
+      checker.check(Induction(), f, refs) shouldBe Nil
+    }
+
+    it("should reject if assumption is not formula with x replaced by n") {
+      val refs = List(
+        refLine("0 = 0"),
+        refBox("m = m", "n + 1 = n + 1", "n")
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchReference(1, _)) =>
+      }
+    }
+
+    it("should reject if conclusion is not formula with x replaced by n + 1") {
+      val refs = List(
+        refLine("0 = 0"),
+        refBox("n = n", "n + 1 = n", "n")
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchReference(1, _)) =>
+      }
+    }
+
+    it("should reject if conclusion is formula with n + 0 not n + 1") {
+      val refs = List(
+        refLine("0 = 0"),
+        refBox("n = n", "n + 0 = n + 0", "n")
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(FormulaDoesntMatchReference(1, _)) =>
+      }
+    }
+
+    it("should fail if assumption of box is not a line") {
+      val refs = List(
+        refLine("0 = 0"),
+        Box(None, Some(refLine("n + 1 = n + 1")), Some("n"))
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(ReferenceDoesntMatchRule(1, _)) =>
+      }
+    }
+
+    it("should fail if conclusion of box is not a line") {
+      val refs = List(
+        refLine("0 = 0"),
+        Box(Some(refLine("n = n")), None, Some("n"))
+      )
+      val f = parse("forall x x = x")
+      checker.check(Induction(), f, refs) should matchPattern {
+        case List(ReferenceDoesntMatchRule(1, _)) =>
       }
     }
   }

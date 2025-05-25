@@ -9,19 +9,26 @@ import logicbox.rule.ArithLogicRule._
 import logicbox.rule.ReferenceUtil.extractNFormulasAndThen
 import logicbox.framework.RuleViolation._
 import logicbox.rule.ReferenceUtil.BoxOrFormula
+import logicbox.rule.ReferenceUtil.extractAndThen
+import logicbox.framework.Reference._
+import logicbox.rule.ReferenceUtil.extractFirstLine
+import logicbox.rule.ReferenceUtil.extractLastLine
 
 class ArithLogicRuleChecker[
   F <: ConnectiveFormula[F] & QuantifierFormula[F, T, V],
   T <: ArithmeticTerm[T], 
   V <: T
-] extends RuleChecker[F, ArithLogicRule, Any] {
+](
+  substitutor: Substitutor[F, T, V]
+) extends RuleChecker[F, ArithLogicRule, FreshVarBoxInfo[V]] {
+  private type BI = FreshVarBoxInfo[V]
 
   private def fail(v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = (v +: vs).toList
   private def failIf(b: Boolean, v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = {
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: ArithLogicRule, formula: F, refs: List[Reference[F, Any]]): List[RuleViolation] = rule match {
+  override def check(rule: ArithLogicRule, formula: F, refs: List[Reference[F, BI]]): List[RuleViolation] = rule match {
     case Peano1() => extractNFormulasAndThen(refs, 0) {
       case Nil => formula match {
         case (t1 + t2) ~= t3 => 
@@ -163,6 +170,47 @@ class ArithLogicRuleChecker[
         fail(ReferenceDoesntMatchRule(0, "TODO"))
     }
 
-    case _ => ???
+    case Induction() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
+      case List(Line(r0), box: Box[F, BI]) => box.info.freshVar match {
+        case Some(n) => formula match {
+          case ForAll(x, phi) =>
+            (substitutor.findReplacement(phi, r0, x) match {
+              case Some(()) => Nil
+              case Some(Zero()) => Nil
+
+              case _ => 
+                fail(FormulaDoesntMatchReference(0, "TODO"))
+            }) ++ (extractFirstLine(box) match {
+              case Some(ass) => 
+                substitutor.findReplacement(phi, ass, x) match {
+                  case Some(y) if y == n || y == () => Nil
+                  case _ => 
+                    fail(FormulaDoesntMatchReference(1, "TODO"))
+                }
+                
+              case _ => 
+                fail(ReferenceDoesntMatchRule(1, "TODO"))
+
+            }) ++ (extractLastLine(box) match {
+              case Some(ass) => 
+                substitutor.findReplacement(phi, ass, x) match {
+                  case Some(y + One()) if y == n => Nil
+                  case Some(()) => Nil
+                  case _ => 
+                    fail(FormulaDoesntMatchReference(1, "TODO"))
+                }
+                
+              case _ => 
+                fail(ReferenceDoesntMatchRule(1, "TODO"))
+            })
+
+          case _ => 
+            fail(FormulaDoesntMatchRule("TODO"))
+        }
+
+        case None =>
+          fail(ReferenceDoesntMatchRule(1, "TODO"))
+      }
+    }
   }
 }
