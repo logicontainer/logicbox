@@ -7,5 +7,8 @@ export const logicConfig: { [K in LogicName]: { rulesets: RulesetName[] }} = {
   },
   predicateLogic: {
     rulesets: ["propositionalLogicRules", "predicateLogicRules"]
+  },
+  arithmetic: {
+    rulesets: ["propositionalLogicRules", "predicateLogicRules", "arithmeticRules"]
   }
 }

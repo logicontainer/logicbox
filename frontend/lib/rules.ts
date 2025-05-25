@@ -260,6 +260,83 @@ export const rulesets = [
       },
     ],
   },
+  {
+    rulesetName: "arithmeticRules",
+    rules: [
+      {
+        ruleName: "peano_1",
+        latex: {
+          ruleName: "P_1",
+
+          premises: [],
+          conclusion: "t + 0 = t",
+        },
+        numPremises: 0,
+      },
+      {
+        ruleName: "peano_2",
+        latex: {
+          ruleName: "P_2",
+
+          premises: [],
+          conclusion: "t_1 + (t_2 + 1) = (t_1 + t_2) + 1",
+        },
+        numPremises: 0,
+      },
+      {
+        ruleName: "peano_3",
+        latex: {
+          ruleName: "P_3",
+
+          premises: [],
+          conclusion: "t * 0 = 0",
+        },
+        numPremises: 0,
+      },
+      {
+        ruleName: "peano_4",
+        latex: {
+          ruleName: "P_4",
+
+          premises: [],
+          conclusion: "t_1 * (t_2 + 1) = (t_1 * t_2) + t_1",
+        },
+        numPremises: 0,
+      },
+      {
+        ruleName: "peano_5",
+        latex: {
+          ruleName: "P_5",
+
+          premises: [],
+          conclusion: "not (0 = t + 1)",
+        },
+        numPremises: 0,
+      },
+      {
+        ruleName: "peano_6",
+        latex: {
+          ruleName: "P_6",
+
+          premises: ["t_1 + 1 = t_2 + 1"],
+          conclusion: "t_1 = t_2",
+        },
+        numPremises: 1,
+      },
+      {
+        ruleName: "induction",
+        latex: {
+          ruleName: "\\text{ind.}",
+          premises: [
+            "\\varphi[0/x]",
+            box("n & \\varphi[n/x] \\\\ & \\vdots \\\\ & \\varphi[n + 1/x]", 2)
+          ],
+          conclusion: "\\forall x \\varphi",
+        },
+        numPremises: 2,
+      },
+    ]
+  }
 ] as const satisfies Ruleset[]
 
 export type RulesetName = (typeof rulesets)[number]["rulesetName"]
