@@ -1,3 +1,5 @@
+import { Lightbulb, TriangleAlert } from "lucide-react";
+
 import { InlineMath } from "react-katex";
 import { TLineNumber } from "@/types/types";
 import { cn } from "@/lib/utils";
@@ -18,17 +20,15 @@ export default function LineNumber({ line }: { line: TLineNumber }) {
   return (
     <div
       className={cn(
-        "text-base/relaxed text-center align-baseline cursor-pointer px-1 w-full rounded-md h-full flex items-center justify-stretch"
+        "text-base/relaxed text-right align-baseline cursor-pointer px-1 w-full rounded-md h-full flex flex-row-reverse items-center justify-end"
       )}
     >
-      <span
-        className={cn(
-          "w-full rounded-sm",
-          proofStepDiagnostics ? "bg-red-500 text-slate-200" : ""
-        )}
-      >
+      <div className={cn("rounded-sm flex-grow")}>
         <InlineMath math={line?.lineNumber.toString() + "."} />
-      </span>
+      </div>
+      {proofStepDiagnostics && (
+        <TriangleAlert className="text-red-500"></TriangleAlert>
+      )}
     </div>
   );
 }

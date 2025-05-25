@@ -111,7 +111,7 @@ export function LineProofStep({
           });
         }}
       >
-        <div ref={lineNumberRef} className="w-10 left-0 absolute">
+        <div ref={lineNumberRef} className="w-16 left-0 absolute">
           <LineNumber line={line} />
         </div>
         <Formula

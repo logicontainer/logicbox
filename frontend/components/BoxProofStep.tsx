@@ -9,7 +9,9 @@ import {
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
 
+import FreshVars from "./FreshVars";
 import { Highlight } from "@/lib/proof-step-highlight";
+import { InlineMath } from "react-katex";
 import { Proof } from "./Proof";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
@@ -41,16 +43,13 @@ export function BoxProofStep({
   const freshVar = props.boxInfo?.freshVar;
 
   return (
-    <ProofStepWrapper
-      isOuterProofStep={props.isOuterProofStep}
-      isBox={true}
-      freshVar={freshVar ?? undefined}
-    >
+    <ProofStepWrapper isOuterProofStep={props.isOuterProofStep} isBox={true}>
+      <FreshVars value={freshVar} />
       <div
         className={cn(
           "pointer-events-auto border-2 overflow-hidden pt-1 mb-1",
           "border-black",
-          freshVar && "mt-4 pt-4",
+          freshVar && "mt-1.5 pt-1.5",
 
           highlight === Highlight.SELECTED && "border-red-500",
 

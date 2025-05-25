@@ -7,14 +7,12 @@ export function ProofStepWrapper({
   isBox,
   isOuterProofStep,
   highlight,
-  freshVar,
 }: {
   children: React.ReactNode;
   isBox?: boolean;
   isOuterProofStep?: boolean;
   highlight?: Highlight;
   currentlySelected?: boolean;
-  freshVar?: string;
 }) {
   return (
     <div
@@ -28,11 +26,6 @@ export function ProofStepWrapper({
         !isBox && highlight === Highlight.REFERRED && "bg-blue-200"
       )}
     >
-      {isBox && freshVar && (
-        <span className="absolute bg-white px-1 text-lg/tight ml-3 -translate-y-1/2 rounded-sm">
-          <InlineMath math={freshVar}></InlineMath>
-        </span>
-      )}
       {children}
     </div>
   );

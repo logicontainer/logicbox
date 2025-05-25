@@ -12,7 +12,6 @@ import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
 import Toolbar from "@/components/Toolbar";
-import { useEffect } from "react";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
@@ -60,7 +59,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
         </div>
         <div className="grid grid-cols-[1fr_auto_1fr] w-full">
           <div></div>
-          <div className="relative pl-10 p-4 flex flex-col justify-between items-center rounded-sm">
+          <div className="relative pl-16 p-4 flex flex-col justify-between items-center rounded-sm">
             <div
               className="flex box-content gap-2 mt-[64px] w-full select-none"
               onClick={(e) => e.stopPropagation()}
