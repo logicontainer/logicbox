@@ -37,7 +37,7 @@ export default function NavigationSidebar() {
               addProof({
                 id: newProofId,
                 title: "New proof",
-                logicName: 'predicateLogic',
+                logicName: 'arithmetic',
                 proof: [
                   {
                     formula: {

@@ -100,7 +100,7 @@ export type Diagnostic = {
   violation: any;
 }
 
-export type LogicName = 'propositionalLogic' | 'predicateLogic'
+export type LogicName = 'propositionalLogic' | 'predicateLogic' | 'arithmetic'
 
 export type ValidationRequest = {
   proof: Proof

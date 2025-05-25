@@ -259,8 +259,8 @@ function InnerThing() {
   if (uuid === null)
     return;
 
-  const elms = violations.map(v => 
-    <div className="p-4" key={JSON.stringify(v)}>
+  const elms = violations.map((v, idx) => 
+    <div className="p-4" key={JSON.stringify(v) + `${idx}`}>
       <DiagnosticMessage diagnostic={{...v, uuid }}/>
     </div>
   )
