@@ -124,11 +124,7 @@ export function Justification({
 
               const referenceHighlight = getDiagnosticHighlightForReference(uuid, i, diagnosticsContext)
               if (referenceHighlight === DiagnosticHighlight.YES) {
-                refLatex = `\\underline{${refLatex}}`
-              }
-              
-              if (refIsBeingHovered(uuid, i, interactionState)) {
-                refLatex = `\\textbf{${refLatex}}`
+                refLatex = `\\textbf{\\underline{${refLatex}}}`
               }
 
               const comma = i < justification.refs.length - 1 ? "," : "";
@@ -136,8 +132,8 @@ export function Justification({
                 <span
                   key={i}
                   className={cn(
+                    (referenceHighlight === DiagnosticHighlight.YES) && "text-red-500",
                     refIsBeingHovered(uuid, i, interactionState) && "text-blue-600",
-                    (referenceHighlight === DiagnosticHighlight.YES) && "text-red-500"
                   )}
                   onClick={(e) => {
                     e.stopPropagation();

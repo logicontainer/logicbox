@@ -6,16 +6,17 @@ export function createHighlightedLatexRule(
   conclusion: string,
   highlightedPremises: number[] = [],
   conclusionIsHighlighted: boolean = false,
+  highlightColor: string = "red"
 ): string {
   const premisesWithHighlights = premises.map((p, idx) => {
     const content = highlightedPremises.includes(idx)
-      ? `{\\color{red}\\underline{${p}}}`
+      ? `{\\color{${highlightColor}}\\${p.includes("begin") ? "underline" : "boxed"}{${p}}}`
       : p;
     return content
   });
   const premiseLine = `{\\begin{array}{${premises.map(_ => "c").join("")}}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{array}}`;
   const conclusionLine = conclusionIsHighlighted
-    ? `\\color{red}\\underline{${conclusion}}`
+    ? `\\color{${highlightColor}}\\boxed{${conclusion}}`
     : conclusion;
   return `\\cfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }

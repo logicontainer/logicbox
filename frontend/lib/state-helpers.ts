@@ -39,6 +39,10 @@ export function stepIsSelected(stepUuid: string, state: InteractionState): boole
   return stepUuid === getSelectedStep(state)
 }
 
+export function formulaIsBeingHovered(stepUuid: string, state: InteractionState): boolean {
+  return state.enum === InteractionStateEnum.IDLE && state.selectedProofStepUuid === stepUuid && !state.sticky && state.hoveredRefIdx === null && !state.ruleIsHovered
+}
+
 export function refIsBeingHovered(stepUuid: string, refIdx: number, state: InteractionState): boolean {
   return state.enum === InteractionStateEnum.IDLE && state.selectedProofStepUuid === stepUuid && state.hoveredRefIdx === refIdx
 }

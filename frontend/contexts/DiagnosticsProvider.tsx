@@ -1,6 +1,6 @@
 "use client";
 
-import { Diagnostic} from "@/types/types";
+import { Diagnostic, ProofStep} from "@/types/types";
 import React from "react";
 
 import _ from "lodash";
@@ -13,13 +13,13 @@ import { useServer } from "./ServerProvider";
 export interface DiagnosticsContextProps {
   diagnostics: Diagnostic[]
 
+  getStep: (uuid: string) => ProofStep | null;
   getStepAsLatex: (uuid: string) => string | null
   getStepAsLatexWithTag: (uuid: string) => string | null
   getRefLatex: (stepUuid: string, refIdx: number) => string | null
-  getLatexForMultipleRefs: (stepUuid: string, refs: number[]) => string | null
   getRefString: (stepUuid: string, refIdx: number) => string | null
   getRefLatexWithTag: (stepUuid: string, refIdx: number) => string | null
-  getRuleAtStepAsLatex: (rule: string, highlightedPremises: number[], conclusionIsHighlighted: boolean) => string | null
+  getRuleAtStepAsLatex: (rule: string, highlightedPremises: number[], conclusionIsHighlighted: boolean, highlightColor: string) => string | null
   getRuleNameAtStepAsLatex: (rule: string) => string | null
 }
 
@@ -100,13 +100,6 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
     return refStep && `${getRefLatex(stepUuid, refIdx)}\\quad ${withAlignMarkAtRef ? "&&" : ""}(\\text{${refStep.stepType}}\\; \\text{${getRefString(stepUuid, refIdx)}})`
   }
 
-  const getLatexForMultipleRefs = (stepUuid: string, refs: number[]) => {
-    const refLatexes = refs.map(r => getRefLatexWithTag(stepUuid, r, true))
-    if (refLatexes.find(s => s === null) !== undefined)
-      return null
-    return `\\begin{aligned}${refLatexes.map(l => `&${l}`).join(' \\\\ ')}\\end{aligned}`
-  }
-
   const getRuleNameAtStepAsLatex = (stepUuid: string) => {
     const step = getStep(stepUuid)
     if (!step || step.stepType !== "line")
@@ -114,13 +107,13 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
     return allRules.filter(s => s.ruleName === step.justification.rule).map(s => s.latex.ruleName).at(0) ?? null
   }
 
-  const getRuleAtStepAsLatex = (stepUuid: string, highlightedPremises: number[] = [], conclusionIsHighlighted: boolean = false) => {
+  const getRuleAtStepAsLatex = (stepUuid: string, highlightedPremises: number[], conclusionIsHighlighted: boolean, highlightColor: string) => {
     const step = getStep(stepUuid)
     if (!step || step.stepType !== "line")
       return null
     return allRules
       .filter(s => s.ruleName === step.justification.rule)
-      .map(s => createHighlightedLatexRule(s.latex.ruleName, s.latex.premises, s.latex.conclusion, highlightedPremises, conclusionIsHighlighted))
+      .map(s => createHighlightedLatexRule(s.latex.ruleName, s.latex.premises, s.latex.conclusion, highlightedPremises, conclusionIsHighlighted, highlightColor))
       .at(0) ?? null
   }
 
@@ -128,9 +121,9 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
     <DiagnosticsContext.Provider
       value={{
         diagnostics,
+        getStep,
         getRefString,
         getRefLatex,
-        getLatexForMultipleRefs,
         getStepAsLatex,
         getStepAsLatexWithTag,
         getRefLatexWithTag,

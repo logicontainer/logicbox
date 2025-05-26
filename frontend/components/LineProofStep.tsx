@@ -97,7 +97,6 @@ export function LineProofStep({
         onMouseMove={(e) => {
           e.stopPropagation();
           if (e.currentTarget !== e.target) return;
-          console.log("balls");
           handleHoverStep(props.uuid, null, false);
         }}
         onContextMenu={(e) => {
@@ -187,11 +186,11 @@ function Formula({
     }
   };
 
-  const withUnderline = (str: string) => `\\underline{${str}}`;
+  const errorHighlight = (str: string) => `\\mathbf{\\underline{${str}}}`;
   const formulaContent = !latexFormula || latexFormula === "" ? "???" : latexFormula;
   const formulaIsWrong = formulaDsHighlight === DiagnosticHighlight.YES
   const formulaLatexContentWithUnderline = formulaIsWrong
-    ? withUnderline(formulaContent)
+    ? errorHighlight(formulaContent)
     : formulaContent;
 
   return isEditingFormula ? (

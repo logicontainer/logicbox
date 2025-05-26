@@ -1,5 +1,5 @@
 import React from "react";
-import { InteractionStateEnum, TransitionEnum, useInteractionState } from "./InteractionStateProvider";
+import { TransitionEnum, useInteractionState } from "./InteractionStateProvider";
 
 export interface HoveringContextProps {
   currentlyHoveredUuid: string | null;
