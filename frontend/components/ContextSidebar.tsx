@@ -12,13 +12,12 @@ import RulePanel from "./RulePanel";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useServer } from "@/contexts/ServerProvider";
-import { getSelectedStep } from "@/lib/state-helpers";
-import { useProof } from "@/contexts/ProofProvider";
+import { formulaIsBeingHovered, getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
 
 export default function ContextSidebar() {
-  const { getProofStepDetails } = useProof()
   const { lines, getReferenceString } = useLines();
-  const { getRuleAtStepAsLatex } = useDiagnostics();
+  const diagnosticContext = useDiagnostics()
+  const { getRuleAtStepAsLatex, getStep } = diagnosticContext;
   const { interactionState } = useInteractionState();
 
   const stepInFocus = getSelectedStep(interactionState)
@@ -29,11 +28,16 @@ export default function ContextSidebar() {
 
   const lineOrBox = proofLine?.stepType === "box" ? "Box" : "Line";
   const refStr = stepInFocus && getReferenceString(stepInFocus);
-  const ruleLatex = stepInFocus && getRuleAtStepAsLatex(stepInFocus, [], false);
-  const isEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
-  const proofStep = ((stepInFocus !== null) ? getProofStepDetails(stepInFocus)?.proofStep : null) ?? null
+  const proofStep = (stepInFocus !== null) ? getStep(stepInFocus) : null
   const optFreshVarString = ((proofStep?.stepType === "box") ? `Fresh var: ${proofStep.boxInfo.freshVar}` : null) ?? ""
+
+  const hoveredRefs = stepInFocus && proofStep?.stepType === "line" ? 
+    proofStep.justification.refs.map((_, idx) => idx).filter(idx => refIsBeingHovered(stepInFocus, idx, interactionState))
+    : []
+  
+  const ruleLatex = stepInFocus && getRuleAtStepAsLatex(stepInFocus, hoveredRefs, false, "blue");
+  const isEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
   return (
     <div className="sm:h-screen p-2">

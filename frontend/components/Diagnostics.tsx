@@ -2,12 +2,26 @@ import { Diagnostic, Violation } from "@/types/types";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
+import { formulaIsBeingHovered, refIsBeingHovered } from "@/lib/state-helpers";
+import { useInteractionState } from "@/contexts/InteractionStateProvider";
 
 type ViolationWithUuid = Violation & { uuid: string }
 
-function MathParagraph({ math, tag }: { math: string, tag?: string }) {
+function prettifyLatex(math: string, tag?: string, highlight?: string) {
+  let content = math + (tag !== undefined ? `\\quad \\quad (${tag})` : "")
+  if (highlight) {
+    content = `{\\color{${highlight}}\\underline{${content}}}`
+  }
+  return content
+}
+
+function MathParagraph({ 
+  math, 
+  tag,
+  highlight
+}: { math: string, tag?: string, highlight?: string }) {
   return <div className="text-center py-2">
-    <InlineMath math={math + (tag !== undefined ? `\\quad \\quad (${tag})` : "")}/>
+    <InlineMath math={prettifyLatex(math, tag, highlight)}/>
   </div>
 }
 
@@ -46,9 +60,11 @@ function MissingDetailInReferenceDiagnostic({
   violationType: "missingDetailInReference",
 }) {
   const refLatex = useDiagnostics().getRefLatex(uuid, refIdx)
+  const { interactionState } = useInteractionState()
+  const refIsHovered = refIsBeingHovered(uuid, refIdx, interactionState)
   return <div>
     {refIdxToString(refIdx)} is incomplete{" "}
-    {refLatex && <MathParagraph math={refLatex} tag={refIdx.toString()}/>}
+    {refLatex && <MathParagraph math={refLatex} tag={refIdx.toString()} highlight={refIsHovered ? "blue" : undefined}/>}
     <ServerMsg>{expl}</ServerMsg>
   </div>;
 }
@@ -84,11 +100,13 @@ function ReferenceDoesntMatchRuleDiagnostic({
   expl,
 }: ViolationWithUuid & { violationType: "referenceDoesntMatchRule" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, ref)
-  const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [ref], false)
+  const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [ref], false, "red")
+  const { interactionState } = useInteractionState()
+  const refIsHovered = refIsBeingHovered(uuid, ref, interactionState)
 
   return <div>
     {refIdxToString(ref)}{" "}
-      {refLatex !== null && <MathParagraph math={refLatex}/>}
+      {refLatex !== null && <MathParagraph math={refLatex} highlight={refIsHovered ? "blue" : undefined}/>}
     {"doesn't"} match the rule{" "}
       {ruleLatex !== null && <MathParagraph math={ruleLatex}/>}
     <br/>
@@ -101,10 +119,22 @@ function ReferencesMismatchDiagnostic({
   refs,
   expl,
 }: ViolationWithUuid & { violationType: "referencesMismatch" }) {
-  const refLatexes = useDiagnostics().getLatexForMultipleRefs(uuid, refs)
+  const { getRefLatexWithTag } = useDiagnostics()
+
+  const math = (() => {
+    const refLatexes = refs.map(r => getRefLatexWithTag(uuid, r))
+    if (refLatexes.find(s => s === null) !== undefined)
+      return null
+    return `\\begin{aligned}${refLatexes.filter(s => s !== null).map(l => `&{${l}}`).join(' \\\\ ')}\\end{aligned}`
+  })()
+  console.log(math)
+  
   return <div>
    {refs.map((r, i) => refIdxToString(r, i === 0)).join(' and ')}{" "}
-    {refLatexes && <MathParagraph math={refLatexes}/>}
+    {math && <div className="text-center py-2">
+      <InlineMath math={math}/>
+    </div>
+}
     do not match.<br/>
 
     <ServerMsg>{expl}</ServerMsg>
@@ -118,12 +148,15 @@ function FormulaDoesntMatchReferenceDiagnostic({
 }: ViolationWithUuid & { violationType: "formulaDoesntMatchReference" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refs)
+  const { interactionState } = useInteractionState()
+  const formulaIsHovered = formulaIsBeingHovered(uuid, interactionState)
+  const refIsHovered = refIsBeingHovered(uuid, refs, interactionState)
 
   return <div>
     The formula{" "}
-      {formulaLatex && <MathParagraph math={formulaLatex}/>}
+      {formulaLatex && <MathParagraph math={formulaLatex} highlight={formulaIsHovered ? "blue" : undefined}/>}
     and {refIdxToString(refs, false)}
-      {refLatex && <MathParagraph math={refLatex}/>}
+      {refLatex && <MathParagraph math={refLatex} highlight={refIsHovered ? "blue" : undefined}/>}
     do not match.
     <br/>
     <ServerMsg>{expl}</ServerMsg>
@@ -135,10 +168,12 @@ function FormulaDoesntMatchRuleDiagnostic({
   expl,
 }: ViolationWithUuid & { violationType: "formulaDoesntMatchRule" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
-  const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [], true)
+  const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [], true, "red")
+  const { interactionState } = useInteractionState()
+  const formulaIsHovered = formulaIsBeingHovered(uuid, interactionState)
   return <div>
     The formula{" "}
-      {formulaLatex && <MathParagraph math={formulaLatex}/>}
+      {formulaLatex && <MathParagraph math={formulaLatex} highlight={formulaIsHovered ? "blue" : undefined}/>}
     {"doesn't"} match the rule
       {ruleLatex && <MathParagraph math={ruleLatex}/>}
     <br/>
@@ -228,10 +263,12 @@ function ReferenceToUnclosedBoxDiagnostic({
   refIdx,
 }: ViolationWithUuid & { violationType: "referenceToUnclosedBox" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refIdx)
+  const { interactionState } = useInteractionState()
+  const refIsHovered = refIsBeingHovered(uuid, refIdx, interactionState)
   return (
     <div>
       {refIdxToString(refIdx)}{" "}
-      {refLatex && <MathParagraph math={refLatex}/>}
+      {refLatex && <MathParagraph math={refLatex} highlight={refIsHovered ? "blue" : undefined}/>}
       references an unclosed box
     </div>
   );

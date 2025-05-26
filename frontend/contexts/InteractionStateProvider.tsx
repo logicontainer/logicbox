@@ -339,7 +339,7 @@ export function InteractionStateProvider({
       [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
       [HOVER]: (state, { stepUuid: lineUuid, refIdx, ruleIsHovered }) => {
         if (state.sticky) {
-          return { ... state, refIdx, ruleIsHovered };
+          return { ...state, refIdx, ruleIsHovered };
         }
         return {
           enum: IDLE,
@@ -649,11 +649,11 @@ export function InteractionStateProvider({
         return prevState;
       } else {
         const newState = func(prevState, transition);
-        console.log(
-          `${TransitionEnum[transition.enum]}: ${
-            InteractionStateEnum[prevState.enum]
-          } -> ${InteractionStateEnum[newState.enum]}`
-        );
+        // console.log(
+        //   `${TransitionEnum[transition.enum]}: ${
+        //     InteractionStateEnum[prevState.enum]
+        //   } -> ${InteractionStateEnum[newState.enum]}`
+        // );
 
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
           return prevState;

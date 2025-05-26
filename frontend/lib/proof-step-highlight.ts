@@ -97,8 +97,6 @@ export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: num
     .filter(d => referenceViolationTypes.includes(d.violationType))
     .filter(d => referenceIdxIsInDiagnostic(d, refIdx))
 
-  console.log(diagnostics)
-
   return ds.length > 0 ?
     DiagnosticHighlight.YES : 
     DiagnosticHighlight.NO
