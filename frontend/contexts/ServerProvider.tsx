@@ -1,6 +1,6 @@
 "use client";
 
-import { Diagnostic, LogicName, Proof, ProofWithMetadata, ValidationRequest, ValidationResponse } from "@/types/types";
+import { Diagnostic, ValidationRequest, ValidationResponse, Violation } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
@@ -20,6 +20,10 @@ export function useServer() {
     throw new Error("useServer must be used within a ServerProvider");
   }
   return context;
+}
+
+function fixDiagnostic(d: Diagnostic) {
+  return { ...d, violation: { ...d.violation, violationType: d.violationType } as Violation}
 }
 
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
@@ -54,7 +58,7 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
       })
       .then((serverResponse: ValidationResponse) => {
         console.log("Server response", serverResponse);
-        setProofDiagnostics(serverResponse.diagnostics);
+        setProofDiagnostics(serverResponse.diagnostics.map(fixDiagnostic));
         setProofContent(serverResponse.proof);
         return true;
       })

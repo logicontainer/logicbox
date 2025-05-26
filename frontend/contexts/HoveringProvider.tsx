@@ -18,7 +18,7 @@ export function useHovering() {
 }
 
 export function HoveringProvider({ children }: React.PropsWithChildren<object>) {
-  const { interactionState, doTransition } = useInteractionState()
+  const { doTransition } = useInteractionState()
   const [currentlyHoveredUuid, setCurrentlyHoveredUuid] = React.useState<string | null>(null);
 
   const lastHover = React.useRef<{

@@ -17,6 +17,8 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { refIsBeingHovered, ruleIsBeingHovered } from "@/lib/state-helpers";
+import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
+import { DiagnosticHighlight, getDiagnosticHighlightForReference, getDiagnosticHighlightForRule } from "@/lib/proof-step-highlight";
 
 export function Justification({
   uuid,
@@ -33,6 +35,7 @@ export function Justification({
 }) {
   const { rulesets } = useRuleset();
   const { handleHoverStep } = useHovering()
+  const diagnosticsContext = useDiagnostics()
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
@@ -42,7 +45,12 @@ export function Justification({
   const rule = rulesets.map(set => set.rules).flat().find(
     (rule) => rule.ruleName == justification.rule
   );
-  const ruleNameLatex = rule?.latex.ruleName;
+
+  let ruleNameLatex = rule?.latex.ruleName ?? "???";
+  const ruleNameHighlight = getDiagnosticHighlightForRule(uuid, diagnosticsContext)
+  if (ruleNameHighlight === DiagnosticHighlight.YES) {
+    ruleNameLatex = `\\underline{${ruleNameLatex}}`
+  }
 
   if (currLineProofStepDetails?.proofStep.stepType !== "line") {
     return null;
@@ -57,7 +65,8 @@ export function Justification({
       <span
         className={cn(
           isEditingRule && "bg-blue-400 text-white",
-          ruleIsBeingHovered(uuid, interactionState) && "text-blue-600"
+          ruleIsBeingHovered(uuid, interactionState) && "text-blue-600",
+          ruleNameHighlight === DiagnosticHighlight.YES && "text-red-500",
         )}
         onClick={(e) => {
           e.stopPropagation();
@@ -68,7 +77,9 @@ export function Justification({
           handleHoverStep(uuid, null, true)
         }}
       >
-        <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
+        <InlineMath 
+          math={ruleNameLatex ?? "???"}
+        ></InlineMath>
       </span>
       {justification.refs && (
         <>
@@ -105,15 +116,29 @@ export function Justification({
               const referencedLine = lines.find((line) => line.uuid == ref);
               if (referencedLine?.stepType === "box") {
                 refLatex = `${referencedLine.boxStartLine}\\text{-}${referencedLine.boxEndLine}`;
-              } else {
+              } else if (referencedLine?.stepType === "line") {
                 refLatex = JSON.stringify(referencedLine?.lineNumber);
+              } else {
+                refLatex = "?"
+              }
+
+              const referenceHighlight = getDiagnosticHighlightForReference(uuid, i, diagnosticsContext)
+              if (referenceHighlight === DiagnosticHighlight.YES) {
+                refLatex = `\\underline{${refLatex}}`
+              }
+              
+              if (refIsBeingHovered(uuid, i, interactionState)) {
+                refLatex = `\\textbf{${refLatex}}`
               }
 
               const comma = i < justification.refs.length - 1 ? "," : "";
               return (
                 <span
                   key={i}
-                  className={cn(refIsBeingHovered(uuid, i, interactionState) && "text-blue-600")}
+                  className={cn(
+                    refIsBeingHovered(uuid, i, interactionState) && "text-blue-600",
+                    (referenceHighlight === DiagnosticHighlight.YES) && "text-red-500"
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -124,7 +149,9 @@ export function Justification({
                     handleHoverStep(uuid, i, false)
                   }}
                 >
-                  <InlineMath math={`${refLatex || "?"}${comma}`} />
+                  <InlineMath math={
+                    `${refLatex}${comma}`
+                  } />
                 </span>
               );
             }
