@@ -78,16 +78,16 @@ export type Violation =
   | { violationType: "missingRule" }
   | { violationType: "missingDetailInReference"; refIdx: number; expl: string }
   | { violationType: "wrongNumberOfReferences"; exp: number; actual: number; }
-  | { violationType: "referenceShouldBeBox"; ref: number; }
-  | { violationType: "referenceShouldBeLine"; ref: number; }
-  | { violationType: "referenceDoesntMatchRule"; ref: number; expl: string }
+  | { violationType: "referenceShouldBeBox"; refIdx: number; }
+  | { violationType: "referenceShouldBeLine"; refIdx: number; }
+  | { violationType: "referenceDoesntMatchRule"; refIdx: number; expl: string }
   | { violationType: "referencesMismatch"; refs: number[]; expl: string }
-  | { violationType: "formulaDoesntMatchReference"; refs: number; expl: string }
+  | { violationType: "formulaDoesntMatchReference"; refIdx: number; expl: string }
   | { violationType: "formulaDoesntMatchRule"; expl: string }
   | { violationType: "miscellaneousViolation"; expl: string }
   | { violationType: "stepNotFound"; stepId: string; expl: string }
-  | { violationType: "referenceIdNotFound"; stepId: string; whichRef: number; refId: string; expl: string }
-  | { violationType: "malformedReference"; stepId: string; whichRef: number; refId: string; expl: string }
+  | { violationType: "referenceIdNotFound"; stepId: string; refIdx: number; refId: string; expl: string }
+  | { violationType: "malformedReference"; stepId: string; refIdx: number; refId: string; expl: string }
   | { violationType: "referenceToLaterStep"; stepId: string; refIdx: number; refId: string }
   | { violationType: "scopeViolation"; stepId: string; stepScope: string; refIdx: number; refId: string; refScope: string }
   | { violationType: "referenceToUnclosedBox"; stepId: string; refIdx: number; boxId: string };
@@ -97,7 +97,7 @@ export type ViolationType = Violation["violationType"]
 export type Diagnostic = {
   uuid: UUID;
   violationType: ViolationType;
-  violation: any;
+  violation: Violation;
 }
 
 export type LogicName = 'propositionalLogic' | 'predicateLogic' | 'arithmetic'

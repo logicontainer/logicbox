@@ -234,7 +234,10 @@ function Formula({
       {!isSyncedWithServer ? (
         currentFormulaValue
       ) : (
-        <span onClickCapture={(e) => e.stopPropagation()}>
+        <span 
+          onClickCapture={(e) => {
+            e.stopPropagation()
+          }}>
           <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
         </span>
       )}

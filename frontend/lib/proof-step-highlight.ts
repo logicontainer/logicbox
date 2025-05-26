@@ -2,7 +2,7 @@ import { InteractionState, InteractionStateEnum } from "@/contexts/InteractionSt
 import { getSelectedStep, stepIsReferee } from "./state-helpers";
 import { ProofContextProps } from "@/contexts/ProofProvider";
 import { DiagnosticsContextProps } from "@/contexts/DiagnosticsProvider";
-import { Violation, ViolationType } from "@/types/types";
+import { Diagnostic, ViolationType } from "@/types/types";
 
 export enum StepHighlight {
   NOTHING,
@@ -57,11 +57,29 @@ export function getDiagnosticHighlightForFormula(stepUuid: string, diagnosticCon
     DiagnosticHighlight.NO
 }
 
+function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
+  if (d.violationType !==  d.violation.violationType) {
+    throw new Error(`Violation types on diagnostic mismatched: ${JSON.stringify(d)}`)
+  }
+
+  switch (d.violation.violationType) {
+    case "referenceShouldBeBox": case "referenceShouldBeLine": case "referenceDoesntMatchRule":
+    case "referenceIdNotFound": case "referenceToLaterStep": case "referenceToUnclosedBox":
+    case "malformedReference": case "formulaDoesntMatchReference": case "missingDetailInReference":
+      return refIdx === d.violation.refIdx
+
+    case "referencesMismatch":
+      return d.violation.refs.includes(refIdx)
+
+    default: 
+      return false
+  }
+}
+
 export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: number, diagnosticContext: DiagnosticsContextProps) {
   const { diagnostics } = diagnosticContext
 
   const referenceViolationTypes: ViolationType[] = [
-    "wrongNumberOfReferences",
     "referenceShouldBeBox",
     "referenceShouldBeLine",
     "referenceDoesntMatchRule",
@@ -77,12 +95,7 @@ export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: num
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
     .filter(d => referenceViolationTypes.includes(d.violationType))
-    .filter(d => {
-      const v = (d as { refIdx: number })
-      if (!v)
-        return false;
-      return d.violation.refIdx === refIdx
-    })
+    .filter(d => referenceIdxIsInDiagnostic(d, refIdx))
 
   console.log(diagnostics)
 

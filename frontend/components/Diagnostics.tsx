@@ -64,7 +64,7 @@ function WrongNumberOfReferencesDiagnostic({
 
 function ReferenceShouldBeBoxDiagnostic({
   uuid,
-  ref,
+  refIdx: ref,
 }: ViolationWithUuid & { violationType: "referenceShouldBeBox" }) {
   const refLineNumber = useDiagnostics().getRefString(uuid, ref)
   return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a box.</div>;
@@ -72,7 +72,7 @@ function ReferenceShouldBeBoxDiagnostic({
 
 function ReferenceShouldBeLineDiagnostic({
   uuid,
-  ref,
+  refIdx: ref,
 }: ViolationWithUuid & { violationType: "referenceShouldBeLine" }) {
   const refLineNumber = useDiagnostics().getRefString(uuid, ref)
   return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a line.</div>;
@@ -80,7 +80,7 @@ function ReferenceShouldBeLineDiagnostic({
 
 function ReferenceDoesntMatchRuleDiagnostic({
   uuid,
-  ref,
+  refIdx: ref,
   expl,
 }: ViolationWithUuid & { violationType: "referenceDoesntMatchRule" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, ref)
@@ -113,7 +113,7 @@ function ReferencesMismatchDiagnostic({
 
 function FormulaDoesntMatchReferenceDiagnostic({
   uuid,
-  refs,
+  refIdx: refs,
   expl,
 }: ViolationWithUuid & { violationType: "formulaDoesntMatchReference" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
@@ -166,20 +166,18 @@ function StepNotFoundDiagnostic({
 }
 
 function ReferenceIdNotFoundDiagnostic({
-  whichRef,
+  refIdx: whichRef,
   expl,
 }: ViolationWithUuid & { violationType: "referenceIdNotFound" }) {
   return <div>
     {refIdxToString(whichRef)} was not found
     <br/>
-    <ServerMsg>{expl}</ServerMsg>
+    {expl ? <ServerMsg>{expl}</ServerMsg> : null}
   </div>
 }
 
 function MalformedReferenceDiagnostic({
-  stepId,
-  whichRef,
-  refId,
+  refIdx: whichRef,
   expl,
 }: ViolationWithUuid & { violationType: "malformedReference" }) {
   return <div>
@@ -192,7 +190,6 @@ function MalformedReferenceDiagnostic({
 function ReferenceToLaterStepDiagnostic({
   uuid,
   refIdx,
-  refId,
 }: ViolationWithUuid & { violationType: "referenceToLaterStep" }) {
   const refString = useDiagnostics().getRefString(uuid, refIdx)
   return (
@@ -245,7 +242,6 @@ export function DiagnosticMessage({ diagnostic }: {
 }) {
   const v = { 
     uuid: diagnostic.uuid,
-    violationType: diagnostic.violationType,
     ...diagnostic.violation
   } as (ViolationWithUuid | undefined) // TODO: better checking
 
@@ -289,6 +285,6 @@ export function DiagnosticMessage({ diagnostic }: {
       return <ReferenceToUnclosedBoxDiagnostic {...v} />;
     default:
       const _: never = v;
-      return null;
+      return _;
   }
 }
