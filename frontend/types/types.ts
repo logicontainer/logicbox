@@ -96,7 +96,7 @@ export type ViolationType = Violation["violationType"]
 
 export type Diagnostic = {
   uuid: UUID;
-  violationType: string;
+  violationType: ViolationType;
   violation: any;
 }
 

@@ -10,7 +10,7 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import FreshVars from "./FreshVars";
-import { Highlight } from "@/lib/proof-step-highlight";
+import { StepHighlight } from "@/lib/proof-step-highlight";
 import { InlineMath } from "react-katex";
 import { Proof } from "./Proof";
 import { ProofStepWrapper } from "./ProofStepWrapper";
@@ -51,13 +51,13 @@ export function BoxProofStep({
           "border-black",
           freshVar && "mt-1.5 pt-1.5",
 
-          highlight === Highlight.SELECTED && "border-red-500",
+          highlight === StepHighlight.SELECTED && "border-red-500",
 
-          highlight === Highlight.SELECTED && "bg-slate-100",
-          highlight === Highlight.HOVERED && "bg-slate-50",
-          highlight === Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
+          highlight === StepHighlight.SELECTED && "bg-slate-100",
+          highlight === StepHighlight.HOVERED && "bg-slate-50",
+          highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
             "bg-blue-200",
-          highlight === Highlight.REFERRED && "bg-blue-200"
+          highlight === StepHighlight.REFERRED && "bg-blue-200"
         )}
         onContextMenu={(e) => {
           e.preventDefault();

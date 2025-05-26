@@ -20,11 +20,11 @@ import LineNumber from "./LineNumber";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { formulaIsWrong } from "@/lib/diagnostic-helpers";
-import { getStepHighlight } from "@/lib/proof-step-highlight";
+import { getDiagnosticHighlightForFormula, getStepHighlight, DiagnosticHighlight } from "@/lib/proof-step-highlight";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 
 export function LineProofStep({
   ...props
@@ -61,7 +61,7 @@ export function LineProofStep({
     );
     return;
   }
-  const highlight = getStepHighlight(
+  const stepHighlight = getStepHighlight(
     props.uuid,
     currentlyHoveredUuid,
     interactionState,
@@ -70,7 +70,7 @@ export function LineProofStep({
 
   return (
     <ProofStepWrapper
-      highlight={highlight}
+      highlight={stepHighlight}
       isOuterProofStep={props.isOuterProofStep}
     >
       <div
@@ -117,7 +117,6 @@ export function LineProofStep({
         <Formula
           latexFormula={props.formula.latex ?? null}
           isSyncedWithServer={!props.formula.unsynced}
-          formulaIsWrong={formulaIsWrong(props.diagnosticsForLine)}
           userInput={props.formula.userInput}
           lineUuid={props.uuid}
         />
@@ -155,16 +154,15 @@ function Formula({
   latexFormula,
   lineUuid,
   isSyncedWithServer,
-  formulaIsWrong,
 }: {
   userInput: string;
   latexFormula: string | null;
   lineUuid: string;
   isSyncedWithServer: boolean;
-  formulaIsWrong: boolean;
 }) {
   const { interactionState, doTransition } = useInteractionState();
   const { handleHoverStep } = useHovering();
+  const diagnosticContext = useDiagnostics()
 
   const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
@@ -173,7 +171,10 @@ function Formula({
   const currentFormulaValue = isEditingFormula
     ? interactionState.currentFormula
     : userInput;
+
   const formulaInputRef = React.useRef<HTMLInputElement>(null);
+
+  const formulaDsHighlight = getDiagnosticHighlightForFormula(lineUuid, diagnosticContext)
 
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
     formulaInputRef.current = ref;
@@ -186,9 +187,9 @@ function Formula({
     }
   };
 
-  const withUnderline = (str: string) => `{\\color{red}\\underline{${str}}}`;
-  const formulaContent =
-    !latexFormula || latexFormula === "" ? "???" : latexFormula;
+  const withUnderline = (str: string) => `\\underline{${str}}`;
+  const formulaContent = !latexFormula || latexFormula === "" ? "???" : latexFormula;
+  const formulaIsWrong = formulaDsHighlight === DiagnosticHighlight.YES
   const formulaLatexContentWithUnderline = formulaIsWrong
     ? withUnderline(formulaContent)
     : formulaContent;
@@ -223,14 +224,14 @@ function Formula({
     <p
       className={cn(
         "shrink",
-        formulaIsWrong && "text-red-500 underline underline-offset-2"
+        formulaIsWrong && "text-red-500"
       )}
       onMouseOver={(e) => {
         e.stopPropagation();
         handleHoverStep(lineUuid, null, false);
       }}
     >
-      {!isSyncedWithServer || formulaIsWrong ? (
+      {!isSyncedWithServer ? (
         currentFormulaValue
       ) : (
         <span onClickCapture={(e) => e.stopPropagation()}>

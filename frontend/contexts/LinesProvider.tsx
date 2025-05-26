@@ -1,15 +1,8 @@
 "use client";
-
 import {
-  BoxProofStep,
-  LineProofStep,
-  Proof,
-  ProofStep,
-  ProofStepDetails,
-  ProofStepPosition,
   TLineNumber,
 } from "@/types/types";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import _ from "lodash";
 import { parseLinesFromProof } from "@/lib/lines-parser";

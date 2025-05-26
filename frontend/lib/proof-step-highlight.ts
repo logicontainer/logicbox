@@ -1,8 +1,10 @@
 import { InteractionState, InteractionStateEnum } from "@/contexts/InteractionStateProvider";
 import { getSelectedStep, stepIsReferee } from "./state-helpers";
 import { ProofContextProps } from "@/contexts/ProofProvider";
+import { DiagnosticsContextProps } from "@/contexts/DiagnosticsProvider";
+import { Violation, ViolationType } from "@/types/types";
 
-export enum Highlight {
+export enum StepHighlight {
   NOTHING,
   HOVERED,
   SELECTED,
@@ -17,16 +19,90 @@ export function getStepHighlight(stepUuid: string, currentlyHoveredUuid: string 
   const otherIsEditingRef = interactionState.enum === InteractionStateEnum.EDITING_REF && interactionState.lineUuid !== stepUuid
 
   if (refBeingEdited) {
-    return Highlight.NOTHING;
+    return StepHighlight.NOTHING;
   } else if (currentlyBeingHovered && otherIsEditingRef) {
-    return Highlight.HOVERED_AND_OTHER_IS_SELECTING_REF;
+    return StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF;
   } else if (stepIsReferee(stepUuid, interactionState, proofContext)) {
-    return Highlight.REFERRED;
+    return StepHighlight.REFERRED;
   } else if (currentlySelected) {
-    return Highlight.SELECTED;
+    return StepHighlight.SELECTED;
   } else if (currentlyBeingHovered) {
-    return Highlight.HOVERED;
+    return StepHighlight.HOVERED;
   }
 
-  return Highlight.NOTHING
+  return StepHighlight.NOTHING
+}
+
+export enum DiagnosticHighlight {
+  NO,
+  YES,
+}
+
+export function getDiagnosticHighlightForFormula(stepUuid: string, diagnosticContext: DiagnosticsContextProps) {
+  const { diagnostics } = diagnosticContext
+
+  const formulaViolationTypes: string[] = [
+    "missingFormula",
+    "formulaDoesntMatchRule",
+    "formulaDoesntMatchReference",
+    "miscellaneousViolation",
+  ] satisfies ViolationType[]
+
+  const ds = diagnostics
+    .filter(d => d.uuid === stepUuid)
+    .filter(d => formulaViolationTypes.includes(d.violationType))
+
+  return ds.length > 0 ?
+    DiagnosticHighlight.YES : 
+    DiagnosticHighlight.NO
+}
+
+export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: number, diagnosticContext: DiagnosticsContextProps) {
+  const { diagnostics } = diagnosticContext
+
+  const referenceViolationTypes: ViolationType[] = [
+    "wrongNumberOfReferences",
+    "referenceShouldBeBox",
+    "referenceShouldBeLine",
+    "referenceDoesntMatchRule",
+    "referencesMismatch",
+    "referenceIdNotFound",
+    "referenceToLaterStep",
+    "referenceToUnclosedBox",
+    "malformedReference",
+    "formulaDoesntMatchReference",
+    "missingDetailInReference",
+  ] as const
+
+  const ds = diagnostics
+    .filter(d => d.uuid === stepUuid)
+    .filter(d => referenceViolationTypes.includes(d.violationType))
+    .filter(d => {
+      const v = (d as { refIdx: number })
+      if (!v)
+        return false;
+      return d.violation.refIdx === refIdx
+    })
+
+  console.log(diagnostics)
+
+  return ds.length > 0 ?
+    DiagnosticHighlight.YES : 
+    DiagnosticHighlight.NO
+}
+
+export function getDiagnosticHighlightForRule(stepUuid: string, diagnosticContext: DiagnosticsContextProps) {
+  const { diagnostics } = diagnosticContext
+
+  const ruleViolationTypes: ViolationType[] = [
+    "missingRule"
+  ] as const
+  
+  const ds = diagnostics
+    .filter(d => d.uuid === stepUuid)
+    .filter(d => ruleViolationTypes.includes(d.violationType))
+
+  return ds.length > 0 ?
+    DiagnosticHighlight.YES : 
+    DiagnosticHighlight.NO
 }
