@@ -2776,6 +2776,717 @@ const examples: ProofWithMetadata[] = [
       "uuid": "100"
     }
   ]
+}, {
+  "id": "reflexivity_plus",
+  "title": "b + a = a + b",
+  "logicName": "arithmetic",
+  "proof": [
+    {
+      "formula": {
+        "ascii": "0 + 0 = 0 + 0",
+        "latex": "0 + 0 = 0 + 0",
+        "userInput": "0 + 0 = 0 + 0"
+      },
+      "justification": {
+        "refs": [],
+        "rule": "equality_intro"
+      },
+      "stepType": "line",
+      "uuid": "10"
+    },
+    {
+      "boxInfo": {
+        "freshVar": "n"
+      },
+      "proof": [
+        {
+          "formula": {
+            "ascii": "n + 0 = 0 + n",
+            "latex": "n + 0 = 0 + n",
+            "userInput": "n + 0 = 0 + n"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "assumption"
+          },
+          "stepType": "line",
+          "uuid": "20"
+        },
+        {
+          "formula": {
+            "ascii": "n + 0 = n + 0",
+            "latex": "n + 0 = n + 0",
+            "userInput": "n + 0 = n + 0"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "equality_intro"
+          },
+          "stepType": "line",
+          "uuid": "22"
+        },
+        {
+          "formula": {
+            "ascii": "0 + n = n + 0",
+            "latex": "0 + n = n + 0",
+            "userInput": "0 + n = n + 0"
+          },
+          "justification": {
+            "refs": [
+              "20",
+              "22"
+            ],
+            "rule": "equality_elim"
+          },
+          "stepType": "line",
+          "uuid": "24"
+        },
+        {
+          "formula": {
+            "ascii": "0 + (n + 1) = (0 + n) + 1",
+            "latex": "0 + (n + 1) = (0 + n) + 1",
+            "userInput": "0 + (n + 1) = (0 + n) + 1"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "peano_2"
+          },
+          "stepType": "line",
+          "uuid": "25"
+        },
+        {
+          "formula": {
+            "ascii": "0 + (n + 1) = (n + 0) + 1",
+            "latex": "0 + (n + 1) = (n + 0) + 1",
+            "userInput": "0 + (n + 1) = (n + 0) + 1"
+          },
+          "justification": {
+            "refs": [
+              "24",
+              "25"
+            ],
+            "rule": "equality_elim"
+          },
+          "stepType": "line",
+          "uuid": "30"
+        },
+        {
+          "formula": {
+            "ascii": "n + 0 = n",
+            "latex": "n + 0 = n",
+            "userInput": "n + 0 = n"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "peano_1"
+          },
+          "stepType": "line",
+          "uuid": "32"
+        },
+        {
+          "formula": {
+            "ascii": "0 + (n + 1) = n + 1",
+            "latex": "0 + (n + 1) = n + 1",
+            "userInput": "0 + (n + 1) = n + 1"
+          },
+          "justification": {
+            "refs": [
+              "32",
+              "30"
+            ],
+            "rule": "equality_elim"
+          },
+          "stepType": "line",
+          "uuid": "34"
+        },
+        {
+          "formula": {
+            "ascii": "(n + 1) + 0 = n + 1",
+            "latex": "(n + 1) + 0 = n + 1",
+            "userInput": "(n + 1) + 0 = n + 1"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "peano_1"
+          },
+          "stepType": "line",
+          "uuid": "36"
+        },
+        {
+          "formula": {
+            "ascii": "(n + 1) + 0 = (n + 1) + 0",
+            "latex": "(n + 1) + 0 = (n + 1) + 0",
+            "userInput": "(n + 1) + 0 = (n + 1) + 0"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "equality_intro"
+          },
+          "stepType": "line",
+          "uuid": "38"
+        },
+        {
+          "formula": {
+            "ascii": "n + 1 = (n + 1) + 0",
+            "latex": "n + 1 = (n + 1) + 0",
+            "userInput": "n + 1 = (n + 1) + 0"
+          },
+          "justification": {
+            "refs": [
+              "36",
+              "38"
+            ],
+            "rule": "equality_elim"
+          },
+          "stepType": "line",
+          "uuid": "40"
+        },
+        {
+          "formula": {
+            "ascii": "0 + (n + 1) = (n + 1) + 0",
+            "latex": "0 + (n + 1) = (n + 1) + 0",
+            "userInput": "0 + (n + 1) = (n + 1) + 0"
+          },
+          "justification": {
+            "refs": [
+              "40",
+              "34"
+            ],
+            "rule": "equality_elim"
+          },
+          "stepType": "line",
+          "uuid": "42"
+        },
+        {
+          "formula": {
+            "ascii": "0 + (n + 1) = 0 + (n + 1)",
+            "latex": "0 + (n + 1) = 0 + (n + 1)",
+            "userInput": "0 + (n + 1) = 0 + (n + 1)"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "equality_intro"
+          },
+          "stepType": "line",
+          "uuid": "44"
+        },
+        {
+          "formula": {
+            "ascii": "(n + 1) + 0 = 0 + (n + 1)",
+            "latex": "(n + 1) + 0 = 0 + (n + 1)",
+            "userInput": "(n + 1) + 0 = 0 + (n + 1)"
+          },
+          "justification": {
+            "refs": [
+              "42",
+              "44"
+            ],
+            "rule": "equality_elim"
+          },
+          "stepType": "line",
+          "uuid": "60"
+        }
+      ],
+      "stepType": "box",
+      "uuid": "bi"
+    },
+    {
+      "formula": {
+        "ascii": "forall b (b + 0 = 0 + b)",
+        "latex": "\\forall b (b + 0 = 0 + b)",
+        "userInput": "forall b (b + 0 = 0 + b)"
+      },
+      "justification": {
+        "refs": [
+          "10",
+          "bi"
+        ],
+        "rule": "induction"
+      },
+      "stepType": "line",
+      "uuid": "100"
+    },
+    {
+      "boxInfo": {
+        "freshVar": "n"
+      },
+      "proof": [
+        {
+          "formula": {
+            "ascii": "forall b (b + n = n + b)",
+            "latex": "\\forall b (b + n = n + b)",
+            "userInput": "forall b (b + n = n + b)"
+          },
+          "justification": {
+            "refs": [],
+            "rule": "assumption"
+          },
+          "stepType": "line",
+          "uuid": "75dc32b3-5a08-454c-b425-69774da76fa5"
+        },
+        {
+          "boxInfo": {
+            "freshVar": "m"
+          },
+          "proof": [
+            {
+              "formula": {
+                "ascii": "m + n = n + m",
+                "latex": "m + n = n + m",
+                "userInput": "m + n = n + m"
+              },
+              "justification": {
+                "refs": [
+                  "75dc32b3-5a08-454c-b425-69774da76fa5"
+                ],
+                "rule": "forall_elim"
+              },
+              "stepType": "line",
+              "uuid": "29bad9bd-0067-43ac-8651-11da3116cc82"
+            },
+            {
+              "formula": {
+                "ascii": "m + (n + 1) = (m + n) + 1",
+                "latex": "m + (n + 1) = (m + n) + 1",
+                "userInput": "m + (n + 1) = (m + n) + 1"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "peano_2"
+              },
+              "stepType": "line",
+              "uuid": "4e27dc24-14e7-440f-b958-5f20f30193ff"
+            },
+            {
+              "formula": {
+                "ascii": "m + (n + 1) = (n + m) + 1",
+                "latex": "m + (n + 1) = (n + m) + 1",
+                "userInput": "m + (n + 1) = (n + m) + 1"
+              },
+              "justification": {
+                "refs": [
+                  "29bad9bd-0067-43ac-8651-11da3116cc82",
+                  "4e27dc24-14e7-440f-b958-5f20f30193ff"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "008812d3-a209-47ca-bfc9-26a4382fb811"
+            },
+            {
+              "formula": {
+                "ascii": "n + (m + 1) = (n + m) + 1",
+                "latex": "n + (m + 1) = (n + m) + 1",
+                "userInput": "n + (m + 1) = (n + m) + 1"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "peano_2"
+              },
+              "stepType": "line",
+              "uuid": "61035b9f-b65a-433f-9ba6-68274d4059f0"
+            },
+            {
+              "formula": {
+                "ascii": "n + (m + 1) = n + (m + 1)",
+                "latex": "n + (m + 1) = n + (m + 1)",
+                "userInput": "n + (m + 1) = n + (m + 1)"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "equality_intro"
+              },
+              "stepType": "line",
+              "uuid": "32a068e2-69a6-4fdd-8f04-a8191c0f3576"
+            },
+            {
+              "formula": {
+                "ascii": "(n + m) + 1 = n + (m + 1)",
+                "latex": "(n + m) + 1 = n + (m + 1)",
+                "userInput": "(n + m) + 1 = n + (m + 1)"
+              },
+              "justification": {
+                "refs": [
+                  "61035b9f-b65a-433f-9ba6-68274d4059f0",
+                  "32a068e2-69a6-4fdd-8f04-a8191c0f3576"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "04489472-5a91-405b-ad3f-99fe53951abf"
+            },
+            {
+              "formula": {
+                "ascii": "m + (n + 1) = n + (m + 1)",
+                "latex": "m + (n + 1) = n + (m + 1)",
+                "userInput": "m + (n + 1) = n + (m + 1)"
+              },
+              "justification": {
+                "refs": [
+                  "04489472-5a91-405b-ad3f-99fe53951abf",
+                  "008812d3-a209-47ca-bfc9-26a4382fb811"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "2bca103d-3f0f-47a4-858e-27617e8d2bb1"
+            },
+            {
+              "formula": {
+                "ascii": "1 + 0 = 0 + 1",
+                "latex": "1 + 0 = 0 + 1",
+                "userInput": "1 + 0 = 0 + 1"
+              },
+              "justification": {
+                "refs": [
+                  "100"
+                ],
+                "rule": "forall_elim"
+              },
+              "stepType": "line",
+              "uuid": "c9bdf795-5830-45a0-884f-81ec07b29f7b"
+            },
+            {
+              "formula": {
+                "ascii": "1 + 0 = 1 + 0",
+                "latex": "1 + 0 = 1 + 0",
+                "userInput": "1 + 0 = 1 + 0"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "equality_intro"
+              },
+              "stepType": "line",
+              "uuid": "6ba2076b-5d7b-4bf4-9b2a-4d48dd0f32a7"
+            },
+            {
+              "formula": {
+                "ascii": "0 + 1 = 1 + 0",
+                "latex": "0 + 1 = 1 + 0",
+                "userInput": "0 + 1 = 1 + 0"
+              },
+              "justification": {
+                "refs": [
+                  "c9bdf795-5830-45a0-884f-81ec07b29f7b",
+                  "6ba2076b-5d7b-4bf4-9b2a-4d48dd0f32a7"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "d9f45517-f804-4511-883a-6598f2a67a0e"
+            },
+            {
+              "formula": {
+                "ascii": "n + (0 + 1) = n + (0 + 1)",
+                "latex": "n + (0 + 1) = n + (0 + 1)",
+                "userInput": "n + (0 + 1) = n + (0 + 1)"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "equality_intro"
+              },
+              "stepType": "line",
+              "uuid": "ddeb4b8e-958c-490a-9501-31ef3960d14a"
+            },
+            {
+              "formula": {
+                "ascii": "n + (0 + 1) = n + (1 + 0)",
+                "latex": "n + (0 + 1) = n + (1 + 0)",
+                "userInput": "n + (0 + 1) = n + (1 + 0)"
+              },
+              "justification": {
+                "refs": [
+                  "d9f45517-f804-4511-883a-6598f2a67a0e",
+                  "ddeb4b8e-958c-490a-9501-31ef3960d14a"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "bddc1707-2e07-4963-81c4-23237733259b"
+            },
+            {
+              "formula": {
+                "ascii": "1 + 0 = 1",
+                "latex": "1 + 0 = 1",
+                "userInput": "1 + 0 = 1"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "peano_1"
+              },
+              "stepType": "line",
+              "uuid": "05ddaec8-f7bd-4f56-8eca-c468627b89b0"
+            },
+            {
+              "formula": {
+                "ascii": "n + (0 + 1) = n + 1",
+                "latex": "n + (0 + 1) = n + 1",
+                "userInput": "n + (0 + 1) = n + 1"
+              },
+              "justification": {
+                "refs": [
+                  "05ddaec8-f7bd-4f56-8eca-c468627b89b0",
+                  "bddc1707-2e07-4963-81c4-23237733259b"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "eb89206f-9d50-4c8d-a5a4-98d24b877158"
+            },
+            {
+              "formula": {
+                "ascii": "(n + 1) + 0 = n + 1",
+                "latex": "(n + 1) + 0 = n + 1",
+                "userInput": "n + 1 + 0 = n + 1"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "peano_1"
+              },
+              "stepType": "line",
+              "uuid": "9e9b5b1f-be80-4cbd-9881-f5a5ec3876c3"
+            },
+            {
+              "formula": {
+                "ascii": "(n + 1) + 0 = (n + 1) + 0",
+                "latex": "(n + 1) + 0 = (n + 1) + 0",
+                "userInput": "(n + 1) + 0 = n + 1 + 0"
+              },
+              "justification": {
+                "refs": [],
+                "rule": "equality_intro"
+              },
+              "stepType": "line",
+              "uuid": "4d7d71cd-8dde-496b-b0d2-b9908ce61302"
+            },
+            {
+              "formula": {
+                "ascii": "n + 1 = (n + 1) + 0",
+                "latex": "n + 1 = (n + 1) + 0",
+                "userInput": "n + 1 = n + 1 + 0"
+              },
+              "justification": {
+                "refs": [
+                  "9e9b5b1f-be80-4cbd-9881-f5a5ec3876c3",
+                  "4d7d71cd-8dde-496b-b0d2-b9908ce61302"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "26b7b788-70c6-4618-a537-89bb8d8d161b"
+            },
+            {
+              "formula": {
+                "ascii": "n + (0 + 1) = (n + 1) + 0",
+                "latex": "n + (0 + 1) = (n + 1) + 0",
+                "userInput": "n + (0 + 1) = n + 1 + 0"
+              },
+              "justification": {
+                "refs": [
+                  "26b7b788-70c6-4618-a537-89bb8d8d161b",
+                  "eb89206f-9d50-4c8d-a5a4-98d24b877158"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "3115d5d1-1137-4f62-90ea-6792499db754"
+            },
+            {
+              "boxInfo": {
+                "freshVar": "k"
+              },
+              "proof": [
+                {
+                  "formula": {
+                    "ascii": "n + (k + 1) = (n + 1) + k",
+                    "latex": "n + (k + 1) = (n + 1) + k",
+                    "userInput": "n + (k + 1) = (n + 1) + k"
+                  },
+                  "justification": {
+                    "refs": [],
+                    "rule": "assumption"
+                  },
+                  "stepType": "line",
+                  "uuid": "e51e6eb1-5fb7-42ae-8efb-5b3cd033dc0a"
+                },
+                {
+                  "formula": {
+                    "ascii": "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
+                    "latex": "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
+                    "userInput": "n + ((k + 1) + 1) = (n + (k + 1)) + 1"
+                  },
+                  "justification": {
+                    "refs": [],
+                    "rule": "peano_2"
+                  },
+                  "stepType": "line",
+                  "uuid": "8b0a032d-1d75-4f7a-ba8d-f2a343c4d671"
+                },
+                {
+                  "formula": {
+                    "ascii": "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
+                    "latex": "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
+                    "userInput": "n + ((k + 1) + 1) = ((n + 1) + k) + 1"
+                  },
+                  "justification": {
+                    "refs": [
+                      "e51e6eb1-5fb7-42ae-8efb-5b3cd033dc0a",
+                      "8b0a032d-1d75-4f7a-ba8d-f2a343c4d671"
+                    ],
+                    "rule": "equality_elim"
+                  },
+                  "stepType": "line",
+                  "uuid": "c98f923c-48f5-450d-a1ae-2ba1cd117836"
+                },
+                {
+                  "formula": {
+                    "ascii": "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
+                    "latex": "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
+                    "userInput": "(n + 1) + (k + 1) = ((n + 1) + k) + 1"
+                  },
+                  "justification": {
+                    "refs": [],
+                    "rule": "peano_2"
+                  },
+                  "stepType": "line",
+                  "uuid": "aa759b94-a16c-4435-82e3-08d55ab9d178"
+                },
+                {
+                  "formula": {
+                    "ascii": "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
+                    "latex": "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
+                    "userInput": "(n + 1) + (k + 1) = (n + 1) + (k + 1)"
+                  },
+                  "justification": {
+                    "refs": [],
+                    "rule": "equality_intro"
+                  },
+                  "stepType": "line",
+                  "uuid": "a8fe5b26-ba12-4e77-9b61-7dd7bf2d9928"
+                },
+                {
+                  "formula": {
+                    "ascii": "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
+                    "latex": "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
+                    "userInput": "((n + 1) + k) + 1 = (n + 1) + (k + 1)"
+                  },
+                  "justification": {
+                    "refs": [
+                      "aa759b94-a16c-4435-82e3-08d55ab9d178",
+                      "a8fe5b26-ba12-4e77-9b61-7dd7bf2d9928"
+                    ],
+                    "rule": "equality_elim"
+                  },
+                  "stepType": "line",
+                  "uuid": "04613c52-95df-4aea-878a-286253798a7d"
+                },
+                {
+                  "formula": {
+                    "ascii": "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
+                    "latex": "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
+                    "userInput": "n + ((k + 1) + 1) = (n + 1) + (k + 1)"
+                  },
+                  "justification": {
+                    "refs": [
+                      "04613c52-95df-4aea-878a-286253798a7d",
+                      "c98f923c-48f5-450d-a1ae-2ba1cd117836"
+                    ],
+                    "rule": "equality_elim"
+                  },
+                  "stepType": "line",
+                  "uuid": "310f6ea0-f5a7-4dae-a124-f7545fa70e94"
+                }
+              ],
+              "stepType": "box",
+              "uuid": "7d06b0dd-445f-45ed-81fa-36e4e1ae03e9"
+            },
+            {
+              "formula": {
+                "ascii": "forall i (n + (i + 1) = (n + 1) + i)",
+                "latex": "\\forall i (n + (i + 1) = (n + 1) + i)",
+                "userInput": "forall i (n + (i + 1) = (n + 1) + i)"
+              },
+              "justification": {
+                "refs": [
+                  "3115d5d1-1137-4f62-90ea-6792499db754",
+                  "7d06b0dd-445f-45ed-81fa-36e4e1ae03e9"
+                ],
+                "rule": "induction"
+              },
+              "stepType": "line",
+              "uuid": "e1ae5123-2131-4e5c-9804-2eae867ab2d5"
+            },
+            {
+              "formula": {
+                "ascii": "n + (m + 1) = (n + 1) + m",
+                "latex": "n + (m + 1) = (n + 1) + m",
+                "userInput": "n + (m + 1) = (n + 1) + m"
+              },
+              "justification": {
+                "refs": [
+                  "e1ae5123-2131-4e5c-9804-2eae867ab2d5"
+                ],
+                "rule": "forall_elim"
+              },
+              "stepType": "line",
+              "uuid": "45486f7f-5073-47e4-bf47-15864ce7cc84"
+            },
+            {
+              "formula": {
+                "ascii": "m + (n + 1) = (n + 1) + m",
+                "latex": "m + (n + 1) = (n + 1) + m",
+                "userInput": "m + (n + 1) = n + 1 + m"
+              },
+              "justification": {
+                "refs": [
+                  "45486f7f-5073-47e4-bf47-15864ce7cc84",
+                  "2bca103d-3f0f-47a4-858e-27617e8d2bb1"
+                ],
+                "rule": "equality_elim"
+              },
+              "stepType": "line",
+              "uuid": "27e18a9b-91e6-4e4f-93e2-aeeb18a88344"
+            }
+          ],
+          "stepType": "box",
+          "uuid": "de3cf44f-2161-445b-ba16-33d29e8553cb"
+        },
+        {
+          "formula": {
+            "ascii": "forall b (b + (n + 1) = (n + 1) + b)",
+            "latex": "\\forall b (b + (n + 1) = (n + 1) + b)",
+            "userInput": "forall b (b + (n + 1) = n + 1 + b)"
+          },
+          "justification": {
+            "refs": [
+              "de3cf44f-2161-445b-ba16-33d29e8553cb"
+            ],
+            "rule": "forall_intro"
+          },
+          "stepType": "line",
+          "uuid": "6e1c9628-8d43-4efc-bec5-ec5f930f607e"
+        }
+      ],
+      "stepType": "box",
+      "uuid": "2cae48b6-2a69-4d4a-b3e0-2494998b0012"
+    },
+    {
+      "formula": {
+        "ascii": "forall a forall b (b + a = a + b)",
+        "latex": "\\forall a \\forall b (b + a = a + b)",
+        "userInput": "forall a forall b (b + a = a + b)"
+      },
+      "justification": {
+        "refs": [
+          "100",
+          "2cae48b6-2a69-4d4a-b3e0-2494998b0012"
+        ],
+        "rule": "induction"
+      },
+      "stepType": "line",
+      "uuid": "e44a8f06-2556-4d87-95a4-b250bf6e8120"
+    }
+  ]
 }
 ];
 
