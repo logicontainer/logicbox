@@ -5,13 +5,14 @@ import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
 import Card from "./Card";
 import Link from "next/link";
-import { ProofMetadata } from "@/types/types";
+import { LogicName, ProofMetadata } from "@/types/types";
 import { cn } from "@/lib/utils";
 // import examples from "@/examples/proof-examples";
 import { useProofStore } from "@/store/proofStore";
 import { useRouter } from "next/navigation";
 import { v4 as uuid } from "uuid";
 import { useProof } from "@/contexts/ProofProvider";
+import { log } from "console";
 
 export default function NavigationSidebar() {
   const proofs = useProofStore((state) => state.proofs);
@@ -34,10 +35,21 @@ export default function NavigationSidebar() {
             variant="outline"
             onClick={() => {
               const newProofId = uuid();
+              let logicName: LogicName | null = null
+
+              while (logicName === null) {
+                const p = prompt("Which logic should your proof be in?\nMust be either \n - 'prop' (propositional logic),\n - 'pred' (predicate logic),\n - 'arith' (arithmetic)")
+                switch (p) {
+                  case 'prop': logicName = "propositionalLogic"; break;
+                  case 'pred': logicName = "predicateLogic"; break;
+                  case 'arith': logicName = "arithmetic"; break;
+                }
+              }
+
               addProof({
                 id: newProofId,
                 title: "New proof",
-                logicName: 'arithmetic',
+                logicName: logicName,
                 proof: [
                   {
                     formula: {
