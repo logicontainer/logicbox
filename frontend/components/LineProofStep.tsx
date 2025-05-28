@@ -230,7 +230,7 @@ function Formula({
         handleHoverStep(lineUuid, null, false);
       }}
     >
-      {!isSyncedWithServer ? (
+      {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
         currentFormulaValue
       ) : (
         <span 
