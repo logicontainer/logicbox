@@ -39,6 +39,7 @@ export default function NavigationSidebar() {
 
               while (logicName === null) {
                 const p = prompt("Which logic should your proof be in?\nMust be either \n - 'prop' (propositional logic),\n - 'pred' (predicate logic),\n - 'arith' (arithmetic)")
+                if (p === null) return;
                 switch (p) {
                   case 'prop': logicName = "propositionalLogic"; break;
                   case 'pred': logicName = "predicateLogic"; break;
