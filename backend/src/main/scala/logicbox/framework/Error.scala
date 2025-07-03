@@ -20,8 +20,14 @@ object Error {
 
   case class WrongNumberOfReferences(exp: Int, actual: Int) extends Error
 
-  case class ShapeMismatch(pos: RulePosition, expected: TemplateFormula) extends Error
-  case class Ambiguous(what: RulePart, entries: List[(RulePosition, Location)])
+  case class ShapeMismatch(pos: (RulePosition, Location), expected: TemplateFormula) extends Error
+
+  object ShapeMismatch {
+    def apply(rulePos: RulePosition, expected: TemplateFormula) = new ShapeMismatch((rulePos, Location.root), expected)
+    def apply(pos: (RulePosition, Location), expected: TemplateFormula) = new ShapeMismatch(pos, expected)
+  }
+
+  case class Ambiguous(what: RulePart, entries: List[(RulePosition, Location)]) extends Error
 
   case class Miscellaneous(pos: RulePosition, expl: String) extends Error
 }
