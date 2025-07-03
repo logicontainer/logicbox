@@ -9,12 +9,12 @@ import org.scalatest.funspec.AnyFunSpec
 import logicbox.formula.PropLogicFormula
 import logicbox.framework.Proof
 
-import logicbox.framework.RuleViolation
-import logicbox.framework.RuleViolation.ReferenceDoesntMatchRule
-import logicbox.framework.Error.RuleViolationAtStep
+import logicbox.framework.Error
 
 import logicbox.rule.PredLogicRule
 import logicbox.rule.PredLogicRule._
+import logicbox.framework.RulePosition
+import logicbox.framework.Error.Miscellaneous
 
 class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
   describe("check") {
@@ -36,7 +36,7 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l3", ReferenceDoesntMatchRule(1, _))) =>
+        case List(("l3", Error.Miscellaneous(RulePosition.Ref(1), _))) =>
       }
     }
 
@@ -51,7 +51,7 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l2", ReferenceDoesntMatchRule(0, _))) =>
+        case List(("l2", Miscellaneous(RulePosition.Ref(0), _))) =>
       }
     }
 

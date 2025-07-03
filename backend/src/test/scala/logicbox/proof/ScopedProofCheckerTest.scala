@@ -31,7 +31,7 @@ class ScopedProofCheckerTest extends AnyFunSpec {
         )
       )
 
-      checker.check(proof) shouldBe List(ReferenceToLaterStep("1", 0, "2"))
+      checker.check(proof) shouldBe List(("1", ReferenceToLaterStep(0)))
     }
 
     it("should diallow references to lines after current line (where step is not first step)") {
@@ -44,7 +44,7 @@ class ScopedProofCheckerTest extends AnyFunSpec {
         )
       )
 
-      checker.check(proof) shouldBe List(ReferenceToLaterStep("1", 0, "2"))
+      checker.check(proof) shouldBe List(("1", ReferenceToLaterStep(0)))
     }
 
     it("should report later reference used if happens in box") {
@@ -57,13 +57,9 @@ class ScopedProofCheckerTest extends AnyFunSpec {
         )
       )
 
-      Inspectors.forAtLeast(1, checker.check(proof)) {
-        _ should matchPattern {
-          case ReferenceToLaterStep("l1", 0, "l2") => 
-        }
-      }
+      checker.check(proof) shouldBe List(("l1", ReferenceToLaterStep(0)))
     }
-
+    
     it("should not stop checking after box") {
       val proof = StubProof(
         rootSteps = Seq("box", "line", "down"),
@@ -74,7 +70,7 @@ class ScopedProofCheckerTest extends AnyFunSpec {
         )
       )
 
-      checker.check(proof) shouldBe List(ReferenceToLaterStep("line", 1, "down"))
+      checker.check(proof) shouldBe List(("line", ReferenceToLaterStep(1)))
     }
 
     it("should not allow reference to box which has not yet been closed") {
@@ -87,9 +83,9 @@ class ScopedProofCheckerTest extends AnyFunSpec {
         )
       )
 
-      checker.check(proof) shouldBe List(ReferenceToUnclosedBox("line", 0, "box"))
+      checker.check(proof) shouldBe List(("line", ReferenceToUnclosedBox(0)))
     }
-
+    
     it("should not notice reference which simply doesn't have a scope (not a part of proof)") {
       val proof = StubProof(
         rootSteps = Seq("1"),
@@ -113,7 +109,7 @@ class ScopedProofCheckerTest extends AnyFunSpec {
         )
       )
 
-      checker.check(proof) shouldBe List(ScopeViolation("line2", "b2", 0, "line1", "b1"))
+      checker.check(proof) shouldBe List(("line2", ReferenceOutOfScope(0)))
     }
 
     it("should report ref to later step when referring to later box") {
@@ -123,10 +119,10 @@ class ScopedProofCheckerTest extends AnyFunSpec {
           "1" -> StubLine(refs = Seq("box")),
           "box" -> StubBox(steps = Seq("2")),
           "2" -> StubLine()
-          )
+        )
       )
       
-      checker.check(proof) shouldBe List(ReferenceToLaterStep("1", 0, "box"))
+      checker.check(proof) shouldBe List(("1", ReferenceToLaterStep(0)))
     }
   }
 }

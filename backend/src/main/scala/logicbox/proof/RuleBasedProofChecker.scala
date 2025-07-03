@@ -67,7 +67,7 @@ class RuleBasedProofChecker[F, R, B, Id](
       (either, id) <- ids.map(proof.getStep).zip(ids)
       res <- either match {
         case Right(step) => checkStep(proof, id, step)
-        case Left(Proof.StepNotFound(id)) => ??? // List(StepNotFound(id))
+        case Left(Proof.StepNotFound(id)) => Nil // ignore invalid steps
       }
     } yield res
 

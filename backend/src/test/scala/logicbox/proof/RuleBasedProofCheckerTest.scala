@@ -9,7 +9,6 @@ import org.scalatest.funspec.AnyFunSpec
 import logicbox.framework.Proof.Step
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
-import logicbox.framework.RuleViolation.MiscellaneousViolation
 import logicbox.framework.Error._
 
 class RuleBasedProofCheckerTest extends AnyFunSpec {
@@ -25,14 +24,12 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
       checker.check(proof) shouldBe Nil
     }
 
-    it("should not allow proof when single id points to nothing") {
+    it("should ignore stray ids") {
       val checker = proofChecker()
       val proof = StubProof(Seq("id"), Map.empty)
       val result = checker.check(proof)
 
-      Inspectors.forAtLeast(1, result) {
-        _ should matchPattern { case StepNotFound("id") => }
-      }
+      result shouldBe Nil
     }
 
     it("should disallow when reference is to unknown id") {
@@ -44,11 +41,11 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
 
       Inspectors.forAtLeast(1, result) {
         _ should matchPattern {
-          case ReferenceIdNotFound("id", 0, "something that doesn't exist") => 
+          case ("id", MissingRef(0)) => 
         }
       }
     }
-
+    
     it("should not of rule violation on first line") {
       val checker = proofChecker()
       val proof = StubProof(Seq("id1"), Map(
@@ -57,11 +54,11 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
       val result = checker.check(proof)
       Inspectors.forAtLeast(1, result) {
         _ should matchPattern {
-          case RuleViolationAtStep("id1", MiscellaneousViolation("test")) =>
+          case ("id1", Miscellaneous(RulePosition.Formula, "test")) =>
         }
       }
     }
-
+    
     it("should call rule with correct refs") {
       val rc = StubRuleChecker()
       val checker = proofChecker(rc)
@@ -87,7 +84,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
         )
       ))
     }
-
+    
     it("should verify subproof (in box)") {
       val checker = proofChecker()
 
@@ -102,24 +99,8 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
 
       Inspectors.forAtLeast(1, checker.check(proof)) {
         _ should matchPattern {
-          case RuleViolationAtStep("ass", MiscellaneousViolation("test")) =>
+          case ("ass", Miscellaneous(RulePosition.Formula, "test")) =>
         }
-      }
-    }
-
-    it("should not have duplicate errors when box has one wrong line") {
-      val checker = proofChecker()
-      val proof = StubProof(
-        rootSteps = Seq("box", "line"),
-        map = Map(
-          "line" -> StubLine(refs = Seq("box")),
-          "box" -> StubBox(steps = Seq("ass")) // no ref
-        )
-      )
-      
-      val result = checker.check(proof)
-      Inspectors.forAtMost(1, result) {
-        case MalformedReference("line", 0, "box", _) =>
       }
     }
   }

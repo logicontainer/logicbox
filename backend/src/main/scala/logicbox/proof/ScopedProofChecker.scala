@@ -27,44 +27,43 @@ class ScopedProofChecker[Id]
   }
 
   override def check(proof: Proof[Any, Any, Any, Id]): List[(Id, Error)] = {
-    // val scopes = collectScopes(proof, proof.rootSteps)
-    // val allIdsInProof = scopes.keySet
-    //
-    // def checkRefs(stepId: Id, refs: Seq[Id], seenSteps: Set[Id], openBoxes: Set[Id]): List[(Id, Error)] = {
-    //   val refsInProof = refs.filter(allIdsInProof.contains)
-    //   refsInProof.zipWithIndex.flatMap {
-    //     case (refId, refIdx) =>
-    //       val List(stepScope, refScope) = List(stepId, refId).map(scopes.apply)
-    //       val Right(refStep) = proof.getStep(refId): @unchecked // unchecked because of above filter
-    //
-    //       if (!isSubscope(stepScope, refScope, scopes)) {
-    //         Some(ScopeViolation(stepId, stepScope, refIdx, refId, refScope))
-    //       } else if (!seenSteps.contains(refId)) refStep match {
-    //         case Proof.Box(_, _) if openBoxes.contains(refId) => 
-    //           Some(ReferenceToUnclosedBox(stepId, refIdx, refId))
-    //         case _ => 
-    //           Some(ReferenceToLaterStep(stepId, refIdx, refId))
-    //       } else None
-    //
-    //   }.toList
-    // }
-    //
-    // def checkImpl(proof: Proof[Any, Any, Any, Id], steps: Seq[Id], seenSteps: Set[Id] = Set.empty, openedBoxes: Set[Id] = Set.empty): List[(Id, Error)] = {
-    //   steps match {
-    //     case Nil => Nil
-    //     case stepId +: rest => (proof.getStep(stepId) match {
-    //       case Right(Proof.Line(_, _, refs: Seq[Id] @unchecked)) => 
-    //         checkRefs(stepId, refs, seenSteps, openedBoxes)
-    //
-    //       case Right(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) => 
-    //         checkImpl(proof, boxSteps, seenSteps, openedBoxes + stepId)
-    //
-    //       case _ => Nil
-    //     }) ++ checkImpl(proof, rest, seenSteps + stepId, openedBoxes)
-    //   }
-    // }
-    //
-    // checkImpl(proof, proof.rootSteps)
-    ???
+    val scopes = collectScopes(proof, proof.rootSteps)
+    val allIdsInProof = scopes.keySet
+
+    def checkRefs(stepId: Id, refs: Seq[Id], seenSteps: Set[Id], openBoxes: Set[Id]): List[(Id, Error)] = {
+      val refsInProof = refs.filter(allIdsInProof.contains)
+      refsInProof.zipWithIndex.flatMap {
+        case (refId, refIdx) =>
+          val List(stepScope, refScope) = List(stepId, refId).map(scopes.apply)
+          val Right(refStep) = proof.getStep(refId): @unchecked // unchecked because of above filter
+
+          if (!isSubscope(stepScope, refScope, scopes)) {
+            Some((stepId, ReferenceOutOfScope(refIdx)))
+          } else if (!seenSteps.contains(refId)) refStep match {
+            case Proof.Box(_, _) if openBoxes.contains(refId) => 
+              Some((stepId, ReferenceToUnclosedBox(refIdx)))
+            case _ => 
+              Some(stepId, ReferenceToLaterStep(refIdx))
+          } else None
+
+      }.toList
+    }
+
+    def checkImpl(proof: Proof[Any, Any, Any, Id], steps: Seq[Id], seenSteps: Set[Id] = Set.empty, openedBoxes: Set[Id] = Set.empty): List[(Id, Error)] = {
+      steps match {
+        case Nil => Nil
+        case stepId +: rest => (proof.getStep(stepId) match {
+          case Right(Proof.Line(_, _, refs: Seq[Id] @unchecked)) => 
+            checkRefs(stepId, refs, seenSteps, openedBoxes)
+
+          case Right(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) => 
+            checkImpl(proof, boxSteps, seenSteps, openedBoxes + stepId)
+
+          case _ => Nil
+        }) ++ checkImpl(proof, rest, seenSteps + stepId, openedBoxes)
+      }
+    }
+
+    checkImpl(proof, proof.rootSteps)
   }
 }
