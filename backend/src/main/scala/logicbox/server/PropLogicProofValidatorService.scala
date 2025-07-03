@@ -26,7 +26,7 @@ object PropLogicProofValidatorService {
       RuleBasedProofChecker(optionRuleChecker)
 
     new ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] {
-      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[Diagnostic[Id]] = {
+      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[(Id, Error)] = {
         val optProofView = ProofView(proof, { 
           case (id, line: Proof.Line[IncompleteFormula[F], Option[R], Id]) => 
             ProofLineImpl(line.formula.optFormula, line.rule, line.refs)

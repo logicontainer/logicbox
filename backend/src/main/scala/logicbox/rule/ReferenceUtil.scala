@@ -1,8 +1,7 @@
 package logicbox.rule
 
 import logicbox.framework.Reference
-import logicbox.framework.RuleViolation
-import logicbox.framework.RuleViolation._
+import logicbox.framework.Error
 
 object ReferenceUtil {
   enum BoxOrFormula { case Box; case Formula }
@@ -18,15 +17,15 @@ object ReferenceUtil {
   }
 
   def extractAndThen[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]) 
-    (func: PartialFunction[List[Reference[F, I]], List[RuleViolation]]): List[RuleViolation] = 
+    (func: PartialFunction[List[Reference[F, I]], List[Error]]): List[Error] = 
   {
-    def checkLengthMatches(refs: Seq[?], pattern: Seq[?]): List[RuleViolation] = {
+    def checkLengthMatches(refs: Seq[?], pattern: Seq[?]): List[Error] = {
       if (refs.length != pattern.length) List(
-        WrongNumberOfReferences(pattern.length, refs.length)
+        Error.WrongNumberOfReferences(pattern.length, refs.length)
       ) else Nil
     }
 
-    def extract[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]): Either[List[RuleViolation], List[Reference[F, I]]] = {
+    def extract[F, I](refs: List[Reference[F, I]], pattern: Seq[BoxOrFormula]): Either[List[Error], List[Reference[F, I]]] = {
       val zp = refs.zipWithIndex.zip(pattern).map { case ((ref, idx), pattern) => (idx, pattern, ref)}
 
       import Reference._
@@ -37,8 +36,8 @@ object ReferenceUtil {
         case (_, BoxOrFormula.Box, b: Box[F, I]) => Right(b)
 
         // violations
-        case (idx, BoxOrFormula.Box, _) => Left(ReferenceShouldBeBox(idx))
-        case (idx, BoxOrFormula.Formula, _) => Left(ReferenceShouldBeLine(idx))
+        case (idx, BoxOrFormula.Box, _) => Left(Error.ReferenceShouldBeBox(idx))
+        case (idx, BoxOrFormula.Formula, _) => Left(Error.ReferenceShouldBeLine(idx))
       }
 
       val good = result.forall {
@@ -71,7 +70,7 @@ object ReferenceUtil {
   // try to extract a list of `n` formulas from `refs` (only if there are `n`).
   // otherwise report mismatches
   def extractNFormulasAndThen[F, I](refs: List[Reference[F, I]], n: Int)
-    (func: PartialFunction[List[F], List[RuleViolation]]): List[RuleViolation] = 
+    (func: PartialFunction[List[F], List[Error]]): List[Error] = 
   {
     extractAndThen(refs, (1 to n).map { _ => BoxOrFormula.Formula }) {
       case lines: List[Reference.Line[F]] @unchecked =>

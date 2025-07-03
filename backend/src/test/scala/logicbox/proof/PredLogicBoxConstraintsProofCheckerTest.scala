@@ -11,7 +11,7 @@ import logicbox.framework.Proof
 
 import logicbox.framework.RuleViolation
 import logicbox.framework.RuleViolation.ReferenceDoesntMatchRule
-import logicbox.framework.Diagnostic.RuleViolationAtStep
+import logicbox.framework.Error.RuleViolationAtStep
 
 import logicbox.rule.PredLogicRule
 import logicbox.rule.PredLogicRule._

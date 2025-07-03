@@ -5,7 +5,7 @@ import logicbox.server.format.RawProof
 
 case class ValidationResult(
   proof: RawProof,
-  diagnostics: List[Diagnostic[String]]
+  diagnostics: List[(String, Error)]
 )
 
 trait ProofValidatorService[Err] {

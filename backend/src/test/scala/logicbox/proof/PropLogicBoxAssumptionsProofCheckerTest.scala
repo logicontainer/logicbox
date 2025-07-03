@@ -13,7 +13,7 @@ import logicbox.framework.Proof
 import logicbox.rule.PropLogicRule._
 import logicbox.framework.RuleViolation
 import logicbox.framework.RuleViolation.ReferenceDoesntMatchRule
-import logicbox.framework.Diagnostic.RuleViolationAtStep
+import logicbox.framework.Error.RuleViolationAtStep
 
 class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
 

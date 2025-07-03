@@ -10,7 +10,7 @@ import logicbox.framework.Proof.Step
 import logicbox.ProofStubs
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
 import logicbox.framework.RuleViolation.MiscellaneousViolation
-import logicbox.framework.Diagnostic._
+import logicbox.framework.Error._
 
 class RuleBasedProofCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._

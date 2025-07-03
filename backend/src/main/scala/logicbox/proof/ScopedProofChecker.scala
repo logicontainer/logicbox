@@ -1,7 +1,7 @@
 package logicbox.proof
 
-import logicbox.framework.{ProofChecker, StepDiagnostic, Proof, Scope, Root, Diagnostic}
-import logicbox.framework.Diagnostic._
+import logicbox.framework.{ProofChecker, Proof, Scope, Root, Error}
+import logicbox.framework.Error._
 
 // note: only scope violations, doesn't report steps/reference/boxes inwhich
 // the id points to something invalid
@@ -26,44 +26,45 @@ class ScopedProofChecker[Id]
       scope == parent || isSubscope(scopes(id), parent, scopes)
   }
 
-  override def check(proof: Proof[Any, Any, Any, Id]): List[Diagnostic[Id]] = {
-    val scopes = collectScopes(proof, proof.rootSteps)
-    val allIdsInProof = scopes.keySet
-
-    def checkRefs(stepId: Id, refs: Seq[Id], seenSteps: Set[Id], openBoxes: Set[Id]): List[Diagnostic[Id]] = {
-      val refsInProof = refs.filter(allIdsInProof.contains)
-      refsInProof.zipWithIndex.flatMap {
-        case (refId, refIdx) =>
-          val List(stepScope, refScope) = List(stepId, refId).map(scopes.apply)
-          val Right(refStep) = proof.getStep(refId): @unchecked // unchecked because of above filter
-
-          if (!isSubscope(stepScope, refScope, scopes)) {
-            Some(ScopeViolation(stepId, stepScope, refIdx, refId, refScope))
-          } else if (!seenSteps.contains(refId)) refStep match {
-            case Proof.Box(_, _) if openBoxes.contains(refId) => 
-              Some(ReferenceToUnclosedBox(stepId, refIdx, refId))
-            case _ => 
-              Some(ReferenceToLaterStep(stepId, refIdx, refId))
-          } else None
-
-      }.toList
-    }
-
-    def checkImpl(proof: Proof[Any, Any, Any, Id], steps: Seq[Id], seenSteps: Set[Id] = Set.empty, openedBoxes: Set[Id] = Set.empty): List[Diagnostic[Id]] = {
-      steps match {
-        case Nil => Nil
-        case stepId +: rest => (proof.getStep(stepId) match {
-          case Right(Proof.Line(_, _, refs: Seq[Id] @unchecked)) => 
-            checkRefs(stepId, refs, seenSteps, openedBoxes)
-
-          case Right(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) => 
-            checkImpl(proof, boxSteps, seenSteps, openedBoxes + stepId)
-
-          case _ => Nil
-        }) ++ checkImpl(proof, rest, seenSteps + stepId, openedBoxes)
-      }
-    }
-
-    checkImpl(proof, proof.rootSteps)
+  override def check(proof: Proof[Any, Any, Any, Id]): List[(Id, Error)] = {
+    // val scopes = collectScopes(proof, proof.rootSteps)
+    // val allIdsInProof = scopes.keySet
+    //
+    // def checkRefs(stepId: Id, refs: Seq[Id], seenSteps: Set[Id], openBoxes: Set[Id]): List[(Id, Error)] = {
+    //   val refsInProof = refs.filter(allIdsInProof.contains)
+    //   refsInProof.zipWithIndex.flatMap {
+    //     case (refId, refIdx) =>
+    //       val List(stepScope, refScope) = List(stepId, refId).map(scopes.apply)
+    //       val Right(refStep) = proof.getStep(refId): @unchecked // unchecked because of above filter
+    //
+    //       if (!isSubscope(stepScope, refScope, scopes)) {
+    //         Some(ScopeViolation(stepId, stepScope, refIdx, refId, refScope))
+    //       } else if (!seenSteps.contains(refId)) refStep match {
+    //         case Proof.Box(_, _) if openBoxes.contains(refId) => 
+    //           Some(ReferenceToUnclosedBox(stepId, refIdx, refId))
+    //         case _ => 
+    //           Some(ReferenceToLaterStep(stepId, refIdx, refId))
+    //       } else None
+    //
+    //   }.toList
+    // }
+    //
+    // def checkImpl(proof: Proof[Any, Any, Any, Id], steps: Seq[Id], seenSteps: Set[Id] = Set.empty, openedBoxes: Set[Id] = Set.empty): List[(Id, Error)] = {
+    //   steps match {
+    //     case Nil => Nil
+    //     case stepId +: rest => (proof.getStep(stepId) match {
+    //       case Right(Proof.Line(_, _, refs: Seq[Id] @unchecked)) => 
+    //         checkRefs(stepId, refs, seenSteps, openedBoxes)
+    //
+    //       case Right(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) => 
+    //         checkImpl(proof, boxSteps, seenSteps, openedBoxes + stepId)
+    //
+    //       case _ => Nil
+    //     }) ++ checkImpl(proof, rest, seenSteps + stepId, openedBoxes)
+    //   }
+    // }
+    //
+    // checkImpl(proof, proof.rootSteps)
+    ???
   }
 }
