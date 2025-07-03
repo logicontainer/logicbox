@@ -12,6 +12,15 @@ import logicbox.rule.ReferenceUtil.extractAndThen
 import logicbox.framework.Reference._
 import logicbox.rule.ReferenceUtil.extractFirstLine
 import logicbox.rule.ReferenceUtil.extractLastLine
+import logicbox.framework.Error.ShapeMismatch
+import logicbox.framework.RulePosition.Formula
+import logicbox.rule.RulePart.MetaTerm
+import logicbox.framework.Error.Ambiguous
+import logicbox.framework.RulePosition.Ref
+import logicbox.framework.Error.ReferenceBoxMissingFreshVar
+import logicbox.rule.RulePart.MetaVariable
+import logicbox.rule.RulePart.MetaFormula
+import logicbox.framework.Error.Miscellaneous
 
 class ArithLogicRuleChecker[
   F <: ConnectiveFormula[F] & QuantifierFormula[F, T, V],
@@ -28,189 +37,163 @@ class ArithLogicRuleChecker[
   }
 
   override def check(rule: ArithLogicRule, formula: F, refs: List[Reference[F, BI]]): List[Error] = rule match {
-    case _ => ???
-  //   case Peano1() => extractNFormulasAndThen(refs, 0) {
-  //     case Nil => formula match {
-  //       case (t1 + t2) ~= t3 => 
-  //         (t2 match {
-  //           case Zero() => Nil
-  //
-  //           case _ => 
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //         }) ++ 
-  //         failIf(
-  //           t1 != t3, 
-  //           FormulaDoesntMatchRule("TODO")
-  //         )
-  //
-  //       case _ ~= _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //       case _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //     }
-  //   }
-  //
-  //   case Peano2() => extractNFormulasAndThen(refs, 0) {
-  //     case Nil => formula match {
-  //       case (t1 + (t2 + One())) ~= ((t3 + t4) + One()) => 
-  //         failIf(t1 != t3, FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(t2 != t4, FormulaDoesntMatchRule("TODO"))
-  //
-  //       case lhs ~= rhs => 
-  //         failIf(Plus.unapply(lhs).isEmpty, FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(Plus.unapply(rhs).isEmpty, FormulaDoesntMatchRule("TODO"))
-  //         ++ (lhs match {
-  //           case _ + (_ + notone) if !One.unapply(notone) => 
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case _ + t if Plus.unapply(t).isEmpty => 
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case _ => Nil
-  //         }) ++ (rhs match {
-  //           case _ + notone if !One.unapply(notone) =>
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case t + _ if Plus.unapply(t).isEmpty =>
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case _ => Nil
-  //         })
-  //
-  //       case _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //     }
-  //   }
-  //
-  //   case Peano3() => extractNFormulasAndThen(refs, 0) {
-  //     case _ => formula match {
-  //       case (_ ~* Zero()) ~= Zero() => Nil
-  //
-  //       case lhs ~= rhs => 
-  //         failIf(Mult.unapply(lhs).isEmpty, FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(!Zero.unapply(rhs), FormulaDoesntMatchRule("TODO")) ++
-  //         (lhs match {
-  //           case _ ~* notzero if !Zero.unapply(notzero) =>
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //           case _ => Nil
-  //         })
-  //
-  //       case _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //     }
-  //   }
-  //
-  //   case Peano4() => extractNFormulasAndThen(refs, 0) {
-  //     case Nil => formula match {
-  //       case (t1 ~* (t2 + One())) ~= ((t3 ~* t4) + t5) =>
-  //         failIf(t1 != t3, FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(t1 != t5, FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(t2 != t4, FormulaDoesntMatchRule("TODO"))
-  //
-  //       case lhs ~= rhs => 
-  //         failIf(Mult.unapply(lhs).isEmpty, FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(Plus.unapply(rhs).isEmpty, FormulaDoesntMatchRule("TODO"))
-  //         ++ (lhs match {
-  //           case _ ~* (_ + notone) if !One.unapply(notone) => 
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case _ ~* t if Plus.unapply(t).isEmpty => 
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case _ => Nil
-  //         }) ++ (rhs match {
-  //           case t + _ if Mult.unapply(t).isEmpty =>
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //
-  //           case _ => Nil
-  //         })
-  //
-  //       case _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //     }
-  //   }
-  //
-  //   case Peano5() => extractNFormulasAndThen(refs, 0) {
-  //     case Nil => formula match {
-  //       case Not(Zero() ~= t + One()) => 
-  //         Nil
-  //
-  //       case Not(lhs ~= rhs) => 
-  //         failIf(!Zero.unapply(lhs), FormulaDoesntMatchRule("TODO")) ++
-  //         failIf(Plus.unapply(rhs).isEmpty, FormulaDoesntMatchRule("TODO")) ++
-  //         (rhs match {
-  //           case t1 + notone if !One.unapply(notone) => 
-  //             fail(FormulaDoesntMatchRule("TODO"))
-  //           case _ => Nil
-  //         })
-  //
-  //       case _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //     }
-  //   }
-  //
-  //   case Peano6() => extractNFormulasAndThen(refs, 1) {
-  //     case List(t1 + o1 ~= t2 + o2) => (formula match {
-  //       case t3 ~= t4 =>
-  //         failIf(t3 != t1, FormulaDoesntMatchReference(0, "TODO")) ++
-  //         failIf(t4 != t2, FormulaDoesntMatchReference(0, "TODO"))
-  //
-  //       case _ => 
-  //         fail(FormulaDoesntMatchRule("TODO"))
-  //     }) ++
-  //     failIf(!One.unapply(o1), ReferenceDoesntMatchRule(0, "TODO")) ++
-  //     failIf(!One.unapply(o2), ReferenceDoesntMatchRule(0, "TODO"))
-  //
-  //     case List(a ~= b) => 
-  //       failIf(Plus.unapply(a).isEmpty, ReferenceDoesntMatchRule(0, "TODO")) ++
-  //       failIf(Plus.unapply(b).isEmpty, ReferenceDoesntMatchRule(0, "TODO"))
-  //
-  //     case List(_) => 
-  //       fail(ReferenceDoesntMatchRule(0, "TODO"))
-  //   }
-  //
-  //   case Induction() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
-  //     case List(Line(r0), box: Box[F, BI]) => box.info.freshVar match {
-  //       case Some(n) => formula match {
-  //         case ForAll(x, phi) =>
-  //           (substitutor.findReplacement(phi, r0, x) match {
-  //             case Some(()) => Nil
-  //             case Some(Zero()) => Nil
-  //
-  //             case _ => 
-  //               fail(FormulaDoesntMatchReference(0, "TODO"))
-  //           }) ++ (extractFirstLine(box) match {
-  //             case Some(ass) => 
-  //               substitutor.findReplacement(phi, ass, x) match {
-  //                 case Some(y) if y == n || y == () => Nil
-  //                 case _ => 
-  //                   fail(FormulaDoesntMatchReference(1, "TODO"))
-  //               }
-  //               
-  //             case _ => 
-  //               fail(ReferenceDoesntMatchRule(1, "TODO"))
-  //
-  //           }) ++ (extractLastLine(box) match {
-  //             case Some(ass) => 
-  //               substitutor.findReplacement(phi, ass, x) match {
-  //                 case Some(y + One()) if y == n => Nil
-  //                 case Some(()) => Nil
-  //                 case _ => 
-  //                   fail(FormulaDoesntMatchReference(1, "TODO"))
-  //               }
-  //               
-  //             case _ => 
-  //               fail(ReferenceDoesntMatchRule(1, "TODO"))
-  //           })
-  //
-  //         case _ => 
-  //           fail(FormulaDoesntMatchRule("TODO"))
-  //       }
-  //
-  //       case None =>
-  //         fail(ReferenceDoesntMatchRule(1, "TODO"))
-  //     }
-  //   }
+    case Peano1() => extractNFormulasAndThen(refs, 0) {
+      case Nil => formula match {
+        case (t1 + Zero()) ~= t2 => 
+          failIf(t1 != t2, Ambiguous(MetaTerm(0), List(
+            (Formula, Location.lhs.lhs),
+            (Formula, Location.rhs)
+          )))
+
+        case _ => 
+          fail(ShapeMismatch(Formula, RulePart.Equals(RulePart.Plus(MetaTerm(0), RulePart.Zero()), MetaTerm(0))))
+      }
+    }
+
+    case Peano2() => extractNFormulasAndThen(refs, 0) {
+      case Nil => formula match {
+        case (t1 + (t2 + One())) ~= ((t3 + t4) + One()) => 
+          failIf(t1 != t3, Ambiguous(MetaTerm(0), List(
+            (Formula, Location.lhs.lhs),
+            (Formula, Location.rhs.lhs.lhs)
+          ))) ++
+          failIf(t2 != t4, Ambiguous(MetaTerm(1), List(
+            (Formula, Location.lhs.rhs.lhs),
+            (Formula, Location.rhs.lhs.rhs)
+          )))
+
+        case _ => 
+          fail(ShapeMismatch(Formula, 
+            RulePart.Equals(
+              RulePart.Plus(MetaTerm(0), RulePart.Plus(MetaTerm(1), RulePart.One())),
+              RulePart.Plus(RulePart.Plus(MetaTerm(0), MetaTerm(1)), RulePart.One())
+            )
+          ))
+      }
+    }
+
+    case Peano3() => extractNFormulasAndThen(refs, 0) {
+      case _ => formula match {
+        case (_ ~* Zero()) ~= Zero() => Nil
+
+        case _ => 
+          fail(ShapeMismatch(Formula, RulePart.Equals(
+            RulePart.Mult(MetaTerm(0), RulePart.Zero()),
+            RulePart.Zero()
+          )))
+      }
+    }
+
+    case Peano4() => extractNFormulasAndThen(refs, 0) {
+      case Nil => formula match {
+        case (t1 ~* (t2 + One())) ~= ((t3 ~* t4) + t5) =>
+          failIf(Set(t1, t3, t5).size > 1, Ambiguous(MetaTerm(0), List(
+            (Formula, Location.lhs.lhs),
+            (Formula, Location.rhs.lhs.lhs),
+            (Formula, Location.rhs.rhs)
+          ))) ++
+          failIf(t2 != t4, Ambiguous(MetaTerm(1), List(
+            (Formula, Location.lhs.rhs.lhs),
+            (Formula, Location.rhs.lhs.rhs)
+          )))
+
+        case _ => 
+          fail(ShapeMismatch(Formula, RulePart.Equals(
+            RulePart.Mult(MetaTerm(0), RulePart.Plus(MetaTerm(1), RulePart.One())),
+            RulePart.Plus(RulePart.Mult(MetaTerm(0), MetaTerm(1)), MetaTerm(0))
+          )))
+      }
+    }
+
+    case Peano5() => extractNFormulasAndThen(refs, 0) {
+      case Nil => formula match {
+        case Not(Zero() ~= t + One()) => 
+          Nil
+
+        case _ => 
+          fail(ShapeMismatch(Formula, RulePart.Not(RulePart.Equals(
+            RulePart.Zero(), 
+            RulePart.Plus(MetaTerm(0), RulePart.One())
+          ))))
+      }
+    }
+
+    case Peano6() => extractNFormulasAndThen(refs, 1) {
+      case List(t1 + One() ~= t2 + One()) => (formula match {
+        case t3 ~= t4 =>
+          failIf(t3 != t1, Ambiguous(MetaTerm(0), List(
+            (Formula, Location.lhs),
+            (Ref(0), Location.lhs.lhs)
+          ))) ++
+          failIf(t4 != t2, Ambiguous(MetaTerm(1), List(
+            (Formula, Location.rhs),
+            (Ref(1), Location.rhs.lhs)
+          )))
+
+        case _ => 
+          fail(ShapeMismatch(Formula, RulePart.Equals(MetaTerm(0), MetaTerm(1))))
+      })
+
+      case List(_) => 
+        fail(ShapeMismatch(Ref(0), RulePart.Equals(
+          RulePart.Plus(MetaTerm(0), RulePart.One()),
+          RulePart.Plus(MetaTerm(1), RulePart.One())
+        )))
+    }
+
+    case Induction() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
+      case List(Line(r0), box: Box[F, BI]) => box.info.freshVar match {
+        case Some(n) => formula match {
+          case ForAll(x, phi) =>
+            (substitutor.findReplacement(phi, r0, x) match {
+              case Some(() | Zero()) => Nil
+
+              case _ => fail(Ambiguous(MetaFormula(0), List(
+                (Formula, Location.formulaInsideQuantifier),
+                (Ref(0), Location.root),
+                (Ref(1), Location.assumption),
+                (Ref(1), Location.conclusion)
+              )))
+
+            }) ++ (extractFirstLine(box) match {
+              case Some(ass) => 
+                substitutor.findReplacement(phi, ass, x) match {
+                  case Some(y) if y == n || y == () => Nil
+                  case _ => fail(Ambiguous(MetaFormula(0), List(
+                    (Formula, Location.formulaInsideQuantifier),
+                    (Ref(0), Location.root),
+                    (Ref(1), Location.assumption),
+                    (Ref(1), Location.conclusion)
+                  )))
+                }
+                
+              case _ => 
+                fail(Miscellaneous(Ref(1), "first step in box must be a line"))
+
+            }) ++ (extractLastLine(box) match {
+              case Some(ass) => 
+                substitutor.findReplacement(phi, ass, x) match {
+                  case Some(y + One()) if y == n => Nil
+                  case Some(()) => Nil
+                  case _ => fail(Ambiguous(MetaFormula(0), List(
+                    (Formula, Location.formulaInsideQuantifier),
+                    (Ref(0), Location.root),
+                    (Ref(1), Location.assumption),
+                    (Ref(1), Location.conclusion)
+                  )))
+                }
+                
+              case _ => 
+                fail(Miscellaneous(Ref(1), "last step in box must be a line"))
+            })
+
+          case _ => 
+            fail(ShapeMismatch(Formula, RulePart.ForAll(MetaVariable(0), MetaFormula(0))))
+        }
+
+        case None =>
+          fail(ReferenceBoxMissingFreshVar(1))
+      }
+    }
   }
 }
