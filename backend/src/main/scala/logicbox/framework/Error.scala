@@ -14,6 +14,7 @@ object Error {
   case class ReferenceOutOfScope(refIdx: Int) extends Error
   case class ReferenceToLaterStep(refIdx: Int) extends Error
   case class ReferenceToUnclosedBox(refIdx: Int) extends Error
+  case class ReferenceBoxMissingFreshVar(refIdx: Int) extends Error
 
   case class ReferenceShouldBeBox(refIdx: Int) extends Error
   case class ReferenceShouldBeLine(refIdx: Int) extends Error
