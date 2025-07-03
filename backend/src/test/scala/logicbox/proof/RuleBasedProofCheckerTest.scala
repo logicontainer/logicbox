@@ -54,7 +54,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
       val result = checker.check(proof)
       Inspectors.forAtLeast(1, result) {
         _ should matchPattern {
-          case ("id1", Miscellaneous(RulePosition.Formula, "test")) =>
+          case ("id1", ProofStubs.stubError) =>
         }
       }
     }
@@ -99,7 +99,7 @@ class RuleBasedProofCheckerTest extends AnyFunSpec {
 
       Inspectors.forAtLeast(1, checker.check(proof)) {
         _ should matchPattern {
-          case ("ass", Miscellaneous(RulePosition.Formula, "test")) =>
+          case ("ass", ProofStubs.stubError) =>
         }
       }
     }

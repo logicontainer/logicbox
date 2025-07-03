@@ -40,6 +40,7 @@ object ProofStubs {
       }
   }
 
+  val stubError = Miscellaneous(RulePosition.Formula, "test")
   case class StubRuleChecker() extends RuleChecker[F, R, B] {
     var refsCalledWith: Option[List[Reference[StubFormula, StubBoxInfo]]] = None
 
