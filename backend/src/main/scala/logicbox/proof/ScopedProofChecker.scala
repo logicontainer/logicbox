@@ -1,7 +1,10 @@
 package logicbox.proof
 
-import logicbox.framework.{ProofChecker, Proof, Scope, Root, Error}
+import logicbox.framework.{ProofChecker, Proof, Error}
 import logicbox.framework.Error._
+
+case object Root
+type Scope[+Id] = Root.type | Id
 
 // note: only scope violations, doesn't report steps/reference/boxes inwhich
 // the id points to something invalid

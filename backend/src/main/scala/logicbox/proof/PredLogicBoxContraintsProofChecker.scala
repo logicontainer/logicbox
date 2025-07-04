@@ -21,7 +21,7 @@ class PredLogicBoxConstraintsProofChecker[R >: PredLogicRule, Id](
       case ForAllIntro() => 
         checkFirstLineOfBoxRef(proof, id, line, 0, {
           case (_, Proof.Line(_, rule, _)) if rule == assumptionRule => List(
-            (id, Error.Miscellaneous(RulePosition.Ref(0), "first line of box must not be assumption"))
+            (id, Error.Miscellaneous(RulePosition.Premise(0), "first line of box must not be assumption"))
           )
           case _ => Nil
         })

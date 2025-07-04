@@ -13,10 +13,10 @@ import logicbox.framework.Reference._
 import logicbox.rule.ReferenceUtil.extractFirstLine
 import logicbox.rule.ReferenceUtil.extractLastLine
 import logicbox.framework.Error.ShapeMismatch
-import logicbox.framework.RulePosition.Formula
+import logicbox.framework.RulePosition.Conclusion
 import logicbox.rule.RulePart.MetaTerm
 import logicbox.framework.Error.Ambiguous
-import logicbox.framework.RulePosition.Ref
+import logicbox.framework.RulePosition.Premise
 import logicbox.framework.Error.ReferenceBoxMissingFreshVar
 import logicbox.rule.RulePart.MetaVariable
 import logicbox.rule.RulePart.MetaFormula
@@ -41,12 +41,12 @@ class ArithLogicRuleChecker[
       case Nil => formula match {
         case (t1 + Zero()) ~= t2 => 
           failIf(t1 != t2, Ambiguous(MetaTerm(0), List(
-            (Formula, Location.lhs.lhs),
-            (Formula, Location.rhs)
+            (Conclusion, Location.lhs.lhs),
+            (Conclusion, Location.rhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Formula, RulePart.Equals(RulePart.Plus(MetaTerm(0), RulePart.Zero()), MetaTerm(0))))
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(RulePart.Plus(MetaTerm(0), RulePart.Zero()), MetaTerm(0))))
       }
     }
 
@@ -54,16 +54,16 @@ class ArithLogicRuleChecker[
       case Nil => formula match {
         case (t1 + (t2 + One())) ~= ((t3 + t4) + One()) => 
           failIf(t1 != t3, Ambiguous(MetaTerm(0), List(
-            (Formula, Location.lhs.lhs),
-            (Formula, Location.rhs.lhs.lhs)
+            (Conclusion, Location.lhs.lhs),
+            (Conclusion, Location.rhs.lhs.lhs)
           ))) ++
           failIf(t2 != t4, Ambiguous(MetaTerm(1), List(
-            (Formula, Location.lhs.rhs.lhs),
-            (Formula, Location.rhs.lhs.rhs)
+            (Conclusion, Location.lhs.rhs.lhs),
+            (Conclusion, Location.rhs.lhs.rhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Formula, 
+          fail(ShapeMismatch(Conclusion, 
             RulePart.Equals(
               RulePart.Plus(MetaTerm(0), RulePart.Plus(MetaTerm(1), RulePart.One())),
               RulePart.Plus(RulePart.Plus(MetaTerm(0), MetaTerm(1)), RulePart.One())
@@ -77,7 +77,7 @@ class ArithLogicRuleChecker[
         case (_ ~* Zero()) ~= Zero() => Nil
 
         case _ => 
-          fail(ShapeMismatch(Formula, RulePart.Equals(
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(
             RulePart.Mult(MetaTerm(0), RulePart.Zero()),
             RulePart.Zero()
           )))
@@ -88,17 +88,17 @@ class ArithLogicRuleChecker[
       case Nil => formula match {
         case (t1 ~* (t2 + One())) ~= ((t3 ~* t4) + t5) =>
           failIf(Set(t1, t3, t5).size > 1, Ambiguous(MetaTerm(0), List(
-            (Formula, Location.lhs.lhs),
-            (Formula, Location.rhs.lhs.lhs),
-            (Formula, Location.rhs.rhs)
+            (Conclusion, Location.lhs.lhs),
+            (Conclusion, Location.rhs.lhs.lhs),
+            (Conclusion, Location.rhs.rhs)
           ))) ++
           failIf(t2 != t4, Ambiguous(MetaTerm(1), List(
-            (Formula, Location.lhs.rhs.lhs),
-            (Formula, Location.rhs.lhs.rhs)
+            (Conclusion, Location.lhs.rhs.lhs),
+            (Conclusion, Location.rhs.lhs.rhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Formula, RulePart.Equals(
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(
             RulePart.Mult(MetaTerm(0), RulePart.Plus(MetaTerm(1), RulePart.One())),
             RulePart.Plus(RulePart.Mult(MetaTerm(0), MetaTerm(1)), MetaTerm(0))
           )))
@@ -111,7 +111,7 @@ class ArithLogicRuleChecker[
           Nil
 
         case _ => 
-          fail(ShapeMismatch(Formula, RulePart.Not(RulePart.Equals(
+          fail(ShapeMismatch(Conclusion, RulePart.Not(RulePart.Equals(
             RulePart.Zero(), 
             RulePart.Plus(MetaTerm(0), RulePart.One())
           ))))
@@ -122,20 +122,20 @@ class ArithLogicRuleChecker[
       case List(t1 + One() ~= t2 + One()) => (formula match {
         case t3 ~= t4 =>
           failIf(t3 != t1, Ambiguous(MetaTerm(0), List(
-            (Formula, Location.lhs),
-            (Ref(0), Location.lhs.lhs)
+            (Conclusion, Location.lhs),
+            (Premise(0), Location.lhs.lhs)
           ))) ++
           failIf(t4 != t2, Ambiguous(MetaTerm(1), List(
-            (Formula, Location.rhs),
-            (Ref(1), Location.rhs.lhs)
+            (Conclusion, Location.rhs),
+            (Premise(1), Location.rhs.lhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Formula, RulePart.Equals(MetaTerm(0), MetaTerm(1))))
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(0), MetaTerm(1))))
       })
 
       case List(_) => 
-        fail(ShapeMismatch(Ref(0), RulePart.Equals(
+        fail(ShapeMismatch(Premise(0), RulePart.Equals(
           RulePart.Plus(MetaTerm(0), RulePart.One()),
           RulePart.Plus(MetaTerm(1), RulePart.One())
         )))
@@ -149,10 +149,10 @@ class ArithLogicRuleChecker[
               case Some(() | Zero()) => Nil
 
               case _ => fail(Ambiguous(MetaFormula(0), List(
-                (Formula, Location.formulaInsideQuantifier),
-                (Ref(0), Location.root),
-                (Ref(1), Location.assumption),
-                (Ref(1), Location.conclusion)
+                (Conclusion, Location.formulaInsideQuantifier),
+                (Premise(0), Location.root),
+                (Premise(1), Location.assumption),
+                (Premise(1), Location.conclusion)
               )))
 
             }) ++ (extractFirstLine(box) match {
@@ -160,15 +160,15 @@ class ArithLogicRuleChecker[
                 substitutor.findReplacement(phi, ass, x) match {
                   case Some(y) if y == n || y == () => Nil
                   case _ => fail(Ambiguous(MetaFormula(0), List(
-                    (Formula, Location.formulaInsideQuantifier),
-                    (Ref(0), Location.root),
-                    (Ref(1), Location.assumption),
-                    (Ref(1), Location.conclusion)
+                    (Conclusion, Location.formulaInsideQuantifier),
+                    (Premise(0), Location.root),
+                    (Premise(1), Location.assumption),
+                    (Premise(1), Location.conclusion)
                   )))
                 }
                 
               case _ => 
-                fail(Miscellaneous(Ref(1), "first step in box must be a line"))
+                fail(Miscellaneous(Premise(1), "first step in box must be a line"))
 
             }) ++ (extractLastLine(box) match {
               case Some(ass) => 
@@ -176,19 +176,19 @@ class ArithLogicRuleChecker[
                   case Some(y + One()) if y == n => Nil
                   case Some(()) => Nil
                   case _ => fail(Ambiguous(MetaFormula(0), List(
-                    (Formula, Location.formulaInsideQuantifier),
-                    (Ref(0), Location.root),
-                    (Ref(1), Location.assumption),
-                    (Ref(1), Location.conclusion)
+                    (Conclusion, Location.formulaInsideQuantifier),
+                    (Premise(0), Location.root),
+                    (Premise(1), Location.assumption),
+                    (Premise(1), Location.conclusion)
                   )))
                 }
                 
               case _ => 
-                fail(Miscellaneous(Ref(1), "last step in box must be a line"))
+                fail(Miscellaneous(Premise(1), "last step in box must be a line"))
             })
 
           case _ => 
-            fail(ShapeMismatch(Formula, RulePart.ForAll(MetaVariable(0), MetaFormula(0))))
+            fail(ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(0), MetaFormula(0))))
         }
 
         case None =>

@@ -36,7 +36,7 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l3", Error.Miscellaneous(RulePosition.Ref(1), _))) =>
+        case List(("l3", Error.Miscellaneous(RulePosition.Premise(1), _))) =>
       }
     }
 
@@ -51,7 +51,7 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(RulePosition.Ref(0), _))) =>
+        case List(("l2", Miscellaneous(RulePosition.Premise(0), _))) =>
       }
     }
 

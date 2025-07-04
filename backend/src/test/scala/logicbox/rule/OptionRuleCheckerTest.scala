@@ -54,7 +54,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       val rule = Some(Good())
       val refs = List(ReferenceLineImpl(Some(StubFormula(2))))
 
-      checker.check(rule, formula, refs) shouldBe List(MissingFormula)
+      checker.check(rule, formula, refs) shouldBe List(MissingFormula())
     }
 
     it("should report missing formula and rule") {
@@ -63,7 +63,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       val refs = List(ReferenceLineImpl(Some(StubFormula())))
 
       checker.check(rule, formula, refs) should contain theSameElementsAs List(
-        MissingFormula, MissingRule
+        MissingFormula(), MissingRule()
       )
     }
     
@@ -77,10 +77,10 @@ class OptionRuleCheckerTest extends AnyFunSpec {
 
       val result = checker.check(rule, formula, refs)
       result.length shouldBe 2
-      result should contain (MissingRule)
+      result should contain (MissingRule())
       Inspectors.forExactly(1, result) {
         _ should matchPattern {
-          case Miscellaneous(RulePosition.Ref(1), _) =>
+          case Miscellaneous(RulePosition.Premise(1), _) =>
         }
       }
     }
@@ -98,7 +98,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       )
 
       checker.check(rule, formula, refs) should matchPattern {
-        case List(Miscellaneous(RulePosition.Ref(1), expl)) if expl.contains("box") =>
+        case List(Miscellaneous(RulePosition.Premise(1), expl)) if expl.contains("box") =>
       }
     }
   }

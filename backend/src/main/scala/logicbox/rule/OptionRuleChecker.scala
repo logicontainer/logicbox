@@ -23,10 +23,10 @@ case class OptionRuleChecker[F, R, B, V](
         Right(ReferenceBoxImpl(info, optAssRef, optConclRef))
 
       case Line(None) =>
-        Left(Error.Miscellaneous(RulePosition.Ref(refIdx), "missing formula"))
+        Left(Error.Miscellaneous(RulePosition.Premise(refIdx), "missing formula"))
 
       case Box(None, _, _) => 
-        Left(Error.Miscellaneous(RulePosition.Ref(refIdx), "missing box info"))
+        Left(Error.Miscellaneous(RulePosition.Premise(refIdx), "missing box info"))
     }
   }
 
@@ -53,11 +53,11 @@ case class OptionRuleChecker[F, R, B, V](
   ): List[Error] = {
     { 
       if (formula.isEmpty) List(
-        Error.MissingFormula
+        Error.MissingFormula()
       ) else Nil
     } ++ {
       if (rule.isEmpty) List(
-        Error.MissingRule
+        Error.MissingRule()
       ) else Nil
     }
   }

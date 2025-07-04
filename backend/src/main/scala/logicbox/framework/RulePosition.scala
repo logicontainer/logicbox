@@ -2,6 +2,6 @@ package logicbox.framework
 
 sealed trait RulePosition
 object RulePosition {
-  case object Formula extends RulePosition
-  case class Ref(idx: Int) extends RulePosition
+  case object Conclusion extends RulePosition
+  case class Premise(idx: Int) extends RulePosition
 }
