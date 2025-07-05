@@ -59,7 +59,7 @@ class PLRuleTest extends AnyFunSpec {
       val l = line("p and q", leftRule, List(ref))
 
       checker.check(leftRule, l.formula, List(ref)) shouldBe List(
-        ShapeMismatch(Premise(0), And(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Premise(0), And(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -68,7 +68,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("q and (p -> v or r)")
       val l = line("p", leftRule, List(ref))
       checker.check(leftRule, l.formula, List(ref)) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.root),
           (Premise(0), Location.lhs)
         ))
@@ -88,7 +88,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("(p and q) or v")
       val l = line("p", rightRule, List(ref))
       checker.check(rightRule, l.formula, List(ref)) shouldBe List(
-        ShapeMismatch(Premise(0), And(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Premise(0), And(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -96,7 +96,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("q and (p -> v or r)")
       val l = line("p", rightRule, List(ref))
       checker.check(rightRule, l.formula, List(ref)) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.root),
           (Premise(1), Location.rhs)
         ))
@@ -116,7 +116,7 @@ class PLRuleTest extends AnyFunSpec {
     it("should reject when line is or") {
       val l = line("p or q", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, And(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Conclusion, And(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -124,13 +124,13 @@ class PLRuleTest extends AnyFunSpec {
       val l = line("r and (s or v)", rule, refs)
       val mismatches = checker.check(rule, l.formula, l.refs)
       Inspectors.forAtLeast(1, mismatches) {
-        _ shouldBe Ambiguous(MetaFormula(0), List(
+        _ shouldBe Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.lhs),
           (Premise(0), Location.root)
         ))
       } 
       Inspectors.forAtLeast(1, mismatches) {
-        _ shouldBe Ambiguous(MetaFormula(1), List(
+        _ shouldBe Ambiguous(MetaFormula(Formulas.Psi), List(
           (Conclusion, Location.rhs),
           (Premise(1), Location.root)
         ))
@@ -140,7 +140,7 @@ class PLRuleTest extends AnyFunSpec {
     it("should report lhs mismatches ref") {
       val l = line("r and q", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.lhs),
           (Premise(0), Location.root)
         ))
@@ -150,7 +150,7 @@ class PLRuleTest extends AnyFunSpec {
     it("should report rhs mismatches ref") {
       val l = line("p and r", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(1), List(
+        Ambiguous(MetaFormula(Formulas.Psi), List(
           (Conclusion, Location.rhs),
           (Premise(1), Location.root)
         ))
@@ -171,7 +171,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("p")
       val l = line("q or (p -> q -> v)", leftRule, List(ref))
       checker.check(leftRule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.lhs),
           (Premise(0), Location.root)
         ))
@@ -182,7 +182,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("p")
       val l = line("p and (p -> q -> v)", leftRule, List(ref))
       checker.check(leftRule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Or(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Conclusion, Or(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -197,7 +197,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("p")
       val l = line("(p -> q -> v) or q", rightRule, List(ref))
       checker.check(rightRule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(1), List(
+        Ambiguous(MetaFormula(Formulas.Psi), List(
           (Conclusion, Location.rhs),
           (Premise(0), Location.root)
         ))
@@ -208,7 +208,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("p")
       val l = line("(p -> q -> v) and p", rightRule, List(ref))
       checker.check(rightRule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Or(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Conclusion, Or(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
   }
@@ -246,7 +246,7 @@ class PLRuleTest extends AnyFunSpec {
       val (r0, r1, r2) = (stub("p -> q"), boxStub("p", "s"), boxStub("q", "s"))
       val l = line("s", rule, List(r0, r1, r2))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Premise(0), Or(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Premise(0), Or(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -254,7 +254,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p or q"), boxStub("p", "s"), boxStub("q", "d"))
       val l = line("s", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(2), List(
+        Ambiguous(MetaFormula(Formulas.Chi), List(
           (Conclusion, Location.root),
           (Premise(1), Location.conclusion),
           (Premise(2), Location.conclusion)
@@ -266,7 +266,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p or q"), boxStub("p", "d"), boxStub("q", "s"))
       val l = line("s", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(2), List(
+        Ambiguous(MetaFormula(Formulas.Chi), List(
           (Conclusion, Location.root),
           (Premise(1), Location.conclusion),
           (Premise(2), Location.conclusion)
@@ -278,7 +278,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p or q"), boxStub("d", "s"), boxStub("q", "s"))
       val l = line("s", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Premise(0), Location.lhs),
           (Premise(1), Location.assumption)
         ))
@@ -289,7 +289,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p or q"), boxStub("p", "s"), boxStub("d", "s"))
       val l = line("s", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(1), List(
+        Ambiguous(MetaFormula(Formulas.Psi), List(
           (Premise(0), Location.rhs),
           (Premise(2), Location.assumption)
         ))
@@ -304,7 +304,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("p", "q")
       val l = line("r -> q", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.lhs),
           (Premise(0), Location.assumption)
         ))
@@ -315,7 +315,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("p", "q")
       val l = line("p -> r", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(1), List(
+        Ambiguous(MetaFormula(Formulas.Psi), List(
           (Conclusion, Location.rhs),
           (Premise(0), Location.conclusion)
         ))
@@ -326,7 +326,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("p", "q")
       val l = line("p and q", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Implies(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Conclusion, Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -344,7 +344,7 @@ class PLRuleTest extends AnyFunSpec {
       val (r0, r1) = (stub("p"), stub("r -> q"))
       val l = line("q", rule, List(r0, r1))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Premise(0), Location.root),
           (Premise(1), Location.lhs)
         ))
@@ -355,7 +355,7 @@ class PLRuleTest extends AnyFunSpec {
       val (r0, r1) = (stub("p"), stub("p -> q"))
       val l = line("r", rule, List(r0, r1))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(1), List(
+        Ambiguous(MetaFormula(Formulas.Psi), List(
           (Premise(1), Location.rhs),
           (Conclusion, Location.root)
         ))
@@ -366,7 +366,7 @@ class PLRuleTest extends AnyFunSpec {
       val (r0, r1) = (stub("p"), stub("p and q"))
       val l = line("q", rule, List(r0, r1))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Premise(1), Implies(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Premise(1), Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
   }
@@ -386,7 +386,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("p", "false")
       val l = line("not q", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.negated),
           (Premise(0), Location.assumption)
         ))
@@ -397,7 +397,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("p", "false")
       val l = line("p", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Not(MetaFormula(0)))
+        ShapeMismatch(Conclusion, Not(MetaFormula(Formulas.Phi)))
       )
     }
   }  
@@ -408,7 +408,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p"), stub("not q"))
       val l = line("false", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Premise(0), Location.root),
           (Premise(1), Location.negated)
         ))
@@ -419,7 +419,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p"), stub("p"))
       val l = line("false", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Premise(1), RulePart.Not(MetaFormula(0)))
+        ShapeMismatch(Premise(1), RulePart.Not(MetaFormula(Formulas.Phi)))
       )
     }
 
@@ -450,7 +450,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("not p")
       val l = line("p", rule, List(ref))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Premise(0), RulePart.Not(RulePart.Not(MetaFormula(0))))
+        ShapeMismatch(Premise(0), RulePart.Not(RulePart.Not(MetaFormula(Formulas.Phi))))
       )
     }
 
@@ -458,7 +458,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("not not p")
       val l = line("q", rule, List(ref))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.root),
           (Premise(0), Location.negated.negated)
         ))
@@ -473,7 +473,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p -> q"), stub("not q"))
       val l = line("p", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Not(MetaFormula(0)))
+        ShapeMismatch(Conclusion, Not(MetaFormula(Formulas.Phi)))
       )
     }
 
@@ -481,7 +481,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p and q"), stub("not q"))
       val l = line("not p", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Premise(0), Implies(MetaFormula(0), MetaFormula(1)))
+        ShapeMismatch(Premise(0), Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -489,7 +489,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p -> q"), stub("q"))
       val l = line("not p", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Premise(1), Not(MetaFormula(1)))
+        ShapeMismatch(Premise(1), Not(MetaFormula(Formulas.Psi)))
       )
     }
 
@@ -497,7 +497,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p -> q"), stub("not q"))
       val l = line("not r", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.negated),
           (Premise(0), Location.lhs)
         ))
@@ -508,7 +508,7 @@ class PLRuleTest extends AnyFunSpec {
       val refs = List(stub("p -> q"), stub("not r"))
       val l = line("not p", rule, refs)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(1), List(
+        Ambiguous(MetaFormula(Formulas.Psi), List(
           (Premise(0), Location.rhs),
           (Premise(1), Location.negated)
         ))
@@ -523,7 +523,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("q")
       val l = line("q", rule, List(ref))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Not(Not(MetaFormula(0))))
+        ShapeMismatch(Conclusion, Not(Not(MetaFormula(Formulas.Phi))))
       )
     }
 
@@ -531,7 +531,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("q")
       val l = line("not not p", rule, List(ref))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.negated.negated),
           (Premise(0), Location.root)
         ))
@@ -554,7 +554,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("p", "false")
       val l = line("p", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch((Premise(0), Location.assumption), Not(MetaFormula(0)))
+        ShapeMismatch((Premise(0), Location.assumption), Not(MetaFormula(Formulas.Phi)))
       )
     }
 
@@ -570,7 +570,7 @@ class PLRuleTest extends AnyFunSpec {
       val box = boxStub("not p", "false")
       val l = line("q", rule, List(box))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.root),
           (Premise(0), Location.assumption.negated)
         ))
@@ -589,14 +589,14 @@ class PLRuleTest extends AnyFunSpec {
     it("should reject when rhs is not negation") {
       val l = line("p or p", rule, Nil)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        ShapeMismatch(Conclusion, Or(MetaFormula(0), Not(MetaFormula(0))))
+        ShapeMismatch(Conclusion, Or(MetaFormula(Formulas.Phi), Not(MetaFormula(Formulas.Phi))))
       )
     }
 
     it("should reject when lhs and negated rhs are not equal") {
       val l = line("p or not q", rule, Nil)
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.lhs),
           (Conclusion, Location.rhs.negated)
         ))
@@ -610,7 +610,7 @@ class PLRuleTest extends AnyFunSpec {
       val ref = stub("q")
       val l = line("p", rule, List(ref))
       checker.check(rule, l.formula, l.refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.root),
           (Premise(0), Location.root)
         ))

@@ -3,16 +3,20 @@ package logicbox.rule
 sealed trait RulePart
 
 object RulePart {
+  enum Terms { case T; case T1; case T2 }
+  enum Vars  { case X; case X0; case N }
+  enum Formulas { case Phi; case Psi; case Chi }
+
   sealed trait TemplateTerm extends RulePart
-  case class MetaVariable(id: Int) extends TemplateTerm
-  case class MetaTerm(id: Int) extends TemplateTerm
+  case class MetaVariable(id: Vars) extends TemplateTerm
+  case class MetaTerm(id: Terms) extends TemplateTerm
   case class Plus(t1: TemplateTerm, t2: TemplateTerm) extends TemplateTerm
   case class Mult(t1: TemplateTerm, t2: TemplateTerm) extends TemplateTerm
   case class Zero() extends TemplateTerm
   case class One() extends TemplateTerm
 
   sealed trait TemplateFormula extends RulePart
-  case class MetaFormula(id: Int) extends TemplateFormula
+  case class MetaFormula(id: Formulas) extends TemplateFormula
   case class Equals(t1: TemplateTerm, t2: TemplateTerm) extends TemplateFormula
   case class Substitution(phi: TemplateFormula, t: TemplateTerm, x: MetaVariable) extends TemplateFormula
 

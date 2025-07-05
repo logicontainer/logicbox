@@ -51,7 +51,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     )
 
   describe("Peano1") {
-    val formulaShape = Equals(Plus(MetaTerm(0), Zero()), MetaTerm(0))
+    val formulaShape = Equals(Plus(MetaTerm(Terms.T1), Zero()), MetaTerm(Terms.T1))
     it("should fail if has ref") {
       val refs = List(refLine("x = x"))
       val f = parse("n + 0 = n")
@@ -77,7 +77,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if lhs of addition and rhs of equality don't match") {
       val f = parse("n + 0 = m")
       checker.check(Peano1(), f, Nil) shouldBe List(
-        Ambiguous(MetaTerm(0), List(
+        Ambiguous(MetaTerm(Terms.T1), List(
           (Conclusion, Location.lhs.lhs),
           (Conclusion, Location.rhs)
         ))
@@ -95,8 +95,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     }
 
     val formulaShape = Equals(
-      Plus(MetaTerm(0), Plus(MetaTerm(1), One())),
-      Plus(Plus(MetaTerm(0), MetaTerm(1)), One())
+      Plus(MetaTerm(Terms.T1), Plus(MetaTerm(Terms.T2), One())),
+      Plus(Plus(MetaTerm(Terms.T1), MetaTerm(Terms.T2)), One())
     )
     it("should fail if not equality") {
       val f = parse("0 = 0 and (n + (m + 1) = (n + m) + 1)")
@@ -115,7 +115,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if t1's are not equal") {
       val f = parse("n + (m + 1) = (k + m) + 1")
       checker.check(Peano2(), f, Nil) shouldBe List(
-        Ambiguous(MetaTerm(0), List(
+        Ambiguous(MetaTerm(Terms.T1), List(
           (Conclusion, Location.lhs.lhs),
           (Conclusion, Location.rhs.lhs.lhs)
         ))
@@ -125,7 +125,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if t2's are not equal") {
       val f = parse("n + (m + 1) = (n + k) + 1")
       checker.check(Peano2(), f, Nil) shouldBe List(
-        Ambiguous(MetaTerm(1), List(
+        Ambiguous(MetaTerm(Terms.T2), List(
           (Conclusion, Location.lhs.rhs.lhs),
           (Conclusion, Location.rhs.lhs.rhs)
         ))
@@ -139,7 +139,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
   }
   
   describe("Peano3") {
-    val formulaShape = Equals(Mult(MetaTerm(0), Zero()), Zero())
+    val formulaShape = Equals(Mult(MetaTerm(Terms.T1), Zero()), Zero())
     it("should fail if has ref") {
       val refs = List(refLine("x = x"))
       val f = parse("n * 0 = 0")
@@ -170,8 +170,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
   
   describe("Peano4") {
     val formulaShape = Equals(
-      Mult(MetaTerm(0), Plus(MetaTerm(1), One())),
-      Plus(Mult(MetaTerm(0), MetaTerm(1)), MetaTerm(0))
+      Mult(MetaTerm(Terms.T1), Plus(MetaTerm(Terms.T2), One())),
+      Plus(Mult(MetaTerm(Terms.T1), MetaTerm(Terms.T2)), MetaTerm(Terms.T1))
     )
 
     it("should fail if has ref") {
@@ -206,7 +206,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if t1's are not equal") {
       val f1 = parse("n * (m + 1) = (k * m) + n")
       checker.check(Peano4(), f1, Nil) shouldBe List(
-        Ambiguous(MetaTerm(0), List(
+        Ambiguous(MetaTerm(Terms.T1), List(
           (Conclusion, Location.lhs.lhs),
           (Conclusion, Location.rhs.lhs.lhs),
           (Conclusion, Location.rhs.rhs)
@@ -215,7 +215,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
 
       val f2 = parse("n * (m + 1) = (n * m) + k")
       checker.check(Peano4(), f2, Nil) shouldBe List(
-        Ambiguous(MetaTerm(0), List(
+        Ambiguous(MetaTerm(Terms.T1), List(
           (Conclusion, Location.lhs.lhs),
           (Conclusion, Location.rhs.lhs.lhs),
           (Conclusion, Location.rhs.rhs)
@@ -227,7 +227,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("n * (m + 1) = (n * k) + n")
 
       checker.check(Peano4(), f, Nil) shouldBe List(
-        Ambiguous(MetaTerm(1), List(
+        Ambiguous(MetaTerm(Terms.T2), List(
           (Conclusion, Location.lhs.rhs.lhs),
           (Conclusion, Location.rhs.lhs.rhs)
         ))
@@ -249,7 +249,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
     }
     
-    val formulaShape = Not(Equals(Zero(), Plus(MetaTerm(0), One())))
+    val formulaShape = Not(Equals(Zero(), Plus(MetaTerm(Terms.T1), One())))
     it("should reject if not negation") {
       val f = parse("0 = 0 and not (0 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
@@ -298,8 +298,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
         WrongNumberOfReferences(1, 0)
       )
     }
-    val refShape = Equals(Plus(MetaTerm(0), One()), Plus(MetaTerm(1), One()))
-    val formulaShape = Equals(MetaTerm(0), MetaTerm(1))
+    val refShape = Equals(Plus(MetaTerm(Terms.T1), One()), Plus(MetaTerm(Terms.T2), One()))
+    val formulaShape = Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))
     it("should fail if not eq") {
       val refs = List(refLine("m + 1 = n + 1"))
       val f = parse("m = n and m = n")
@@ -320,7 +320,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("m + 1 = n + 1"))
       val f = parse("k = n")
       checker.check(Peano6(), f, refs) shouldBe List(
-        Ambiguous(MetaTerm(0), List(
+        Ambiguous(MetaTerm(Terms.T1), List(
           (Conclusion, Location.lhs),
           (Premise(0), Location.lhs.lhs)
         ))
@@ -331,7 +331,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("m + 1 = n + 1"))
       val f = parse("m = k")
       checker.check(Peano6(), f, refs) shouldBe List(
-        Ambiguous(MetaTerm(1), List(
+        Ambiguous(MetaTerm(Terms.T2), List(
           (Conclusion, Location.rhs),
           (Premise(1), Location.rhs.lhs)
         ))
@@ -382,7 +382,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(0), MetaFormula(0)))
+        ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi)))
       )
     }
 
@@ -393,7 +393,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.formulaInsideQuantifier),
           (Premise(0), Location.root),
           (Premise(1), Location.assumption),
@@ -418,7 +418,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.formulaInsideQuantifier),
           (Premise(0), Location.root),
           (Premise(1), Location.assumption),
@@ -434,7 +434,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.formulaInsideQuantifier),
           (Premise(0), Location.root),
           (Premise(1), Location.assumption),
@@ -450,7 +450,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        Ambiguous(MetaFormula(0), List(
+        Ambiguous(MetaFormula(Formulas.Phi), List(
           (Conclusion, Location.formulaInsideQuantifier),
           (Premise(0), Location.root),
           (Premise(1), Location.assumption),

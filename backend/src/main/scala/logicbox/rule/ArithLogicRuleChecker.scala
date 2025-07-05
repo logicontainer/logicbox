@@ -21,6 +21,9 @@ import logicbox.framework.Error.ReferenceBoxMissingFreshVar
 import logicbox.rule.RulePart.MetaVariable
 import logicbox.rule.RulePart.MetaFormula
 import logicbox.framework.Error.Miscellaneous
+import logicbox.rule.RulePart.Terms
+import logicbox.rule.RulePart.Vars
+import logicbox.rule.RulePart.Formulas
 
 class ArithLogicRuleChecker[
   F <: ConnectiveFormula[F] & QuantifierFormula[F, T, V],
@@ -40,24 +43,24 @@ class ArithLogicRuleChecker[
     case Peano1() => extractNFormulasAndThen(refs, 0) {
       case Nil => formula match {
         case (t1 + Zero()) ~= t2 => 
-          failIf(t1 != t2, Ambiguous(MetaTerm(0), List(
+          failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T1), List(
             (Conclusion, Location.lhs.lhs),
             (Conclusion, Location.rhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(RulePart.Plus(MetaTerm(0), RulePart.Zero()), MetaTerm(0))))
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(RulePart.Plus(MetaTerm(Terms.T1), RulePart.Zero()), MetaTerm(Terms.T1))))
       }
     }
 
     case Peano2() => extractNFormulasAndThen(refs, 0) {
       case Nil => formula match {
         case (t1 + (t2 + One())) ~= ((t3 + t4) + One()) => 
-          failIf(t1 != t3, Ambiguous(MetaTerm(0), List(
+          failIf(t1 != t3, Ambiguous(MetaTerm(Terms.T1), List(
             (Conclusion, Location.lhs.lhs),
             (Conclusion, Location.rhs.lhs.lhs)
           ))) ++
-          failIf(t2 != t4, Ambiguous(MetaTerm(1), List(
+          failIf(t2 != t4, Ambiguous(MetaTerm(Terms.T2), List(
             (Conclusion, Location.lhs.rhs.lhs),
             (Conclusion, Location.rhs.lhs.rhs)
           )))
@@ -65,8 +68,8 @@ class ArithLogicRuleChecker[
         case _ => 
           fail(ShapeMismatch(Conclusion, 
             RulePart.Equals(
-              RulePart.Plus(MetaTerm(0), RulePart.Plus(MetaTerm(1), RulePart.One())),
-              RulePart.Plus(RulePart.Plus(MetaTerm(0), MetaTerm(1)), RulePart.One())
+              RulePart.Plus(MetaTerm(Terms.T1), RulePart.Plus(MetaTerm(Terms.T2), RulePart.One())),
+              RulePart.Plus(RulePart.Plus(MetaTerm(Terms.T1), MetaTerm(Terms.T2)), RulePart.One())
             )
           ))
       }
@@ -78,7 +81,7 @@ class ArithLogicRuleChecker[
 
         case _ => 
           fail(ShapeMismatch(Conclusion, RulePart.Equals(
-            RulePart.Mult(MetaTerm(0), RulePart.Zero()),
+            RulePart.Mult(MetaTerm(Terms.T1), RulePart.Zero()),
             RulePart.Zero()
           )))
       }
@@ -87,20 +90,20 @@ class ArithLogicRuleChecker[
     case Peano4() => extractNFormulasAndThen(refs, 0) {
       case Nil => formula match {
         case (t1 ~* (t2 + One())) ~= ((t3 ~* t4) + t5) =>
-          failIf(Set(t1, t3, t5).size > 1, Ambiguous(MetaTerm(0), List(
+          failIf(Set(t1, t3, t5).size > 1, Ambiguous(MetaTerm(Terms.T1), List(
             (Conclusion, Location.lhs.lhs),
             (Conclusion, Location.rhs.lhs.lhs),
             (Conclusion, Location.rhs.rhs)
           ))) ++
-          failIf(t2 != t4, Ambiguous(MetaTerm(1), List(
+          failIf(t2 != t4, Ambiguous(MetaTerm(Terms.T2), List(
             (Conclusion, Location.lhs.rhs.lhs),
             (Conclusion, Location.rhs.lhs.rhs)
           )))
 
         case _ => 
           fail(ShapeMismatch(Conclusion, RulePart.Equals(
-            RulePart.Mult(MetaTerm(0), RulePart.Plus(MetaTerm(1), RulePart.One())),
-            RulePart.Plus(RulePart.Mult(MetaTerm(0), MetaTerm(1)), MetaTerm(0))
+            RulePart.Mult(MetaTerm(Terms.T1), RulePart.Plus(MetaTerm(Terms.T2), RulePart.One())),
+            RulePart.Plus(RulePart.Mult(MetaTerm(Terms.T1), MetaTerm(Terms.T2)), MetaTerm(Terms.T1))
           )))
       }
     }
@@ -113,7 +116,7 @@ class ArithLogicRuleChecker[
         case _ => 
           fail(ShapeMismatch(Conclusion, RulePart.Not(RulePart.Equals(
             RulePart.Zero(), 
-            RulePart.Plus(MetaTerm(0), RulePart.One())
+            RulePart.Plus(MetaTerm(Terms.T1), RulePart.One())
           ))))
       }
     }
@@ -121,23 +124,23 @@ class ArithLogicRuleChecker[
     case Peano6() => extractNFormulasAndThen(refs, 1) {
       case List(t1 + One() ~= t2 + One()) => (formula match {
         case t3 ~= t4 =>
-          failIf(t3 != t1, Ambiguous(MetaTerm(0), List(
+          failIf(t3 != t1, Ambiguous(MetaTerm(Terms.T1), List(
             (Conclusion, Location.lhs),
             (Premise(0), Location.lhs.lhs)
           ))) ++
-          failIf(t4 != t2, Ambiguous(MetaTerm(1), List(
+          failIf(t4 != t2, Ambiguous(MetaTerm(Terms.T2), List(
             (Conclusion, Location.rhs),
             (Premise(1), Location.rhs.lhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(0), MetaTerm(1))))
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))))
       })
 
       case List(_) => 
         fail(ShapeMismatch(Premise(0), RulePart.Equals(
-          RulePart.Plus(MetaTerm(0), RulePart.One()),
-          RulePart.Plus(MetaTerm(1), RulePart.One())
+          RulePart.Plus(MetaTerm(Terms.T1), RulePart.One()),
+          RulePart.Plus(MetaTerm(Terms.T2), RulePart.One())
         )))
     }
 
@@ -148,7 +151,7 @@ class ArithLogicRuleChecker[
             (substitutor.findReplacement(phi, r0, x) match {
               case Some(() | Zero()) => Nil
 
-              case _ => fail(Ambiguous(MetaFormula(0), List(
+              case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
                 (Conclusion, Location.formulaInsideQuantifier),
                 (Premise(0), Location.root),
                 (Premise(1), Location.assumption),
@@ -159,7 +162,7 @@ class ArithLogicRuleChecker[
               case Some(ass) => 
                 substitutor.findReplacement(phi, ass, x) match {
                   case Some(y) if y == n || y == () => Nil
-                  case _ => fail(Ambiguous(MetaFormula(0), List(
+                  case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
                     (Conclusion, Location.formulaInsideQuantifier),
                     (Premise(0), Location.root),
                     (Premise(1), Location.assumption),
@@ -175,7 +178,7 @@ class ArithLogicRuleChecker[
                 substitutor.findReplacement(phi, ass, x) match {
                   case Some(y + One()) if y == n => Nil
                   case Some(()) => Nil
-                  case _ => fail(Ambiguous(MetaFormula(0), List(
+                  case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
                     (Conclusion, Location.formulaInsideQuantifier),
                     (Premise(0), Location.root),
                     (Premise(1), Location.assumption),
@@ -188,7 +191,7 @@ class ArithLogicRuleChecker[
             })
 
           case _ => 
-            fail(ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(0), MetaFormula(0))))
+            fail(ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi))))
         }
 
         case None =>

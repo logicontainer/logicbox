@@ -106,5 +106,6 @@ class ArithLogicProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 
-  proofChecker = proofChecker
+  proofChecker = proofChecker,
+  convertError = ???
 )

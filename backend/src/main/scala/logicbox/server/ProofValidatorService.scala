@@ -2,10 +2,11 @@ package logicbox.framework
 
 import spray.json._
 import logicbox.server.format.RawProof
+import logicbox.server.format.OutputError
 
 case class ValidationResult(
   proof: RawProof,
-  diagnostics: List[(String, Error)]
+  diagnostics: List[OutputError]
 )
 
 trait ProofValidatorService[Err] {

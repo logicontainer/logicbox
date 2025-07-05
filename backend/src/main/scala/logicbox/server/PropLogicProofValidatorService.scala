@@ -69,6 +69,8 @@ object PropLogicProofValidatorService {
     ruleToString = ruleToString,
     boxInfoToRaw = _ => RawBoxInfo(None)
   )
+
+  def convertError(id: Id, error: Error): OutputError = ???
 }
 
 import PropLogicProofValidatorService._
@@ -76,5 +78,6 @@ class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 
-  proofChecker = proofChecker
+  proofChecker = proofChecker,
+  convertError = convertError
 )
