@@ -148,7 +148,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         refBox("P(a)", "Q(b)", "a")
       )
       checker.check(ExistsElim(), f, refs) shouldBe List(
-        Ambiguous(MetaFormula(Formulas.Psi), List(
+        Ambiguous(MetaFormula(Formulas.Chi), List(
           (Conclusion, Location.root),
           (Premise(1), Location.conclusion)
         ))
@@ -234,14 +234,14 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject when formula is not equality") {
       val f = parse("P(a)")
       checker.check(EqualityIntro(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2)))
+        ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T)))
       )
     }
 
     it("should reject when lhs and rhs are not equal") {
       val f = parse("a = b")
       checker.check(EqualityIntro(), f, Nil) shouldBe List(
-        Ambiguous(MetaTerm(Terms.T1), List(
+        Ambiguous(MetaTerm(Terms.T), List(
           (Conclusion, Location.lhs),
           (Conclusion, Location.rhs)
         ))

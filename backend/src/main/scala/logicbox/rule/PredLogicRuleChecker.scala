@@ -89,7 +89,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           ) ++ 
           failIf(
             concl != Some(formula), 
-            Ambiguous(MetaFormula(Formulas.Psi), List(
+            Ambiguous(MetaFormula(Formulas.Chi), List(
               (Conclusion, Location.root),
               (Premise(1), Location.conclusion)
             ))
@@ -125,13 +125,13 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
     case EqualityIntro() => extractNFormulasAndThen(refs, 0) {
       case _ => formula match {
         case Equals(t1, t2) => 
-          failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T1), List(
+          failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T), List(
             (Conclusion, Location.lhs),
             (Conclusion, Location.rhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))))
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T))))
       }
     }
 

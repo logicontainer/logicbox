@@ -51,7 +51,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     )
 
   describe("Peano1") {
-    val formulaShape = Equals(Plus(MetaTerm(Terms.T1), Zero()), MetaTerm(Terms.T1))
+    val formulaShape = Equals(Plus(MetaTerm(Terms.T), Zero()), MetaTerm(Terms.T))
     it("should fail if has ref") {
       val refs = List(refLine("x = x"))
       val f = parse("n + 0 = n")
@@ -77,7 +77,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if lhs of addition and rhs of equality don't match") {
       val f = parse("n + 0 = m")
       checker.check(Peano1(), f, Nil) shouldBe List(
-        Ambiguous(MetaTerm(Terms.T1), List(
+        Ambiguous(MetaTerm(Terms.T), List(
           (Conclusion, Location.lhs.lhs),
           (Conclusion, Location.rhs)
         ))
@@ -139,7 +139,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
   }
   
   describe("Peano3") {
-    val formulaShape = Equals(Mult(MetaTerm(Terms.T1), Zero()), Zero())
+    val formulaShape = Equals(Mult(MetaTerm(Terms.T), Zero()), Zero())
     it("should fail if has ref") {
       val refs = List(refLine("x = x"))
       val f = parse("n * 0 = 0")
@@ -249,7 +249,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
     }
     
-    val formulaShape = Not(Equals(Zero(), Plus(MetaTerm(Terms.T1), One())))
+    val formulaShape = Not(Equals(Zero(), Plus(MetaTerm(Terms.T), One())))
     it("should reject if not negation") {
       val f = parse("0 = 0 and not (0 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(

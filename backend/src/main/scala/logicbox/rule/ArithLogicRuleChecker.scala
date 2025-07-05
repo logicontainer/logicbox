@@ -43,13 +43,13 @@ class ArithLogicRuleChecker[
     case Peano1() => extractNFormulasAndThen(refs, 0) {
       case Nil => formula match {
         case (t1 + Zero()) ~= t2 => 
-          failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T1), List(
+          failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T), List(
             (Conclusion, Location.lhs.lhs),
             (Conclusion, Location.rhs)
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(RulePart.Plus(MetaTerm(Terms.T1), RulePart.Zero()), MetaTerm(Terms.T1))))
+          fail(ShapeMismatch(Conclusion, RulePart.Equals(RulePart.Plus(MetaTerm(Terms.T), RulePart.Zero()), MetaTerm(Terms.T))))
       }
     }
 
@@ -81,7 +81,7 @@ class ArithLogicRuleChecker[
 
         case _ => 
           fail(ShapeMismatch(Conclusion, RulePart.Equals(
-            RulePart.Mult(MetaTerm(Terms.T1), RulePart.Zero()),
+            RulePart.Mult(MetaTerm(Terms.T), RulePart.Zero()),
             RulePart.Zero()
           )))
       }
@@ -116,7 +116,7 @@ class ArithLogicRuleChecker[
         case _ => 
           fail(ShapeMismatch(Conclusion, RulePart.Not(RulePart.Equals(
             RulePart.Zero(), 
-            RulePart.Plus(MetaTerm(Terms.T1), RulePart.One())
+            RulePart.Plus(MetaTerm(Terms.T), RulePart.One())
           ))))
       }
     }
