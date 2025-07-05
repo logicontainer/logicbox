@@ -13,7 +13,6 @@ object RulePart {
 
   sealed trait TemplateFormula extends RulePart
   case class MetaFormula(id: Int) extends TemplateFormula
-  case class Predicate(p: String, ps: List[TemplateTerm]) extends TemplateFormula
   case class Equals(t1: TemplateTerm, t2: TemplateTerm) extends TemplateFormula
   case class Substitution(phi: TemplateFormula, t: TemplateTerm, x: MetaVariable) extends TemplateFormula
 

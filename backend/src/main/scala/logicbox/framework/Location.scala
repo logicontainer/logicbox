@@ -7,7 +7,7 @@ case class Location(steps: List[Int]) {
   def lhs: Location = Location(steps :+ 0)
   def rhs: Location = Location(steps :+ 1)
   def negated: Location = Location(steps :+ 0)
-  def insideForAll: Location = Location(steps :+ 0)
+  def formulaInsideQuantifier: Location = Location(steps :+ 0)
 
   def assumption: Location = Location(steps :+ 0)
   def conclusion: Location = Location(steps :+ 1)
@@ -21,7 +21,7 @@ object Location {
   def lhs = root.lhs
   def rhs = root.rhs
   def negated = root.negated
-  def formulaInsideQuantifier = root.insideForAll
+  def formulaInsideQuantifier = root.formulaInsideQuantifier
 
   def assumption = root.assumption
   def conclusion = root.conclusion
