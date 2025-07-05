@@ -12,6 +12,8 @@ case class Location(steps: List[Int]) {
   def assumption: Location = Location(steps :+ 0)
   def conclusion: Location = Location(steps :+ 1)
   def freshVar: Location = Location(steps :+ 2)
+
+  def operand(idx: Int) = Location(steps :+ idx)
 }
 
 object Location {
@@ -24,4 +26,6 @@ object Location {
   def assumption = root.assumption
   def conclusion = root.conclusion
   def freshVar = root.freshVar
+  
+  def operand(idx: Int) = root.operand(idx)
 }

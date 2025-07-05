@@ -79,6 +79,14 @@ class PredLogicParser extends PackratParsers {
     }
   }
 
+  def parseTerm(input: List[PredLogicToken]): PredLogicTerm = {
+    phrase(termexp)(PredLogicTokenReader(input)) match {
+      case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
+        throw new RuntimeException(p.toString)
+      case Success(result, _) => result
+    }
+  }
+
   def parseFormula(input: List[PredLogicToken]): PredLogicFormula = {
     phrase(formula)(PredLogicTokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 

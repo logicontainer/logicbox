@@ -84,6 +84,14 @@ class ArithLogicParser extends PackratParsers {
     }
   }
 
+  def parseTerm(input: List[ArithLogicToken]): ArithLogicTerm = {
+    phrase(termexp)(ArithLogicTokenReader(input)) match {
+      case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
+        throw new RuntimeException(p.toString)
+      case Success(result, _) => result
+    }
+  }
+
   def parseFormula(input: List[ArithLogicToken]): ArithLogicFormula = {
     phrase(formula)(ArithLogicTokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
