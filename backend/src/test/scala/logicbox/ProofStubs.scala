@@ -24,6 +24,7 @@ object ProofStubs {
     override val refs: Seq[Id] = Seq(),
   ) extends Proof.Line[StubFormula, StubRule, Id]
 
+
   case class StubBox(
     override val info: StubBoxInfo = StubBoxInfo(),
     override val steps: Seq[Id] = Seq(),
