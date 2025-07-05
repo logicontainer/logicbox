@@ -5,6 +5,8 @@ import logicbox.rule._
 import logicbox.framework._
 import logicbox.proof._
 import logicbox.server.format._
+import logicbox.rule.RulePart.TemplateTerm
+import logicbox.rule.RulePart.TemplateFormula
 
 // 'factory'
 object PropLogicProofValidatorService {
@@ -70,7 +72,8 @@ object PropLogicProofValidatorService {
     boxInfoToRaw = _ => RawBoxInfo(None)
   )
 
-  def convertError(id: Id, error: Error): OutputError = ???
+  def convertError(id: Id, error: Error): OutputError = error match {
+  }
 }
 
 import PropLogicProofValidatorService._

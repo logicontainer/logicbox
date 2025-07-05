@@ -8,6 +8,8 @@ import logicbox.rule.PropLogicRule
 import logicbox.rule.PropLogicRule._
 
 import logicbox.formula._
+import logicbox.rule.RulePart.TemplateTerm
+import logicbox.rule.RulePart.TemplateFormula
 
 object Stringifiers {
   private def propLogicFormulaWithBracks(formula: PropLogicFormula, inner: PropLogicFormula => String, l: String, r: String): String = {
@@ -195,5 +197,57 @@ object Stringifiers {
     case Peano5() => "peano_5"
     case Peano6() => "peano_6"
     case Induction() => "induction"
+  }
+
+  private def templateFormulaWithBracks(formula: TemplateFormula, inner: TemplateFormula => String, l: String, r: String): String = {
+    import logicbox.rule.RulePart._
+    formula match {
+      case Contradiction() | Not(_) | ForAll(_, _) | Exists(_, _) | MetaFormula(_) | Substitution(_, _, _) => inner(formula)
+      case And(_, _) | Or(_, _) | Implies(_, _) | Equals(_, _) => s"$l${inner(formula)}$r"
+    }
+  }
+
+  private def templateTermWithBracks(term: TemplateTerm, inner: TemplateTerm => String, l: String, r: String): String = {
+    import logicbox.rule.RulePart._
+    term match {
+      case Zero() | One() | MetaTerm(_) | MetaVariable(_) => inner(term)
+      case Plus(_, _) | Mult(_, _) => s"$l${inner(term)}$r"
+    }
+  }
+
+  def templateTermToLaTeX(term: TemplateTerm): String = {
+    import logicbox.rule.RulePart._
+    def b(f: TemplateTerm) = templateTermWithBracks(f, templateTermToLaTeX, "(", ")")
+    term match {
+      case MetaVariable(Vars.X) => "x"
+      case MetaVariable(Vars.X0) => "x_0"
+      case MetaVariable(Vars.N) => "n"
+      case MetaTerm(Terms.T) => "t"
+      case MetaTerm(Terms.T1) => "t_1"
+      case MetaTerm(Terms.T2) => "t_2"
+      case Zero() => "0"
+      case One() => "1"
+      case Plus(t1, t2) => s"${b(t1)} + ${b(t2)}"
+      case Mult(t1, t2) => s"${b(t1)} * ${b(t2)}"
+    }
+  }
+
+  def templateFormulaToLaTeX(formula: TemplateFormula): String = {
+    import logicbox.rule.RulePart._
+    def b(f: TemplateFormula) = templateFormulaWithBracks(f, templateFormulaToLaTeX, "(", ")")
+    formula match {
+      case MetaFormula(Formulas.Phi) => "\\phi"
+      case MetaFormula(Formulas.Psi) => "\\psi"
+      case MetaFormula(Formulas.Chi) => "\\chi"
+      case Substitution(phi, t, x) => s"${b(phi)}[${templateTermToLaTeX(t)}/${templateTermToLaTeX(x)}]"
+      case Contradiction() => "false"
+      case Equals(t1, t2) => s"${templateTermToLaTeX(t1)} = ${templateTermToLaTeX(t2)}"
+      case And(phi, psi) => s"${b(phi)} and ${b(psi)}"
+      case Or(phi, psi) => s"${b(phi)} or ${b(psi)}"
+      case Implies(phi, psi) => s"${b(phi)} -> ${b(psi)}"
+      case Not(phi) => s"not ${b(phi)}"
+      case ForAll(x, phi) => s"forall ${templateTermToLaTeX(x)} ${b(phi)}"
+      case Exists(x, phi) => s"exists ${templateTermToLaTeX(x)} ${b(phi)}"
+    }
   }
 }
