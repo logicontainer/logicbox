@@ -63,14 +63,14 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if formula is not equality") {
       val f = parse("0 = 0 and n + 0 = n")
       checker.check(Peano1(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should fail if rhs is not 0") {
       val f = parse("n + 1 = n")
       checker.check(Peano1(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -101,14 +101,14 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if not equality") {
       val f = parse("0 = 0 and (n + (m + 1) = (n + m) + 1)")
       checker.check(Peano2(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should fail if lhs is not addition") {
       val f = parse("n * (m + 1) = (n + m) + 1")
       checker.check(Peano2(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -151,14 +151,14 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if not equality") {
       val f = parse("0 = 0 and n * 0 = 0")
       checker.check(Peano3(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should fail if not multiplication") {
       val f = parse("n + 0 = 0")
       checker.check(Peano3(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
     
@@ -185,21 +185,21 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if not equality") {
       val f = parse("0 = 0 and (n * (m * 1) = (n * m) + m)")
       checker.check(Peano4(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should fail if lhs is not mult") {
       val f = parse("n + (m + 1) = (n * m) + n")
       checker.check(Peano4(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should fail if lhs doesn't not have correct 1") {
       val f = parse("n * (m + 0) = (n * m) + n")
       checker.check(Peano4(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -253,35 +253,35 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject if not negation") {
       val f = parse("0 = 0 and not (0 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should reject if inner is not equality") {
       val f = parse("not (not 0 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should reject when lhs is not 0") {
       val f = parse("not (1 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should reject when rhs is not addition") {
       val f = parse("not (0 = t * 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
     it("should reject ift rhs of addition is not 1") {
       val f = parse("not (0 = t + 0)") 
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -304,7 +304,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("m + 1 = n + 1"))
       val f = parse("m = n and m = n")
       checker.check(Peano6(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion, formulaShape)
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -312,7 +312,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("m + 1 = n + 1 and top"))
       val f = parse("m = n")
       checker.check(Peano6(), f, refs) shouldBe List(
-        ShapeMismatch(Premise(0), refShape)
+        ShapeMismatch(Premise(0))
       )
     }
 
@@ -382,7 +382,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi)))
+        ShapeMismatch(Conclusion)
       )
     }
 

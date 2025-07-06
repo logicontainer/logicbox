@@ -101,5 +101,5 @@ class PredLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  convertError = ???
+  errorConverter = ???
 )

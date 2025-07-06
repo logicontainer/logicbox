@@ -13,7 +13,7 @@ import logicbox.server.format.OutputError
 class ProofValidatorServiceImpl[F, R, B](
   val rawProofConverter: RawProofConverter[Proof[F, R, B, String]],
   val proofChecker: ProofChecker[F, R, B, String],
-  val convertError: (String, Error) => OutputError
+  val errorConverter: ErrorConverter[F, R, B]
 ) extends ProofValidatorService[Unit] {
 
   override def validateProof(rawProof: RawProof): Either[Unit, ValidationResult] = {
@@ -22,7 +22,7 @@ class ProofValidatorServiceImpl[F, R, B](
     val outputRawProof = rawProofConverter.convertToRaw(proof)
     Right(ValidationResult(
       proof = outputRawProof,
-      diagnostics = errors.map((id, e) => convertError(id, e))
+      diagnostics = errors.map((id, e) => errorConverter.convert(proof, id, e))
     ))
   }
 }

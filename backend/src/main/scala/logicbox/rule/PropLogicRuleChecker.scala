@@ -49,7 +49,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             ))
         }
         
-        case _ => fail(ShapeMismatch(PPremise(0), RulePart.And(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+        case _ => fail(ShapeMismatch(PPremise(0)))
       }
     }
   
@@ -65,7 +65,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             (PPremise(1), Location.root)
           )))
         
-        case _ => fail(ShapeMismatch(Conclusion, RulePart.And(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+        case _ => fail(ShapeMismatch(Conclusion))
       }
     }
   
@@ -83,7 +83,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             (PPremise(0), Location.root)
           )))
 
-        case _ => fail(ShapeMismatch(Conclusion, RulePart.Or(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+        case _ => fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -117,7 +117,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
                 (PPremise(2), Location.assumption)
               )))
 
-            case _ => fail(ShapeMismatch(PPremise(0), RulePart.Or(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+            case _ => fail(ShapeMismatch(PPremise(0)))
           }}
         }
       }
@@ -136,7 +136,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -153,7 +153,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
           )))
 
         case _ => 
-          fail(ShapeMismatch(PPremise(1), RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+          fail(ShapeMismatch(PPremise(1)))
       }
     }
 
@@ -163,7 +163,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
           case Some(Contradiction()) => Nil
 
           case _ => 
-            fail(ShapeMismatch((PPremise(0), Location.conclusion), RulePart.Contradiction()))
+            fail(ShapeMismatch(PPremise(0), Location.conclusion))
 
         }} ++ { 
           formula match {
@@ -174,7 +174,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
               )))
 
             case _ => 
-              fail(ShapeMismatch(Conclusion, RulePart.Not(MetaFormula(Formulas.Phi))))
+              fail(ShapeMismatch(Conclusion))
           }
         }
     }
@@ -183,7 +183,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
       case List(r0, r1) =>
         { formula match {
           case Contradiction() => Nil
-          case _ => fail(ShapeMismatch(Conclusion, RulePart.Contradiction()))
+          case _ => fail(ShapeMismatch(Conclusion))
         }} ++ { r1 match {
           case Not(phi) => 
             failIf(r0 != phi, Ambiguous(MetaFormula(Formulas.Phi), List(
@@ -192,13 +192,13 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             )))
 
           case _ =>
-            fail(ShapeMismatch(PPremise(1), RulePart.Not(MetaFormula(Formulas.Phi))))
+            fail(ShapeMismatch(PPremise(1)))
         }}
     }
 
     case ContradictionElim() => extractNFormulasAndThen(refs, 1) {
       case List(Contradiction()) => Nil
-      case _ => fail(ShapeMismatch(PPremise(0), RulePart.Contradiction()))
+      case _ => fail(ShapeMismatch(PPremise(0)))
     }
 
     case NotNotElim() => extractNFormulasAndThen(refs, 1) {
@@ -209,7 +209,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
         )))
 
       case List(_) => 
-        fail(ShapeMismatch(PPremise(0), RulePart.Not(RulePart.Not(MetaFormula(Formulas.Phi)))))
+        fail(ShapeMismatch(PPremise(0)))
     }
   
     case ModusTollens() => extractNFormulasAndThen(refs, 2) {
@@ -217,15 +217,15 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
         { formula match {
           case Not(_) => Nil
           case _ => 
-            fail(ShapeMismatch(Conclusion, RulePart.Not(MetaFormula(Formulas.Phi))))
+            fail(ShapeMismatch(Conclusion))
         }} ++ { r0 match {
           case Implies(_, _) => Nil
           case _ => 
-            fail(ShapeMismatch(PPremise(0), RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Psi))))
+            fail(ShapeMismatch(PPremise(0)))
         }} ++ { r1 match {
           case Not(_) => Nil
           case _ => 
-            fail(ShapeMismatch(PPremise(1), RulePart.Not(MetaFormula(Formulas.Psi))))
+            fail(ShapeMismatch(PPremise(1)))
         }} ++ { (formula, r0, r1) match {
           case (Not(phi2), Implies(phi1, psi1), Not(psi2)) =>
             failIf(phi2 != phi1, Ambiguous(MetaFormula(Formulas.Phi), List(
@@ -250,7 +250,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Not(RulePart.Not(MetaFormula(Formulas.Phi)))))
+          fail(ShapeMismatch(Conclusion))
       }
     }
   
@@ -264,13 +264,13 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             )))
 
           case _ => 
-            fail(ShapeMismatch((PPremise(0), Location.assumption), RulePart.Not(MetaFormula(Formulas.Phi))))
+            fail(ShapeMismatch(PPremise(0), Location.assumption))
         }
       } ++ { 
         concl match {
           case Some(Reference.Line(Contradiction())) => Nil
           case _ => 
-            fail(ShapeMismatch((PPremise(0), Location.conclusion), RulePart.Contradiction()))
+            fail(ShapeMismatch(PPremise(0), Location.conclusion))
         }
       }
     }
@@ -283,7 +283,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             (Conclusion, Location.rhs.negated)
           )))
 
-        case _ => fail(ShapeMismatch(Conclusion, RulePart.Or(MetaFormula(Formulas.Phi), RulePart.Not(MetaFormula(Formulas.Phi)))))
+        case _ => fail(ShapeMismatch(Conclusion))
       }
     }
 

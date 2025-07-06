@@ -49,7 +49,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           )
 
         case _ => 
-          fail(ShapeMismatch(Premise(0), RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi))))
+          fail(ShapeMismatch(Premise(0)))
       }
     }
 
@@ -71,7 +71,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
               )
 
             case _ => 
-              fail(ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi))))
+              fail(ShapeMismatch(Conclusion))
           }
       }
     }
@@ -103,7 +103,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           fail(ReferenceBoxMissingFreshVar(1))
       }
       case _ => 
-        fail(ShapeMismatch(Premise(0), RulePart.Exists(MetaVariable(Vars.X), MetaFormula(Formulas.Phi))))
+        fail(ShapeMismatch(Premise(0)))
     }
 
     case ExistsIntro() => extractNFormulasAndThen(refs, 1) {
@@ -118,7 +118,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           )
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Exists(MetaVariable(Vars.X), MetaFormula(Formulas.Phi))))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -131,7 +131,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T))))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -147,7 +147,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           )
 
         case _ => 
-          fail(ShapeMismatch(Premise(0), RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))))
+          fail(ShapeMismatch(Premise(0)))
       }
     }
   }

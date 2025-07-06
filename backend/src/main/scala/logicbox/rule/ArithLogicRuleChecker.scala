@@ -49,7 +49,7 @@ class ArithLogicRuleChecker[
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(RulePart.Plus(MetaTerm(Terms.T), RulePart.Zero()), MetaTerm(Terms.T))))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -66,12 +66,7 @@ class ArithLogicRuleChecker[
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, 
-            RulePart.Equals(
-              RulePart.Plus(MetaTerm(Terms.T1), RulePart.Plus(MetaTerm(Terms.T2), RulePart.One())),
-              RulePart.Plus(RulePart.Plus(MetaTerm(Terms.T1), MetaTerm(Terms.T2)), RulePart.One())
-            )
-          ))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -79,11 +74,7 @@ class ArithLogicRuleChecker[
       case _ => formula match {
         case (_ ~* Zero()) ~= Zero() => Nil
 
-        case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(
-            RulePart.Mult(MetaTerm(Terms.T), RulePart.Zero()),
-            RulePart.Zero()
-          )))
+        case _ => fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -101,10 +92,7 @@ class ArithLogicRuleChecker[
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(
-            RulePart.Mult(MetaTerm(Terms.T1), RulePart.Plus(MetaTerm(Terms.T2), RulePart.One())),
-            RulePart.Plus(RulePart.Mult(MetaTerm(Terms.T1), MetaTerm(Terms.T2)), MetaTerm(Terms.T1))
-          )))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -114,10 +102,7 @@ class ArithLogicRuleChecker[
           Nil
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Not(RulePart.Equals(
-            RulePart.Zero(), 
-            RulePart.Plus(MetaTerm(Terms.T), RulePart.One())
-          ))))
+          fail(ShapeMismatch(Conclusion))
       }
     }
 
@@ -134,14 +119,11 @@ class ArithLogicRuleChecker[
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))))
+          fail(ShapeMismatch(Conclusion))
       })
 
       case List(_) => 
-        fail(ShapeMismatch(Premise(0), RulePart.Equals(
-          RulePart.Plus(MetaTerm(Terms.T1), RulePart.One()),
-          RulePart.Plus(MetaTerm(Terms.T2), RulePart.One())
-        )))
+        fail(ShapeMismatch(Premise(0)))
     }
 
     case Induction() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
@@ -191,7 +173,7 @@ class ArithLogicRuleChecker[
             })
 
           case _ => 
-            fail(ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi))))
+            fail(ShapeMismatch(Conclusion))
         }
 
         case None =>

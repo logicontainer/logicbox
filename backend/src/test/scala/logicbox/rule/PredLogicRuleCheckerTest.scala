@@ -68,7 +68,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject if ref is not forall") {
       val f = parse("P(x)")
       checker.check(ForAllElim(), f, List(refLine("P(x)"))) shouldBe List(
-        ShapeMismatch(Premise(0), RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi)))
+        ShapeMismatch(Premise(0))
       )
     }
 
@@ -106,7 +106,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject when formula is not forall") {
       val f = parse("P(x)")
       checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", "a"))) shouldBe List(
-        ShapeMismatch(Conclusion, RulePart.ForAll(MetaVariable(Vars.X), MetaFormula(Formulas.Phi)))
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -184,7 +184,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         refBox("P(a)", "P(a)", "a")
       )
       checker.check(ExistsElim(), f, refs) shouldBe List(
-        ShapeMismatch(Premise(0), RulePart.Exists(MetaVariable(Vars.X), MetaFormula(Formulas.Phi)))
+        ShapeMismatch(Premise(0))
       )
     }
   }
@@ -194,7 +194,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(x)")
       val refs = List(refLine("P(a)"))
       checker.check(ExistsIntro(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion, RulePart.Exists(MetaVariable(Vars.X), MetaFormula(Formulas.Phi)))
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -234,7 +234,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject when formula is not equality") {
       val f = parse("P(a)")
       checker.check(EqualityIntro(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion, RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T)))
+        ShapeMismatch(Conclusion)
       )
     }
 
@@ -254,7 +254,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(b)")
       val refs = List(refLine("P(b)"), refLine("P(a)"))
       checker.check(EqualityElim(), f, refs) shouldBe List(
-        ShapeMismatch(Premise(0), RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2)))
+        ShapeMismatch(Premise(0))
       )
     }
 

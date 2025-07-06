@@ -71,9 +71,6 @@ object PropLogicProofValidatorService {
     ruleToString = ruleToString,
     boxInfoToRaw = _ => RawBoxInfo(None)
   )
-
-  def convertError(id: Id, error: Error): OutputError = error match {
-  }
 }
 
 import PropLogicProofValidatorService._
@@ -82,5 +79,5 @@ class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  convertError = convertError
+  errorConverter = ???
 )
