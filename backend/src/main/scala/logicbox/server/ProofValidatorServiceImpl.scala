@@ -22,7 +22,7 @@ class ProofValidatorServiceImpl[F, R, B](
     val outputRawProof = rawProofConverter.convertToRaw(proof)
     Right(ValidationResult(
       proof = outputRawProof,
-      diagnostics = errors.map((id, e) => errorConverter.convert(proof, id, e))
+      diagnostics = errors.map((id, e) => errorConverter.convert(proof, id, e).getOrElse(???))
     ))
   }
 }

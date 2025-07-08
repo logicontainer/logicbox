@@ -7,7 +7,7 @@ import logicbox.framework.Location
 class ProofNavigator[F, B, Id, O](
   formulaNavigator: Navigator[F, O],
   boxInfoNavigator: Navigator[B, O],
-) extends Navigator[(Proof[F, ?, B, Id], Id), O] {
+) extends Navigator[(Proof[F, Any, B, Id], Id), O] {
   private enum Result {
     case Nothing
     case FoundFormula(formula: F, rest: Location)
