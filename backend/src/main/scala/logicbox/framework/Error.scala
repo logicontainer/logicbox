@@ -19,7 +19,7 @@ object Error {
   case class ReferenceShouldBeLine(refIdx: Int) extends Error
 
   case class WrongNumberOfReferences(exp: Int, actual: Int) extends Error
-  case class ShapeMismatch(rulePos: RulePosition, loc: Location = Location.root) extends Error
-  case class Ambiguous(what: RulePart, entries: List[(RulePosition, Location)]) extends Error
-  case class Miscellaneous(pos: RulePosition, expl: String) extends Error
+  case class ShapeMismatch(loc: Location) extends Error
+  case class Ambiguous(what: RulePart, entries: List[Location]) extends Error
+  case class Miscellaneous(pos: Location, expl: String) extends Error
 }

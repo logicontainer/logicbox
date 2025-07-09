@@ -12,7 +12,7 @@ import logicbox.server.format.OutputError.AmbiguityEntry
 import logicbox.framework.Location
 
 class ErrorConverterImpl[F, R, B](
-  getRulePart: (R, RulePosition) => Option[RulePart],
+  getRulePart: (R, Location) => Option[RulePart],
   formulaToString: F => String,
   rulePartToString: RulePart => String,
   proofNavigator: Navigator[(Proof[F, R, B, String], String), F],
@@ -34,14 +34,14 @@ class ErrorConverterImpl[F, R, B](
   }
 
   override def convert(proof: Proof[F, R, B, String], stepId: String, error: Error): Option[OutputError] = error match {
-    case ShapeMismatch(rulePos, loc) => for {
+    case ShapeMismatch(loc) => for {
       _ <- Some(())
       rule <- proof.getStep(stepId).toOption.collect { case Proof.Line(_, rule, _) => rule }
-      rulePart <- getRulePart(rule, rulePos).flatMap(rulePartNavigator.get(_, loc))
-      actualPartId <- getIdOfStepAtRulePos(proof, stepId, rulePos)
+      rulePart <- getRulePart(rule, ???).flatMap(rulePartNavigator.get(_, loc))
+      actualPartId <- getIdOfStepAtRulePos(proof, stepId, ???)
       actualPart <- proofNavigator.get((proof, actualPartId), loc)
 
-      rulePosStr = rulePosToStr(rulePos)
+      rulePosStr = rulePosToStr(???)
       expectedStr = rulePartToString(rulePart)
       actualStr = formulaToString(actualPart)
     } yield OutputError.ShapeMismatch(stepId, rulePosStr, expectedStr, actualStr)
@@ -49,12 +49,12 @@ class ErrorConverterImpl[F, R, B](
     case Ambiguous(what, ls) => for {
       rule <- proof.getStep(stepId).toOption.collect { case Proof.Line(_, rule, _) => rule }
       entries <- ls.foldRight(Some(Nil): Option[List[AmbiguityEntry]]) {
-        case ((rulePos, loc), Some(es)) => for {
-          rulePart <- getRulePart(rule, rulePos).flatMap(rulePartNavigator.get(_, loc))
-          actualPartId <- getIdOfStepAtRulePos(proof, stepId, rulePos)
+        case (loc, Some(es)) => for {
+          rulePart <- getRulePart(rule, ???).flatMap(rulePartNavigator.get(_, loc))
+          actualPartId <- getIdOfStepAtRulePos(proof, stepId, ???)
           actualPart <- proofNavigator.get((proof, actualPartId), loc)
         } yield OutputError.AmbiguityEntry(
-          rulePosition = rulePosToStr(rulePos),
+          rulePosition = rulePosToStr(???),
           meta = rulePartToString(rulePart),
           actual = formulaToString(actualPart)
         ) :: es

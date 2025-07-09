@@ -1,6 +1,7 @@
 package logicbox.proof
 
 import logicbox.framework.{Proof, Error, RulePosition}
+import logicbox.framework.Location
 
 object ProofCheckUtil {
   def getFirstLine[F, R, Id](proof: Proof[F, R, ?, Id], box: Proof.Box[?, Id]): Option[Proof.Line[F, R, Id]] = box match {
@@ -39,7 +40,7 @@ object ProofCheckUtil {
   ): List[(Id, Error)] = {
     checkFirstLineOfBoxRef(proof, stepId, line, refIdx, {
       case (id, Proof.Line(_, rule, _)) if rule != assumptionRule => List(
-        (stepId, Error.Miscellaneous(RulePosition.Premise(refIdx), "first line in box must be assumption"))
+        (stepId, Error.Miscellaneous(Location.premise(refIdx), "first line in box must be assumption"))
       )
 
       case _ => Nil

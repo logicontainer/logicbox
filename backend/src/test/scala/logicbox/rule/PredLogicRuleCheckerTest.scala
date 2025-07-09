@@ -19,7 +19,6 @@ import logicbox.framework.RulePosition.Premise
 import logicbox.rule.RulePart.MetaFormula
 import logicbox.rule.RulePart.MetaVariable
 import logicbox.framework.Location
-import logicbox.framework.RulePosition.Conclusion
 import logicbox.rule.RulePart.MetaTerm
 import logicbox.rule.RulePart.Formulas
 import logicbox.rule.RulePart.Terms
@@ -68,7 +67,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject if ref is not forall") {
       val f = parse("P(x)")
       checker.check(ForAllElim(), f, List(refLine("P(x)"))) shouldBe List(
-        ShapeMismatch(Premise(0))
+        ShapeMismatch(Location.premise(0))
       )
     }
 
@@ -76,8 +75,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("Q(a)")
       checker.check(ForAllElim(), f, List(refLine("forall x P(x)"))) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.root),
-          (Premise(0), Location.formulaInsideQuantifier)
+          Location.conclusion.root,
+          Location.premise(0).formulaInsideQuantifier
         ))
       )
     }
@@ -106,7 +105,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject when formula is not forall") {
       val f = parse("P(x)")
       checker.check(ForAllIntro(), f, List(refBox("P(a)", "P(a)", "a"))) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -119,8 +118,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("forall x P(x)")
       checker.check(ForAllIntro(), f, List(refBox("P(a)", "Q(x)", "a"))) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.formulaInsideQuantifier),
-          (Premise(0), Location.conclusion)
+          Location.conclusion.formulaInsideQuantifier,
+          Location.premise(0).lastLine
         ))
       )
     }
@@ -135,8 +134,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       )
       checker.check(ExistsElim(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Premise(0), Location.formulaInsideQuantifier),
-          (Premise(1), Location.assumption)
+          Location.premise(0).formulaInsideQuantifier,
+          Location.premise(1).firstLine
         ))
       )
     }
@@ -149,8 +148,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       )
       checker.check(ExistsElim(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Chi), List(
-          (Conclusion, Location.root),
-          (Premise(1), Location.conclusion)
+          Location.conclusion.root,
+          Location.premise(1).lastLine
         ))
       )
     }
@@ -173,7 +172,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         refBox("P(a)", "P(a) and P(a)", "a")
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
-        case List(Miscellaneous(Conclusion, _)) => 
+        case List(Miscellaneous(Location(0 :: Nil), _)) => 
       }
     }
     
@@ -184,7 +183,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         refBox("P(a)", "P(a)", "a")
       )
       checker.check(ExistsElim(), f, refs) shouldBe List(
-        ShapeMismatch(Premise(0))
+        ShapeMismatch(Location.premise(0))
       )
     }
   }
@@ -194,7 +193,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(x)")
       val refs = List(refLine("P(a)"))
       checker.check(ExistsIntro(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -215,8 +214,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("P(x)"))
       checker.check(ExistsIntro(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.formulaInsideQuantifier),
-          (Premise(0), Location.root)
+          Location.conclusion.formulaInsideQuantifier,
+          Location.premise(0).root
         ))
       )
     }
@@ -234,7 +233,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject when formula is not equality") {
       val f = parse("P(a)")
       checker.check(EqualityIntro(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -242,8 +241,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("a = b")
       checker.check(EqualityIntro(), f, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T), List(
-          (Conclusion, Location.lhs),
-          (Conclusion, Location.rhs)
+          Location.conclusion.lhs,
+          Location.conclusion.rhs
         ))
       )
     }
@@ -254,7 +253,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(b)")
       val refs = List(refLine("P(b)"), refLine("P(a)"))
       checker.check(EqualityElim(), f, refs) shouldBe List(
-        ShapeMismatch(Premise(0))
+        ShapeMismatch(Location.premise(0))
       )
     }
 
@@ -265,8 +264,8 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
 
       checker.check(EqualityElim(), to, List(eq, from)) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.root),
-          (Premise(1), Location.root)
+          Location.conclusion.root,
+          Location.premise(1).root
         ))
       )
     }

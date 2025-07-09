@@ -41,7 +41,7 @@ object ProofStubs {
       }
   }
 
-  val stubError = Miscellaneous(RulePosition.Conclusion, "test")
+  val stubError = Miscellaneous(Location.conclusion, "test")
   case class StubRuleChecker() extends RuleChecker[F, R, B] {
     var refsCalledWith: Option[List[Reference[StubFormula, StubBoxInfo]]] = None
 
@@ -49,7 +49,7 @@ object ProofStubs {
       refsCalledWith = Some(refs)
       rule match {
         case Good() => Nil
-        case Bad() => List(Miscellaneous(RulePosition.Conclusion, "test"))
+        case Bad() => List(Miscellaneous(Location.conclusion, "test"))
       }
   }
 }

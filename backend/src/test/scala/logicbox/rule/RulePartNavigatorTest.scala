@@ -41,13 +41,13 @@ class RulePartNavigatorTest extends AnyFunSpec {
     }
 
     it("should get assumption of box") {
-      nav.get(TemplateBox(Some(MetaFormula(Formulas.Phi)), None, None), Location.assumption) shouldBe Some(MetaFormula(Formulas.Phi))
-      nav.get(TemplateBox(None, None, None), Location.assumption) shouldBe None
+      nav.get(TemplateBox(Some(MetaFormula(Formulas.Phi)), None, None), Location.firstLine) shouldBe Some(MetaFormula(Formulas.Phi))
+      nav.get(TemplateBox(None, None, None), Location.firstLine) shouldBe None
     }
 
     it("should get conclusion of box") {
-      nav.get(TemplateBox(None, Some(MetaFormula(Formulas.Psi)), None), Location.conclusion) shouldBe Some(MetaFormula(Formulas.Psi))
-      nav.get(TemplateBox(None, None, None), Location.assumption) shouldBe None
+      nav.get(TemplateBox(None, Some(MetaFormula(Formulas.Psi)), None), Location.lastLine) shouldBe Some(MetaFormula(Formulas.Psi))
+      nav.get(TemplateBox(None, None, None), Location.lastLine) shouldBe None
     }
 
     it("should get operands of addition") {
@@ -74,7 +74,7 @@ class RulePartNavigatorTest extends AnyFunSpec {
         None, 
         None
       )
-      nav.get(part, Location.assumption.negated.rhs.lhs.rhs.lhs) shouldBe Some(MetaTerm(Terms.T1))
+      nav.get(part, Location.firstLine.negated.rhs.lhs.rhs.lhs) shouldBe Some(MetaTerm(Terms.T1))
     }
 
     it("should reject nonsense") {

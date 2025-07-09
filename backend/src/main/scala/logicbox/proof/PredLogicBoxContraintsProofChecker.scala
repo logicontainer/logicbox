@@ -1,11 +1,12 @@
 package logicbox.proof
 
-import logicbox.framework.{Proof, ProofChecker, Error, RulePosition}
+import logicbox.framework.{Proof, ProofChecker, Error}
 import logicbox.rule.{PredLogicRule}
 import logicbox.rule.PredLogicRule._
 import logicbox.proof.ProofCheckUtil.checkForEveryLine
 import logicbox.proof.ProofCheckUtil.checkRefHasAssumptionOnFirstLine
 import logicbox.proof.ProofCheckUtil.checkFirstLineOfBoxRef
+import logicbox.framework.Location
 
 class PredLogicBoxConstraintsProofChecker[R >: PredLogicRule, Id](
   assumptionRule: R
@@ -21,7 +22,7 @@ class PredLogicBoxConstraintsProofChecker[R >: PredLogicRule, Id](
       case ForAllIntro() => 
         checkFirstLineOfBoxRef(proof, id, line, 0, {
           case (_, Proof.Line(_, rule, _)) if rule == assumptionRule => List(
-            (id, Error.Miscellaneous(RulePosition.Premise(0), "first line of box must not be assumption"))
+            (id, Error.Miscellaneous(Location.premise(0), "first line of box must not be assumption"))
           )
           case _ => Nil
         })

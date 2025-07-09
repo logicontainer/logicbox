@@ -13,7 +13,7 @@ import logicbox.framework.Proof
 import logicbox.rule.PropLogicRule._
 import logicbox.framework.Error
 import logicbox.framework.Error.Miscellaneous
-import logicbox.framework.RulePosition
+import logicbox.framework.Location
 
 class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
 
@@ -30,7 +30,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(RulePosition.Premise(0), _))) =>
+        case List(("l2", Miscellaneous(Location(d :: Nil), _))) =>
       }
     }
 
@@ -103,7 +103,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Error.Miscellaneous(RulePosition.Premise(0), _))) =>
+        case List(("l2", Error.Miscellaneous(Location(d :: Nil), _))) =>
       }
     }
 
@@ -118,7 +118,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(RulePosition.Premise(0), _))) =>
+        case List(("l2", Miscellaneous(Location(d :: Nil), _))) =>
       }
     }
 
@@ -138,7 +138,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(("l4", Miscellaneous(RulePosition.Premise(1), _))) =>
+        case List(("l4", Miscellaneous(Location(d :: Nil), _))) =>
       }
     }
 
@@ -158,7 +158,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(("l4", Miscellaneous(RulePosition.Premise(2), _))) =>
+        case List(("l4", Miscellaneous(Location(d :: Nil), _))) =>
       }
     }
 
@@ -189,7 +189,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(RulePosition.Premise(0), _))) =>
+        case List(("l2", Miscellaneous(Location(d :: Nil), _))) =>
       }
     }
   }

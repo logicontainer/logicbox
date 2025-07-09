@@ -15,6 +15,7 @@ import logicbox.rule.PredLogicRule
 import logicbox.rule.PredLogicRule._
 import logicbox.framework.RulePosition
 import logicbox.framework.Error.Miscellaneous
+import logicbox.framework.Location
 
 class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
   describe("check") {
@@ -36,7 +37,7 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l3", Error.Miscellaneous(RulePosition.Premise(1), _))) =>
+        case List(("l3", Error.Miscellaneous(Location(1 :: Nil), _))) =>
       }
     }
 
@@ -51,7 +52,7 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(RulePosition.Premise(0), _))) =>
+        case List(("l2", Miscellaneous(Location(0 :: Nil), _))) =>
       }
     }
 

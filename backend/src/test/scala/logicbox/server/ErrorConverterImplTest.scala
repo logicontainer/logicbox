@@ -25,7 +25,6 @@ import logicbox.server.format.OutputError
 import logicbox.framework.RulePosition.Premise
 import logicbox.proof.ProofNavigator
 import logicbox.rule.RulePartNavigator
-import logicbox.framework.RulePosition.Conclusion
 import logicbox.server.format.OutputError.AmbiguityEntry
 
 class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
@@ -34,7 +33,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
   val NAV_FAIL = 512502
 
   trait RulePartGetter {
-    def getRulePart(rule: StubRule, rulePos: RulePosition): Option[RulePart]
+    def getRulePart(rule: StubRule, rulePos: Location): Option[RulePart]
   }
 
   def fix = {
@@ -55,7 +54,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
     def stubFormulaToString(f: StubFormula): String = s"sf(${f.i.toString})"
     def rulePartToLaTeX(r: RulePart): String = s"--${r.toString}"
-    def getRulePart(rule: StubRule, rulePos: RulePosition): Option[RulePart] = rpg.getRulePart(rule, rulePos)
+    def getRulePart(rule: StubRule, rulePos: Location): Option[RulePart] = rpg.getRulePart(rule, rulePos)
 
     val pnav = ProofNavigator[F, B, String, F](StubFormulaNav(), BoxNav())
 
@@ -73,9 +72,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val part = RulePart.Equals(MetaVariable(Vars.X), MetaVariable(Vars.X))
-      when(rpg.getRulePart(Good(), Conclusion)).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(part))
 
-      cvtr.convert(pf, "l1", Error.ShapeMismatch(Conclusion, Location.root)) shouldBe Some(OutputError.ShapeMismatch(
+      cvtr.convert(pf, "l1", Error.ShapeMismatch(Location.conclusion.root)) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "l1",
         rulePosition = "conclusion",
         expected = s"--${part.toString}",
@@ -93,9 +92,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val part = RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T))
-      when(rpg.getRulePart(Good(), Conclusion)).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(part))
 
-      cvtr.convert(pf, "l2", Error.ShapeMismatch(Conclusion, Location.root)) shouldBe Some(OutputError.ShapeMismatch(
+      cvtr.convert(pf, "l2", Error.ShapeMismatch(Location.conclusion)) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "l2",
         rulePosition = "conclusion",
         expected = s"--${part.toString}",
@@ -114,9 +113,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val part = RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T))
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
 
-      cvtr.convert(pf, "l1", Error.ShapeMismatch(Premise(0), Location.root)) shouldBe Some(OutputError.ShapeMismatch(
+      cvtr.convert(pf, "l1", Error.ShapeMismatch(Location.premise(0))) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "l1",
         rulePosition = "premise 0",
         expected = s"--${part.toString}",
@@ -136,9 +135,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Premise(1))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(part))
 
-      cvtr.convert(pf, "l1", Error.ShapeMismatch(Premise(1), Location.root)) shouldBe Some(OutputError.ShapeMismatch(
+      cvtr.convert(pf, "l1", Error.ShapeMismatch(Location.premise(1))) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "l1",
         rulePosition = "premise 1",
         expected = s"--${part.toString}",
@@ -160,9 +159,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val assRulePart = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))
       val part = TemplateBox(ass = Some(assRulePart), concl = None, freshVar = None)
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
 
-      cvtr.convert(pf, "line", Error.ShapeMismatch(Premise(0), Location.assumption)) shouldBe Some(OutputError.ShapeMismatch(
+      cvtr.convert(pf, "line", Error.ShapeMismatch(Location.premise(0).firstLine)) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "line",
         rulePosition = "premise 0",
         expected = s"--${assRulePart.toString}",
@@ -184,10 +183,10 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       // rule is t1 = t1
       val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
 
       // but we ask for operand 3
-      cvtr.convert(pf, "line", Error.ShapeMismatch(Premise(0), Location.operand(3))) shouldBe None
+      cvtr.convert(pf, "line", Error.ShapeMismatch(Location.premise(0).operand(3))) shouldBe None
     }
 
     it("should return none when formula nav fails") {
@@ -200,9 +199,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Conclusion)).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(part))
 
-      cvtr.convert(pf, "line", Error.ShapeMismatch(Conclusion, Location.root)) shouldBe None
+      cvtr.convert(pf, "line", Error.ShapeMismatch(Location.conclusion.root)) shouldBe None
     }
   
     it("should return none if id is invalid") {
@@ -210,9 +209,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       val pf = StubProof()
 
       val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Premise(1))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(part))
 
-      cvtr.convert(pf, "invalid_id", Error.ShapeMismatch(Conclusion, Location.root)) shouldBe None
+      cvtr.convert(pf, "invalid_id", Error.ShapeMismatch(Location.conclusion.root)) shouldBe None
     }
 
     it("should return none when try to get ref of box") {
@@ -222,9 +221,9 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
 
-      cvtr.convert(pf, "box", Error.ShapeMismatch(Premise(0), Location.root)) shouldBe None
+      cvtr.convert(pf, "box", Error.ShapeMismatch(Location.premise(0).root)) shouldBe None
     }
 
     it("should convert ambiguous error with no entries") {
@@ -262,12 +261,12 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Chi)
       val err = Error.Ambiguous(what, List(
-        (Conclusion, Location.root)
+        Location.conclusion.root
       ))
 
 
       val conclusionRulePart = RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Chi))
-      when(rpg.getRulePart(Good(), Conclusion)).thenReturn(Some(conclusionRulePart))
+      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(conclusionRulePart))
 
       cvtr.convert(pf, "line", err) shouldBe Some(OutputError.Ambiguous(
         uuid = "line",
@@ -293,14 +292,14 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Phi)
       val err = Error.Ambiguous(what, List(
-        (Premise(0), Location.root),
-        (Premise(1), Location.root)
+        Location.premise(0).root,
+        Location.premise(1).root
       ))
 
       val premise0RulePart = Substitution(MetaFormula(Formulas.Phi), MetaTerm(Terms.T), MetaVariable(Vars.X))
       val premise1RulePart = MetaFormula(Formulas.Phi)
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(premise0RulePart))
-      when(rpg.getRulePart(Good(), Premise(1))).thenReturn(Some(premise1RulePart))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(premise0RulePart))
+      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(premise1RulePart))
 
       cvtr.convert(pf, "l", err) shouldBe Some(OutputError.Ambiguous(
         uuid = "l",
@@ -329,13 +328,13 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Chi)
       val err = Error.Ambiguous(what, List(
-        (Conclusion, Location.rhs) // RIGHT HAND SIDE!!
+        Location.conclusion.rhs // RIGHT HAND SIDE!!
       ))
 
 
       val conclusionRulePart = RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Chi))
       val thePartThatShouldBeHighlighted = conclusionRulePart.psi
-      when(rpg.getRulePart(Good(), Conclusion)).thenReturn(Some(conclusionRulePart))
+      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(conclusionRulePart))
 
       cvtr.convert(pf, "line", err) shouldBe Some(OutputError.Ambiguous(
         uuid = "line",
@@ -363,7 +362,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Chi)
       val err = Error.Ambiguous(what, List(
-        (Conclusion, Location.root)
+        Location.conclusion.root
       ))
 
       // rpg not set up -> getRulePart will be None
@@ -380,11 +379,11 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Chi)
       val err = Error.Ambiguous(what, List(
-        (Premise(0), Location.lhs)
+        Location.premise(0).lhs
       ))
     
       val part = what // there is no LHS of chi!
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
 
       cvtr.convert(pf, "line", err) shouldBe None
     }
@@ -398,11 +397,11 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Chi)
       val err = Error.Ambiguous(what, List(
-        (Premise(0), Location.root)
+        Location.premise(0).root
       ))
     
       val part = what
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
 
       cvtr.convert(pf, "line", err) shouldBe None
     }
@@ -416,11 +415,11 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Chi)
       val err = Error.Ambiguous(what, List(
-        (Premise(1), Location.root) // REF 1???
+        Location.premise(1).root // REF 1???
       ))
     
       val part = what
-      when(rpg.getRulePart(Good(), Premise(1))).thenReturn(Some(part))
+      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(part))
 
       cvtr.convert(pf, "line", err) shouldBe None
     }
@@ -437,14 +436,14 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val what = MetaFormula(Formulas.Phi)
       val err = Error.Ambiguous(what, List(
-        (Premise(0), Location.root), 
-        (Premise(1), Location.root) // REFER TO r0
+        Location.premise(0).root, 
+        Location.premise(1).root // REFER TO r0
       ))
 
       val premise0RulePart = Substitution(MetaFormula(Formulas.Phi), MetaTerm(Terms.T), MetaVariable(Vars.X))
       val premise1RulePart = MetaFormula(Formulas.Phi)
-      when(rpg.getRulePart(Good(), Premise(0))).thenReturn(Some(premise0RulePart))
-      when(rpg.getRulePart(Good(), Premise(1))).thenReturn(Some(premise1RulePart))
+      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(premise0RulePart))
+      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(premise1RulePart))
 
       cvtr.convert(pf, "l", err) shouldBe None
     }

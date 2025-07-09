@@ -16,7 +16,6 @@ import logicbox.framework.RulePosition.Premise
 import logicbox.rule.RulePart.MetaFormula
 import logicbox.rule.RulePart.MetaVariable
 import logicbox.framework.Error.Ambiguous
-import logicbox.framework.RulePosition.Conclusion
 import logicbox.framework.Location
 import logicbox.framework.Error.ReferenceBoxMissingFreshVar
 import logicbox.framework.Error.Miscellaneous
@@ -43,13 +42,13 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           failIf(
             substitutor.findReplacement(phi, formula, x).isEmpty, 
             Ambiguous(MetaFormula(Formulas.Phi), List(
-              (Conclusion, Location.root),
-              (Premise(0), Location.formulaInsideQuantifier)
+              Location.conclusion.root,
+              Location.premise(0).formulaInsideQuantifier
             ))
           )
 
         case _ => 
-          fail(ShapeMismatch(Premise(0)))
+          fail(ShapeMismatch(Location.premise(0)))
       }
     }
 
@@ -65,13 +64,13 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
               failIf(
                 lst != Some(substitutor.substitute(phi, x0, x)),
                 Ambiguous(MetaFormula(Formulas.Phi), List(
-                  (Conclusion, Location.formulaInsideQuantifier),
-                  (Premise(0), Location.conclusion)
+                  Location.conclusion.formulaInsideQuantifier,
+                  Location.premise(0).lastLine
                 ))
               )
 
             case _ => 
-              fail(ShapeMismatch(Conclusion))
+              fail(ShapeMismatch(Location.conclusion))
           }
       }
     }
@@ -83,27 +82,27 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           failIf(
             ass != Some(substitutor.substitute(phi, x0, x)),
             Ambiguous(MetaFormula(Formulas.Phi), List(
-              (Premise(0), Location.formulaInsideQuantifier),
-              (Premise(1), Location.assumption)
+              Location.premise(0).formulaInsideQuantifier,
+              Location.premise(1).firstLine
             ))
           ) ++ 
           failIf(
             concl != Some(formula), 
             Ambiguous(MetaFormula(Formulas.Chi), List(
-              (Conclusion, Location.root),
-              (Premise(1), Location.conclusion)
+              Location.conclusion.root,
+              Location.premise(1).lastLine
             ))
           ) ++
           failIf(
             substitutor.hasFreeOccurance(formula, x0),
-            Miscellaneous(Conclusion, "fresh variable must not occur in conclusion")
+            Miscellaneous(Location.conclusion, "fresh variable must not occur in conclusion")
           )
 
         case None => 
           fail(ReferenceBoxMissingFreshVar(1))
       }
       case _ => 
-        fail(ShapeMismatch(Premise(0)))
+        fail(ShapeMismatch(Location.premise(0)))
     }
 
     case ExistsIntro() => extractNFormulasAndThen(refs, 1) {
@@ -112,13 +111,13 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           failIf(
             substitutor.findReplacement(phi, ref, x).isEmpty,
             Ambiguous(MetaFormula(Formulas.Phi), List(
-              (Conclusion, Location.formulaInsideQuantifier),
-              (Premise(0), Location.root)
+              Location.conclusion.formulaInsideQuantifier,
+              Location.premise(0).root
             ))
           )
 
         case _ => 
-          fail(ShapeMismatch(Conclusion))
+          fail(ShapeMismatch(Location.conclusion))
       }
     }
 
@@ -126,12 +125,12 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
       case _ => formula match {
         case Equals(t1, t2) => 
           failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T), List(
-            (Conclusion, Location.lhs),
-            (Conclusion, Location.rhs)
+            Location.conclusion.lhs,
+            Location.conclusion.rhs
           )))
 
         case _ => 
-          fail(ShapeMismatch(Conclusion))
+          fail(ShapeMismatch(Location.conclusion))
       }
     }
 
@@ -141,13 +140,13 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           failIf(
             !substitutor.equalExcept(r1, formula, t1, t2),
             Ambiguous(MetaFormula(Formulas.Phi), List(
-              (Conclusion, Location.root),
-              (Premise(1), Location.root)
+              Location.conclusion.root,
+              Location.premise(1).root
             ))
           )
 
         case _ => 
-          fail(ShapeMismatch(Premise(0)))
+          fail(ShapeMismatch(Location.premise(0)))
       }
     }
   }

@@ -7,6 +7,7 @@ import org.scalatest.Inspectors
 
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.ProofStubs
+import logicbox.framework.Location
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
 import logicbox.framework.Error._
 
@@ -80,7 +81,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       result should contain (MissingRule())
       Inspectors.forExactly(1, result) {
         _ should matchPattern {
-          case Miscellaneous(RulePosition.Premise(1), _) =>
+          case Miscellaneous(Location(d :: Nil), _) =>
         }
       }
     }
@@ -98,7 +99,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       )
 
       checker.check(rule, formula, refs) should matchPattern {
-        case List(Miscellaneous(RulePosition.Premise(1), expl)) if expl.contains("box") =>
+        case List(Miscellaneous(Location(d :: Nil), expl)) if expl.contains("box") =>
       }
     }
   }

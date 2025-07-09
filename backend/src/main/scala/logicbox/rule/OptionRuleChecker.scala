@@ -4,6 +4,7 @@ import logicbox.framework.{RuleChecker, Reference, Error, RulePosition}
 import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
+import logicbox.framework.Location
 
 case class OptionRuleChecker[F, R, B, V](
   ruleChecker: RuleChecker[F, R, B]
@@ -23,10 +24,10 @@ case class OptionRuleChecker[F, R, B, V](
         Right(ReferenceBoxImpl(info, optAssRef, optConclRef))
 
       case Line(None) =>
-        Left(Error.Miscellaneous(RulePosition.Premise(refIdx), "missing formula"))
+        Left(Error.Miscellaneous(Location.premise(refIdx), "missing formula"))
 
       case Box(None, _, _) => 
-        Left(Error.Miscellaneous(RulePosition.Premise(refIdx), "missing box info"))
+        Left(Error.Miscellaneous(Location.premise(refIdx), "missing box info"))
     }
   }
 

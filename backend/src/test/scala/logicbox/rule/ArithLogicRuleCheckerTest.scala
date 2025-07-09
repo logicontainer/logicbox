@@ -14,7 +14,6 @@ import logicbox.framework._
 import logicbox.rule.ArithLogicRule._
 import logicbox.framework.Error._
 import logicbox.rule.RulePart._
-import logicbox.framework.RulePosition.Conclusion
 import logicbox.framework.RulePosition.Premise
 
 class ArithLogicRuleCheckerTest extends AnyFunSpec {
@@ -63,14 +62,14 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if formula is not equality") {
       val f = parse("0 = 0 and n + 0 = n")
       checker.check(Peano1(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should fail if rhs is not 0") {
       val f = parse("n + 1 = n")
       checker.check(Peano1(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -78,8 +77,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("n + 0 = m")
       checker.check(Peano1(), f, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T), List(
-          (Conclusion, Location.lhs.lhs),
-          (Conclusion, Location.rhs)
+          Location.conclusion.lhs.lhs,
+          Location.conclusion.rhs
         ))
       )
     }
@@ -101,14 +100,14 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if not equality") {
       val f = parse("0 = 0 and (n + (m + 1) = (n + m) + 1)")
       checker.check(Peano2(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should fail if lhs is not addition") {
       val f = parse("n * (m + 1) = (n + m) + 1")
       checker.check(Peano2(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -116,8 +115,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("n + (m + 1) = (k + m) + 1")
       checker.check(Peano2(), f, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T1), List(
-          (Conclusion, Location.lhs.lhs),
-          (Conclusion, Location.rhs.lhs.lhs)
+          Location.conclusion.lhs.lhs,
+          Location.conclusion.rhs.lhs.lhs
         ))
       )
     }
@@ -126,8 +125,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("n + (m + 1) = (n + k) + 1")
       checker.check(Peano2(), f, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T2), List(
-          (Conclusion, Location.lhs.rhs.lhs),
-          (Conclusion, Location.rhs.lhs.rhs)
+          Location.conclusion.lhs.rhs.lhs,
+          Location.conclusion.rhs.lhs.rhs
         ))
       )
     }
@@ -151,14 +150,14 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if not equality") {
       val f = parse("0 = 0 and n * 0 = 0")
       checker.check(Peano3(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should fail if not multiplication") {
       val f = parse("n + 0 = 0")
       checker.check(Peano3(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
     
@@ -185,21 +184,21 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should fail if not equality") {
       val f = parse("0 = 0 and (n * (m * 1) = (n * m) + m)")
       checker.check(Peano4(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should fail if lhs is not mult") {
       val f = parse("n + (m + 1) = (n * m) + n")
       checker.check(Peano4(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should fail if lhs doesn't not have correct 1") {
       val f = parse("n * (m + 0) = (n * m) + n")
       checker.check(Peano4(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -207,18 +206,18 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f1 = parse("n * (m + 1) = (k * m) + n")
       checker.check(Peano4(), f1, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T1), List(
-          (Conclusion, Location.lhs.lhs),
-          (Conclusion, Location.rhs.lhs.lhs),
-          (Conclusion, Location.rhs.rhs)
+          Location.conclusion.lhs.lhs,
+          Location.conclusion.rhs.lhs.lhs,
+          Location.conclusion.rhs.rhs
         ))
       )
 
       val f2 = parse("n * (m + 1) = (n * m) + k")
       checker.check(Peano4(), f2, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T1), List(
-          (Conclusion, Location.lhs.lhs),
-          (Conclusion, Location.rhs.lhs.lhs),
-          (Conclusion, Location.rhs.rhs)
+          Location.conclusion.lhs.lhs,
+          Location.conclusion.rhs.lhs.lhs,
+          Location.conclusion.rhs.rhs
         ))
       )
     }
@@ -228,8 +227,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
 
       checker.check(Peano4(), f, Nil) shouldBe List(
         Ambiguous(MetaTerm(Terms.T2), List(
-          (Conclusion, Location.lhs.rhs.lhs),
-          (Conclusion, Location.rhs.lhs.rhs)
+          Location.conclusion.lhs.rhs.lhs,
+          Location.conclusion.rhs.lhs.rhs
         ))
       )
     }
@@ -253,35 +252,35 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     it("should reject if not negation") {
       val f = parse("0 = 0 and not (0 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should reject if inner is not equality") {
       val f = parse("not (not 0 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should reject when lhs is not 0") {
       val f = parse("not (1 = t + 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should reject when rhs is not addition") {
       val f = parse("not (0 = t * 1)")
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
     it("should reject ift rhs of addition is not 1") {
       val f = parse("not (0 = t + 0)") 
       checker.check(Peano5(), f, Nil) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -304,7 +303,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("m + 1 = n + 1"))
       val f = parse("m = n and m = n")
       checker.check(Peano6(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -312,7 +311,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val refs = List(refLine("m + 1 = n + 1 and top"))
       val f = parse("m = n")
       checker.check(Peano6(), f, refs) shouldBe List(
-        ShapeMismatch(Premise(0))
+        ShapeMismatch(Location.premise(0))
       )
     }
 
@@ -321,8 +320,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("k = n")
       checker.check(Peano6(), f, refs) shouldBe List(
         Ambiguous(MetaTerm(Terms.T1), List(
-          (Conclusion, Location.lhs),
-          (Premise(0), Location.lhs.lhs)
+          Location.conclusion.lhs,
+          Location.premise(0).lhs.lhs
         ))
       )
     }
@@ -332,8 +331,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("m = k")
       checker.check(Peano6(), f, refs) shouldBe List(
         Ambiguous(MetaTerm(Terms.T2), List(
-          (Conclusion, Location.rhs),
-          (Premise(1), Location.rhs.lhs)
+          Location.conclusion.rhs,
+          Location.premise(1).rhs.lhs
         ))
       )
     }
@@ -382,7 +381,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("x = x")
       checker.check(Induction(), f, refs) shouldBe List(
-        ShapeMismatch(Conclusion)
+        ShapeMismatch(Location.conclusion)
       )
     }
 
@@ -394,10 +393,10 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.formulaInsideQuantifier),
-          (Premise(0), Location.root),
-          (Premise(1), Location.assumption),
-          (Premise(1), Location.conclusion)
+          Location.conclusion.formulaInsideQuantifier,
+          Location.premise(0).root,
+          Location.premise(1).firstLine,
+          Location.premise(1).lastLine
         ))
       )
     }
@@ -419,10 +418,10 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.formulaInsideQuantifier),
-          (Premise(0), Location.root),
-          (Premise(1), Location.assumption),
-          (Premise(1), Location.conclusion)
+          Location.conclusion.formulaInsideQuantifier,
+          Location.premise(0).root,
+          Location.premise(1).firstLine,
+          Location.premise(1).lastLine
         ))
       )
     }
@@ -435,10 +434,10 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.formulaInsideQuantifier),
-          (Premise(0), Location.root),
-          (Premise(1), Location.assumption),
-          (Premise(1), Location.conclusion)
+          Location.conclusion.formulaInsideQuantifier,
+          Location.premise(0).root,
+          Location.premise(1).firstLine,
+          Location.premise(1).lastLine
         ))
       )
     }
@@ -451,10 +450,10 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
-          (Conclusion, Location.formulaInsideQuantifier),
-          (Premise(0), Location.root),
-          (Premise(1), Location.assumption),
-          (Premise(1), Location.conclusion)
+          Location.conclusion.formulaInsideQuantifier,
+          Location.premise(0).root,
+          Location.premise(1).firstLine,
+          Location.premise(1).lastLine
         ))
       )
     }
@@ -466,7 +465,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) should matchPattern {
-        case List(Miscellaneous(Premise(1), _)) =>
+        case List(Miscellaneous(Location(1 :: Nil), _)) =>
       }
     }
 
@@ -477,7 +476,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       )
       val f = parse("forall x x = x")
       checker.check(Induction(), f, refs) should matchPattern {
-        case List(Miscellaneous(Premise(1), _)) =>
+        case List(Miscellaneous(Location(1 :: Nil), _)) =>
       }
     }
   }

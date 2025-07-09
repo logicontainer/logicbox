@@ -41,7 +41,7 @@ class ProofNavigatorTest extends AnyFunSpec {
         )
       )
 
-      nav.get((pf, "box"), Location.assumption) shouldBe Some("40_")
+      nav.get((pf, "box"), Location.firstLine) shouldBe Some("40_")
     }
 
     it("should get conclusion of first step of box") {
@@ -55,7 +55,7 @@ class ProofNavigatorTest extends AnyFunSpec {
         )
       )
 
-      nav.get((pf, "outer"), Location.assumption.conclusion) shouldBe Some("30_")
+      nav.get((pf, "outer"), Location.firstLine.lastLine) shouldBe Some("30_")
     }
 
     it("should get deep nested boxes") {
@@ -69,7 +69,7 @@ class ProofNavigatorTest extends AnyFunSpec {
         )
       )
 
-      nav.get((pf, "b3"), Location.assumption.conclusion.assumption) shouldBe Some("123_")
+      nav.get((pf, "b3"), Location.firstLine.lastLine.firstLine) shouldBe Some("123_")
     }
 
     it("should obtain box info") {
