@@ -8,6 +8,8 @@ import logicbox.framework.RulePosition.Premise
 import logicbox.rule.RulePart
 import logicbox.framework.RulePosition
 import logicbox.framework.Navigator
+import logicbox.server.format.OutputError.AmbiguityEntry
+import logicbox.framework.Location
 
 class ErrorConverterImpl[F, R, B](
   getRulePart: (R, RulePosition) => Option[RulePart],
@@ -43,6 +45,27 @@ class ErrorConverterImpl[F, R, B](
       expectedStr = rulePartToString(rulePart)
       actualStr = formulaToString(actualPart)
     } yield OutputError.ShapeMismatch(stepId, rulePosStr, expectedStr, actualStr)
+
+    case Ambiguous(what, ls) => for {
+      rule <- proof.getStep(stepId).toOption.collect { case Proof.Line(_, rule, _) => rule }
+      entries <- ls.foldRight(Some(Nil): Option[List[AmbiguityEntry]]) {
+        case ((rulePos, loc), Some(es)) => for {
+          rulePart <- getRulePart(rule, rulePos).flatMap(rulePartNavigator.get(_, loc))
+          actualPartId <- getIdOfStepAtRulePos(proof, stepId, rulePos)
+          actualPart <- proofNavigator.get((proof, actualPartId), loc)
+        } yield OutputError.AmbiguityEntry(
+          rulePosition = rulePosToStr(rulePos),
+          meta = rulePartToString(rulePart),
+          actual = formulaToString(actualPart)
+        ) :: es
+
+        case _ => None
+      }
+    } yield OutputError.Ambiguous(
+      uuid = stepId,
+      subject = rulePartToString(what),
+      entries = entries
+    )
 
     case _ => ???
   }
