@@ -9,6 +9,7 @@ import zio.http.Middleware.{CorsConfig, cors}
 import logicbox.server.format.RawProof
 import logicbox.framework.ValidationResult
 import logicbox.server.format.Stringifiers
+import logicbox.server.format.SprayFormatters
 
 case class VerifyBody(
   proof: RawProof,
@@ -25,7 +26,7 @@ object GreetingRoutes {
       JsObject(
         "proof" -> rawProofFormat.write(result.proof),
         "diagnostics" -> JsArray(
-          result.diagnostics.map(???)
+          result.diagnostics.map(SprayFormatters.outputErrorWriter.write)
         )
       )
     }
