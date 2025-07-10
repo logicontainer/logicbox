@@ -7,6 +7,12 @@ import spray.json.{JsonFormat, DefaultJsonProtocol, RootJsonFormat, JsValue, JsS
 import spray.json.RootJsonReader
 import spray.json.JsObject
 import spray.json.JsonWriter
+import logicbox.framework.ValidationResult
+import logicbox.server.format.OutputError.Simple
+import logicbox.server.format.OutputError.RefErr
+import spray.json.JsNumber
+import logicbox.server.format.OutputError.AmbiguityEntry
+import spray.json.JsArray
 
 object SprayFormatters extends DefaultJsonProtocol {
   implicit val rawFormulaFormat: JsonFormat[RawFormula] = jsonFormat3(RawFormula.apply)
@@ -55,4 +61,35 @@ object SprayFormatters extends DefaultJsonProtocol {
 
   implicit val rawProofFormat: RootJsonFormat[RawProof] = listFormat
 
+  implicit object outputErrorWriter extends JsonWriter[OutputError]  {
+    override def write(obj: OutputError): JsValue = obj match {
+      case e @ Simple(uuid, errorType) => jsonFormat2(Simple.apply).write(e)
+      case e @ RefErr(uuid, errorType, refIdx) => jsonFormat3(RefErr.apply).write(e)
+      case OutputError.WrongNumberOfReferences(uuid, expected, actual) => JsObject(
+        "uuid" -> JsString(uuid),
+        "errorType" -> JsString(obj.errorType),
+        "expected" -> JsNumber(expected),
+        "actual" -> JsNumber(actual),
+      )
+      case OutputError.ShapeMismatch(uuid, rulePosition, expected, actual) => JsObject(
+        "uuid" -> JsString(uuid),
+        "errorType" -> JsString(obj.errorType),
+        "rulePosition" -> JsString(rulePosition),
+        "expected" -> JsString(expected),
+        "actual" -> JsString(actual),
+      )
+      case OutputError.Ambiguous(uuid, subject, entries) => JsObject(
+        "uuid" -> JsString(uuid),
+        "errorType" -> JsString(obj.errorType),
+        "subject" -> JsString(subject),
+        "entries" -> JsArray(entries.map { jsonFormat3(OutputError.AmbiguityEntry.apply).write(_) })
+      )
+      case OutputError.Miscellaneous(uuid, rulePosition, explanation) => JsObject(
+        "uuid" -> JsString(uuid),
+        "errorType" -> JsString(obj.errorType),
+        "rulePosition" -> JsString(rulePosition),
+        "explanation" -> JsString(explanation)
+      )
+    }
+  }
 }
