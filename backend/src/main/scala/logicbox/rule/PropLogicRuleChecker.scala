@@ -9,9 +9,9 @@ import logicbox.rule.PropLogicRule
 import logicbox.formula.ConnectiveFormula
 import logicbox.formula.ConnectiveFormula._
 import logicbox.framework.Error._
-import logicbox.rule.RulePart.MetaFormula
+import logicbox.framework.RulePart.MetaFormula
 import logicbox.framework.Location
-import logicbox.rule.RulePart.Formulas
+import logicbox.framework.RulePart.Formulas
 
 class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, PropLogicRule, Any] {
   private type Ref = Reference[F, Any]

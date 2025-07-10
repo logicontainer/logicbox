@@ -36,8 +36,9 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
         rootSteps = Seq("box", "l2", "l3")
       )
 
+      import Location.Step._
       checker.check(proof) should matchPattern {
-        case List(("l3", Error.Miscellaneous(Location(1 :: Nil), _))) =>
+        case List(("l3", Error.Miscellaneous(Location(Premise(0) :: FirstLine :: Nil), _))) =>
       }
     }
 
@@ -51,8 +52,9 @@ class PredLogicBoxContraintsProofCheckerTest extends AnyFunSpec {
         rootSteps = Seq("box", "l2")
       )
 
+      import Location.Step._
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(Location(0 :: Nil), _))) =>
+        case List(("l2", Miscellaneous(Location(Premise(0) :: FirstLine), _))) =>
       }
     }
 

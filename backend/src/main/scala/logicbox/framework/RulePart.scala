@@ -1,4 +1,4 @@
-package logicbox.rule
+package logicbox.framework
 
 sealed trait RulePart
 

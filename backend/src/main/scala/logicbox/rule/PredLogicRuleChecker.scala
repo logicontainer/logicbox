@@ -13,16 +13,16 @@ import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
 import logicbox.framework.Error.ShapeMismatch
 import logicbox.framework.RulePosition.Premise
-import logicbox.rule.RulePart.MetaFormula
-import logicbox.rule.RulePart.MetaVariable
+import logicbox.framework.RulePart.MetaFormula
+import logicbox.framework.RulePart.MetaVariable
 import logicbox.framework.Error.Ambiguous
 import logicbox.framework.Location
 import logicbox.framework.Error.ReferenceBoxMissingFreshVar
 import logicbox.framework.Error.Miscellaneous
-import logicbox.rule.RulePart.MetaTerm
-import logicbox.rule.RulePart.Formulas
-import logicbox.rule.RulePart.Vars
-import logicbox.rule.RulePart.Terms
+import logicbox.framework.RulePart.MetaTerm
+import logicbox.framework.RulePart.Formulas
+import logicbox.framework.RulePart.Vars
+import logicbox.framework.RulePart.Terms
 
 class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   substitutor: Substitutor[F, T, V]

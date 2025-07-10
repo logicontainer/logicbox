@@ -13,7 +13,7 @@ import logicbox.formula.ArithLogicLexer
 import logicbox.framework._
 import logicbox.rule.ArithLogicRule._
 import logicbox.framework.Error._
-import logicbox.rule.RulePart._
+import logicbox.framework.RulePart._
 import logicbox.framework.RulePosition.Premise
 
 class ArithLogicRuleCheckerTest extends AnyFunSpec {
@@ -464,8 +464,9 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
         Box(None, Some(refLine("n + 1 = n + 1")), Some("n"))
       )
       val f = parse("forall x x = x")
+      import Location.Step._
       checker.check(Induction(), f, refs) should matchPattern {
-        case List(Miscellaneous(Location(1 :: Nil), _)) =>
+        case List(Miscellaneous(Location(Location.Step.Premise(1) :: Conclusion :: Nil), _)) =>
       }
     }
 
@@ -475,8 +476,9 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
         Box(Some(refLine("n = n")), None, Some("n"))
       )
       val f = parse("forall x x = x")
+      import Location.Step._
       checker.check(Induction(), f, refs) should matchPattern {
-        case List(Miscellaneous(Location(1 :: Nil), _)) =>
+        case List(Miscellaneous(Location(Location.Step.Premise(1) :: LastLine :: Nil), _)) =>
       }
     }
   }

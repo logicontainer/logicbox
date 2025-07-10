@@ -8,8 +8,8 @@ import logicbox.rule.PropLogicRule
 import logicbox.rule.PropLogicRule._
 
 import logicbox.formula._
-import logicbox.rule.RulePart.TemplateTerm
-import logicbox.rule.RulePart.TemplateFormula
+import logicbox.framework.RulePart.TemplateTerm
+import logicbox.framework.RulePart.TemplateFormula
 
 object Stringifiers {
   private def propLogicFormulaWithBracks(formula: PropLogicFormula, inner: PropLogicFormula => String, l: String, r: String): String = {
@@ -200,7 +200,7 @@ object Stringifiers {
   }
 
   private def templateFormulaWithBracks(formula: TemplateFormula, inner: TemplateFormula => String, l: String, r: String): String = {
-    import logicbox.rule.RulePart._
+    import logicbox.framework.RulePart._
     formula match {
       case Contradiction() | Not(_) | ForAll(_, _) | Exists(_, _) | MetaFormula(_) | Substitution(_, _, _) => inner(formula)
       case And(_, _) | Or(_, _) | Implies(_, _) | Equals(_, _) => s"$l${inner(formula)}$r"
@@ -208,7 +208,7 @@ object Stringifiers {
   }
 
   private def templateTermWithBracks(term: TemplateTerm, inner: TemplateTerm => String, l: String, r: String): String = {
-    import logicbox.rule.RulePart._
+    import logicbox.framework.RulePart._
     term match {
       case Zero() | One() | MetaTerm(_) | MetaVariable(_) => inner(term)
       case Plus(_, _) | Mult(_, _) => s"$l${inner(term)}$r"
@@ -216,7 +216,7 @@ object Stringifiers {
   }
 
   def templateTermToLaTeX(term: TemplateTerm): String = {
-    import logicbox.rule.RulePart._
+    import logicbox.framework.RulePart._
     def b(f: TemplateTerm) = templateTermWithBracks(f, templateTermToLaTeX, "(", ")")
     term match {
       case MetaVariable(Vars.X) => "x"
@@ -233,7 +233,7 @@ object Stringifiers {
   }
 
   def templateFormulaToLaTeX(formula: TemplateFormula): String = {
-    import logicbox.rule.RulePart._
+    import logicbox.framework.RulePart._
     def b(f: TemplateFormula) = templateFormulaWithBracks(f, templateFormulaToLaTeX, "(", ")")
     formula match {
       case MetaFormula(Formulas.Phi) => "\\phi"

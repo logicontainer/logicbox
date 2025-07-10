@@ -65,7 +65,7 @@ class PredLogicFormulaNavigatorTest extends AnyFunSpec {
 
     it("should return none when location is invalid") {
       nav.get(parse("P(a) and Q(a)"), Location.lhs.operand(0).operand(0)) shouldBe None
-      nav.get(parse("P(a) and Q(a)"), Location(2 :: 0 :: Nil)) shouldBe None
+      nav.get(parse("P(a) and Q(a)"), Location.operand(2).lhs) shouldBe None
     }
   }
 }

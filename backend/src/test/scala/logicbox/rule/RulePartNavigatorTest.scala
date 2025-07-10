@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 import logicbox.framework.Location
-import logicbox.rule.RulePart._
+import logicbox.framework.RulePart._
 
 class RulePartNavigatorTest extends AnyFunSpec {
   describe("get") {

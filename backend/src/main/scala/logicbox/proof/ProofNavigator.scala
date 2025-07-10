@@ -3,6 +3,9 @@ package logicbox.proof
 import logicbox.framework.Navigator
 import logicbox.framework.Proof
 import logicbox.framework.Location
+import logicbox.framework.Proof.Line
+import logicbox.framework.Proof.Box
+import logicbox.framework.Location.Step
 
 class ProofNavigator[F, B, Id, O](
   formulaNavigator: Navigator[F, O],
@@ -14,27 +17,42 @@ class ProofNavigator[F, B, Id, O](
     case FoundBoxInfo(info: B, rest: Location)
   }
 
-  private def getFormula(proof: Proof[F, ?, B, Id], stepId: Id, loc: Location): Result =
-    proof.getStep(stepId) match {
-      case Right(Proof.Line(formula, _, _)) => 
-        Result.FoundFormula(formula, loc)
+  private def derefFirstStep(proof: Proof[F, ?, B, Id], stepId: Id, firstStep: Location.Step): Option[Proof.Step[F, ?, B, Id]] = {
+    firstStep match {
+      case Step.Premise(idx) => 
+        proof.getStep(stepId).toOption.collect {
+          case Proof.Line(_, _, refs) => refs
+        }.flatMap(_.lift(idx))
+         .flatMap(proof.getStep(_).toOption)
 
-      case Right(Proof.Box(info, ids)) => loc.steps match {
-        case 0 :: rest => ids.headOption
-          .map(getFormula(proof, _, Location(rest)))
-          .getOrElse(Result.Nothing)
-
-        case 1 :: rest => ids.lastOption
-          .map(getFormula(proof, _, Location(rest)))
-          .getOrElse(Result.Nothing)
-
-        case 2 :: rest => Result.FoundBoxInfo(info, Location(rest))
-
-        case _ => Result.Nothing
-      }
-
-      case _ => Result.Nothing
+      case Step.Conclusion => proof.getStep(stepId).toOption
+      case _ => None
     }
+  }
+    
+  import Location.Step
+  private def getFormula(proof: Proof[F, ?, B, Id], stepId: Id, loc: Location): Result = {
+    for {
+      (fst, rest) <- loc.steps match {
+        case x :: xs => Some(x, xs)
+        case _ => None
+      }
+      (step, rest) <- (rest, derefFirstStep(proof, stepId, fst)) match {
+        case (Step.FirstLine :: rest, Some(Proof.Box(_, first :: _))) => 
+          proof.getStep(first).toOption.map((_, rest))
+        case (Step.LastLine :: rest, Some(Proof.Box(_, _ :+ last))) =>
+          proof.getStep(last).toOption.map((_, rest))
+        case (rest, Some(step)) => Some(step, rest)
+        case _ => None
+      }
+      res <- step match {
+        case Proof.Line(f, _, _) => Some(Result.FoundFormula(f, Location(rest)))
+        case Proof.Box(info, _) if rest.headOption == Some(Step.FreshVar) => 
+          Some(Result.FoundBoxInfo(info, Location(rest.tail)))
+        case _ => None
+      }
+    } yield res
+  }.getOrElse(Result.Nothing)
 
   override def get(proofAndId: (Proof[F, ?, B, Id], Id), loc: Location): Option[O] = {
     getFormula(proofAndId._1, proofAndId._2, loc) match {

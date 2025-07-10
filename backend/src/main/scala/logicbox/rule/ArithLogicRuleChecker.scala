@@ -13,16 +13,16 @@ import logicbox.framework.Reference._
 import logicbox.rule.ReferenceUtil.extractFirstLine
 import logicbox.rule.ReferenceUtil.extractLastLine
 import logicbox.framework.Error.ShapeMismatch
-import logicbox.rule.RulePart.MetaTerm
+import logicbox.framework.RulePart.MetaTerm
 import logicbox.framework.Error.Ambiguous
 import logicbox.framework.RulePosition.Premise
 import logicbox.framework.Error.ReferenceBoxMissingFreshVar
-import logicbox.rule.RulePart.MetaVariable
-import logicbox.rule.RulePart.MetaFormula
+import logicbox.framework.RulePart.MetaVariable
+import logicbox.framework.RulePart.MetaFormula
 import logicbox.framework.Error.Miscellaneous
-import logicbox.rule.RulePart.Terms
-import logicbox.rule.RulePart.Vars
-import logicbox.rule.RulePart.Formulas
+import logicbox.framework.RulePart.Terms
+import logicbox.framework.RulePart.Vars
+import logicbox.framework.RulePart.Formulas
 
 class ArithLogicRuleChecker[
   F <: ConnectiveFormula[F] & QuantifierFormula[F, T, V],

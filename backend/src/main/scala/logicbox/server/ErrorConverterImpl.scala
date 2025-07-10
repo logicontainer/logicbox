@@ -1,15 +1,10 @@
 package logicbox.server
 
-import logicbox.framework.{Proof, Error}
+import logicbox.framework._
 import logicbox.server.format.OutputError
 import logicbox.framework.Error._
-import logicbox.framework.RulePosition.Conclusion
-import logicbox.framework.RulePosition.Premise
-import logicbox.rule.RulePart
-import logicbox.framework.RulePosition
-import logicbox.framework.Navigator
+import logicbox.framework.RulePosition._
 import logicbox.server.format.OutputError.AmbiguityEntry
-import logicbox.framework.Location
 
 class ErrorConverterImpl[F, R, B](
   getRulePart: (R, Location) => Option[RulePart],

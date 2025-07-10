@@ -7,26 +7,27 @@ import PredLogicTerm._
 
 class PredLogicFormulaNavigator extends Navigator[PredLogicFormula, PredLogicFormula | PredLogicTerm] {
   override def get(subject: PredLogicFormula, loc: Location): Option[PredLogicFormula | PredLogicTerm] = 
+    import Location.Step._
     loc.steps.foldLeft(Some(subject): Option[PredLogicFormula | PredLogicTerm]) {
       case (Some(f), step) => (f, step) match {
-        case (Not(phi), 0) => Some(phi)
+        case (Not(phi), Negated) => Some(phi)
 
-        case (And(phi, _), 0) => Some(phi)
-        case (Or(phi, _), 0) => Some(phi)
-        case (Implies(phi, _), 0) => Some(phi)
+        case (And(phi, _), Lhs) => Some(phi)
+        case (Or(phi, _), Lhs) => Some(phi)
+        case (Implies(phi, _), Lhs) => Some(phi)
 
-        case (And(_, psi), 1) => Some(psi)
-        case (Or(_, psi), 1) => Some(psi)
-        case (Implies(_, psi), 1) => Some(psi)
+        case (And(_, psi), Rhs) => Some(psi)
+        case (Or(_, psi), Rhs) => Some(psi)
+        case (Implies(_, psi), Rhs) => Some(psi)
 
-        case (ForAll(_, phi), 0) => Some(phi)
-        case (Exists(_, phi), 0) => Some(phi)
+        case (ForAll(_, phi), InsideQuantifier) => Some(phi)
+        case (Exists(_, phi), InsideQuantifier) => Some(phi)
         
-        case (Predicate(_, ts), idx) => ts.lift(idx)
-        case (FunAppl(_, ts), idx) => ts.lift(idx)
+        case (Predicate(_, ts), Operand(idx)) => ts.lift(idx)
+        case (FunAppl(_, ts), Operand(idx)) => ts.lift(idx)
 
-        case (Equals(t1, _), 0) => Some(t1)
-        case (Equals(_, t2), 1) => Some(t2)
+        case (Equals(t1, _), Lhs) => Some(t1)
+        case (Equals(_, t2), Rhs) => Some(t2)
 
         case _ => None
       }

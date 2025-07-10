@@ -8,7 +8,7 @@ import org.scalatest.Inspectors
 class TemplateFormulaAndTermToLaTeXTest extends AnyFunSpec {
   describe("Stringifiers::templateFormulaToLaTeX") {
     it("should work on an example") {
-      import logicbox.rule.RulePart._
+      import logicbox.framework.RulePart._
       Stringifiers.templateFormulaToLaTeX(
         Implies(
           ForAll(MetaVariable(Vars.X), 

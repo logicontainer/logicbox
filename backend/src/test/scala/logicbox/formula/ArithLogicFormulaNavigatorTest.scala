@@ -57,8 +57,8 @@ class ArithLogicFormulaNavigatorTest extends AnyFunSpec {
     }
 
     it("should return none when location is invalid") {
-      nav.get(parse("a = a and a = a"), Location(2 :: Nil)) shouldBe None
-      nav.get(parse("a = a and a = a"), Location(2 :: 0 :: Nil)) shouldBe None
+      nav.get(parse("a = a and a = a"), Location.operand(2).rhs) shouldBe None
+      nav.get(parse("a = a and a = a"), Location.operand(4)) shouldBe None
     }
   }
 }

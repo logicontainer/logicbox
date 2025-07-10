@@ -5,8 +5,8 @@ import logicbox.rule._
 import logicbox.framework._
 import logicbox.proof._
 import logicbox.server.format._
-import logicbox.rule.RulePart.TemplateTerm
-import logicbox.rule.RulePart.TemplateFormula
+import logicbox.framework.RulePart.TemplateTerm
+import logicbox.framework.RulePart.TemplateFormula
 
 // 'factory'
 object PropLogicProofValidatorService {

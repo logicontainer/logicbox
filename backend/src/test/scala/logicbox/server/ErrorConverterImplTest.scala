@@ -1,13 +1,6 @@
 package logicbox.server
 
 import org.scalatest.funspec.AnyFunSpec
-
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.*
-import org.scalatest.matchers.should.Matchers.*
-import org.scalatest.Inspectors
-
-import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
@@ -19,13 +12,13 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.*
 
 import logicbox.framework._
-import logicbox.rule._
-import logicbox.rule.RulePart._
+import logicbox.framework.RulePart._
 import logicbox.server.format.OutputError
 import logicbox.framework.RulePosition.Premise
 import logicbox.proof.ProofNavigator
 import logicbox.rule.RulePartNavigator
 import logicbox.server.format.OutputError.AmbiguityEntry
+import logicbox.framework.RulePart
 
 class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
   import logicbox.ProofStubs._
@@ -40,7 +33,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
     class StubFormulaNav extends Navigator[StubFormula, StubFormula] {
       override def get(subject: StubFormula, loc: Location): Option[StubFormula] = {
         if subject.i == NAV_FAIL then None else
-        Some(StubFormula(subject.i + loc.steps.sum))
+        Some(StubFormula(subject.i))
       }
     }
 
@@ -448,4 +441,6 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert(pf, "l", err) shouldBe None
     }
   }
+
+  
 }

@@ -1,7 +1,6 @@
 package logicbox.framework
 
-import logicbox.rule.RulePart
-import logicbox.rule.RulePart.*
+import RulePart.*
 import logicbox.framework.{RulePosition, Location}
 
 sealed trait Error

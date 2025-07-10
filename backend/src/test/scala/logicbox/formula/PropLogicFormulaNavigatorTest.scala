@@ -37,7 +37,7 @@ class PropLogicFormulaNavigatorTest extends AnyFunSpec {
 
     it("should return none when location is invalid") {
       nav.get(parse("p and q"), Location.lhs.lhs) shouldBe None
-      nav.get(parse("p and q"), Location(2 :: 0 :: Nil)) shouldBe None
+      nav.get(parse("p and q"), Location.operand(2).lhs) shouldBe None
     }
   }
 }

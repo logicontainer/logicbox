@@ -7,7 +7,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
-import logicbox.rule.RulePart.MetaFormula
+import logicbox.framework.RulePart.MetaFormula
 import logicbox.framework.Location
 import java.awt.Shape
 
@@ -43,7 +43,7 @@ class PLRuleTest extends AnyFunSpec {
   private val checker = PropLogicRuleChecker[PropLogicFormula]()
 
   import logicbox.framework.RulePosition._
-  import logicbox.rule.RulePart._
+  import logicbox.framework.RulePart._
 
   describe("AndElim") {
     val leftRule = AndElim(Side.Left)

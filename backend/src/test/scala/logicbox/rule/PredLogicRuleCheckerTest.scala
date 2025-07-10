@@ -16,13 +16,13 @@ import logicbox.formula.PredLogicTerm._
 import logicbox.rule.PredLogicRule._
 import org.scalactic.Equality
 import logicbox.framework.RulePosition.Premise
-import logicbox.rule.RulePart.MetaFormula
-import logicbox.rule.RulePart.MetaVariable
+import logicbox.framework.RulePart.MetaFormula
+import logicbox.framework.RulePart.MetaVariable
 import logicbox.framework.Location
-import logicbox.rule.RulePart.MetaTerm
-import logicbox.rule.RulePart.Formulas
-import logicbox.rule.RulePart.Terms
-import logicbox.rule.RulePart.Vars
+import logicbox.framework.RulePart.MetaTerm
+import logicbox.framework.RulePart.Formulas
+import logicbox.framework.RulePart.Terms
+import logicbox.framework.RulePart.Vars
 
 class PredLogicRuleCheckerTest extends AnyFunSpec {
   private val lexer = PredLogicLexer()
@@ -172,7 +172,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         refBox("P(a)", "P(a) and P(a)", "a")
       )
       checker.check(ExistsElim(), f, refs) should matchPattern {
-        case List(Miscellaneous(Location(0 :: Nil), _)) => 
+        case List(Miscellaneous(Location(Location.Step.Conclusion :: Nil), _)) => 
       }
     }
     
