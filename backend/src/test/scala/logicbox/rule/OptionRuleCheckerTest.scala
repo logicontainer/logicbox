@@ -7,8 +7,9 @@ import org.scalatest.Inspectors
 
 import org.scalatest.funspec.AnyFunSpec
 import logicbox.ProofStubs
+import logicbox.framework.Location
 import logicbox.rule.{ReferenceBoxImpl, ReferenceLineImpl}
-import logicbox.framework.RuleViolation._
+import logicbox.framework.Error._
 
 class OptionRuleCheckerTest extends AnyFunSpec {
   import logicbox.ProofStubs._
@@ -46,7 +47,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
         
       val badResult = checker.check(badRule, formula, refs)
       badResult.length shouldBe 1
-      badResult shouldBe List(MiscellaneousViolation("test"))
+      badResult shouldBe List(ProofStubs.stubError)
     }
 
     it("should report missing formula") {
@@ -54,7 +55,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       val rule = Some(Good())
       val refs = List(ReferenceLineImpl(Some(StubFormula(2))))
 
-      checker.check(rule, formula, refs) shouldBe List(MissingFormula)
+      checker.check(rule, formula, refs) shouldBe List(MissingFormula())
     }
 
     it("should report missing formula and rule") {
@@ -63,7 +64,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       val refs = List(ReferenceLineImpl(Some(StubFormula())))
 
       checker.check(rule, formula, refs) should contain theSameElementsAs List(
-        MissingFormula, MissingRule
+        MissingFormula(), MissingRule()
       )
     }
     
@@ -77,10 +78,10 @@ class OptionRuleCheckerTest extends AnyFunSpec {
 
       val result = checker.check(rule, formula, refs)
       result.length shouldBe 2
-      result should contain (MissingRule)
+      result should contain (MissingRule())
       Inspectors.forExactly(1, result) {
         _ should matchPattern {
-          case MissingDetailInReference(1, _) =>
+          case Miscellaneous(Location(d :: Nil), _) =>
         }
       }
     }
@@ -98,7 +99,7 @@ class OptionRuleCheckerTest extends AnyFunSpec {
       )
 
       checker.check(rule, formula, refs) should matchPattern {
-        case List(MissingDetailInReference(1, expl)) if expl.contains("box") =>
+        case List(Miscellaneous(Location(d :: Nil), expl)) if expl.contains("box") =>
       }
     }
   }

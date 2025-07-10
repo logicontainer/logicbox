@@ -1,8 +1,8 @@
 package logicbox
 
 import logicbox.framework._
-import logicbox.framework.RuleViolation.MissingFormula
-import logicbox.framework.RuleViolation.MiscellaneousViolation
+import logicbox.framework.Error.MissingFormula
+import logicbox.framework.Error.Miscellaneous
 
 object ProofStubs {
   case class StubFormula(i: Int = 0)
@@ -24,6 +24,7 @@ object ProofStubs {
     override val refs: Seq[Id] = Seq(),
   ) extends Proof.Line[StubFormula, StubRule, Id]
 
+
   case class StubBox(
     override val info: StubBoxInfo = StubBoxInfo(),
     override val steps: Seq[Id] = Seq(),
@@ -40,14 +41,15 @@ object ProofStubs {
       }
   }
 
+  val stubError = Miscellaneous(Location.conclusion, "test")
   case class StubRuleChecker() extends RuleChecker[F, R, B] {
     var refsCalledWith: Option[List[Reference[StubFormula, StubBoxInfo]]] = None
 
-    override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[RuleViolation] = 
+    override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[Error] = 
       refsCalledWith = Some(refs)
       rule match {
         case Good() => Nil
-        case Bad() => List(MiscellaneousViolation("test"))
+        case Bad() => List(Miscellaneous(Location.conclusion, "test"))
       }
   }
 }

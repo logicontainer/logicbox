@@ -25,7 +25,7 @@ object GreetingRoutes {
       JsObject(
         "proof" -> rawProofFormat.write(result.proof),
         "diagnostics" -> JsArray(
-          result.diagnostics.map(writeDiagnostic(_))
+          result.diagnostics.map(???)
         )
       )
     }

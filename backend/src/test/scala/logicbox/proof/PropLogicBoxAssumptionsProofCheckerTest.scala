@@ -11,14 +11,15 @@ import logicbox.formula.PropLogicFormula
 import logicbox.framework.Proof
 
 import logicbox.rule.PropLogicRule._
-import logicbox.framework.RuleViolation
-import logicbox.framework.RuleViolation.ReferenceDoesntMatchRule
-import logicbox.framework.Diagnostic.RuleViolationAtStep
+import logicbox.framework.Error
+import logicbox.framework.Error.Miscellaneous
+import logicbox.framework.Location
 
 class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
 
   describe("check") {
     val checker = PropLogicBoxAssumptionsProofChecker[PropLogicRule, String]()
+    import Location.Step
     it("should reject if ImplIntro doesn't have assumption on first line") {
       val proof = ProofImpl(
         map = Map(
@@ -30,7 +31,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l2", ReferenceDoesntMatchRule(0, _))) =>
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -45,7 +46,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       
       checker.check(proof) shouldBe Nil
     }
-
+    
     it("should say nothing for implication intro with no refs") {
       val proof = ProofImpl(
         map = Map(
@@ -77,7 +78,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) shouldBe Nil
-    
+
     }
 
     it("should say nothing for implication intro with ref to line") {
@@ -103,7 +104,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l2", ReferenceDoesntMatchRule(0, _))) =>
+        case List(("l2", Error.Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -118,7 +119,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l2", ReferenceDoesntMatchRule(0, _))) =>
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -138,7 +139,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l4", ReferenceDoesntMatchRule(1, _))) =>
+        case List(("l4", Miscellaneous(Location(Step.Premise(1) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -158,7 +159,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l4", ReferenceDoesntMatchRule(2, _))) =>
+        case List(("l4", Miscellaneous(Location(Step.Premise(2) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -189,7 +190,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(RuleViolationAtStep("l2", ReferenceDoesntMatchRule(0, _))) =>
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
   }

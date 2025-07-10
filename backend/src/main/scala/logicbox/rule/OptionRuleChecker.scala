@@ -1,18 +1,16 @@
 package logicbox.rule
 
-import logicbox.framework.{RuleChecker, Reference}
+import logicbox.framework.{RuleChecker, Reference, Error, RulePosition}
 import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
 import logicbox.rule.{ReferenceLineImpl, ReferenceBoxImpl}
-
-import logicbox.framework.RuleViolation
-import logicbox.framework.RuleViolation._
+import logicbox.framework.Location
 
 case class OptionRuleChecker[F, R, B, V](
   ruleChecker: RuleChecker[F, R, B]
 ) extends RuleChecker[Option[F], Option[R], Option[B]] {
 
-  private def computeConcreteReference(optRef: Reference[Option[F], Option[B]], refIdx: Int): Either[RuleViolation, Reference[F, B]] = {
+  private def computeConcreteReference(optRef: Reference[Option[F], Option[B]], refIdx: Int): Either[Error, Reference[F, B]] = {
     optRef match {
       case Line(Some(formula)) => 
         Right(ReferenceLineImpl(formula))
@@ -26,17 +24,17 @@ case class OptionRuleChecker[F, R, B, V](
         Right(ReferenceBoxImpl(info, optAssRef, optConclRef))
 
       case Line(None) =>
-        Left(MissingDetailInReference(refIdx, "missing formula"))
+        Left(Error.Miscellaneous(Location.premise(refIdx), "missing formula"))
 
       case Box(None, _, _) => 
-        Left(MissingDetailInReference(refIdx, "missing box info"))
+        Left(Error.Miscellaneous(Location.premise(refIdx), "missing box info"))
     }
   }
 
   private def computeConcreteReferences(
     optRefs: List[Reference[Option[F], Option[B]]]
-  ): Either[List[RuleViolation], List[Reference[F, B]]] = {
-    val init: (List[Reference[F, B]], List[RuleViolation]) = (Nil, Nil)
+  ): Either[List[Error], List[Reference[F, B]]] = {
+    val init: (List[Reference[F, B]], List[Error]) = (Nil, Nil)
     val (refs, vs) = optRefs.zipWithIndex.foldRight(init) {
       case ((optRef, refIdx), (refs, missingIdxs)) => 
         computeConcreteReference(optRef, refIdx) match {
@@ -53,14 +51,14 @@ case class OptionRuleChecker[F, R, B, V](
   
   private def computeArgumentViolations(
     rule: Option[R], formula: Option[F]
-  ): List[RuleViolation] = {
+  ): List[Error] = {
     { 
       if (formula.isEmpty) List(
-        MissingFormula
+        Error.MissingFormula()
       ) else Nil
     } ++ {
       if (rule.isEmpty) List(
-        MissingRule
+        Error.MissingRule()
       ) else Nil
     }
   }
@@ -68,7 +66,7 @@ case class OptionRuleChecker[F, R, B, V](
   override def check(
     rule: Option[R], formula: Option[F], 
     optRefs: List[Reference[Option[F], Option[B]]]
-  ): List[RuleViolation] = {
+  ): List[Error] = {
     val refsOrMissingRefs = computeConcreteReferences(optRefs)
     val argViolations = computeArgumentViolations(rule, formula)
 

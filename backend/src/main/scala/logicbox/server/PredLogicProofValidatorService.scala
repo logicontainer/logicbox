@@ -37,7 +37,7 @@ object PredLogicProofValidatorService {
       RuleBasedProofChecker(optionRuleChecker)
 
     new ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] {
-      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[Diagnostic[Id]] = {
+      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[(Id, Error)] = {
         val optProofView: Proof[Option[F], Option[R], Option[B], Id] = ProofView(proof, { 
           case (id, line: Proof.Line[IncompleteFormula[F], Option[R], Id]) => 
             ProofLineImpl(line.formula.optFormula, line.rule, line.refs)
@@ -93,6 +93,19 @@ object PredLogicProofValidatorService {
       case FreshVarBoxInfo(freshVar) => RawBoxInfo(freshVar.map(_.x.toString))
     }
   )
+
+  def getInfRule(rule: R): Option[InfRule] = {
+    import RulePart._
+    rule match {
+      case r: PredLogicRule => Some(RuleMaps.getPredLogicInfRule(r))
+      case r: PropLogicRule => Some(RuleMaps.getPropLogicInfRule(r))
+    }
+  }
+
+  def formulaOrTermToLaTeX(formulaOrTerm: PredLogicFormula | PredLogicTerm): String = formulaOrTerm match {
+    case f: PredLogicFormula => Stringifiers.predLogicFormulaAsLaTeX(f)
+    case t: PredLogicTerm => Stringifiers.predLogicTermAsString(t)
+  }
 }
 
 import PredLogicProofValidatorService._
@@ -100,5 +113,12 @@ class PredLogicProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 
-  proofChecker = proofChecker
+  proofChecker = proofChecker,
+  createErrorConverter = pf => createErrorConverter(
+    pf,
+    PredLogicFormulaNavigator(),
+    FreshVarBoxInfoNavigator[PredLogicTerm.Var](),
+    getInfRule,
+    formulaOrTermToLaTeX
+  )
 )

@@ -3,15 +3,26 @@ package logicbox.rule
 import logicbox.framework.RuleChecker
 import logicbox.formula.PredLogicFormula
 import logicbox.framework.Reference
-import logicbox.framework.RuleViolation
+import logicbox.framework.Error
 import logicbox.formula.QuantifierFormula
 
 import logicbox.rule.ReferenceUtil._
 import QuantifierFormula._
 import logicbox.rule.PredLogicRule._
-import logicbox.framework.RuleViolation._
 import logicbox.framework.Reference.Line
 import logicbox.framework.Reference.Box
+import logicbox.framework.Error.ShapeMismatch
+import logicbox.framework.RulePosition.Premise
+import logicbox.framework.RulePart.MetaFormula
+import logicbox.framework.RulePart.MetaVariable
+import logicbox.framework.Error.Ambiguous
+import logicbox.framework.Location
+import logicbox.framework.Error.ReferenceBoxMissingFreshVar
+import logicbox.framework.Error.Miscellaneous
+import logicbox.framework.RulePart.MetaTerm
+import logicbox.framework.RulePart.Formulas
+import logicbox.framework.RulePart.Vars
+import logicbox.framework.RulePart.Terms
 
 class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   substitutor: Substitutor[F, T, V]
@@ -19,29 +30,32 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   private type R = PredLogicRule
   private type B = FreshVarBoxInfo[V]
 
-  private def fail(v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = (v +: vs).toList
-  private def failIf(b: Boolean, v: => RuleViolation, vs: => RuleViolation*): List[RuleViolation] = {
+  private def fail(v: => Error, vs: => Error*): List[Error] = (v +: vs).toList
+  private def failIf(b: Boolean, v: => Error, vs: => Error*): List[Error] = {
     if !b then Nil else (v +: vs).toList
   }
 
-  override def check(rule: R, formula: F, refs: List[Reference[F, B]]): List[RuleViolation] = rule match {
+  override def check(rule: R, formula: F, refs: List[Reference[F, B]]): List[Error] = rule match {
     case ForAllElim() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
         case ForAll(x, phi) => 
           failIf(
             substitutor.findReplacement(phi, formula, x).isEmpty, 
-            FormulaDoesntMatchReference(0, "resulting formula must match the contents of forall")
+            Ambiguous(MetaFormula(Formulas.Phi), List(
+              Location.conclusion.root,
+              Location.premise(0).formulaInsideQuantifier
+            ))
           )
 
         case _ => 
-          fail(ReferenceDoesntMatchRule(0, "must be forall"))
+          fail(ShapeMismatch(Location.premise(0)))
       }
     }
 
     case ForAllIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(b: Box[F, B]) => b.info.freshVar match {
         case None => 
-          fail(ReferenceDoesntMatchRule(0, "box does not contain fresh variable"))
+          fail(ReferenceBoxMissingFreshVar(0))
 
         case Some(x0) => 
           val lst = extractLastLine(b)
@@ -49,11 +63,14 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
             case ForAll(x, phi) =>
               failIf(
                 lst != Some(substitutor.substitute(phi, x0, x)),
-                FormulaDoesntMatchReference(0, "last line of box must match formula")
+                Ambiguous(MetaFormula(Formulas.Phi), List(
+                  Location.conclusion.formulaInsideQuantifier,
+                  Location.premise(0).lastLine
+                ))
               )
 
             case _ => 
-              fail(FormulaDoesntMatchRule("must be forall"))
+              fail(ShapeMismatch(Location.conclusion))
           }
       }
     }
@@ -64,44 +81,56 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
           val (ass, concl) = (extractFirstLine(b), extractLastLine(b))
           failIf(
             ass != Some(substitutor.substitute(phi, x0, x)),
-            ReferencesMismatch(List(0, 1), "assumption of box should match formula within exists-quantifier")
+            Ambiguous(MetaFormula(Formulas.Phi), List(
+              Location.premise(0).formulaInsideQuantifier,
+              Location.premise(1).firstLine
+            ))
           ) ++ 
           failIf(
             concl != Some(formula), 
-            FormulaDoesntMatchReference(1, "conclusion of box should match formula")
+            Ambiguous(MetaFormula(Formulas.Chi), List(
+              Location.conclusion.root,
+              Location.premise(1).lastLine
+            ))
           ) ++
           failIf(
             substitutor.hasFreeOccurance(formula, x0),
-            FormulaDoesntMatchRule(s"the formula contains a free ocurrance of $x0")
+            Miscellaneous(Location.conclusion, "fresh variable must not occur in conclusion")
           )
 
         case None => 
-          fail(ReferenceDoesntMatchRule(1, "box does not contain fresh variable"))
+          fail(ReferenceBoxMissingFreshVar(1))
       }
       case _ => 
-        fail(ReferenceDoesntMatchRule(0, "must be exists"))
+        fail(ShapeMismatch(Location.premise(0)))
     }
-    
+
     case ExistsIntro() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => formula match {
         case Exists(x, phi) => 
           failIf(
             substitutor.findReplacement(phi, ref, x).isEmpty,
-            FormulaDoesntMatchReference(0, "reference must be equal to formula, with variable replaced by a term")
+            Ambiguous(MetaFormula(Formulas.Phi), List(
+              Location.conclusion.formulaInsideQuantifier,
+              Location.premise(0).root
+            ))
           )
 
         case _ => 
-          fail(FormulaDoesntMatchRule("must be exists"))
+          fail(ShapeMismatch(Location.conclusion))
       }
     }
 
     case EqualityIntro() => extractNFormulasAndThen(refs, 0) {
       case _ => formula match {
         case Equals(t1, t2) => 
-          failIf(t1 != t2, FormulaDoesntMatchRule("sides of equality must be the same"))
+          failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T), List(
+            Location.conclusion.lhs,
+            Location.conclusion.rhs
+          )))
 
         case _ => 
-          fail(FormulaDoesntMatchRule("must be equals"))
+          fail(ShapeMismatch(Location.conclusion))
       }
     }
 
@@ -110,11 +139,14 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
         case Equals(t1, t2) => 
           failIf(
             !substitutor.equalExcept(r1, formula, t1, t2),
-            FormulaDoesntMatchReference(1, "Invalid substitution")
+            Ambiguous(MetaFormula(Formulas.Phi), List(
+              Location.conclusion.root,
+              Location.premise(1).root
+            ))
           )
 
         case _ => 
-          fail(ReferenceDoesntMatchRule(0, "must be equality"))
+          fail(ShapeMismatch(Location.premise(0)))
       }
     }
   }

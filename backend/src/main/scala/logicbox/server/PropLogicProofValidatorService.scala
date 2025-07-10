@@ -5,6 +5,8 @@ import logicbox.rule._
 import logicbox.framework._
 import logicbox.proof._
 import logicbox.server.format._
+import logicbox.framework.RulePart.TemplateTerm
+import logicbox.framework.RulePart.TemplateFormula
 
 // 'factory'
 object PropLogicProofValidatorService {
@@ -26,7 +28,7 @@ object PropLogicProofValidatorService {
       RuleBasedProofChecker(optionRuleChecker)
 
     new ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] {
-      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[Diagnostic[Id]] = {
+      override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[(Id, Error)] = {
         val optProofView = ProofView(proof, { 
           case (id, line: Proof.Line[IncompleteFormula[F], Option[R], Id]) => 
             ProofLineImpl(line.formula.optFormula, line.rule, line.refs)
@@ -69,6 +71,12 @@ object PropLogicProofValidatorService {
     ruleToString = ruleToString,
     boxInfoToRaw = _ => RawBoxInfo(None)
   )
+
+  def getInfRule(rule: R): Option[InfRule] = Some(RuleMaps.getPropLogicInfRule(rule))
+}
+
+class NoBoxInfoNavigator extends Navigator[Unit, Nothing] {
+  override def get(subject: Unit, loc: Location): Option[Nothing] = None
 }
 
 import PropLogicProofValidatorService._
@@ -76,5 +84,12 @@ class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 
-  proofChecker = proofChecker
+  proofChecker = proofChecker,
+  createErrorConverter = pf => createErrorConverter(
+    pf,
+    PropLogicFormulaNavigator(),
+    NoBoxInfoNavigator(),
+    getInfRule,
+    Stringifiers.propLogicFormulaAsLaTeX
+  )
 )
