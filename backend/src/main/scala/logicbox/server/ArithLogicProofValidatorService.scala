@@ -107,5 +107,5 @@ class ArithLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  errorConverter = ???
+  createErrorConverter = ???
 )

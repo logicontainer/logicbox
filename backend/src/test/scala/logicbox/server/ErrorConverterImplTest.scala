@@ -23,424 +23,500 @@ import logicbox.framework.RulePart
 class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
   import logicbox.ProofStubs._
 
-  val NAV_FAIL = 512502
-
-  trait RulePartGetter {
-    def getRulePart(rule: StubRule, rulePos: Location): Option[RulePart]
-  }
-
-  def fix = {
-    class StubFormulaNav extends Navigator[StubFormula, StubFormula] {
-      override def get(subject: StubFormula, loc: Location): Option[StubFormula] = {
-        if subject.i == NAV_FAIL then None else
-        Some(StubFormula(subject.i))
-      }
-    }
-
-    class BoxNav extends Navigator[StubBoxInfo, StubFormula] {
-      override def get(subject: StubBoxInfo, loc: Location): Option[StubFormula] = ???
-    }
-
-  
-    val rpg = mock[RulePartGetter]
-    when(rpg.getRulePart(any(), any())).thenReturn(None)
-
-    def stubFormulaToString(f: StubFormula): String = s"sf(${f.i.toString})"
+  def fix(pf: Proof[F, R, B, String]) = {
+    def expToString(f: Int): String = f.toString
     def rulePartToLaTeX(r: RulePart): String = s"--${r.toString}"
-    def getRulePart(rule: StubRule, rulePos: Location): Option[RulePart] = rpg.getRulePart(rule, rulePos)
+    
+    val pnav = mock[Navigator[(Proof[F, R, B, String], String), Int]]
+    val rnav = mock[Navigator[InfRule, RulePart]]
+    val getInfRule = mock[R => Option[InfRule]]
 
-    val pnav = ProofNavigator[F, B, String, F](StubFormulaNav(), BoxNav())
-
-    (ErrorConverterImpl[F, R, B](getRulePart, stubFormulaToString, rulePartToLaTeX, pnav, RulePartNavigator()), rpg)
+    (ErrorConverterImpl[F, R, B, Int](pnav, rnav, getInfRule, expToString, rulePartToLaTeX, pf): ErrorConverter, pnav, rnav, getInfRule)
   }
 
-  describe("convert") {
-    it("should convert shape mismatch on formula") {
-      val (cvtr, rpg) = fix
+  describe("convert ShapeMismatch") {
+    it("should convert shape mismatch on conclusion") {
       val pf = StubProof(
         rootSteps = Seq("l1"),
         map = Map(
-          "l1" -> StubLine(StubFormula(2), Good())
+          "l1" -> StubLine(StubFormula(), Good())
         )
       )
 
-      val part = RulePart.Equals(MetaVariable(Vars.X), MetaVariable(Vars.X))
-      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(part))
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      cvtr.convert(pf, "l1", Error.ShapeMismatch(Location.conclusion.root)) shouldBe Some(OutputError.ShapeMismatch(
+      val concl = MetaFormula(Formulas.Phi)
+      val ir = InfRule(Nil, concl)
+
+      val conclLoc = Location.conclusion.root
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "l1"), conclLoc)).thenReturn(Some(2))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+
+      cvtr.convert("l1", Error.ShapeMismatch(conclLoc)) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "l1",
         rulePosition = "conclusion",
-        expected = s"--${part.toString}",
-        actual = "sf(2)"
+        expected = s"--${concl.toString}",
+        actual = "2"
       ))
     }
-
-    it("should convert shape mismatch on formula 2") {
-      val (cvtr, rpg) = fix
+    
+    it("should convert shape mismatch on premises 0, 1") {
       val pf = StubProof(
         rootSteps = Seq("l2"),
         map = Map(
-          "l2" -> StubLine(StubFormula(3), Good())
+          "ref" -> StubLine(),
+          "l2" -> StubLine(StubFormula(1), Bad(), Seq("ref", "ref"))
         )
       )
 
-      val part = RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T))
-      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(part))
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      cvtr.convert(pf, "l2", Error.ShapeMismatch(Location.conclusion)) shouldBe Some(OutputError.ShapeMismatch(
+      val prem0 = MetaFormula(Formulas.Chi)
+      val prem1 = MetaFormula(Formulas.Psi)
+      val ir = InfRule(List(prem0, prem1), MetaFormula(Formulas.Phi))
+
+      val prem0Loc = Location.premise(0).root
+      val prem1Loc = Location.premise(1).root
+      when(getInfRule(Bad())).thenReturn(Some(ir))
+      when(pnav.get((pf, "l2"), prem0Loc)).thenReturn(Some(4))
+      when(pnav.get((pf, "l2"), prem1Loc)).thenReturn(Some(5))
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0))
+      when(rnav.get(ir, prem1Loc)).thenReturn(Some(prem1))
+
+      cvtr.convert("l2", Error.ShapeMismatch(prem0Loc)) shouldBe Some(OutputError.ShapeMismatch(
         uuid = "l2",
-        rulePosition = "conclusion",
-        expected = s"--${part.toString}",
-        actual = "sf(3)"
-      ))
-    }
-
-    it("should convert shape mismatch on ref 0") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("l1", "ref"),
-        map = Map(
-          "ref" -> StubLine(StubFormula(1)),
-          "l1" -> StubLine(StubFormula(2), Good(), Seq("ref"))
-        )
-      )
-
-      val part = RulePart.Equals(MetaTerm(Terms.T), MetaTerm(Terms.T))
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
-
-      cvtr.convert(pf, "l1", Error.ShapeMismatch(Location.premise(0))) shouldBe Some(OutputError.ShapeMismatch(
-        uuid = "l1",
         rulePosition = "premise 0",
-        expected = s"--${part.toString}",
-        actual = "sf(1)"
+        expected = s"--${prem0.toString}",
+        actual = "4"
       ))
-    }
 
-    it("should convert shape mismatch on ref 1") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("l1", "ref"),
-        map = Map(
-          "r0" -> StubLine(StubFormula(1)),
-          "r1" -> StubLine(StubFormula(2)),
-          "l1" -> StubLine(StubFormula(2), Good(), Seq("r0", "r1"))
-        )
-      )
-
-      val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(part))
-
-      cvtr.convert(pf, "l1", Error.ShapeMismatch(Location.premise(1))) shouldBe Some(OutputError.ShapeMismatch(
-        uuid = "l1",
+      cvtr.convert("l2", Error.ShapeMismatch(prem1Loc)) shouldBe Some(OutputError.ShapeMismatch(
+        uuid = "l2",
         rulePosition = "premise 1",
-        expected = s"--${part.toString}",
-        actual = "sf(2)"
-      ))
-    }
-    
-    it("should convert shape mismatch on assumption of box") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("box"),
-        map = Map(
-          "ass" -> StubLine(StubFormula(123)),
-          "concl" -> StubLine(StubFormula(456)),
-          "box" -> StubBox(StubBoxInfo(), Seq("ass", "concl")),
-          "line" -> StubLine(StubFormula(), Good(), Seq("box"))
-        )
-      )
-
-      val assRulePart = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T2))
-      val part = TemplateBox(ass = Some(assRulePart), concl = None, freshVar = None)
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
-
-      cvtr.convert(pf, "line", Error.ShapeMismatch(Location.premise(0).firstLine)) shouldBe Some(OutputError.ShapeMismatch(
-        uuid = "line",
-        rulePosition = "premise 0",
-        expected = s"--${assRulePart.toString}",
-        actual = "sf(123)"
+        expected = s"--${prem1.toString}",
+        actual = "5"
       ))
     }
 
-    it("should return none when rule part location is not valid") {
-      val (cvtr, rpg) = fix
+    it("should fail when location doesn't point to concl or premises") {
       val pf = StubProof(
-        rootSteps = Seq("box"),
+        rootSteps = Seq("l1"),
         map = Map(
-          "ass" -> StubLine(StubFormula(123)),
-          "concl" -> StubLine(StubFormula(456)),
-          "box" -> StubBox(StubBoxInfo(), Seq("ass", "concl")),
-          "line" -> StubLine(StubFormula(), Good(), Seq("box"))
+          "l1" -> StubLine(StubFormula(), Good())
         )
       )
 
-      // rule is t1 = t1
-      val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      // but we ask for operand 3
-      cvtr.convert(pf, "line", Error.ShapeMismatch(Location.premise(0).operand(3))) shouldBe None
+      val concl = MetaFormula(Formulas.Phi)
+      val ir = InfRule(Nil, concl)
+
+      val invalidLoc = Location.root
+      when(getInfRule(Good())).thenReturn(Some(ir))
+
+      // even if the navigators somehow accept!
+      when(pnav.get((pf, "l1"), invalidLoc)).thenReturn(Some(2))
+      when(rnav.get(ir, invalidLoc)).thenReturn(Some(concl))
+
+      cvtr.convert("l1", Error.ShapeMismatch(invalidLoc)) shouldBe None
     }
 
-    it("should return none when formula nav fails") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map(
-          "line" -> StubLine(StubFormula(NAV_FAIL))
-        )
-      )
-
-      val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(part))
-
-      cvtr.convert(pf, "line", Error.ShapeMismatch(Location.conclusion.root)) shouldBe None
-    }
-  
-    it("should return none if id is invalid") {
-      val (cvtr, rpg) = fix
+    it("should return none when proof step is not defined") {
       val pf = StubProof()
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(part))
+      val concl = MetaFormula(Formulas.Phi)
+      val ir = InfRule(Nil, concl)
 
-      cvtr.convert(pf, "invalid_id", Error.ShapeMismatch(Location.conclusion.root)) shouldBe None
+      val conclLoc = Location.conclusion.root
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+      // even if proof nav poops out something
+      when(pnav.get((pf, "invalid_id"), conclLoc)).thenReturn(Some(2))
+
+      cvtr.convert("invalid_id", Error.ShapeMismatch(conclLoc)) shouldBe None
     }
 
-    it("should return none when try to get ref of box") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        Seq("box"), Map("box" -> StubBox())
-      )
+    it("should return none when proof step is not a line") {
+      val pf = StubProof(rootSteps = Seq("box"), map = Map("box" -> StubBox()))
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      val part = RulePart.Equals(MetaTerm(Terms.T1), MetaTerm(Terms.T1))
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
+      val concl = MetaFormula(Formulas.Phi)
+      val ir = InfRule(Nil, concl)
 
-      cvtr.convert(pf, "box", Error.ShapeMismatch(Location.premise(0).root)) shouldBe None
+      val conclLoc = Location.conclusion.root
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+      when(pnav.get((pf, "invalid_id"), conclLoc)).thenReturn(Some(2)) // even if proof nav gives us something
+
+      cvtr.convert("box", Error.ShapeMismatch(conclLoc)) shouldBe None
     }
 
-    it("should convert ambiguous error with no entries") {
-      val (cvtr, rpg) = fix
+    it("should return none if infrulenav fails") {
       val pf = StubProof(
-        rootSteps = Seq("l1", "l2"),
-        map = Map("l1" -> StubLine(), "l2" -> StubLine())
-      )
-
-      val what = MetaFormula(Formulas.Phi)
-
-      cvtr.convert(pf, "l1", Error.Ambiguous(what, Nil)) shouldBe Some(
-        OutputError.Ambiguous(
-          uuid = "l1", 
-          subject = s"--${what.toString}",
-          entries = Nil
-        )
-      )
-
-      cvtr.convert(pf, "l2", Error.Ambiguous(what, Nil)) shouldBe Some(
-        OutputError.Ambiguous(
-          uuid = "l2", 
-          subject = s"--${what.toString}",
-          entries = Nil
-        )
-      )
-    }
-
-    it("should convert a single entry") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map("line" -> StubLine(StubFormula(144), Good()))
-      )
-
-      val what = MetaFormula(Formulas.Chi)
-      val err = Error.Ambiguous(what, List(
-        Location.conclusion.root
-      ))
-
-
-      val conclusionRulePart = RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Chi))
-      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(conclusionRulePart))
-
-      cvtr.convert(pf, "line", err) shouldBe Some(OutputError.Ambiguous(
-        uuid = "line",
-        subject = s"--${what.toString}",
-        entries = List(AmbiguityEntry(
-          rulePosition = "conclusion",
-          meta = s"--${conclusionRulePart.toString}",
-          actual = "sf(144)"
-        ))
-      ))
-    }
-
-    it("should convert multiple entries with refs") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("l", "r0", "r1"),
+        rootSteps = Seq("l1"),
         map = Map(
-          "r0" -> StubLine(StubFormula(10)),
-          "r1" -> StubLine(StubFormula(11)),
-          "l" -> StubLine(StubFormula(144), Good(), Seq("r0", "r1"))
+          "l1" -> StubLine(StubFormula(), Good())
         )
       )
 
-      val what = MetaFormula(Formulas.Phi)
-      val err = Error.Ambiguous(what, List(
-        Location.premise(0).root,
-        Location.premise(1).root
-      ))
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      val premise0RulePart = Substitution(MetaFormula(Formulas.Phi), MetaTerm(Terms.T), MetaVariable(Vars.X))
-      val premise1RulePart = MetaFormula(Formulas.Phi)
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(premise0RulePart))
-      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(premise1RulePart))
+      val ir = InfRule(List(MetaFormula(Formulas.Phi)), Contradiction())
 
-      cvtr.convert(pf, "l", err) shouldBe Some(OutputError.Ambiguous(
-        uuid = "l",
-        subject = s"--${what.toString}",
-        entries = List(
-          AmbiguityEntry(
-            rulePosition = "premise 0",
-            meta = s"--${premise0RulePart.toString}",
-            actual = "sf(10)"
-          ),
-          AmbiguityEntry(
-            rulePosition = "premise 1",
-            meta = s"--${premise1RulePart.toString}",
-            actual = "sf(11)"
-          )
-        )
-      ))
+      val prem0Loc = Location.premise(0).root
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "l1"), prem0Loc)).thenReturn(Some(2)) 
+      when(rnav.get(ir, prem0Loc)).thenReturn(None) // fail!
+
+      cvtr.convert("l1", Error.ShapeMismatch(prem0Loc)) shouldBe None
     }
 
-    it("should work with locations in entries") {
-      val (cvtr, rpg) = fix
+    it("should ret. none if proofnav fails") {
       val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map("line" -> StubLine(StubFormula(123), Good()))
-      )
-
-      val what = MetaFormula(Formulas.Chi)
-      val err = Error.Ambiguous(what, List(
-        Location.conclusion.rhs // RIGHT HAND SIDE!!
-      ))
-
-
-      val conclusionRulePart = RulePart.Implies(MetaFormula(Formulas.Phi), MetaFormula(Formulas.Chi))
-      val thePartThatShouldBeHighlighted = conclusionRulePart.psi
-      when(rpg.getRulePart(Good(), Location.conclusion)).thenReturn(Some(conclusionRulePart))
-
-      cvtr.convert(pf, "line", err) shouldBe Some(OutputError.Ambiguous(
-        uuid = "line",
-        subject = s"--${what.toString}",
-        entries = List(AmbiguityEntry(
-          rulePosition = "conclusion",
-          meta = s"--${thePartThatShouldBeHighlighted.toString}",
-          actual = "sf(124)" // FHS WILL BE + 1!!
-        ))
-      ))
-    }
-
-    it("should not convert ambiguous error when uuid is invalid") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof()
-      cvtr.convert(pf, "invalid_id", Error.Ambiguous(MetaFormula(Formulas.Phi), Nil)) shouldBe None
-    }
-
-    it("should be none when rule part is not specified") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map("line" -> StubLine(StubFormula(12), Good()))
-      )
-
-      val what = MetaFormula(Formulas.Chi)
-      val err = Error.Ambiguous(what, List(
-        Location.conclusion.root
-      ))
-
-      // rpg not set up -> getRulePart will be None
-
-      cvtr.convert(pf, "line", err) shouldBe None
-    }
-
-    it("should be none when location in rule part doesn't make sense") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map("line" -> StubLine(StubFormula(12), Good()))
-      )
-
-      val what = MetaFormula(Formulas.Chi)
-      val err = Error.Ambiguous(what, List(
-        Location.premise(0).lhs
-      ))
-    
-      val part = what // there is no LHS of chi!
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
-
-      cvtr.convert(pf, "line", err) shouldBe None
-    }
-
-    it("should be none when refers to invalid id") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map("line" -> StubLine(StubFormula(12), Good(), Seq("invalid_ref")))
-      )
-
-      val what = MetaFormula(Formulas.Chi)
-      val err = Error.Ambiguous(what, List(
-        Location.premise(0).root
-      ))
-    
-      val part = what
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(part))
-
-      cvtr.convert(pf, "line", err) shouldBe None
-    }
-
-    it("should be none when try to get ref 1 when there are no refs") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("line"),
-        map = Map("line" -> StubLine(StubFormula(12), Good())) // NO REFS
-      )
-
-      val what = MetaFormula(Formulas.Chi)
-      val err = Error.Ambiguous(what, List(
-        Location.premise(1).root // REF 1???
-      ))
-    
-      val part = what
-      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(part))
-
-      cvtr.convert(pf, "line", err) shouldBe None
-    }
-
-    it("should fail if just a single entry is invalid") {
-      val (cvtr, rpg) = fix
-      val pf = StubProof(
-        rootSteps = Seq("l", "r1"),
+        rootSteps = Seq("l1"),
         map = Map(
-          "r0" -> StubLine(StubFormula(11)),
-          "l" -> StubLine(StubFormula(144), Good(), Seq("r0", "r1")) // r1 DOESNT EXIST!
+          "l3" -> StubLine(StubFormula(), Good())
         )
       )
 
-      val what = MetaFormula(Formulas.Phi)
-      val err = Error.Ambiguous(what, List(
-        Location.premise(0).root, 
-        Location.premise(1).root // REFER TO r0
-      ))
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
 
-      val premise0RulePart = Substitution(MetaFormula(Formulas.Phi), MetaTerm(Terms.T), MetaVariable(Vars.X))
-      val premise1RulePart = MetaFormula(Formulas.Phi)
-      when(rpg.getRulePart(Good(), Location.premise(0))).thenReturn(Some(premise0RulePart))
-      when(rpg.getRulePart(Good(), Location.premise(1))).thenReturn(Some(premise1RulePart))
+      val prem0 = MetaFormula(Formulas.Phi)
+      val ir = InfRule(List(prem0), Contradiction())
 
-      cvtr.convert(pf, "l", err) shouldBe None
+      val prem0Loc = Location.premise(0).root
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "l3"), prem0Loc)).thenReturn(None) // fail!
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0)) 
+
+      cvtr.convert("l3", Error.ShapeMismatch(prem0Loc)) shouldBe None
+    }
+
+    it("should ret. none if getInfRule fails") {
+      val pf = StubProof(
+        rootSteps = Seq("l1"),
+        map = Map(
+          "l3" -> StubLine(StubFormula(), Good())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+
+      val prem0 = MetaFormula(Formulas.Phi)
+      val ir = InfRule(List(prem0), Contradiction())
+
+      val prem0Loc = Location.premise(0).root
+      when(getInfRule(Good())).thenReturn(None)
+      when(pnav.get((pf, "l3"), prem0Loc)).thenReturn(Some(2)) // fail!
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0)) 
+
+      cvtr.convert("l3", Error.ShapeMismatch(prem0Loc)) shouldBe None
     }
   }
 
-  
+  describe("convert Ambiguous") {
+    it("should convert error with no entries") {
+      val pf = StubProof(
+        rootSteps = Seq("ll", "l1"),
+        map = Map(
+          "ll" -> StubLine(StubFormula()),
+          "l1" -> StubLine(StubFormula())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what1 = MetaTerm(Terms.T)
+      val what2 = MetaTerm(Terms.T2)
+      cvtr.convert("ll", Error.Ambiguous(what1, Nil)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "ll",
+        subject = s"--${what1.toString}",
+        entries = Nil
+      ))
+
+      cvtr.convert("l1", Error.Ambiguous(what2, Nil)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "l1",
+        subject = s"--${what2.toString}",
+        entries = Nil
+      ))
+    }
+
+    it("should convert error with single entry in conclusion") {
+      val pf = StubProof(
+        rootSteps = Seq("ll", "l1"),
+        map = Map(
+          "ll" -> StubLine(StubFormula(), Good())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaTerm(Terms.T2)
+
+      val concl = MetaFormula(Formulas.Psi)
+      val ir = InfRule(Nil, concl)
+
+      val conclLoc = Location.conclusion.root
+      val entries = List(conclLoc)
+
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "ll"), conclLoc)).thenReturn(Some(10))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+
+      cvtr.convert("ll", Error.Ambiguous(what, entries)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "ll",
+        subject = s"--${what.toString}",
+        entries = List(AmbiguityEntry(
+          rulePosition = "conclusion",
+          meta = s"--${concl.toString}",
+          actual = "10"
+        ))
+      ))
+    }
+
+    it("should convert error with single entry in premise 0") {
+      val pf = StubProof(
+        rootSteps = Seq("id"),
+        map = Map(
+          "id" -> StubLine(StubFormula(), Bad())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaVariable(Vars.X)
+
+      val prem0 = And(MetaFormula(Formulas.Chi), MetaFormula(Formulas.Psi))
+      val ir = InfRule(List(prem0), Contradiction())
+
+      val prem0Loc = Location.premise(0).lhs
+      val entries = List(prem0Loc)
+
+      when(getInfRule(Bad())).thenReturn(Some(ir))
+      when(pnav.get((pf, "id"), prem0Loc)).thenReturn(Some(5))
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0.phi))
+
+      cvtr.convert("id", Error.Ambiguous(what, entries)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "id",
+        subject = s"--${what.toString}",
+        entries = List(AmbiguityEntry(
+          rulePosition = "premise 0",
+          meta = s"--${prem0.phi.toString}",
+          actual = "5"
+        ))
+      ))
+    }
+
+    it("should convert error with multiple entries") {
+      val pf = StubProof(
+        rootSteps = Seq("id"),
+        map = Map(
+          "id" -> StubLine(StubFormula(), Bad())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaVariable(Vars.X)
+
+      val prem0 = MetaFormula(Formulas.Chi)
+      val concl = And(Contradiction(), MetaFormula(Formulas.Psi))
+      val ir = InfRule(List(prem0), concl)
+
+      val prem0Loc = Location.premise(0).root
+      val conclLoc = Location.conclusion.rhs
+      val entries = List(conclLoc, prem0Loc)
+
+      when(getInfRule(Bad())).thenReturn(Some(ir))
+      when(pnav.get((pf, "id"), prem0Loc)).thenReturn(Some(6))
+      when(pnav.get((pf, "id"), conclLoc)).thenReturn(Some(7))
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl.psi))
+
+      cvtr.convert("id", Error.Ambiguous(what, entries)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "id",
+        subject = s"--${what.toString}",
+        entries = List(AmbiguityEntry(
+          rulePosition = "conclusion",
+          meta = s"--${concl.psi.toString}",
+          actual = "7"
+        ), AmbiguityEntry(
+          rulePosition = "premise 0",
+          meta = s"--${prem0.toString}",
+          actual = "6"
+        ))
+      ))
+    }
+
+    it("should return none when there is not first step") {
+      val pf = StubProof(
+        rootSteps = Seq("ll"),
+        map = Map(
+          "ll" -> StubLine(StubFormula(), Good())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaFormula(Formulas.Psi)
+
+      val concl = MetaFormula(Formulas.Psi)
+      val ir = InfRule(Nil, concl)
+
+      val conclLoc = Location.root // LOCATION EMPTY
+      val entries = List(conclLoc)
+
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "ll"), conclLoc)).thenReturn(Some(10))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+
+      cvtr.convert("ll", Error.Ambiguous(what, entries)) shouldBe None
+    }
+
+    it("should return none when first step is not a valid rule pos") {
+      val pf = StubProof(
+        rootSteps = Seq("ll", "l1"),
+        map = Map(
+          "ll" -> StubLine(StubFormula(), Good())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaTerm(Terms.T2)
+
+      val concl = MetaFormula(Formulas.Psi)
+      val ir = InfRule(Nil, concl)
+
+      val conclLoc = Location.operand(4).root // invalid rule pos!
+      val entries = List(conclLoc)
+
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "ll"), conclLoc)).thenReturn(Some(10))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+
+      cvtr.convert("ll", Error.Ambiguous(what, entries)) shouldBe None
+    }
+
+    it("should fail when id doesn't refers to box or id is invalid") {
+      val pf = StubProof(
+        rootSteps = Seq("box"),
+        map = Map(
+          "box" -> StubBox()
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaTerm(Terms.T2)
+
+      val concl = MetaFormula(Formulas.Psi)
+      val ir = InfRule(Nil, concl)
+
+      val conclLoc = Location.conclusion.root
+      val entries = List(conclLoc)
+
+      when(getInfRule(Good())).thenReturn(Some(ir))
+      when(pnav.get((pf, "box"), conclLoc)).thenReturn(Some(10))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+
+      cvtr.convert("box", Error.Ambiguous(what, entries)) shouldBe None
+      cvtr.convert("invalid_id", Error.Ambiguous(what, entries)) shouldBe None
+    }
+
+    it("should fail when getInfRule fails") {
+      val pf = StubProof(
+        rootSteps = Seq("line"),
+        map = Map(
+          "line" -> StubLine(StubFormula(), Bad())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaVariable(Vars.X)
+
+      val prem0 = And(MetaFormula(Formulas.Chi), MetaFormula(Formulas.Psi))
+      val ir = InfRule(List(prem0), Contradiction())
+
+      val prem0Loc = Location.premise(0).lhs
+      val entries = List(prem0Loc)
+
+      when(getInfRule(Bad())).thenReturn(None) // FAILS
+      when(pnav.get((pf, "line"), prem0Loc)).thenReturn(Some(5))
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0.phi))
+
+      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe None
+    }
+
+    it("should fail when proof nav fails") {
+      val pf = StubProof(
+        rootSteps = Seq("line"),
+        map = Map(
+          "line" -> StubLine(StubFormula(), Bad())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaVariable(Vars.X)
+
+      val prem0 = And(MetaFormula(Formulas.Chi), MetaFormula(Formulas.Psi))
+      val ir = InfRule(List(prem0), Contradiction())
+
+      val prem0Loc = Location.premise(0).lhs
+      val entries = List(prem0Loc)
+
+      when(getInfRule(Bad())).thenReturn(Some(ir))
+      when(pnav.get((pf, "line"), prem0Loc)).thenReturn(None) // FAILS
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0.phi))
+
+      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe None
+    }
+
+    it("should fail when rule part nav fails") {
+      val pf = StubProof(
+        rootSteps = Seq("line"),
+        map = Map(
+          "line" -> StubLine(StubFormula(), Bad())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaVariable(Vars.X)
+
+      val prem0 = And(MetaFormula(Formulas.Chi), MetaFormula(Formulas.Psi))
+      val ir = InfRule(List(prem0), Contradiction())
+
+      val prem0Loc = Location.premise(0).lhs
+      val entries = List(prem0Loc)
+
+      when(getInfRule(Bad())).thenReturn(Some(ir))
+      when(pnav.get((pf, "line"), prem0Loc)).thenReturn(Some(124)) // FAILS
+      when(rnav.get(ir, prem0Loc)).thenReturn(None)
+
+      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe None
+    }
+
+    it("should fail when only second entry fails") {
+      val pf = StubProof(
+        rootSteps = Seq("id"),
+        map = Map(
+          "id" -> StubLine(StubFormula(), Bad())
+        )
+      )
+
+      val (cvtr, pnav, rnav, getInfRule) = fix(pf)
+      val what = MetaVariable(Vars.X)
+
+      val prem0 = MetaFormula(Formulas.Chi)
+      val concl = And(Contradiction(), MetaFormula(Formulas.Psi))
+      val ir = InfRule(List(prem0), concl)
+
+      val prem0Loc = Location.premise(0).root
+      val conclLoc = Location.conclusion.rhs
+      val entries = List(prem0Loc, conclLoc) // concl is second location in entries
+
+      when(getInfRule(Bad())).thenReturn(Some(ir))
+      when(pnav.get((pf, "id"), prem0Loc)).thenReturn(Some(6))
+      when(pnav.get((pf, "id"), conclLoc)).thenReturn(None) // concl will fail!
+      when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0))
+      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl.psi))
+
+      cvtr.convert("id", Error.Ambiguous(what, entries)) shouldBe None 
+    }
+  }
 }

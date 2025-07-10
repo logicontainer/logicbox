@@ -79,5 +79,5 @@ class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  errorConverter = ???
+  createErrorConverter = ???
 )
