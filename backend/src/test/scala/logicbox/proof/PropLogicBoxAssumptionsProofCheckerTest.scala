@@ -19,6 +19,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
 
   describe("check") {
     val checker = PropLogicBoxAssumptionsProofChecker[PropLogicRule, String]()
+    import Location.Step
     it("should reject if ImplIntro doesn't have assumption on first line") {
       val proof = ProofImpl(
         map = Map(
@@ -30,7 +31,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(Location(d :: Nil), _))) =>
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -103,7 +104,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Error.Miscellaneous(Location(d :: Nil), _))) =>
+        case List(("l2", Error.Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -118,7 +119,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
 
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(Location(d :: Nil), _))) =>
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -138,7 +139,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(("l4", Miscellaneous(Location(d :: Nil), _))) =>
+        case List(("l4", Miscellaneous(Location(Step.Premise(1) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -158,7 +159,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(("l4", Miscellaneous(Location(d :: Nil), _))) =>
+        case List(("l4", Miscellaneous(Location(Step.Premise(2) :: Step.FirstLine :: Nil), _))) =>
       }
     }
 
@@ -189,7 +190,7 @@ class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
       )
       
       checker.check(proof) should matchPattern {
-        case List(("l2", Miscellaneous(Location(d :: Nil), _))) =>
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
       }
     }
   }

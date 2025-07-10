@@ -152,7 +152,7 @@ class ArithLogicRuleChecker[
                 }
                 
               case _ => 
-                fail(Miscellaneous(Location.premise(1), "first step in box must be a line"))
+                fail(Miscellaneous(Location.premise(1).firstLine, "first step in box must be a line"))
 
             }) ++ (extractLastLine(box) match {
               case Some(ass) => 
@@ -168,7 +168,7 @@ class ArithLogicRuleChecker[
                 }
                 
               case _ => 
-                fail(Miscellaneous(Location.premise(1), "last step in box must be a line"))
+                fail(Miscellaneous(Location.premise(1).lastLine, "last step in box must be a line"))
             })
 
           case _ => 

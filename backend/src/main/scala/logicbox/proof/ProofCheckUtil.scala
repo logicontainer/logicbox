@@ -40,7 +40,7 @@ object ProofCheckUtil {
   ): List[(Id, Error)] = {
     checkFirstLineOfBoxRef(proof, stepId, line, refIdx, {
       case (id, Proof.Line(_, rule, _)) if rule != assumptionRule => List(
-        (stepId, Error.Miscellaneous(Location.premise(refIdx), "first line in box must be assumption"))
+        (stepId, Error.Miscellaneous(Location.premise(refIdx).firstLine, "first line in box must be assumption"))
       )
 
       case _ => Nil

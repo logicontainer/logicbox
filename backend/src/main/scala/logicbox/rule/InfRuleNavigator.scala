@@ -14,7 +14,7 @@ class InfRuleNavigator(
       subject.premises.lift(idx)
         .flatMap(rulePartNavigator.get(_, Location(rest)))
 
-    case Nil => None
+    case _ => None
   }
   
 }

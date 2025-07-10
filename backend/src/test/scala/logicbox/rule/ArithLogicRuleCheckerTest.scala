@@ -466,7 +466,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("forall x x = x")
       import Location.Step._
       checker.check(Induction(), f, refs) should matchPattern {
-        case List(Miscellaneous(Location(Location.Step.Premise(1) :: Conclusion :: Nil), _)) =>
+        case List(Miscellaneous(Location(Location.Step.Premise(1) :: FirstLine :: Nil), _)) =>
       }
     }
 
