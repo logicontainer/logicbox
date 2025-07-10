@@ -115,42 +115,17 @@ object ArithLogicProofValidatorService {
   }
 }
 
-class FreshVarBoxInfoNavigator[V] extends Navigator[FreshVarBoxInfo[V], V] {
-  override def get(subject: FreshVarBoxInfo[V], loc: Location): Option[V] = loc.steps match {
-    case Nil => subject.freshVar
-    case _ => None
-  }
-}
-
 import ArithLogicProofValidatorService._
 class ArithLogicProofValidatorService extends ProofValidatorServiceImpl[
   IncompleteFormula[F], Option[R], Option[B]
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  createErrorConverter = pf => {
-    val cleanProof: Proof[F, R, B, Id] = OptionProofView(pf, {
-      case (_, Proof.Line(IncompleteFormula(_, Some(f)), Some(r), refs)) => 
-        Some(ProofLineImpl(f, r, refs))
-      case (_, Proof.Box(Some(info), steps)) => 
-        Some(ProofBoxImpl(info, steps))
-      case _ => None
-    })
-
-    ErrorConverterImpl(
-      ProofNavigator(
-        ArithLogicFormulaNavigator(),
-        FreshVarBoxInfoNavigator[ArithLogicTerm.Var]()
-      ),
-      InfRuleNavigator(RulePartNavigator()),
-      getInfRule,
-      formulaOrTermToLaTeX,
-      rulePart => rulePart match {
-        case t: RulePart.TemplateTerm => Stringifiers.templateTermToLaTeX(t)
-        case f: RulePart.TemplateFormula => Stringifiers.templateFormulaToLaTeX(f)
-        case _ => "???"
-      },
-      cleanProof
-    )
-  }
+  createErrorConverter = pf => createErrorConverter(
+    pf, 
+    ArithLogicFormulaNavigator(), 
+    FreshVarBoxInfoNavigator[ArithLogicTerm.Var](),
+    getInfRule,
+    formulaOrTermToLaTeX
+  )
 )

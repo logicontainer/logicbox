@@ -71,6 +71,12 @@ object PropLogicProofValidatorService {
     ruleToString = ruleToString,
     boxInfoToRaw = _ => RawBoxInfo(None)
   )
+
+  def getInfRule(rule: R): Option[InfRule] = Some(RuleMaps.getPropLogicInfRule(rule))
+}
+
+class NoBoxInfoNavigator extends Navigator[Unit, Nothing] {
+  override def get(subject: Unit, loc: Location): Option[Nothing] = None
 }
 
 import PropLogicProofValidatorService._
@@ -79,5 +85,11 @@ class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  createErrorConverter = ???
+  createErrorConverter = pf => createErrorConverter(
+    pf,
+    PropLogicFormulaNavigator(),
+    NoBoxInfoNavigator(),
+    getInfRule,
+    Stringifiers.propLogicFormulaAsLaTeX
+  )
 )

@@ -93,6 +93,19 @@ object PredLogicProofValidatorService {
       case FreshVarBoxInfo(freshVar) => RawBoxInfo(freshVar.map(_.x.toString))
     }
   )
+
+  def getInfRule(rule: R): Option[InfRule] = {
+    import RulePart._
+    rule match {
+      case r: PredLogicRule => Some(RuleMaps.getPredLogicInfRule(r))
+      case r: PropLogicRule => Some(RuleMaps.getPropLogicInfRule(r))
+    }
+  }
+
+  def formulaOrTermToLaTeX(formulaOrTerm: PredLogicFormula | PredLogicTerm): String = formulaOrTerm match {
+    case f: PredLogicFormula => Stringifiers.predLogicFormulaAsLaTeX(f)
+    case t: PredLogicTerm => Stringifiers.predLogicTermAsString(t)
+  }
 }
 
 import PredLogicProofValidatorService._
@@ -101,5 +114,11 @@ class PredLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  createErrorConverter = ???
+  createErrorConverter = pf => createErrorConverter(
+    pf,
+    PredLogicFormulaNavigator(),
+    FreshVarBoxInfoNavigator[PredLogicTerm.Var](),
+    getInfRule,
+    formulaOrTermToLaTeX
+  )
 )

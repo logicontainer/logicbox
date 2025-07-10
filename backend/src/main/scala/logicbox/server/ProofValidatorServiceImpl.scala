@@ -15,7 +15,6 @@ class ProofValidatorServiceImpl[F, R, B](
   val proofChecker: ProofChecker[F, R, B, String],
   val createErrorConverter: Proof[F, R, B, String] => ErrorConverter
 ) extends ProofValidatorService[Unit] {
-
   override def validateProof(rawProof: RawProof): Either[Unit, ValidationResult] = {
     val proof = rawProofConverter.convertFromRaw(rawProof)
     val errors = proofChecker.check(proof)
