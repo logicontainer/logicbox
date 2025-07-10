@@ -65,8 +65,23 @@ class ErrorConverterImpl[F, R, B, O](
           entries = es
         )
       }
+
+    case Miscellaneous(loc, expl) => 
+      loc.steps.headOption
+        .flatMap(getRulePosition(_))
+        .map(OutputError.Miscellaneous(stepId, _, expl))
     
-    
-    case _ => Some(OutputError.Simple(stepId, "seomthing"))
+    case MissingFormula() => Some(OutputError.Simple(stepId, "MissingFormula"))
+    case MissingRule() => Some(OutputError.Simple(stepId, "MissingRule"))
+    case MissingRef(refIdx) => Some(OutputError.RefErr(stepId, "MissingRef", refIdx))
+
+    case ReferenceOutOfScope(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceOutOfScope", refIdx))
+    case ReferenceToLaterStep(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceToLaterStep", refIdx))
+    case ReferenceToUnclosedBox(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceToUnclosedBox", refIdx))
+    case ReferenceBoxMissingFreshVar(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceBoxMissingFreshVar", refIdx))
+    case ReferenceShouldBeBox(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceShouldBeBox", refIdx))
+    case ReferenceShouldBeLine(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceShouldBeLine", refIdx))
+
+    case WrongNumberOfReferences(exp, actual) => Some(OutputError.WrongNumberOfReferences(stepId, exp, actual))
   }
 }

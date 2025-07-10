@@ -519,4 +519,63 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert("id", Error.Ambiguous(what, entries)) shouldBe None 
     }
   }
+
+  describe("convert Miscellaneous") {
+    it("should convert with conclusion") {
+      val pf = StubProof(Seq("line"), Map("line" -> StubLine()))
+      val (cvtr, _, _, _) = fix(pf)
+
+      cvtr.convert("line", Error.Miscellaneous(Location.conclusion, "msg")) shouldBe Some(
+        OutputError.Miscellaneous("line", "conclusion", "msg")
+      )
+    }
+
+    it("should convert with premises") {
+      val pf = StubProof(Seq("line"), Map("line" -> StubLine(StubFormula(), Good(), Seq("0", "1", "2"))))
+      val (cvtr, _, _, _) = fix(pf)
+
+      cvtr.convert("line", Error.Miscellaneous(Location.premise(0), "msg 010")) shouldBe Some(
+        OutputError.Miscellaneous("line", "premise 0", "msg 010")
+      )
+
+      cvtr.convert("line", Error.Miscellaneous(Location.premise(2), "msg afsljk")) shouldBe Some(
+        OutputError.Miscellaneous("line", "premise 2", "msg afsljk")
+      )
+    }
+
+    it("should return none when loc is empty") {
+      val pf = StubProof(Seq("line"), Map("line" -> StubLine(StubFormula(), Good(), Seq("0", "1", "2"))))
+      val (cvtr, _, _, _) = fix(pf)
+
+      cvtr.convert("line", Error.Miscellaneous(Location.root, "msg 010")) shouldBe None
+    }
+
+    it("should return none when loc is invalid") {
+      val pf = StubProof(Seq("line"), Map("line" -> StubLine(StubFormula(), Good(), Seq("0", "1", "2"))))
+      val (cvtr, _, _, _) = fix(pf)
+
+      cvtr.convert("line", Error.Miscellaneous(Location.firstLine, "msg 010")) shouldBe None
+    }
+  }
+  
+  describe("convert rest") {
+    it("should convert rest fine") {
+      val pf = StubProof(Seq("id", "id2"), Map("id" -> StubLine(), "id2" -> StubBox()))
+      val (cvtr, _, _, _) = fix(pf)
+
+      cvtr.convert("id", Error.ReferenceOutOfScope(0)) shouldBe Some(OutputError.RefErr("id", "ReferenceOutOfScope", 0))
+      cvtr.convert("id", Error.ReferenceToLaterStep(0)) shouldBe Some(OutputError.RefErr("id", "ReferenceToLaterStep", 0))
+      cvtr.convert("id", Error.ReferenceToUnclosedBox(1)) shouldBe Some(OutputError.RefErr("id", "ReferenceToUnclosedBox", 1))
+      cvtr.convert("id", Error.ReferenceBoxMissingFreshVar(0)) shouldBe Some(OutputError.RefErr("id", "ReferenceBoxMissingFreshVar", 0))
+      cvtr.convert("id", Error.ReferenceShouldBeBox(0)) shouldBe Some(OutputError.RefErr("id", "ReferenceShouldBeBox", 0))
+      cvtr.convert("id", Error.ReferenceShouldBeLine(0)) shouldBe Some(OutputError.RefErr("id", "ReferenceShouldBeLine", 0))
+      cvtr.convert("id", Error.MissingRef(4)) shouldBe Some(OutputError.RefErr("id", "MissingRef", 4))
+      cvtr.convert("id", Error.MissingFormula()) shouldBe Some(OutputError.Simple("id", "MissingFormula"))
+      cvtr.convert("id", Error.MissingRule()) shouldBe Some(OutputError.Simple("id", "MissingRule"))
+
+      cvtr.convert("id", Error.WrongNumberOfReferences(14, 15)) shouldBe Some(
+        OutputError.WrongNumberOfReferences("id", 14, 15)
+      )
+    }
+  }
 }
