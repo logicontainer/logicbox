@@ -67,6 +67,6 @@ class ErrorConverterImpl[F, R, B, O](
       }
     
     
-    case _ => ???
+    case _ => Some(OutputError.Simple(stepId, "seomthing"))
   }
 }

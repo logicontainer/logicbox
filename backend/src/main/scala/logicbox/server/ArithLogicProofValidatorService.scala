@@ -99,6 +99,27 @@ object ArithLogicProofValidatorService {
       case FreshVarBoxInfo(freshVar) => RawBoxInfo(freshVar.map(_.x.toString))
     }
   )
+
+  def getInfRule(rule: R): Option[InfRule] = {
+    import RulePart._
+    rule match {
+      case r: ArithLogicRule => Some(RuleMaps.getArithLogicInfRule(r))
+      case r: PredLogicRule => Some(RuleMaps.getPredLogicInfRule(r))
+      case r: PropLogicRule => Some(RuleMaps.getPropLogicInfRule(r))
+    }
+  }
+
+  def formulaOrTermToLaTeX(formulaOrTerm: ArithLogicFormula | ArithLogicTerm): String = formulaOrTerm match {
+    case f: ArithLogicFormula => Stringifiers.arithLogicFormulaAsLaTeX(f)
+    case t: ArithLogicTerm => Stringifiers.arithLogicTermAsString(t)
+  }
+}
+
+class FreshVarBoxInfoNavigator[V] extends Navigator[FreshVarBoxInfo[V], V] {
+  override def get(subject: FreshVarBoxInfo[V], loc: Location): Option[V] = loc.steps match {
+    case Nil => subject.freshVar
+    case _ => None
+  }
 }
 
 import ArithLogicProofValidatorService._
@@ -107,5 +128,29 @@ class ArithLogicProofValidatorService extends ProofValidatorServiceImpl[
 ](
   rawProofConverter = rawProofConverter, 
   proofChecker = proofChecker,
-  createErrorConverter = ???
+  createErrorConverter = pf => {
+    val cleanProof: Proof[F, R, B, Id] = OptionProofView(pf, {
+      case (_, Proof.Line(IncompleteFormula(_, Some(f)), Some(r), refs)) => 
+        Some(ProofLineImpl(f, r, refs))
+      case (_, Proof.Box(Some(info), steps)) => 
+        Some(ProofBoxImpl(info, steps))
+      case _ => None
+    })
+
+    ErrorConverterImpl(
+      ProofNavigator(
+        ArithLogicFormulaNavigator(),
+        FreshVarBoxInfoNavigator[ArithLogicTerm.Var]()
+      ),
+      InfRuleNavigator(RulePartNavigator()),
+      getInfRule,
+      formulaOrTermToLaTeX,
+      rulePart => rulePart match {
+        case t: RulePart.TemplateTerm => Stringifiers.templateTermToLaTeX(t)
+        case f: RulePart.TemplateFormula => Stringifiers.templateFormulaToLaTeX(f)
+        case _ => "???"
+      },
+      cleanProof
+    )
+  }
 )
