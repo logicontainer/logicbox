@@ -1,7 +1,5 @@
 "use client";
-import {
-  TLineNumber,
-} from "@/types/types";
+import { TLineNumber } from "@/types/types";
 import React from "react";
 
 import _ from "lodash";

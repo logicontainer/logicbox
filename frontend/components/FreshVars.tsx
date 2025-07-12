@@ -25,7 +25,7 @@ export default function FreshVars({
       className={cn(
         "absolute bg-white px-1 text-lg/tight ml-3 -translate-y-1/2 rounded-sm pointer-events-auto",
         "hover:bg-slate-100",
-        isCurrentlyBeingChanged && "bg-blue-400 text-white"
+        isCurrentlyBeingChanged && "bg-blue-400 text-white",
       )}
       // onMouseMoveCapture={}
       onClickCapture={onClick}

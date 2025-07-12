@@ -13,18 +13,18 @@ export default function RulePanel() {
   const { doTransition } = useInteractionState();
   const [hoveredRule, setHoveredRule] = useState<string | null>(null);
 
-  const allRules = rulesets.map(s => s.rules).flat()
+  const allRules = rulesets.map((s) => s.rules).flat();
   const hoveredRuleDetails = allRules.find(
-    (rule) => rule.ruleName === hoveredRule
+    (rule) => rule.ruleName === hoveredRule,
   );
   const hoveredRuleDetailsLatex = hoveredRuleDetails
     ? createHighlightedLatexRule(
-      hoveredRuleDetails.latex.ruleName,
-      hoveredRuleDetails.latex.premises,
-      hoveredRuleDetails.latex.conclusion,
-      [],
-      false
-    )
+        hoveredRuleDetails.latex.ruleName,
+        hoveredRuleDetails.latex.premises,
+        hoveredRuleDetails.latex.conclusion,
+        [],
+        false,
+      )
     : "";
 
   const handleChangeRule = (ruleName: string) => {

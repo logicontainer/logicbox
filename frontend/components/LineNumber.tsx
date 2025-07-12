@@ -9,7 +9,7 @@ export default function LineNumber({ line }: { line: TLineNumber }) {
   const serverContext = useServer();
   const proofDiagnostics = serverContext.proofDiagnostics;
   const diagnosticMap = Object.fromEntries(
-    proofDiagnostics.map((d) => [d.uuid, d])
+    proofDiagnostics.map((d) => [d.uuid, d]),
   );
 
   const proofStepDiagnostics = diagnosticMap[line.uuid];
@@ -20,7 +20,7 @@ export default function LineNumber({ line }: { line: TLineNumber }) {
   return (
     <div
       className={cn(
-        "text-base/relaxed text-right align-baseline cursor-pointer px-1 w-full rounded-md h-full flex flex-row-reverse items-center justify-end"
+        "text-base/relaxed text-right align-baseline cursor-pointer px-1 w-full rounded-md h-full flex flex-row-reverse items-center justify-end",
       )}
     >
       <div className={cn("rounded-sm flex-grow")}>

@@ -19,11 +19,11 @@ import { useProof } from "@/contexts/ProofProvider";
 export default function ContextSidebar() {
   const { proof } = useProof();
   const { lines, getReferenceString } = useLines();
-  const diagnosticContext = useDiagnostics()
+  const diagnosticContext = useDiagnostics();
   const { getRuleAtStepAsLatex, getStep } = diagnosticContext;
   const { interactionState } = useInteractionState();
 
-  const stepInFocus = getSelectedStep(interactionState)
+  const stepInFocus = getSelectedStep(interactionState);
   const proofLine = lines.find((line) => line.uuid === stepInFocus);
 
   const { proofDiagnostics } = useServer();
@@ -32,15 +32,26 @@ export default function ContextSidebar() {
   const lineOrBox = proofLine?.stepType === "box" ? "Box" : "Line";
   const refStr = stepInFocus && getReferenceString(stepInFocus);
 
-  const proofStep = (stepInFocus !== null) ? getStep(stepInFocus) : null
-  const optFreshVarString = ((proofStep?.stepType === "box") ? `Fresh var: ${proofStep.boxInfo.freshVar}` : null) ?? ""
+  const proofStep = stepInFocus !== null ? getStep(stepInFocus) : null;
+  const optFreshVarString =
+    (proofStep?.stepType === "box"
+      ? `Fresh var: ${proofStep.boxInfo.freshVar}`
+      : null) ?? "";
 
-  const hoveredRefs = stepInFocus && proofStep?.stepType === "line" ?
-    proofStep.justification.refs.map((_, idx) => idx).filter(idx => refIsBeingHovered(stepInFocus, idx, interactionState))
-    : []
+  const hoveredRefs =
+    stepInFocus && proofStep?.stepType === "line"
+      ? proofStep.justification.refs
+          .map((_, idx) => idx)
+          .filter((idx) =>
+            refIsBeingHovered(stepInFocus, idx, interactionState),
+          )
+      : [];
 
-  const ruleLatex = stepInFocus && getRuleAtStepAsLatex(stepInFocus, hoveredRefs, false, "blue");
-  const isEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE;
+  const ruleLatex =
+    stepInFocus &&
+    getRuleAtStepAsLatex(stepInFocus, hoveredRefs, false, "blue");
+  const isEditingRule =
+    interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
   return (
     <div className="lg:h-screen p-2 overflox-auto">
@@ -55,10 +66,10 @@ export default function ContextSidebar() {
             <p className="text-xl">{proof.title}</p>
           </Card>
         </Link>
-        {(proofLine && !isEditingRule) && (
+        {proofLine && !isEditingRule && (
           <Card>
             <h2 className="text-left text-lg font-bold pb-2">
-              {lineOrBox} {refStr} in focus.{" "}{optFreshVarString}
+              {lineOrBox} {refStr} in focus. {optFreshVarString}
             </h2>
             <p className="flex justify-center items-center text-md bg-gray-100 rounded-md py-4 h-32">
               <InlineMath math={ruleLatex ?? "???"} />

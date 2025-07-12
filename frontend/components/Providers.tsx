@@ -24,9 +24,7 @@ export function Providers({ children }: ProviderProps) {
               <HistoryProvider>
                 <InteractionStateProvider>
                   <ContextMenuProvider>
-                    <HoveringProvider>
-                      {children}
-                    </HoveringProvider>
+                    <HoveringProvider>{children}</HoveringProvider>
                   </ContextMenuProvider>
                 </InteractionStateProvider>
               </HistoryProvider>

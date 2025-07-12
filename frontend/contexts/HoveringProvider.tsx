@@ -1,9 +1,16 @@
 import React from "react";
-import { TransitionEnum, useInteractionState } from "./InteractionStateProvider";
+import {
+  TransitionEnum,
+  useInteractionState,
+} from "./InteractionStateProvider";
 
 export interface HoveringContextProps {
   currentlyHoveredUuid: string | null;
-  handleHoverStep: (uuid: string | null, refIdx: number | null, ruleIsHovered: boolean) => void;
+  handleHoverStep: (
+    uuid: string | null,
+    refIdx: number | null,
+    ruleIsHovered: boolean,
+  ) => void;
 }
 
 // Context Setup
@@ -17,29 +24,44 @@ export function useHovering() {
   return context;
 }
 
-export function HoveringProvider({ children }: React.PropsWithChildren<object>) {
-  const { doTransition } = useInteractionState()
-  const [currentlyHoveredUuid, setCurrentlyHoveredUuid] = React.useState<string | null>(null);
+export function HoveringProvider({
+  children,
+}: React.PropsWithChildren<object>) {
+  const { doTransition } = useInteractionState();
+  const [currentlyHoveredUuid, setCurrentlyHoveredUuid] = React.useState<
+    string | null
+  >(null);
 
   const lastHover = React.useRef<{
-    uuid: string | null
-    refIdx: number | null
-    ruleIsHovered: boolean
-  }>(null)
+    uuid: string | null;
+    refIdx: number | null;
+    ruleIsHovered: boolean;
+  }>(null);
 
-  const handleHoverStep = (uuid: string | null, refIdx: number | null = null, ruleIsHovered: boolean = false) => {
-    setCurrentlyHoveredUuid(uuid)
+  const handleHoverStep = (
+    uuid: string | null,
+    refIdx: number | null = null,
+    ruleIsHovered: boolean = false,
+  ) => {
+    setCurrentlyHoveredUuid(uuid);
 
-    if (uuid !== lastHover.current?.uuid || refIdx !== lastHover.current?.refIdx || ruleIsHovered !== lastHover.current?.ruleIsHovered) {
-      doTransition({ enum: TransitionEnum.HOVER, stepUuid: uuid, refIdx, ruleIsHovered })
-      lastHover.current = { uuid: uuid, refIdx, ruleIsHovered }
+    if (
+      uuid !== lastHover.current?.uuid ||
+      refIdx !== lastHover.current?.refIdx ||
+      ruleIsHovered !== lastHover.current?.ruleIsHovered
+    ) {
+      doTransition({
+        enum: TransitionEnum.HOVER,
+        stepUuid: uuid,
+        refIdx,
+        ruleIsHovered,
+      });
+      lastHover.current = { uuid: uuid, refIdx, ruleIsHovered };
     }
-  }
+  };
 
   return (
-    <HoveringContext.Provider
-      value={{currentlyHoveredUuid, handleHoverStep}}
-    >
+    <HoveringContext.Provider value={{ currentlyHoveredUuid, handleHoverStep }}>
       {children}
     </HoveringContext.Provider>
   );

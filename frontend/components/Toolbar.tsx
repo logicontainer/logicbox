@@ -35,7 +35,7 @@ function AppToolbar() {
               "py-2 pl-2",
               historyContext.canUndo
                 ? "hover:bg-gray-100"
-                : "text-slate-500 border-slate-500 "
+                : "text-slate-500 border-slate-500 ",
             )}
             title="Undo latest action"
             onClick={handleUndo}
@@ -48,7 +48,7 @@ function AppToolbar() {
               "py-2 pr-2",
               historyContext.canRedo
                 ? "hover:bg-gray-100"
-                : "text-slate-500 border-slate-500 "
+                : "text-slate-500 border-slate-500 ",
             )}
             title="Redo latest action"
             onClick={handleRedo}
