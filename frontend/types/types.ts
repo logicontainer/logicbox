@@ -46,6 +46,7 @@ export type ProofMetadata = {
   id: string;
   title: string;
   logicName: LogicName;
+  createdAt?: string;
 };
 
 export type ProofWithMetadata = {
@@ -56,9 +57,9 @@ export type TLineNumber = {
   uuid: string;
   stepType: "line" | "box";
 } & (
-  | { stepType: "line"; lineNumber: number }
-  | { stepType: "box"; boxStartLine: number; boxEndLine: number }
-);
+    | { stepType: "line"; lineNumber: number }
+    | { stepType: "box"; boxStartLine: number; boxEndLine: number }
+  );
 
 export type ProofStepDetails = {
   proofStep: ProofStep;

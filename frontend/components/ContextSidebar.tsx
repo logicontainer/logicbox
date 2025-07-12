@@ -12,9 +12,12 @@ import RulePanel from "./RulePanel";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useServer } from "@/contexts/ServerProvider";
-import { formulaIsBeingHovered, getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
+import { getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
+import Link from "next/link";
+import { useProof } from "@/contexts/ProofProvider";
 
 export default function ContextSidebar() {
+  const { proof } = useProof();
   const { lines, getReferenceString } = useLines();
   const diagnosticContext = useDiagnostics()
   const { getRuleAtStepAsLatex, getStep } = diagnosticContext;
@@ -32,16 +35,26 @@ export default function ContextSidebar() {
   const proofStep = (stepInFocus !== null) ? getStep(stepInFocus) : null
   const optFreshVarString = ((proofStep?.stepType === "box") ? `Fresh var: ${proofStep.boxInfo.freshVar}` : null) ?? ""
 
-  const hoveredRefs = stepInFocus && proofStep?.stepType === "line" ? 
+  const hoveredRefs = stepInFocus && proofStep?.stepType === "line" ?
     proofStep.justification.refs.map((_, idx) => idx).filter(idx => refIsBeingHovered(stepInFocus, idx, interactionState))
     : []
-  
+
   const ruleLatex = stepInFocus && getRuleAtStepAsLatex(stepInFocus, hoveredRefs, false, "blue");
   const isEditingRule = interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
   return (
-    <div className="sm:h-screen p-2">
+    <div className="lg:h-screen p-2 overflox-auto">
       <div className="flex flex-col gap-2">
+        <Link href={"/gallery"}>
+          <Card className="flex items-center justify-start gap-3 py-2">
+            <div className="flex items-cetner justify-center gap-2 py-2">
+              <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
+              <h1 className="text-left text-2xl font-bold py-2">LogicBox</h1>
+            </div>
+            <div className="w-[1px] self-stretch bg-gray-600 my-3"></div>
+            <p className="text-xl">{proof.title}</p>
+          </Card>
+        </Link>
         {(proofLine && !isEditingRule) && (
           <Card>
             <h2 className="text-left text-lg font-bold pb-2">

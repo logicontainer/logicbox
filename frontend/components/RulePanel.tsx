@@ -19,12 +19,12 @@ export default function RulePanel() {
   );
   const hoveredRuleDetailsLatex = hoveredRuleDetails
     ? createHighlightedLatexRule(
-        hoveredRuleDetails.latex.ruleName,
-        hoveredRuleDetails.latex.premises,
-        hoveredRuleDetails.latex.conclusion,
-        [],
-        false
-      )
+      hoveredRuleDetails.latex.ruleName,
+      hoveredRuleDetails.latex.premises,
+      hoveredRuleDetails.latex.conclusion,
+      [],
+      false
+    )
     : "";
 
   const handleChangeRule = (ruleName: string) => {
@@ -41,21 +41,21 @@ export default function RulePanel() {
       <h2 className="text-lg font-bold">Select a rule</h2>
       <div className="grid grid-cols-3 gap-2">
         {allRules.map((rule) => {
-            return (
-              <div
-                key={rule.ruleName}
-                className="flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
-                onMouseOver={() => setHoveredRule(rule.ruleName)}
-                onMouseLeave={() => setHoveredRule(null)}
-                onClick={() => handleChangeRule(rule.ruleName)}
-              >
-                <h3 className="text">
-                  <InlineMath math={rule.latex.ruleName}></InlineMath>
-                </h3>
-                <p className="text-sm text-gray-600"></p>
-              </div>
-            );
-          })}
+          return (
+            <div
+              key={rule.ruleName}
+              className="flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
+              onMouseOver={() => setHoveredRule(rule.ruleName)}
+              onMouseLeave={() => setHoveredRule(null)}
+              onClick={() => handleChangeRule(rule.ruleName)}
+            >
+              <h3 className="text">
+                <InlineMath math={rule.latex.ruleName}></InlineMath>
+              </h3>
+              <p className="text-sm text-gray-600"></p>
+            </div>
+          );
+        })}
       </div>
       {hoveredRule && (
         <div className="p-2 bg-white border border-gray-300 rounded-md shadow-md flex items-center gap-2 justify-center">
