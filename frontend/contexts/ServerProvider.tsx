@@ -1,6 +1,11 @@
 "use client";
 
-import { Diagnostic, ValidationRequest, ValidationResponse, Violation } from "@/types/types";
+import {
+  Diagnostic,
+  ValidationRequest,
+  ValidationResponse,
+  Violation,
+} from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
@@ -23,20 +28,25 @@ export function useServer() {
 }
 
 function fixDiagnostic(d: Diagnostic) {
-  return { ...d, violation: { ...d.violation, violationType: d.violationType } as Violation}
+  return {
+    ...d,
+    violation: { ...d.violation, violationType: d.violationType } as Violation,
+  };
 }
 
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
 
-  const { proof, setProofContent } = useProof()
+  const { proof, setProofContent } = useProof();
 
   useEffect(() => {
     validateProof({ proof: proof.proof, logicName: proof.logicName });
   }, [proof.id]);
 
-  const validateProof = async (request: ValidationRequest): Promise<boolean> => {
+  const validateProof = async (
+    request: ValidationRequest,
+  ): Promise<boolean> => {
     setServerSyncingStatus("syncing");
     console.trace(proof);
     return Promise.resolve()

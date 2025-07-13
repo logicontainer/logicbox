@@ -22,13 +22,12 @@ export function useRuleset() {
 }
 
 export function RulesetProvider({ children }: React.PropsWithChildren<object>) {
-  const { proof } = useProof()
-  const rulesets: Ruleset[] = logicConfig[proof.logicName].rulesets.map(findRulesetFromName)
+  const { proof } = useProof();
+  const rulesets: Ruleset[] =
+    logicConfig[proof.logicName].rulesets.map(findRulesetFromName);
 
   return (
-    <RulesetContext.Provider
-      value={{ rulesets }}
-    >
+    <RulesetContext.Provider value={{ rulesets }}>
       {children}
     </RulesetContext.Provider>
   );

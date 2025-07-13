@@ -31,7 +31,7 @@ export function Proof({
               key={lineProofStepProps.uuid}
               lines={props.lines}
               diagnosticsForLine={props.diagnostics.filter(
-                (d) => d.uuid === proofStep.uuid
+                (d) => d.uuid === proofStep.uuid,
               )}
               isOuterProofStep={props.isOuterProof}
               {...lineProofStepProps}

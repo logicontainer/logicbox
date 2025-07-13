@@ -2,7 +2,7 @@ import { BoxProofStep, ProofStep, TLineNumber } from "@/types/types";
 
 function extractLineUuids(
   proof: ProofStep[],
-  currLineNumber: number = 1
+  currLineNumber: number = 1,
 ): {
   lines: TLineNumber[];
   boxes: TLineNumber[];

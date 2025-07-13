@@ -20,7 +20,11 @@ import LineNumber from "./LineNumber";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { getDiagnosticHighlightForFormula, getStepHighlight, DiagnosticHighlight } from "@/lib/proof-step-highlight";
+import {
+  getDiagnosticHighlightForFormula,
+  getStepHighlight,
+  DiagnosticHighlight,
+} from "@/lib/proof-step-highlight";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
@@ -53,11 +57,11 @@ export function LineProofStep({
   }, [parentRef, lineNumberRef]);
 
   const line = props.lines.find(
-    (l) => l.uuid === props.uuid && l.stepType == "line"
+    (l) => l.uuid === props.uuid && l.stepType == "line",
   );
   if (line?.stepType !== "line") {
     console.error(
-      `LineProofStep: Expected line with uuid ${props.uuid} to be of type 'line', but found ${line?.stepType}`
+      `LineProofStep: Expected line with uuid ${props.uuid} to be of type 'line', but found ${line?.stepType}`,
     );
     return;
   }
@@ -65,7 +69,7 @@ export function LineProofStep({
     props.uuid,
     currentlyHoveredUuid,
     interactionState,
-    proofContext
+    proofContext,
   );
 
   return (
@@ -78,7 +82,7 @@ export function LineProofStep({
         key={props.uuid}
         className={cn(
           "text-nowrap pointer-events-auto",
-          "flex justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch"
+          "flex justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
         )}
         onClick={(e) => {
           e.stopPropagation();
@@ -161,7 +165,7 @@ function Formula({
 }) {
   const { interactionState, doTransition } = useInteractionState();
   const { handleHoverStep } = useHovering();
-  const diagnosticContext = useDiagnostics()
+  const diagnosticContext = useDiagnostics();
 
   const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
@@ -173,7 +177,10 @@ function Formula({
 
   const formulaInputRef = React.useRef<HTMLInputElement>(null);
 
-  const formulaDsHighlight = getDiagnosticHighlightForFormula(lineUuid, diagnosticContext)
+  const formulaDsHighlight = getDiagnosticHighlightForFormula(
+    lineUuid,
+    diagnosticContext,
+  );
 
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
     formulaInputRef.current = ref;
@@ -187,8 +194,9 @@ function Formula({
   };
 
   const errorHighlight = (str: string) => `\\mathbf{\\underline{${str}}}`;
-  const formulaContent = !latexFormula || latexFormula === "" ? "???" : latexFormula;
-  const formulaIsWrong = formulaDsHighlight === DiagnosticHighlight.YES
+  const formulaContent =
+    !latexFormula || latexFormula === "" ? "???" : latexFormula;
+  const formulaIsWrong = formulaDsHighlight === DiagnosticHighlight.YES;
   const formulaLatexContentWithUnderline = formulaIsWrong
     ? errorHighlight(formulaContent)
     : formulaContent;
@@ -215,16 +223,13 @@ function Formula({
       title="Write a formula"
       className={cn(
         "text-slate-800 grow resize shrink",
-        formulaIsWrong && "text-red-500"
+        formulaIsWrong && "text-red-500",
       )}
       inputClassName="px-2"
     />
   ) : (
     <p
-      className={cn(
-        "shrink",
-        formulaIsWrong && "text-red-500"
-      )}
+      className={cn("shrink", formulaIsWrong && "text-red-500")}
       onMouseOver={(e) => {
         e.stopPropagation();
         handleHoverStep(lineUuid, null, false);
@@ -233,10 +238,11 @@ function Formula({
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
         currentFormulaValue
       ) : (
-        <span 
+        <span
           onClickCapture={(e) => {
-            e.stopPropagation()
-          }}>
+            e.stopPropagation();
+          }}
+        >
           <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
         </span>
       )}

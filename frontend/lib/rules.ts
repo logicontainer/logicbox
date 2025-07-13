@@ -6,22 +6,23 @@ export function createHighlightedLatexRule(
   conclusion: string,
   highlightedPremises: number[] = [],
   conclusionIsHighlighted: boolean = false,
-  highlightColor: string = "red"
+  highlightColor: string = "red",
 ): string {
   const premisesWithHighlights = premises.map((p, idx) => {
     const content = highlightedPremises.includes(idx)
       ? `{\\color{${highlightColor}}\\${p.includes("begin") ? "underline" : "boxed"}{${p}}}`
       : p;
-    return content
+    return content;
   });
-  const premiseLine = `{\\begin{array}{${premises.map(_ => "c").join("")}}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{array}}`;
+  const premiseLine = `{\\begin{array}{${premises.map((_) => "c").join("")}}${premisesWithHighlights.join("&") || "\\quad\\quad"}\\end{array}}`;
   const conclusionLine = conclusionIsHighlighted
     ? `\\color{${highlightColor}}\\boxed{${conclusion}}`
     : conclusion;
   return `\\cfrac{${premiseLine}}{${conclusionLine}}\\small{${name}}`;
 }
 
-const box = (str: string, columns: number = 1) => `\\begin{array}{|${"c".repeat(columns)}|} \\hline ${str} \\\\ \\hline \\end{array}`
+const box = (str: string, columns: number = 1) =>
+  `\\begin{array}{|${"c".repeat(columns)}|} \\hline ${str} \\\\ \\hline \\end{array}`;
 
 export const rulesets = [
   {
@@ -103,7 +104,11 @@ export const rulesets = [
         ruleName: "or_elim",
         latex: {
           ruleName: "\\lor e",
-          premises: ["\\varphi \\lor \\psi", box("\\varphi\\\\ \\vdots \\\\ \\chi"), box("\\psi\\\\ \\vdots \\\\ \\chi")],
+          premises: [
+            "\\varphi \\lor \\psi",
+            box("\\varphi\\\\ \\vdots \\\\ \\chi"),
+            box("\\psi\\\\ \\vdots \\\\ \\chi"),
+          ],
           conclusion: "\\chi",
         },
         numPremises: 3,
@@ -207,9 +212,7 @@ export const rulesets = [
         ruleName: "forall_intro",
         latex: {
           ruleName: "\\forall i.",
-          premises: [
-            box("x_0 & \\\\ & \\vdots \\\\ & \\varphi[x_0/x]", 2)
-          ],
+          premises: [box("x_0 & \\\\ & \\vdots \\\\ & \\varphi[x_0/x]", 2)],
           conclusion: "\\forall x \\varphi",
         },
         numPremises: 1,
@@ -236,7 +239,10 @@ export const rulesets = [
         ruleName: "exists_elim",
         latex: {
           ruleName: "\\exists e.",
-          premises: ["\\exists x \\varphi", box("x_0 & \\varphi[x_0/x] \\\\ & \\vdots \\\\ & \\chi", 2)],
+          premises: [
+            "\\exists x \\varphi",
+            box("x_0 & \\varphi[x_0/x] \\\\ & \\vdots \\\\ & \\chi", 2),
+          ],
           conclusion: "\\chi",
         },
         numPremises: 2,
@@ -330,14 +336,14 @@ export const rulesets = [
           ruleName: "\\text{ind.}",
           premises: [
             "\\varphi[0/x]",
-            box("n & \\varphi[n/x] \\\\ & \\vdots \\\\ & \\varphi[n + 1/x]", 2)
+            box("n & \\varphi[n/x] \\\\ & \\vdots \\\\ & \\varphi[n + 1/x]", 2),
           ],
           conclusion: "\\forall x \\varphi",
         },
         numPremises: 2,
       },
-    ]
-  }
-] as const satisfies Ruleset[]
+    ],
+  },
+] as const satisfies Ruleset[];
 
-export type RulesetName = (typeof rulesets)[number]["rulesetName"]
+export type RulesetName = (typeof rulesets)[number]["rulesetName"];

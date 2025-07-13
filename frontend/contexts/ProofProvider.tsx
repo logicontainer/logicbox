@@ -9,7 +9,7 @@ import {
   ProofStepPosition,
   Proof,
 } from "@/types/types";
-import React  from "react";
+import React from "react";
 
 import _ from "lodash";
 import { useProofStore } from "@/store/proofStore";
@@ -26,7 +26,7 @@ export interface ProofContextProps {
   updateLine: (uuid: string, updatedLineProofStep: LineProofStep) => unknown;
   updateFreshVarOnBox: (uuid: string, freshVar: string | null) => unknown;
   getProofStepDetails: (
-    uuid: string
+    uuid: string,
   ) => (ProofStepDetails & { isOnlyChildInBox: boolean }) | null;
   getNearestDeletableProofStep: (uuid: string) => {
     proofStepDetails: ProofStepDetails | null;
@@ -48,21 +48,21 @@ const FALLBACK_PROOF: ProofWithMetadata = {
   id: "fallback_proof",
   title: "YOU SHOULD NOT BE SEEING THIS!",
   logicName: "propositionalLogic",
-  proof: []
-}
+  proof: [],
+};
 
 export function ProofProvider({ children }: React.PropsWithChildren<object>) {
-  const [proofId, setProofId] = React.useState<string | null>(null)
-  const { updateProofContent, getProof } = useProofStore()
-  const proof = ((proofId !== null) ? getProof(proofId) : null) ?? FALLBACK_PROOF
+  const [proofId, setProofId] = React.useState<string | null>(null);
+  const { updateProofContent, getProof } = useProofStore();
+  const proof = (proofId !== null ? getProof(proofId) : null) ?? FALLBACK_PROOF;
 
   const setProofContent = (updater: (_: Proof) => Proof) => {
     if (!proofId) {
-      console.warn("Can't update proof content, as proofId is null")
+      console.warn("Can't update proof content, as proofId is null");
       return;
     }
-    updateProofContent(proofId, updater)
-  }
+    updateProofContent(proofId, updater);
+  };
 
   const setStringProof = (stringProof: string) => {
     setProofContent(JSON.parse(stringProof));
@@ -75,18 +75,18 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     actionAtIndex: (
       layer: ProofStep[],
       indexInCurrLayer: number,
-      parentBox: BoxProofStep | null
-    ) => void
+      parentBox: BoxProofStep | null,
+    ) => void,
   ): boolean => {
     const indexInCurrentLayer = proof.findIndex(
-      (proofStep) => proofStep.uuid == uuid
+      (proofStep) => proofStep.uuid == uuid,
     );
     if (indexInCurrentLayer != -1) {
       actionAtIndex(proof, indexInCurrentLayer, parentBox);
       return true;
     }
     const boxProofSteps: BoxProofStep[] = proof.filter(
-      (proofStep) => proofStep.stepType == "box"
+      (proofStep) => proofStep.stepType == "box",
     ) as unknown as BoxProofStep[];
     for (const boxProofStep of boxProofSteps) {
       if (
@@ -94,7 +94,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
           boxProofStep.proof,
           uuid,
           boxProofStep,
-          actionAtIndex
+          actionAtIndex,
         )
       )
         return true;
@@ -108,19 +108,19 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       const insertProofStepAtUuid = (
         proof: ProofStep[],
         indexInCurrLayer: number,
-        parentBox: BoxProofStep | null
+        parentBox: BoxProofStep | null,
       ) => {
         return proof.splice(
           indexInCurrLayer + (position.prepend ? 0 : 1),
           0,
-          proofStep
+          proofStep,
         );
       };
       interactWithProofNearUuid(
         newProof,
         position.nearProofStepWithUuid,
         null,
-        insertProofStepAtUuid
+        insertProofStepAtUuid,
       );
       return newProof;
     });
@@ -132,7 +132,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       const removeProofStepAtUuid = (
         proof: ProofStep[],
         indexInCurrLayer: number,
-        parentBox: BoxProofStep | null
+        parentBox: BoxProofStep | null,
       ) => {
         return proof.splice(indexInCurrLayer, 1);
       };
@@ -147,7 +147,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       const updateProofStepAtUuid = (
         proof: ProofStep[],
         indexInCurrLayer: number,
-        parentBox: BoxProofStep | null
+        parentBox: BoxProofStep | null,
       ) => {
         proof[indexInCurrLayer] = updatedLineProofStep;
       };
@@ -162,20 +162,22 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       const updateProofStepAtUuid = (
         proof: ProofStep[],
         indexInCurrLayer: number,
-        parentBox: BoxProofStep | null
+        parentBox: BoxProofStep | null,
       ) => {
-        if (proof[indexInCurrLayer].stepType !== "box") 
-          throw new Error(`Attempted to update fresh var on ${uuid} - not a box`)
+        if (proof[indexInCurrLayer].stepType !== "box")
+          throw new Error(
+            `Attempted to update fresh var on ${uuid} - not a box`,
+          );
 
         proof[indexInCurrLayer].boxInfo.freshVar = freshVar;
       };
       interactWithProofNearUuid(newProof, uuid, null, updateProofStepAtUuid);
       return newProof;
     });
-  }
+  };
 
   const getProofStepDetails = (
-    uuid: string
+    uuid: string,
   ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
     let proofStepDetails = {} as
       | (ProofStepDetails & { isOnlyChildInBox: boolean })
@@ -183,7 +185,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     const extractProofStepDetails = (
       proof: ProofStep[],
       indexInCurrLayer: number,
-      parentBox: BoxProofStep | null
+      parentBox: BoxProofStep | null,
     ) => {
       const isOnlyChildInBox = proof ? proof.length == 1 : false;
       if (isOnlyChildInBox) {
@@ -217,7 +219,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   };
 
   const getNearestDeletableProofStep = (
-    uuid: string
+    uuid: string,
   ): { proofStepDetails: ProofStepDetails | null; cascadeCount: number } => {
     let cascadeCount = 0;
     const findNearestDeletableProofStepCascade = (uuid: string) => {
@@ -227,7 +229,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         if (proofStepDetails.parentBoxUuid == null) return null;
         cascadeCount++;
         return findNearestDeletableProofStepCascade(
-          proofStepDetails.parentBoxUuid
+          proofStepDetails.parentBoxUuid,
         );
       }
       return proofStepDetails;
@@ -241,7 +243,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       value={{
         proof,
         loadProofFromId: setProofId,
-        setProofContent: pf => setProofContent(_ => pf),
+        setProofContent: (pf) => setProofContent((_) => pf),
         setStringProof,
         updateFreshVarOnBox,
         addLine,

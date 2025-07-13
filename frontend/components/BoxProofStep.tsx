@@ -37,7 +37,7 @@ export function BoxProofStep({
     props.uuid,
     currentlyHoveredUuid,
     interactionState,
-    useProof()
+    useProof(),
   );
 
   const freshVar = props.boxInfo?.freshVar;
@@ -57,7 +57,7 @@ export function BoxProofStep({
           highlight === StepHighlight.HOVERED && "bg-slate-50",
           highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
             "bg-blue-200",
-          highlight === StepHighlight.REFERRED && "bg-blue-200"
+          highlight === StepHighlight.REFERRED && "bg-blue-200",
         )}
         onContextMenu={(e) => {
           e.preventDefault();
