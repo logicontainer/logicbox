@@ -1,9 +1,6 @@
 import * as React from "react";
 
-import {
-  CaretLeftIcon,
-  CaretRightIcon,
-} from "@radix-ui/react-icons";
+import { CaretLeftIcon, CaretRightIcon } from "@radix-ui/react-icons";
 
 import Card from "./Card";
 import { Toolbar } from "radix-ui";

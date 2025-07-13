@@ -44,10 +44,10 @@ export default function ContextSidebar() {
   const hoveredRefs =
     stepInFocus && proofStep?.stepType === "line"
       ? proofStep.justification.refs
-        .map((_, idx) => idx)
-        .filter((idx) =>
-          refIsBeingHovered(stepInFocus, idx, interactionState),
-        )
+          .map((_, idx) => idx)
+          .filter((idx) =>
+            refIsBeingHovered(stepInFocus, idx, interactionState),
+          )
       : [];
 
   const ruleLatex =
