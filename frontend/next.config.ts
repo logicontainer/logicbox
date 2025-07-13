@@ -15,11 +15,16 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // {
-      //   source: "/",
-      //   destination: "/proofs",
-      //   permanent: true,
-      // },
+      {
+        source: "/",
+        destination: "/gallery",
+        permanent: true,
+      },
+      {
+        source: "/proofs",
+        destination: "/gallery",
+        permanent: true,
+      },
     ];
   },
 };

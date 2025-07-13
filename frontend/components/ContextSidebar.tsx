@@ -15,6 +15,9 @@ import { useServer } from "@/contexts/ServerProvider";
 import { getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
 import Link from "next/link";
 import { useProof } from "@/contexts/ProofProvider";
+import { Button } from "./ui/button";
+import { DownloadIcon } from "lucide-react";
+import DownloadProofButton from "./DownloadProofButton";
 
 export default function ContextSidebar() {
   const { proof } = useProof();
@@ -41,10 +44,10 @@ export default function ContextSidebar() {
   const hoveredRefs =
     stepInFocus && proofStep?.stepType === "line"
       ? proofStep.justification.refs
-          .map((_, idx) => idx)
-          .filter((idx) =>
-            refIsBeingHovered(stepInFocus, idx, interactionState),
-          )
+        .map((_, idx) => idx)
+        .filter((idx) =>
+          refIsBeingHovered(stepInFocus, idx, interactionState),
+        )
       : [];
 
   const ruleLatex =
@@ -56,16 +59,19 @@ export default function ContextSidebar() {
   return (
     <div className="lg:h-screen p-2 overflox-auto">
       <div className="flex flex-col gap-2">
-        <Link href={"/gallery"}>
-          <Card className="flex items-center justify-start gap-3 py-2">
+        <Card className="flex items-center justify-start gap-3 py-2">
+          <Link href={"/gallery"} title="Go to your proof gallery">
             <div className="flex items-cetner justify-center gap-2 py-2">
               <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
               <h1 className="text-left text-2xl font-bold py-2">LogicBox</h1>
             </div>
-            <div className="w-[1px] self-stretch bg-gray-600 my-3"></div>
+          </Link>
+          <div className="w-[1px] self-stretch bg-gray-600 my-3"></div>
+          <div className="flex justify-between grow items-center">
             <p className="text-xl">{proof.title}</p>
-          </Card>
-        </Link>
+            <DownloadProofButton proofId={proof.id} />
+          </div>
+        </Card>
         {proofLine && !isEditingRule && (
           <Card>
             <h2 className="text-left text-lg font-bold pb-2">
