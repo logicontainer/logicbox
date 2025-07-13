@@ -6,7 +6,7 @@ import { download } from "@/lib/utils";
 
 export default function DownloadProofButton({ proofId }: { proofId: string }) {
   const proofs = useProofStore((state) => state.proofs);
-  function handleDownloadProof(e: MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function handleDownloadProof(e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     const proof = proofs.find((proof) => proof.id == proofId);
