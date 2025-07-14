@@ -4,7 +4,8 @@ const examples: ProofWithMetadata[] = [
   {
     id: "0",
     title: "Proof with errors",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
+    createdAt: "2025-06-06T00:00:00.000Z",
     proof: [
       {
         formula: {
@@ -115,7 +116,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "2",
     title: "Some example",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
     proof: [
       {
         formula: {
@@ -275,7 +276,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "3",
     title: "Example 3",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
     proof: [
       {
         formula: {
@@ -334,7 +335,7 @@ const examples: ProofWithMetadata[] = [
                 uuid: "e179f6c7-7c6c-40bd-9674-dea19a249716",
               },
             ],
-        boxInfo: { freshVar: null },
+            boxInfo: { freshVar: null },
             stepType: "box",
             uuid: "5ce3a68e-06c1-45dc-b960-9b19660fac0d",
           },
@@ -486,7 +487,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "4",
     title: "Example 4",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
     proof: [
       {
         formula: {
@@ -654,7 +655,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "5",
     title: "Another proof",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
     proof: [
       {
         formula: {
@@ -863,7 +864,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "6",
     title: "Chunky Example",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
     proof: [
       {
         formula: {
@@ -1380,7 +1381,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "7",
     title: "Deeply nested example",
-    logicName: 'propositionalLogic',
+    logicName: "propositionalLogic",
     proof: [
       {
         proof: [
@@ -1544,1950 +1545,1890 @@ const examples: ProofWithMetadata[] = [
         uuid: "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
       },
     ],
-
   },
   {
-    "id": "some-id",
-    "title": "predicate logic proof",
-    "logicName": "predicateLogic",
-    "proof": [
+    id: "some-id",
+    title: "predicate logic proof",
+    logicName: "predicateLogic",
+    proof: [
       {
-        "formula": {
-          "ascii": "exists x P(x)",
-          "latex": "\\exists x P(x)",
-          "userInput": "exists x P(x)"
+        formula: {
+          ascii: "exists x P(x)",
+          latex: "\\exists x P(x)",
+          userInput: "exists x P(x)",
         },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
+        justification: {
+          refs: [],
+          rule: "premise",
         },
-        "stepType": "line",
-        "uuid": "225552eb-45ec-4fb3-9287-1b0402946d20"
+        stepType: "line",
+        uuid: "225552eb-45ec-4fb3-9287-1b0402946d20",
       },
       {
-        "formula": {
-          "ascii": "forall x (P(x) -> Q(x))",
-          "latex": "\\forall x (P(x) \\rightarrow Q(x))",
-          "userInput": "forall x (P(x) -> Q(x))"
+        formula: {
+          ascii: "forall x (P(x) -> Q(x))",
+          latex: "\\forall x (P(x) \\rightarrow Q(x))",
+          userInput: "forall x (P(x) -> Q(x))",
         },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
+        justification: {
+          refs: [],
+          rule: "premise",
         },
-        "stepType": "line",
-        "uuid": "4d31bf2e-31f1-495d-a68d-3b71813c1f9d"
+        stepType: "line",
+        uuid: "4d31bf2e-31f1-495d-a68d-3b71813c1f9d",
       },
       {
-        "boxInfo": {
-          "freshVar": "x_0"
+        boxInfo: {
+          freshVar: "x_0",
         },
-        "proof": [
+        proof: [
           {
-            "formula": {
-              "ascii": "P(x_0)",
-              "latex": "P(x_0)",
-              "userInput": "P(x_0)"
+            formula: {
+              ascii: "P(x_0)",
+              latex: "P(x_0)",
+              userInput: "P(x_0)",
             },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
+            justification: {
+              refs: [],
+              rule: "assumption",
             },
-            "stepType": "line",
-            "uuid": "bb8bd992-3801-4594-9532-4988cd98bafd"
+            stepType: "line",
+            uuid: "bb8bd992-3801-4594-9532-4988cd98bafd",
           },
           {
-            "formula": {
-              "ascii": "P(x_0) -> Q(x_0)",
-              "latex": "P(x_0) \\rightarrow Q(x_0)",
-              "userInput": "P(x_0) -> Q(x_0)"
+            formula: {
+              ascii: "P(x_0) -> Q(x_0)",
+              latex: "P(x_0) \\rightarrow Q(x_0)",
+              userInput: "P(x_0) -> Q(x_0)",
             },
-            "justification": {
-              "refs": [
-                "4d31bf2e-31f1-495d-a68d-3b71813c1f9d"
-              ],
-              "rule": "forall_elim"
+            justification: {
+              refs: ["4d31bf2e-31f1-495d-a68d-3b71813c1f9d"],
+              rule: "forall_elim",
             },
-            "stepType": "line",
-            "uuid": "a4443463-684d-44db-aa6d-6d166486dd51"
+            stepType: "line",
+            uuid: "a4443463-684d-44db-aa6d-6d166486dd51",
           },
           {
-            "formula": {
-              "ascii": "Q(x_0)",
-              "latex": "Q(x_0)",
-              "userInput": "Q(x_0)"
+            formula: {
+              ascii: "Q(x_0)",
+              latex: "Q(x_0)",
+              userInput: "Q(x_0)",
             },
-            "justification": {
-              "refs": [
+            justification: {
+              refs: [
                 "bb8bd992-3801-4594-9532-4988cd98bafd",
-                "a4443463-684d-44db-aa6d-6d166486dd51"
+                "a4443463-684d-44db-aa6d-6d166486dd51",
               ],
-              "rule": "implies_elim"
+              rule: "implies_elim",
             },
-            "stepType": "line",
-            "uuid": "eb6b17c5-15fa-41b3-994b-da1e61bf284f"
+            stepType: "line",
+            uuid: "eb6b17c5-15fa-41b3-994b-da1e61bf284f",
           },
           {
-            "formula": {
-              "ascii": "exists x Q(x)",
-              "latex": "\\exists x Q(x)",
-              "userInput": "exists x Q(x)"
+            formula: {
+              ascii: "exists x Q(x)",
+              latex: "\\exists x Q(x)",
+              userInput: "exists x Q(x)",
             },
-            "justification": {
-              "refs": [
-                "eb6b17c5-15fa-41b3-994b-da1e61bf284f"
-              ],
-              "rule": "exists_intro"
+            justification: {
+              refs: ["eb6b17c5-15fa-41b3-994b-da1e61bf284f"],
+              rule: "exists_intro",
             },
-            "stepType": "line",
-            "uuid": "2fd37b95-e5c7-4ec5-958f-085470f7a6b5"
-          }
+            stepType: "line",
+            uuid: "2fd37b95-e5c7-4ec5-958f-085470f7a6b5",
+          },
         ],
-        "stepType": "box",
-        "uuid": "bb9e59d0-8f4d-41ad-b43c-657e58ecbed8"
+        stepType: "box",
+        uuid: "bb9e59d0-8f4d-41ad-b43c-657e58ecbed8",
       },
       {
-        "formula": {
-          "ascii": "exists x Q(x)",
-          "latex": "\\exists x Q(x)",
-          "userInput": "exists x Q(x)"
+        formula: {
+          ascii: "exists x Q(x)",
+          latex: "\\exists x Q(x)",
+          userInput: "exists x Q(x)",
         },
-        "justification": {
-          "refs": [
+        justification: {
+          refs: [
             "225552eb-45ec-4fb3-9287-1b0402946d20",
-            "bb9e59d0-8f4d-41ad-b43c-657e58ecbed8"
+            "bb9e59d0-8f4d-41ad-b43c-657e58ecbed8",
           ],
-          "rule": "exists_elim"
+          rule: "exists_elim",
         },
-        "stepType": "line",
-        "uuid": "308557d4-6509-43c2-9424-92fdde3be6e8"
-      }
-    ]
+        stepType: "line",
+        uuid: "308557d4-6509-43c2-9424-92fdde3be6e8",
+      },
+    ],
   },
   {
-    "id": "a05dabc8-0a46-4501-9941-8fa47c8cf482",
-    "title": "forall/exists duality 1",
-    "logicName": "predicateLogic",
-    "proof": [
+    id: "a05dabc8-0a46-4501-9941-8fa47c8cf482",
+    title: "forall/exists duality 1",
+    logicName: "predicateLogic",
+    proof: [
       {
-        "formula": {
-          "ascii": "not forall x P(x)",
-          "latex": "\\lnot \\forall x P(x)",
-          "userInput": "not forall x P(x)"
+        formula: {
+          ascii: "not forall x P(x)",
+          latex: "\\lnot \\forall x P(x)",
+          userInput: "not forall x P(x)",
         },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
+        justification: {
+          refs: [],
+          rule: "premise",
         },
-        "stepType": "line",
-        "uuid": "80fec1a4-001a-4c00-8a52-daa4a3959abe"
+        stepType: "line",
+        uuid: "80fec1a4-001a-4c00-8a52-daa4a3959abe",
       },
       {
-        "boxInfo": { freshVar: null },
-        "proof": [
+        boxInfo: { freshVar: null },
+        proof: [
           {
-            "formula": {
-              "ascii": "not exists x not P(x)",
-              "latex": "\\lnot \\exists x \\lnot P(x)",
-              "userInput": "not exists x not P(x)"
+            formula: {
+              ascii: "not exists x not P(x)",
+              latex: "\\lnot \\exists x \\lnot P(x)",
+              userInput: "not exists x not P(x)",
             },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
+            justification: {
+              refs: [],
+              rule: "assumption",
             },
-            "stepType": "line",
-            "uuid": "6d7118bf-5af8-4260-a19a-19490a622c50"
+            stepType: "line",
+            uuid: "6d7118bf-5af8-4260-a19a-19490a622c50",
           },
           {
-            "boxInfo": {
-              "freshVar": "x_0"
+            boxInfo: {
+              freshVar: "x_0",
             },
-            "proof": [
+            proof: [
               {
-                "boxInfo": { freshVar: null },
-                "proof": [
+                boxInfo: { freshVar: null },
+                proof: [
                   {
-                    "formula": {
-                      "ascii": "not P(x_0)",
-                      "latex": "\\lnot P(x_0)",
-                      "userInput": "not P(x_0)"
+                    formula: {
+                      ascii: "not P(x_0)",
+                      latex: "\\lnot P(x_0)",
+                      userInput: "not P(x_0)",
                     },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
+                    justification: {
+                      refs: [],
+                      rule: "assumption",
                     },
-                    "stepType": "line",
-                    "uuid": "3e2f5262-1fa4-4411-9480-8cd172cca749"
+                    stepType: "line",
+                    uuid: "3e2f5262-1fa4-4411-9480-8cd172cca749",
                   },
                   {
-                    "formula": {
-                      "ascii": "exists x not P(x)",
-                      "latex": "\\exists x \\lnot P(x)",
-                      "userInput": "exists x not P(x)"
+                    formula: {
+                      ascii: "exists x not P(x)",
+                      latex: "\\exists x \\lnot P(x)",
+                      userInput: "exists x not P(x)",
                     },
-                    "justification": {
-                      "refs": [
-                        "3e2f5262-1fa4-4411-9480-8cd172cca749"
-                      ],
-                      "rule": "exists_intro"
+                    justification: {
+                      refs: ["3e2f5262-1fa4-4411-9480-8cd172cca749"],
+                      rule: "exists_intro",
                     },
-                    "stepType": "line",
-                    "uuid": "45ac7e84-4b5b-45e6-ba09-f446d1d2a4dc"
+                    stepType: "line",
+                    uuid: "45ac7e84-4b5b-45e6-ba09-f446d1d2a4dc",
                   },
                   {
-                    "formula": {
-                      "ascii": "false",
-                      "latex": "\\bot",
-                      "userInput": "false"
+                    formula: {
+                      ascii: "false",
+                      latex: "\\bot",
+                      userInput: "false",
                     },
-                    "justification": {
-                      "refs": [
+                    justification: {
+                      refs: [
                         "45ac7e84-4b5b-45e6-ba09-f446d1d2a4dc",
-                        "6d7118bf-5af8-4260-a19a-19490a622c50"
+                        "6d7118bf-5af8-4260-a19a-19490a622c50",
                       ],
-                      "rule": "not_elim"
+                      rule: "not_elim",
                     },
-                    "stepType": "line",
-                    "uuid": "f68e7f39-3bcd-4587-a428-63097bec2c3f"
-                  }
+                    stepType: "line",
+                    uuid: "f68e7f39-3bcd-4587-a428-63097bec2c3f",
+                  },
                 ],
-                "stepType": "box",
-                "uuid": "128719c5-276a-4f9f-9a7c-c73bd061bac4"
+                stepType: "box",
+                uuid: "128719c5-276a-4f9f-9a7c-c73bd061bac4",
               },
               {
-                "formula": {
-                  "ascii": "P(x_0)",
-                  "latex": "P(x_0)",
-                  "userInput": "P(x_0)"
+                formula: {
+                  ascii: "P(x_0)",
+                  latex: "P(x_0)",
+                  userInput: "P(x_0)",
                 },
-                "justification": {
-                  "refs": [
-                    "128719c5-276a-4f9f-9a7c-c73bd061bac4"
-                  ],
-                  "rule": "proof_by_contradiction"
+                justification: {
+                  refs: ["128719c5-276a-4f9f-9a7c-c73bd061bac4"],
+                  rule: "proof_by_contradiction",
                 },
-                "stepType": "line",
-                "uuid": "f2c603ce-926a-42c2-9f43-57b58d8f5095"
-              }
+                stepType: "line",
+                uuid: "f2c603ce-926a-42c2-9f43-57b58d8f5095",
+              },
             ],
-            "stepType": "box",
-            "uuid": "454eca5a-332a-4faa-b22f-fb0af218c645"
+            stepType: "box",
+            uuid: "454eca5a-332a-4faa-b22f-fb0af218c645",
           },
           {
-            "formula": {
-              "ascii": "forall x P(x)",
-              "latex": "\\forall x P(x)",
-              "userInput": "forall x P(x)"
+            formula: {
+              ascii: "forall x P(x)",
+              latex: "\\forall x P(x)",
+              userInput: "forall x P(x)",
             },
-            "justification": {
-              "refs": [
-                "454eca5a-332a-4faa-b22f-fb0af218c645"
-              ],
-              "rule": "forall_intro"
+            justification: {
+              refs: ["454eca5a-332a-4faa-b22f-fb0af218c645"],
+              rule: "forall_intro",
             },
-            "stepType": "line",
-            "uuid": "cc86c523-f0fa-4985-8cfd-83ab91ab62a7"
+            stepType: "line",
+            uuid: "cc86c523-f0fa-4985-8cfd-83ab91ab62a7",
           },
           {
-            "formula": {
-              "ascii": "false",
-              "latex": "\\bot",
-              "userInput": "false"
+            formula: {
+              ascii: "false",
+              latex: "\\bot",
+              userInput: "false",
             },
-            "justification": {
-              "refs": [
+            justification: {
+              refs: [
                 "cc86c523-f0fa-4985-8cfd-83ab91ab62a7",
-                "80fec1a4-001a-4c00-8a52-daa4a3959abe"
+                "80fec1a4-001a-4c00-8a52-daa4a3959abe",
               ],
-              "rule": "not_elim"
+              rule: "not_elim",
             },
-            "stepType": "line",
-            "uuid": "dbedef33-657e-44bc-bca6-168186934651"
-          }
+            stepType: "line",
+            uuid: "dbedef33-657e-44bc-bca6-168186934651",
+          },
         ],
-        "stepType": "box",
-        "uuid": "42238cb8-518f-4d76-b5f9-88cd238be9eb"
+        stepType: "box",
+        uuid: "42238cb8-518f-4d76-b5f9-88cd238be9eb",
       },
       {
-        "formula": {
-          "ascii": "exists x not P(x)",
-          "latex": "\\exists x \\lnot P(x)",
-          "userInput": "exists x not P(x)"
+        formula: {
+          ascii: "exists x not P(x)",
+          latex: "\\exists x \\lnot P(x)",
+          userInput: "exists x not P(x)",
         },
-        "justification": {
-          "refs": [
-            "42238cb8-518f-4d76-b5f9-88cd238be9eb"
-          ],
-          "rule": "proof_by_contradiction"
+        justification: {
+          refs: ["42238cb8-518f-4d76-b5f9-88cd238be9eb"],
+          rule: "proof_by_contradiction",
         },
-        "stepType": "line",
-        "uuid": "e57b2938-a65c-40d2-b289-a529865c38c9"
-      }
-    ]
+        stepType: "line",
+        uuid: "e57b2938-a65c-40d2-b289-a529865c38c9",
+      },
+    ],
   },
   {
-    "id": "5d7fb9e7-db81-452a-a784-71970cacd1a5",
-    "title": "forall/exists duality 2",
-    "logicName": "predicateLogic",
-    "proof": [
+    id: "5d7fb9e7-db81-452a-a784-71970cacd1a5",
+    title: "forall/exists duality 2",
+    logicName: "predicateLogic",
+    proof: [
       {
-        "formula": {
-          "ascii": "exists x not P(x)",
-          "latex": "\\exists x \\lnot P(x)",
-          "userInput": "exists x not P(x)"
+        formula: {
+          ascii: "exists x not P(x)",
+          latex: "\\exists x \\lnot P(x)",
+          userInput: "exists x not P(x)",
         },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
+        justification: {
+          refs: [],
+          rule: "premise",
         },
-        "stepType": "line",
-        "uuid": "b3ffe773-e798-404b-927f-1bad4968877b"
+        stepType: "line",
+        uuid: "b3ffe773-e798-404b-927f-1bad4968877b",
       },
       {
-        "boxInfo": {freshVar: null},
-        "proof": [
+        boxInfo: { freshVar: null },
+        proof: [
           {
-            "formula": {
-              "ascii": "forall x P(x)",
-              "latex": "\\forall x P(x)",
-              "userInput": "forall x P(x)"
+            formula: {
+              ascii: "forall x P(x)",
+              latex: "\\forall x P(x)",
+              userInput: "forall x P(x)",
             },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
+            justification: {
+              refs: [],
+              rule: "assumption",
             },
-            "stepType": "line",
-            "uuid": "d7605135-720e-48c3-9b5a-4a3af0bf6e58"
+            stepType: "line",
+            uuid: "d7605135-720e-48c3-9b5a-4a3af0bf6e58",
           },
           {
-            "boxInfo": {
-              "freshVar": "x_0"
+            boxInfo: {
+              freshVar: "x_0",
             },
-            "proof": [
+            proof: [
               {
-                "formula": {
-                  "ascii": "not P(x_0)",
-                  "latex": "\\lnot P(x_0)",
-                  "userInput": "not P(x_0)"
+                formula: {
+                  ascii: "not P(x_0)",
+                  latex: "\\lnot P(x_0)",
+                  userInput: "not P(x_0)",
                 },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
+                justification: {
+                  refs: [],
+                  rule: "assumption",
                 },
-                "stepType": "line",
-                "uuid": "5985e9f7-b12c-4cee-b1e4-bd628735c64a"
+                stepType: "line",
+                uuid: "5985e9f7-b12c-4cee-b1e4-bd628735c64a",
               },
               {
-                "formula": {
-                  "ascii": "P(x_0)",
-                  "latex": "P(x_0)",
-                  "userInput": "P(x_0)"
+                formula: {
+                  ascii: "P(x_0)",
+                  latex: "P(x_0)",
+                  userInput: "P(x_0)",
                 },
-                "justification": {
-                  "refs": [
-                    "d7605135-720e-48c3-9b5a-4a3af0bf6e58"
-                  ],
-                  "rule": "forall_elim"
+                justification: {
+                  refs: ["d7605135-720e-48c3-9b5a-4a3af0bf6e58"],
+                  rule: "forall_elim",
                 },
-                "stepType": "line",
-                "uuid": "58641507-2fd0-4e9e-87da-7dfd413f82a2"
+                stepType: "line",
+                uuid: "58641507-2fd0-4e9e-87da-7dfd413f82a2",
               },
               {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
+                formula: {
+                  ascii: "false",
+                  latex: "\\bot",
+                  userInput: "false",
                 },
-                "justification": {
-                  "refs": [
+                justification: {
+                  refs: [
                     "58641507-2fd0-4e9e-87da-7dfd413f82a2",
-                    "5985e9f7-b12c-4cee-b1e4-bd628735c64a"
+                    "5985e9f7-b12c-4cee-b1e4-bd628735c64a",
                   ],
-                  "rule": "not_elim"
+                  rule: "not_elim",
                 },
-                "stepType": "line",
-                "uuid": "446673b6-352c-4c5b-9993-5b714817818c"
-              }
+                stepType: "line",
+                uuid: "446673b6-352c-4c5b-9993-5b714817818c",
+              },
             ],
-            "stepType": "box",
-            "uuid": "a06482a8-21e2-4494-b33e-c5ed48fe93c0"
+            stepType: "box",
+            uuid: "a06482a8-21e2-4494-b33e-c5ed48fe93c0",
           },
           {
-            "formula": {
-              "ascii": "false",
-              "latex": "\\bot",
-              "userInput": "false"
+            formula: {
+              ascii: "false",
+              latex: "\\bot",
+              userInput: "false",
             },
-            "justification": {
-              "refs": [
+            justification: {
+              refs: [
                 "b3ffe773-e798-404b-927f-1bad4968877b",
-                "a06482a8-21e2-4494-b33e-c5ed48fe93c0"
+                "a06482a8-21e2-4494-b33e-c5ed48fe93c0",
               ],
-              "rule": "exists_elim"
+              rule: "exists_elim",
             },
-            "stepType": "line",
-            "uuid": "adff04ea-54fd-4b0e-931e-52f78a0ea531"
-          }
+            stepType: "line",
+            uuid: "adff04ea-54fd-4b0e-931e-52f78a0ea531",
+          },
         ],
-        "stepType": "box",
-        "uuid": "3cd3c426-b387-4d6c-83c5-af01901bf4d0"
+        stepType: "box",
+        uuid: "3cd3c426-b387-4d6c-83c5-af01901bf4d0",
       },
       {
-        "formula": {
-          "ascii": "not forall x P(x)",
-          "latex": "\\lnot \\forall x P(x)",
-          "userInput": "not forall x P(x)"
+        formula: {
+          ascii: "not forall x P(x)",
+          latex: "\\lnot \\forall x P(x)",
+          userInput: "not forall x P(x)",
         },
-        "justification": {
-          "refs": [
-            "3cd3c426-b387-4d6c-83c5-af01901bf4d0"
-          ],
-          "rule": "not_intro"
+        justification: {
+          refs: ["3cd3c426-b387-4d6c-83c5-af01901bf4d0"],
+          rule: "not_intro",
         },
-        "stepType": "line",
-        "uuid": "dc45982a-cac7-4a3a-90db-0adc5a5d18d3"
-      }
-    ]
+        stepType: "line",
+        uuid: "dc45982a-cac7-4a3a-90db-0adc5a5d18d3",
+      },
+    ],
   },
   {
-    "id": "17bbbe22-8d24-4163-be29-4afecd21d333",
-    "title": "forall/exists duality 3",
-    "logicName": "predicateLogic",
-    "proof": [
+    id: "17bbbe22-8d24-4163-be29-4afecd21d333",
+    title: "forall/exists duality 3",
+    logicName: "predicateLogic",
+    proof: [
       {
-        "formula": {
-          "ascii": "not exists x P(x)",
-          "latex": "\\lnot \\exists x P(x)",
-          "userInput": "not exists x P(x)"
+        formula: {
+          ascii: "not exists x P(x)",
+          latex: "\\lnot \\exists x P(x)",
+          userInput: "not exists x P(x)",
         },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
+        justification: {
+          refs: [],
+          rule: "premise",
         },
-        "stepType": "line",
-        "uuid": "c6f6a376-117f-4a00-8dc7-8e93e8da143b"
+        stepType: "line",
+        uuid: "c6f6a376-117f-4a00-8dc7-8e93e8da143b",
       },
       {
-        "boxInfo": {
-          "freshVar": "x_0"
+        boxInfo: {
+          freshVar: "x_0",
         },
-        "proof": [
+        proof: [
           {
-            "boxInfo": { freshVar: null },
-            "proof": [
+            boxInfo: { freshVar: null },
+            proof: [
               {
-                "formula": {
-                  "ascii": "P(x_0)",
-                  "latex": "P(x_0)",
-                  "userInput": "P(x_0)"
+                formula: {
+                  ascii: "P(x_0)",
+                  latex: "P(x_0)",
+                  userInput: "P(x_0)",
                 },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
+                justification: {
+                  refs: [],
+                  rule: "assumption",
                 },
-                "stepType": "line",
-                "uuid": "8ee79978-922b-41f7-8959-fbd716434160"
+                stepType: "line",
+                uuid: "8ee79978-922b-41f7-8959-fbd716434160",
               },
               {
-                "formula": {
-                  "ascii": "exists x P(x)",
-                  "latex": "\\exists x P(x)",
-                  "userInput": "exists x P(x)"
+                formula: {
+                  ascii: "exists x P(x)",
+                  latex: "\\exists x P(x)",
+                  userInput: "exists x P(x)",
                 },
-                "justification": {
-                  "refs": [
-                    "8ee79978-922b-41f7-8959-fbd716434160"
-                  ],
-                  "rule": "exists_intro"
+                justification: {
+                  refs: ["8ee79978-922b-41f7-8959-fbd716434160"],
+                  rule: "exists_intro",
                 },
-                "stepType": "line",
-                "uuid": "59f3b315-9987-4cfc-bfca-21e2eedd4026"
+                stepType: "line",
+                uuid: "59f3b315-9987-4cfc-bfca-21e2eedd4026",
               },
               {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
+                formula: {
+                  ascii: "false",
+                  latex: "\\bot",
+                  userInput: "false",
                 },
-                "justification": {
-                  "refs": [
+                justification: {
+                  refs: [
                     "59f3b315-9987-4cfc-bfca-21e2eedd4026",
-                    "c6f6a376-117f-4a00-8dc7-8e93e8da143b"
+                    "c6f6a376-117f-4a00-8dc7-8e93e8da143b",
                   ],
-                  "rule": "not_elim"
+                  rule: "not_elim",
                 },
-                "stepType": "line",
-                "uuid": "379d80ee-db97-43ab-88bd-4e0e524f913b"
-              }
+                stepType: "line",
+                uuid: "379d80ee-db97-43ab-88bd-4e0e524f913b",
+              },
             ],
-            "stepType": "box",
-            "uuid": "79ad972e-8605-4545-9bf4-1f4a5b067878"
+            stepType: "box",
+            uuid: "79ad972e-8605-4545-9bf4-1f4a5b067878",
           },
           {
-            "formula": {
-              "ascii": "not P(x_0)",
-              "latex": "\\lnot P(x_0)",
-              "userInput": "not P(x_0)"
+            formula: {
+              ascii: "not P(x_0)",
+              latex: "\\lnot P(x_0)",
+              userInput: "not P(x_0)",
             },
-            "justification": {
-              "refs": [
-                "79ad972e-8605-4545-9bf4-1f4a5b067878"
-              ],
-              "rule": "not_intro"
+            justification: {
+              refs: ["79ad972e-8605-4545-9bf4-1f4a5b067878"],
+              rule: "not_intro",
             },
-            "stepType": "line",
-            "uuid": "b26d5d20-2569-4f78-8e13-d561f1621dcc"
-          }
+            stepType: "line",
+            uuid: "b26d5d20-2569-4f78-8e13-d561f1621dcc",
+          },
         ],
-        "stepType": "box",
-        "uuid": "d9fd8dd6-e1bb-41e7-a04e-06e0f5f7f634"
+        stepType: "box",
+        uuid: "d9fd8dd6-e1bb-41e7-a04e-06e0f5f7f634",
       },
       {
-        "formula": {
-          "ascii": "forall x not P(x)",
-          "latex": "\\forall x \\lnot P(x)",
-          "userInput": "forall x not P(x)"
+        formula: {
+          ascii: "forall x not P(x)",
+          latex: "\\forall x \\lnot P(x)",
+          userInput: "forall x not P(x)",
         },
-        "justification": {
-          "refs": [
-            "d9fd8dd6-e1bb-41e7-a04e-06e0f5f7f634"
-          ],
-          "rule": "forall_intro"
+        justification: {
+          refs: ["d9fd8dd6-e1bb-41e7-a04e-06e0f5f7f634"],
+          rule: "forall_intro",
         },
-        "stepType": "line",
-        "uuid": "6497cf01-84a6-4004-b03f-98cff3286306"
-      }
-    ]
+        stepType: "line",
+        uuid: "6497cf01-84a6-4004-b03f-98cff3286306",
+      },
+    ],
   },
   {
-    "id": "2d7beef5-1983-466a-935a-bfecf9d217c0",
-    "title": "forall/exists duality 4",
-    "logicName": "predicateLogic",
-    "proof": [
+    id: "2d7beef5-1983-466a-935a-bfecf9d217c0",
+    title: "forall/exists duality 4",
+    logicName: "predicateLogic",
+    proof: [
       {
-        "formula": {
-          "ascii": "forall x not P(x)",
-          "latex": "\\forall x \\lnot P(x)",
-          "userInput": "forall x not P(x)"
+        formula: {
+          ascii: "forall x not P(x)",
+          latex: "\\forall x \\lnot P(x)",
+          userInput: "forall x not P(x)",
         },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
+        justification: {
+          refs: [],
+          rule: "premise",
         },
-        "stepType": "line",
-        "uuid": "c95c6301-4808-479e-b5e6-48ae30fff572"
+        stepType: "line",
+        uuid: "c95c6301-4808-479e-b5e6-48ae30fff572",
       },
       {
-        "boxInfo": {freshVar: null},
-        "proof": [
+        boxInfo: { freshVar: null },
+        proof: [
           {
-            "formula": {
-              "ascii": "exists x P(x)",
-              "latex": "\\exists x P(x)",
-              "userInput": "exists x P(x)"
+            formula: {
+              ascii: "exists x P(x)",
+              latex: "\\exists x P(x)",
+              userInput: "exists x P(x)",
             },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
+            justification: {
+              refs: [],
+              rule: "assumption",
             },
-            "stepType": "line",
-            "uuid": "8fed3078-c2f0-41ee-bea8-aa56241e1cc2"
+            stepType: "line",
+            uuid: "8fed3078-c2f0-41ee-bea8-aa56241e1cc2",
           },
           {
-            "boxInfo": {
-              "freshVar": "x_0"
+            boxInfo: {
+              freshVar: "x_0",
             },
-            "proof": [
+            proof: [
               {
-                "formula": {
-                  "ascii": "P(x_0)",
-                  "latex": "P(x_0)",
-                  "userInput": "P(x_0)"
+                formula: {
+                  ascii: "P(x_0)",
+                  latex: "P(x_0)",
+                  userInput: "P(x_0)",
                 },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
+                justification: {
+                  refs: [],
+                  rule: "assumption",
                 },
-                "stepType": "line",
-                "uuid": "2065b23d-d1a8-41c0-b0b9-a4f0cc90e304"
+                stepType: "line",
+                uuid: "2065b23d-d1a8-41c0-b0b9-a4f0cc90e304",
               },
               {
-                "formula": {
-                  "ascii": "not P(x_0)",
-                  "latex": "\\lnot P(x_0)",
-                  "userInput": "not P(x_0)"
+                formula: {
+                  ascii: "not P(x_0)",
+                  latex: "\\lnot P(x_0)",
+                  userInput: "not P(x_0)",
                 },
-                "justification": {
-                  "refs": [
-                    "c95c6301-4808-479e-b5e6-48ae30fff572"
-                  ],
-                  "rule": "forall_elim"
+                justification: {
+                  refs: ["c95c6301-4808-479e-b5e6-48ae30fff572"],
+                  rule: "forall_elim",
                 },
-                "stepType": "line",
-                "uuid": "d0aa5f82-dcfc-4363-8f9b-49ac66789456"
+                stepType: "line",
+                uuid: "d0aa5f82-dcfc-4363-8f9b-49ac66789456",
               },
               {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
+                formula: {
+                  ascii: "false",
+                  latex: "\\bot",
+                  userInput: "false",
                 },
-                "justification": {
-                  "refs": [
+                justification: {
+                  refs: [
                     "2065b23d-d1a8-41c0-b0b9-a4f0cc90e304",
-                    "d0aa5f82-dcfc-4363-8f9b-49ac66789456"
+                    "d0aa5f82-dcfc-4363-8f9b-49ac66789456",
                   ],
-                  "rule": "not_elim"
+                  rule: "not_elim",
                 },
-                "stepType": "line",
-                "uuid": "a514b742-f338-41f8-a2fb-b4282503ea02"
-              }
+                stepType: "line",
+                uuid: "a514b742-f338-41f8-a2fb-b4282503ea02",
+              },
             ],
-            "stepType": "box",
-            "uuid": "b756fd22-2adc-41c2-b044-12b1551657c2"
+            stepType: "box",
+            uuid: "b756fd22-2adc-41c2-b044-12b1551657c2",
           },
           {
-            "formula": {
-              "ascii": "false",
-              "latex": "\\bot",
-              "userInput": "false"
+            formula: {
+              ascii: "false",
+              latex: "\\bot",
+              userInput: "false",
             },
-            "justification": {
-              "refs": [
+            justification: {
+              refs: [
                 "8fed3078-c2f0-41ee-bea8-aa56241e1cc2",
-                "b756fd22-2adc-41c2-b044-12b1551657c2"
+                "b756fd22-2adc-41c2-b044-12b1551657c2",
               ],
-              "rule": "exists_elim"
+              rule: "exists_elim",
             },
-            "stepType": "line",
-            "uuid": "1c6138df-57a0-4e86-abef-2d24c9efbdaa"
-          }
+            stepType: "line",
+            uuid: "1c6138df-57a0-4e86-abef-2d24c9efbdaa",
+          },
         ],
-        "stepType": "box",
-        "uuid": "4dd9d26d-4fea-4189-a3cc-19f0c897b75a"
+        stepType: "box",
+        uuid: "4dd9d26d-4fea-4189-a3cc-19f0c897b75a",
       },
       {
-        "formula": {
-          "ascii": "not exists x P(x)",
-          "latex": "\\lnot \\exists x P(x)",
-          "userInput": "not exists x P(x)"
+        formula: {
+          ascii: "not exists x P(x)",
+          latex: "\\lnot \\exists x P(x)",
+          userInput: "not exists x P(x)",
         },
-        "justification": {
-          "refs": [
-            "4dd9d26d-4fea-4189-a3cc-19f0c897b75a"
-          ],
-          "rule": "not_intro"
+        justification: {
+          refs: ["4dd9d26d-4fea-4189-a3cc-19f0c897b75a"],
+          rule: "not_intro",
         },
-        "stepType": "line",
-        "uuid": "1498fb5d-d567-4828-ad5e-214b93182f70"
-      }
-    ]
+        stepType: "line",
+        uuid: "1498fb5d-d567-4828-ad5e-214b93182f70",
+      },
+    ],
   },
   {
-    "id": "c6d62cf0-dc60-4817-ae0b-6670872cc003",
-    "title": "Drinker paradox",
-    "logicName": "predicateLogic",
-    "proof": [
+    id: "c6d62cf0-dc60-4817-ae0b-6670872cc003",
+    title: "Drinker paradox",
+    logicName: "predicateLogic",
+    proof: [
       {
-        "formula": {
-          "ascii": "forall y D(y) or not forall y D(y)",
-          "latex": "\\forall y D(y) \\lor \\lnot \\forall y D(y)",
-          "userInput": "forall y D(y) or not forall y D(y)"
+        formula: {
+          ascii: "forall y D(y) or not forall y D(y)",
+          latex: "\\forall y D(y) \\lor \\lnot \\forall y D(y)",
+          userInput: "forall y D(y) or not forall y D(y)",
         },
-        "justification": {
-          "refs": [],
-          "rule": "law_of_excluded_middle"
+        justification: {
+          refs: [],
+          rule: "law_of_excluded_middle",
         },
-        "stepType": "line",
-        "uuid": "d2a52f76-2bda-4e41-b6d4-2286e74250c5"
+        stepType: "line",
+        uuid: "d2a52f76-2bda-4e41-b6d4-2286e74250c5",
       },
       {
-        "boxInfo": {freshVar: null},
-        "proof": [
+        boxInfo: { freshVar: null },
+        proof: [
           {
-            "formula": {
-              "ascii": "forall y D(y)",
-              "latex": "\\forall y D(y)",
-              "userInput": "forall y D(y)"
+            formula: {
+              ascii: "forall y D(y)",
+              latex: "\\forall y D(y)",
+              userInput: "forall y D(y)",
             },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
+            justification: {
+              refs: [],
+              rule: "assumption",
             },
-            "stepType": "line",
-            "uuid": "fcc2095e-6e6e-4c5b-bb93-d96fb8184f10"
+            stepType: "line",
+            uuid: "fcc2095e-6e6e-4c5b-bb93-d96fb8184f10",
           },
           {
-            "boxInfo": {freshVar: null},
-            "proof": [
+            boxInfo: { freshVar: null },
+            proof: [
               {
-                "formula": {
-                  "ascii": "D(x_0)",
-                  "latex": "D(x_0)",
-                  "userInput": "D(x_0)"
+                formula: {
+                  ascii: "D(x_0)",
+                  latex: "D(x_0)",
+                  userInput: "D(x_0)",
                 },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
+                justification: {
+                  refs: [],
+                  rule: "assumption",
                 },
-                "stepType": "line",
-                "uuid": "9ae6f0fb-22a7-4914-9b70-debc518dd6a4"
+                stepType: "line",
+                uuid: "9ae6f0fb-22a7-4914-9b70-debc518dd6a4",
               },
               {
-                "formula": {
-                  "ascii": "forall y D(y)",
-                  "latex": "\\forall y D(y)",
-                  "userInput": "forall y D(y)"
+                formula: {
+                  ascii: "forall y D(y)",
+                  latex: "\\forall y D(y)",
+                  userInput: "forall y D(y)",
                 },
-                "justification": {
-                  "refs": [
-                    "fcc2095e-6e6e-4c5b-bb93-d96fb8184f10"
-                  ],
-                  "rule": "copy"
+                justification: {
+                  refs: ["fcc2095e-6e6e-4c5b-bb93-d96fb8184f10"],
+                  rule: "copy",
                 },
-                "stepType": "line",
-                "uuid": "82c5025d-7e5a-424f-9a6a-9283f758a91c"
-              }
+                stepType: "line",
+                uuid: "82c5025d-7e5a-424f-9a6a-9283f758a91c",
+              },
             ],
-            "stepType": "box",
-            "uuid": "f79565be-3013-4ab7-8c89-6a2e6fdf27f0"
+            stepType: "box",
+            uuid: "f79565be-3013-4ab7-8c89-6a2e6fdf27f0",
           },
           {
-            "formula": {
-              "ascii": "D(x_0) -> forall y D(y)",
-              "latex": "D(x_0) \\rightarrow \\forall y D(y)",
-              "userInput": "D(x_0) -> forall y D(y)"
+            formula: {
+              ascii: "D(x_0) -> forall y D(y)",
+              latex: "D(x_0) \\rightarrow \\forall y D(y)",
+              userInput: "D(x_0) -> forall y D(y)",
             },
-            "justification": {
-              "refs": [
-                "f79565be-3013-4ab7-8c89-6a2e6fdf27f0"
-              ],
-              "rule": "implies_intro"
+            justification: {
+              refs: ["f79565be-3013-4ab7-8c89-6a2e6fdf27f0"],
+              rule: "implies_intro",
             },
-            "stepType": "line",
-            "uuid": "10d04be4-b32f-45b3-bc24-12d4c1c9959d"
+            stepType: "line",
+            uuid: "10d04be4-b32f-45b3-bc24-12d4c1c9959d",
           },
           {
-            "formula": {
-              "ascii": "exists x (D(x) -> forall y D(y))",
-              "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
-              "userInput": "exists x (D(x) -> forall y D(y))"
+            formula: {
+              ascii: "exists x (D(x) -> forall y D(y))",
+              latex: "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+              userInput: "exists x (D(x) -> forall y D(y))",
             },
-            "justification": {
-              "refs": [
-                "10d04be4-b32f-45b3-bc24-12d4c1c9959d"
-              ],
-              "rule": "exists_intro"
+            justification: {
+              refs: ["10d04be4-b32f-45b3-bc24-12d4c1c9959d"],
+              rule: "exists_intro",
             },
-            "stepType": "line",
-            "uuid": "b7bd91d9-b3d0-408a-8b14-96b1e257239e"
-          }
+            stepType: "line",
+            uuid: "b7bd91d9-b3d0-408a-8b14-96b1e257239e",
+          },
         ],
-        "stepType": "box",
-        "uuid": "0e322c9b-4aa1-4f11-aa36-fc7c221ef588"
+        stepType: "box",
+        uuid: "0e322c9b-4aa1-4f11-aa36-fc7c221ef588",
       },
       {
-        "boxInfo": {freshVar: null},
-        "proof": [
+        boxInfo: { freshVar: null },
+        proof: [
           {
-            "formula": {
-              "ascii": "not forall y D(y)",
-              "latex": "\\lnot \\forall y D(y)",
-              "userInput": "not forall y D(y)"
+            formula: {
+              ascii: "not forall y D(y)",
+              latex: "\\lnot \\forall y D(y)",
+              userInput: "not forall y D(y)",
             },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
+            justification: {
+              refs: [],
+              rule: "assumption",
             },
-            "stepType": "line",
-            "uuid": "a8cf33c1-d032-41e3-99dd-0f70a186bb03"
+            stepType: "line",
+            uuid: "a8cf33c1-d032-41e3-99dd-0f70a186bb03",
           },
           {
-            "boxInfo": {freshVar: null},
-            "proof": [
+            boxInfo: { freshVar: null },
+            proof: [
               {
-                "formula": {
-                  "ascii": "not exists x not D(x)",
-                  "latex": "\\lnot \\exists x \\lnot D(x)",
-                  "userInput": "not exists x not D(x)"
+                formula: {
+                  ascii: "not exists x not D(x)",
+                  latex: "\\lnot \\exists x \\lnot D(x)",
+                  userInput: "not exists x not D(x)",
                 },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
+                justification: {
+                  refs: [],
+                  rule: "assumption",
                 },
-                "stepType": "line",
-                "uuid": "ce303b39-0441-424c-801d-5b0005580ed5"
+                stepType: "line",
+                uuid: "ce303b39-0441-424c-801d-5b0005580ed5",
               },
               {
-                "boxInfo": {
-                  "freshVar": "y_0"
+                boxInfo: {
+                  freshVar: "y_0",
                 },
-                "proof": [
+                proof: [
                   {
-                    "boxInfo": {freshVar: null},
-                    "proof": [
+                    boxInfo: { freshVar: null },
+                    proof: [
                       {
-                        "formula": {
-                          "ascii": "not D(y_0)",
-                          "latex": "\\lnot D(y_0)",
-                          "userInput": "not D(y_0)"
+                        formula: {
+                          ascii: "not D(y_0)",
+                          latex: "\\lnot D(y_0)",
+                          userInput: "not D(y_0)",
                         },
-                        "justification": {
-                          "refs": [],
-                          "rule": "assumption"
+                        justification: {
+                          refs: [],
+                          rule: "assumption",
                         },
-                        "stepType": "line",
-                        "uuid": "689a8d80-4628-4936-a513-d8b374450ae8"
+                        stepType: "line",
+                        uuid: "689a8d80-4628-4936-a513-d8b374450ae8",
                       },
                       {
-                        "formula": {
-                          "ascii": "exists x not D(x)",
-                          "latex": "\\exists x \\lnot D(x)",
-                          "userInput": "exists x not D(x)"
+                        formula: {
+                          ascii: "exists x not D(x)",
+                          latex: "\\exists x \\lnot D(x)",
+                          userInput: "exists x not D(x)",
                         },
-                        "justification": {
-                          "refs": [
-                            "689a8d80-4628-4936-a513-d8b374450ae8"
-                          ],
-                          "rule": "exists_intro"
+                        justification: {
+                          refs: ["689a8d80-4628-4936-a513-d8b374450ae8"],
+                          rule: "exists_intro",
                         },
-                        "stepType": "line",
-                        "uuid": "71a27271-bec1-48c2-bf61-06e8e1cb92d4"
+                        stepType: "line",
+                        uuid: "71a27271-bec1-48c2-bf61-06e8e1cb92d4",
                       },
                       {
-                        "formula": {
-                          "ascii": "false",
-                          "latex": "\\bot",
-                          "userInput": "false"
+                        formula: {
+                          ascii: "false",
+                          latex: "\\bot",
+                          userInput: "false",
                         },
-                        "justification": {
-                          "refs": [
+                        justification: {
+                          refs: [
                             "71a27271-bec1-48c2-bf61-06e8e1cb92d4",
-                            "ce303b39-0441-424c-801d-5b0005580ed5"
+                            "ce303b39-0441-424c-801d-5b0005580ed5",
                           ],
-                          "rule": "not_elim"
+                          rule: "not_elim",
                         },
-                        "stepType": "line",
-                        "uuid": "2d6c0783-05ca-42cd-9ecd-9c81c7a36f0c"
-                      }
+                        stepType: "line",
+                        uuid: "2d6c0783-05ca-42cd-9ecd-9c81c7a36f0c",
+                      },
                     ],
-                    "stepType": "box",
-                    "uuid": "77a31330-80d0-4dab-9b11-42737be973d7"
+                    stepType: "box",
+                    uuid: "77a31330-80d0-4dab-9b11-42737be973d7",
                   },
                   {
-                    "formula": {
-                      "ascii": "D(y_0)",
-                      "latex": "D(y_0)",
-                      "userInput": "D(y_0)"
+                    formula: {
+                      ascii: "D(y_0)",
+                      latex: "D(y_0)",
+                      userInput: "D(y_0)",
                     },
-                    "justification": {
-                      "refs": [
-                        "77a31330-80d0-4dab-9b11-42737be973d7"
-                      ],
-                      "rule": "proof_by_contradiction"
+                    justification: {
+                      refs: ["77a31330-80d0-4dab-9b11-42737be973d7"],
+                      rule: "proof_by_contradiction",
                     },
-                    "stepType": "line",
-                    "uuid": "d3ea30a4-8d6e-4d45-babb-a4686aea332a"
-                  }
+                    stepType: "line",
+                    uuid: "d3ea30a4-8d6e-4d45-babb-a4686aea332a",
+                  },
                 ],
-                "stepType": "box",
-                "uuid": "46a588a9-4446-409c-ae4c-37f1223a5b47"
+                stepType: "box",
+                uuid: "46a588a9-4446-409c-ae4c-37f1223a5b47",
               },
               {
-                "formula": {
-                  "ascii": "forall y D(y)",
-                  "latex": "\\forall y D(y)",
-                  "userInput": "forall y D(y)"
+                formula: {
+                  ascii: "forall y D(y)",
+                  latex: "\\forall y D(y)",
+                  userInput: "forall y D(y)",
                 },
-                "justification": {
-                  "refs": [
-                    "46a588a9-4446-409c-ae4c-37f1223a5b47"
-                  ],
-                  "rule": "forall_intro"
+                justification: {
+                  refs: ["46a588a9-4446-409c-ae4c-37f1223a5b47"],
+                  rule: "forall_intro",
                 },
-                "stepType": "line",
-                "uuid": "a6324ad6-2580-4002-9e3a-0159b6297400"
+                stepType: "line",
+                uuid: "a6324ad6-2580-4002-9e3a-0159b6297400",
               },
               {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
+                formula: {
+                  ascii: "false",
+                  latex: "\\bot",
+                  userInput: "false",
                 },
-                "justification": {
-                  "refs": [
+                justification: {
+                  refs: [
                     "a6324ad6-2580-4002-9e3a-0159b6297400",
-                    "a8cf33c1-d032-41e3-99dd-0f70a186bb03"
+                    "a8cf33c1-d032-41e3-99dd-0f70a186bb03",
                   ],
-                  "rule": "not_elim"
+                  rule: "not_elim",
                 },
-                "stepType": "line",
-                "uuid": "1e5aea47-048a-4b9b-b5ce-0432ad41a0a4"
-              }
+                stepType: "line",
+                uuid: "1e5aea47-048a-4b9b-b5ce-0432ad41a0a4",
+              },
             ],
-            "stepType": "box",
-            "uuid": "2b76e60e-e957-4c34-90d1-42dc1063afe6"
+            stepType: "box",
+            uuid: "2b76e60e-e957-4c34-90d1-42dc1063afe6",
           },
           {
-            "formula": {
-              "ascii": "exists x not D(x)",
-              "latex": "\\exists x \\lnot D(x)",
-              "userInput": "exists x not D(x)"
+            formula: {
+              ascii: "exists x not D(x)",
+              latex: "\\exists x \\lnot D(x)",
+              userInput: "exists x not D(x)",
             },
-            "justification": {
-              "refs": [
-                "2b76e60e-e957-4c34-90d1-42dc1063afe6"
-              ],
-              "rule": "proof_by_contradiction"
+            justification: {
+              refs: ["2b76e60e-e957-4c34-90d1-42dc1063afe6"],
+              rule: "proof_by_contradiction",
             },
-            "stepType": "line",
-            "uuid": "8e9b5540-9315-4df7-ac32-584d7cfcb5c3"
+            stepType: "line",
+            uuid: "8e9b5540-9315-4df7-ac32-584d7cfcb5c3",
           },
           {
-            "boxInfo": {
-              "freshVar": "x_0"
+            boxInfo: {
+              freshVar: "x_0",
             },
-            "proof": [
+            proof: [
               {
-                "formula": {
-                  "ascii": "not D(x_0)",
-                  "latex": "\\lnot D(x_0)",
-                  "userInput": "not D(x_0)"
+                formula: {
+                  ascii: "not D(x_0)",
+                  latex: "\\lnot D(x_0)",
+                  userInput: "not D(x_0)",
                 },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
+                justification: {
+                  refs: [],
+                  rule: "assumption",
                 },
-                "stepType": "line",
-                "uuid": "0f05950b-cd3a-4fe6-898a-74c636bdb3cf"
+                stepType: "line",
+                uuid: "0f05950b-cd3a-4fe6-898a-74c636bdb3cf",
               },
               {
-                "boxInfo": {freshVar: null},
-                "proof": [
+                boxInfo: { freshVar: null },
+                proof: [
                   {
-                    "formula": {
-                      "ascii": "D(x_0)",
-                      "latex": "D(x_0)",
-                      "userInput": "D(x_0)"
+                    formula: {
+                      ascii: "D(x_0)",
+                      latex: "D(x_0)",
+                      userInput: "D(x_0)",
                     },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
+                    justification: {
+                      refs: [],
+                      rule: "assumption",
                     },
-                    "stepType": "line",
-                    "uuid": "9a1656cb-1129-4190-9dd0-1d89f81ce4e5"
+                    stepType: "line",
+                    uuid: "9a1656cb-1129-4190-9dd0-1d89f81ce4e5",
                   },
                   {
-                    "formula": {
-                      "ascii": "false",
-                      "latex": "\\bot",
-                      "userInput": "false"
+                    formula: {
+                      ascii: "false",
+                      latex: "\\bot",
+                      userInput: "false",
                     },
-                    "justification": {
-                      "refs": [
+                    justification: {
+                      refs: [
                         "9a1656cb-1129-4190-9dd0-1d89f81ce4e5",
-                        "0f05950b-cd3a-4fe6-898a-74c636bdb3cf"
+                        "0f05950b-cd3a-4fe6-898a-74c636bdb3cf",
                       ],
-                      "rule": "not_elim"
+                      rule: "not_elim",
                     },
-                    "stepType": "line",
-                    "uuid": "78ed221c-75a6-41b2-9141-3ab7bae2da00"
+                    stepType: "line",
+                    uuid: "78ed221c-75a6-41b2-9141-3ab7bae2da00",
                   },
                   {
-                    "formula": {
-                      "ascii": "forall y D(y)",
-                      "latex": "\\forall y D(y)",
-                      "userInput": "forall y D(y)"
+                    formula: {
+                      ascii: "forall y D(y)",
+                      latex: "\\forall y D(y)",
+                      userInput: "forall y D(y)",
                     },
-                    "justification": {
-                      "refs": [
-                        "78ed221c-75a6-41b2-9141-3ab7bae2da00"
-                      ],
-                      "rule": "bot_elim"
+                    justification: {
+                      refs: ["78ed221c-75a6-41b2-9141-3ab7bae2da00"],
+                      rule: "bot_elim",
                     },
-                    "stepType": "line",
-                    "uuid": "dcecdcc0-838c-4d75-ba25-c79d0f886836"
-                  }
+                    stepType: "line",
+                    uuid: "dcecdcc0-838c-4d75-ba25-c79d0f886836",
+                  },
                 ],
-                "stepType": "box",
-                "uuid": "f1f57be9-b7db-4ba6-9022-399f54aaff63"
+                stepType: "box",
+                uuid: "f1f57be9-b7db-4ba6-9022-399f54aaff63",
               },
               {
-                "formula": {
-                  "ascii": "D(x_0) -> forall y D(y)",
-                  "latex": "D(x_0) \\rightarrow \\forall y D(y)",
-                  "userInput": "D(x_0) -> forall y D(y)"
+                formula: {
+                  ascii: "D(x_0) -> forall y D(y)",
+                  latex: "D(x_0) \\rightarrow \\forall y D(y)",
+                  userInput: "D(x_0) -> forall y D(y)",
                 },
-                "justification": {
-                  "refs": [
-                    "f1f57be9-b7db-4ba6-9022-399f54aaff63"
-                  ],
-                  "rule": "implies_intro"
+                justification: {
+                  refs: ["f1f57be9-b7db-4ba6-9022-399f54aaff63"],
+                  rule: "implies_intro",
                 },
-                "stepType": "line",
-                "uuid": "fe3f8add-f9a8-44bd-91fd-a7d4f9a7d744"
+                stepType: "line",
+                uuid: "fe3f8add-f9a8-44bd-91fd-a7d4f9a7d744",
               },
               {
-                "formula": {
-                  "ascii": "exists x (D(x) -> forall y D(y))",
-                  "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
-                  "userInput": "exists x (D(x) -> forall y D(y))"
+                formula: {
+                  ascii: "exists x (D(x) -> forall y D(y))",
+                  latex: "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+                  userInput: "exists x (D(x) -> forall y D(y))",
                 },
-                "justification": {
-                  "refs": [
-                    "fe3f8add-f9a8-44bd-91fd-a7d4f9a7d744"
-                  ],
-                  "rule": "exists_intro"
+                justification: {
+                  refs: ["fe3f8add-f9a8-44bd-91fd-a7d4f9a7d744"],
+                  rule: "exists_intro",
                 },
-                "stepType": "line",
-                "uuid": "415b6d3c-c386-4703-b8b0-10f8b7851dfc"
-              }
+                stepType: "line",
+                uuid: "415b6d3c-c386-4703-b8b0-10f8b7851dfc",
+              },
             ],
-            "stepType": "box",
-            "uuid": "2f514f72-e025-45ba-be92-79e94d5933c8"
+            stepType: "box",
+            uuid: "2f514f72-e025-45ba-be92-79e94d5933c8",
           },
           {
-            "formula": {
-              "ascii": "exists x (D(x) -> forall y D(y))",
-              "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
-              "userInput": "exists x (D(x) -> forall y D(y))"
+            formula: {
+              ascii: "exists x (D(x) -> forall y D(y))",
+              latex: "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+              userInput: "exists x (D(x) -> forall y D(y))",
             },
-            "justification": {
-              "refs": [
+            justification: {
+              refs: [
                 "8e9b5540-9315-4df7-ac32-584d7cfcb5c3",
-                "2f514f72-e025-45ba-be92-79e94d5933c8"
+                "2f514f72-e025-45ba-be92-79e94d5933c8",
               ],
-              "rule": "exists_elim"
+              rule: "exists_elim",
             },
-            "stepType": "line",
-            "uuid": "847fe8dc-bbd5-45a2-8199-d29e8e0ddb08"
-          }
+            stepType: "line",
+            uuid: "847fe8dc-bbd5-45a2-8199-d29e8e0ddb08",
+          },
         ],
-        "stepType": "box",
-        "uuid": "8840ab49-e7dc-451d-a3be-427f4e536c86"
+        stepType: "box",
+        uuid: "8840ab49-e7dc-451d-a3be-427f4e536c86",
       },
       {
-        "formula": {
-          "ascii": "exists x (D(x) -> forall y D(y))",
-          "latex": "\\exists x (D(x) \\rightarrow \\forall y D(y))",
-          "userInput": "exists x (D(x) -> forall y D(y))"
+        formula: {
+          ascii: "exists x (D(x) -> forall y D(y))",
+          latex: "\\exists x (D(x) \\rightarrow \\forall y D(y))",
+          userInput: "exists x (D(x) -> forall y D(y))",
         },
-        "justification": {
-          "refs": [
+        justification: {
+          refs: [
             "d2a52f76-2bda-4e41-b6d4-2286e74250c5",
             "0e322c9b-4aa1-4f11-aa36-fc7c221ef588",
-            "8840ab49-e7dc-451d-a3be-427f4e536c86"
+            "8840ab49-e7dc-451d-a3be-427f4e536c86",
           ],
-          "rule": "or_elim"
+          rule: "or_elim",
         },
-        "stepType": "line",
-        "uuid": "c089ea54-9833-441b-b7e9-fd4dbf66b75a"
-      }
-    ]
-  }, {
-    "id": "arith_1",
-    "title": "k + 0 = 0 + k",
-    "logicName": "arithmetic",
-    "proof": [{
-      "formula": {
-        "ascii": "0 + 0 = 0 + 0",
-        "latex": "0 + 0 = 0 + 0",
-        "userInput": "0 + 0 = 0 + 0"
+        stepType: "line",
+        uuid: "c089ea54-9833-441b-b7e9-fd4dbf66b75a",
       },
-      "justification": {
-        "refs": [],
-        "rule": "equality_intro"
+    ],
+  },
+  {
+    id: "arith_1",
+    title: "k + 0 = 0 + k",
+    logicName: "arithmetic",
+    proof: [
+      {
+        formula: {
+          ascii: "0 + 0 = 0 + 0",
+          latex: "0 + 0 = 0 + 0",
+          userInput: "0 + 0 = 0 + 0",
+        },
+        justification: {
+          refs: [],
+          rule: "equality_intro",
+        },
+        stepType: "line",
+        uuid: "10",
       },
-      "stepType": "line",
-      "uuid": "10"
-    }, {
-      "boxInfo": {
-        "freshVar": "n"
-      },
-      "proof": [{
-        "formula": {
-          "ascii": "n + 0 = 0 + n",
-          "latex": "n + 0 = 0 + n",
-          "userInput": "n + 0 = 0 + n"
+      {
+        boxInfo: {
+          freshVar: "n",
         },
-        "justification": {
-          "refs": [],
-          "rule": "assumption"
-        },
-        "stepType": "line",
-        "uuid": "20"
-      }, {
-        "formula": {
-          "ascii": "n + 0 = n + 0",
-          "latex": "n + 0 = n + 0",
-          "userInput": "n + 0 = n + 0"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "equality_intro"
-        },
-        "stepType": "line",
-        "uuid": "22"
-      }, {
-        "formula": {
-          "ascii": "0 + n = n + 0",
-          "latex": "0 + n = n + 0",
-          "userInput": "0 + n = n + 0"
-        },
-        "justification": {
-          "refs": ["20", "22"],
-          "rule": "equality_elim"
-        },
-        "stepType": "line",
-        "uuid": "24"
-      }, {
-        "formula": {
-          "ascii": "0 + (n + 1) = (0 + n) + 1",
-          "latex": "0 + (n + 1) = (0 + n) + 1",
-          "userInput": "0 + (n + 1) = (0 + n) + 1"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "peano_2"
-        },
-        "stepType": "line",
-        "uuid": "25"
-      }, {
-        "formula": {
-          "ascii": "0 + (n + 1) = (n + 0) + 1",
-          "latex": "0 + (n + 1) = (n + 0) + 1",
-          "userInput": "0 + (n + 1) = (n + 0) + 1"
-        },
-        "justification": {
-          "refs": ["24", "25"],
-          "rule": "equality_elim"
-        },
-        "stepType": "line",
-        "uuid": "30"
-      }, {
-        "formula": {
-          "ascii": "n + 0 = n",
-          "latex": "n + 0 = n",
-          "userInput": "n + 0 = n"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "peano_1"
-        },
-        "stepType": "line",
-        "uuid": "32"
-      }, {
-        "formula": {
-          "ascii": "0 + (n + 1) = n + 1",
-          "latex": "0 + (n + 1) = n + 1",
-          "userInput": "0 + (n + 1) = n + 1"
-        },
-        "justification": {
-          "refs": ["32", "30"],
-          "rule": "equality_elim"
-        },
-        "stepType": "line",
-        "uuid": "34"
-      }, {
-        "formula": {
-          "ascii": "(n + 1) + 0 = n + 1",
-          "latex": "(n + 1) + 0 = n + 1",
-          "userInput": "(n + 1) + 0 = n + 1"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "peano_1"
-        },
-        "stepType": "line",
-        "uuid": "36"
-      }, {
-        "formula": {
-          "ascii": "(n + 1) + 0 = (n + 1) + 0",
-          "latex": "(n + 1) + 0 = (n + 1) + 0",
-          "userInput": "(n + 1) + 0 = (n + 1) + 0"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "equality_intro"
-        },
-        "stepType": "line",
-        "uuid": "38"
-      }, {
-        "formula": {
-          "ascii": "n + 1 = (n + 1) + 0",
-          "latex": "n + 1 = (n + 1) + 0",
-          "userInput": "n + 1 = (n + 1) + 0"
-        },
-        "justification": {
-          "refs": ["36", "38"],
-          "rule": "equality_elim"
-        },
-        "stepType": "line",
-        "uuid": "40"
-      }, {
-        "formula": {
-          "ascii": "0 + (n + 1) = (n + 1) + 0",
-          "latex": "0 + (n + 1) = (n + 1) + 0",
-          "userInput": "0 + (n + 1) = (n + 1) + 0"
-        },
-        "justification": {
-          "refs": ["40", "34"],
-          "rule": "equality_elim"
-        },
-        "stepType": "line",
-        "uuid": "42"
-      }, {
-        "formula": {
-          "ascii": "0 + (n + 1) = 0 + (n + 1)",
-          "latex": "0 + (n + 1) = 0 + (n + 1)",
-          "userInput": "0 + (n + 1) = 0 + (n + 1)"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "equality_intro"
-        },
-        "stepType": "line",
-        "uuid": "44"
-      }, {
-        "formula": {
-          "ascii": "(n + 1) + 0 = 0 + (n + 1)",
-          "latex": "(n + 1) + 0 = 0 + (n + 1)",
-          "userInput": "(n + 1) + 0 = 0 + (n + 1)"
-        },
-        "justification": {
-          "refs": ["42", "44"],
-          "rule": "equality_elim"
-        },
-        "stepType": "line",
-        "uuid": "60"
-      }],
-      "stepType": "box",
-      "uuid": "bi"
-    }, {
-      "formula": {
-        "ascii": "forall k (k + 0 = 0 + k)",
-        "latex": "\\forall k (k + 0 = 0 + k)",
-        "userInput": "forall k (k + 0 = 0 + k)"
-      },
-      "justification": {
-        "refs": ["10", "bi"],
-        "rule": "induction"
-      },
-      "stepType": "line",
-      "uuid": "100"
-    }
-  ]
-}, {
-  "id": "reflexivity_plus",
-  "title": "b + a = a + b",
-  "logicName": "arithmetic",
-  "proof": [
-    {
-      "formula": {
-        "ascii": "0 + 0 = 0 + 0",
-        "latex": "0 + 0 = 0 + 0",
-        "userInput": "0 + 0 = 0 + 0"
-      },
-      "justification": {
-        "refs": [],
-        "rule": "equality_intro"
-      },
-      "stepType": "line",
-      "uuid": "10"
-    },
-    {
-      "boxInfo": {
-        "freshVar": "n"
-      },
-      "proof": [
-        {
-          "formula": {
-            "ascii": "n + 0 = 0 + n",
-            "latex": "n + 0 = 0 + n",
-            "userInput": "n + 0 = 0 + n"
+        proof: [
+          {
+            formula: {
+              ascii: "n + 0 = 0 + n",
+              latex: "n + 0 = 0 + n",
+              userInput: "n + 0 = 0 + n",
+            },
+            justification: {
+              refs: [],
+              rule: "assumption",
+            },
+            stepType: "line",
+            uuid: "20",
           },
-          "justification": {
-            "refs": [],
-            "rule": "assumption"
+          {
+            formula: {
+              ascii: "n + 0 = n + 0",
+              latex: "n + 0 = n + 0",
+              userInput: "n + 0 = n + 0",
+            },
+            justification: {
+              refs: [],
+              rule: "equality_intro",
+            },
+            stepType: "line",
+            uuid: "22",
           },
-          "stepType": "line",
-          "uuid": "20"
-        },
-        {
-          "formula": {
-            "ascii": "n + 0 = n + 0",
-            "latex": "n + 0 = n + 0",
-            "userInput": "n + 0 = n + 0"
+          {
+            formula: {
+              ascii: "0 + n = n + 0",
+              latex: "0 + n = n + 0",
+              userInput: "0 + n = n + 0",
+            },
+            justification: {
+              refs: ["20", "22"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "24",
           },
-          "justification": {
-            "refs": [],
-            "rule": "equality_intro"
+          {
+            formula: {
+              ascii: "0 + (n + 1) = (0 + n) + 1",
+              latex: "0 + (n + 1) = (0 + n) + 1",
+              userInput: "0 + (n + 1) = (0 + n) + 1",
+            },
+            justification: {
+              refs: [],
+              rule: "peano_2",
+            },
+            stepType: "line",
+            uuid: "25",
           },
-          "stepType": "line",
-          "uuid": "22"
-        },
-        {
-          "formula": {
-            "ascii": "0 + n = n + 0",
-            "latex": "0 + n = n + 0",
-            "userInput": "0 + n = n + 0"
+          {
+            formula: {
+              ascii: "0 + (n + 1) = (n + 0) + 1",
+              latex: "0 + (n + 1) = (n + 0) + 1",
+              userInput: "0 + (n + 1) = (n + 0) + 1",
+            },
+            justification: {
+              refs: ["24", "25"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "30",
           },
-          "justification": {
-            "refs": [
-              "20",
-              "22"
-            ],
-            "rule": "equality_elim"
+          {
+            formula: {
+              ascii: "n + 0 = n",
+              latex: "n + 0 = n",
+              userInput: "n + 0 = n",
+            },
+            justification: {
+              refs: [],
+              rule: "peano_1",
+            },
+            stepType: "line",
+            uuid: "32",
           },
-          "stepType": "line",
-          "uuid": "24"
-        },
-        {
-          "formula": {
-            "ascii": "0 + (n + 1) = (0 + n) + 1",
-            "latex": "0 + (n + 1) = (0 + n) + 1",
-            "userInput": "0 + (n + 1) = (0 + n) + 1"
+          {
+            formula: {
+              ascii: "0 + (n + 1) = n + 1",
+              latex: "0 + (n + 1) = n + 1",
+              userInput: "0 + (n + 1) = n + 1",
+            },
+            justification: {
+              refs: ["32", "30"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "34",
           },
-          "justification": {
-            "refs": [],
-            "rule": "peano_2"
+          {
+            formula: {
+              ascii: "(n + 1) + 0 = n + 1",
+              latex: "(n + 1) + 0 = n + 1",
+              userInput: "(n + 1) + 0 = n + 1",
+            },
+            justification: {
+              refs: [],
+              rule: "peano_1",
+            },
+            stepType: "line",
+            uuid: "36",
           },
-          "stepType": "line",
-          "uuid": "25"
-        },
-        {
-          "formula": {
-            "ascii": "0 + (n + 1) = (n + 0) + 1",
-            "latex": "0 + (n + 1) = (n + 0) + 1",
-            "userInput": "0 + (n + 1) = (n + 0) + 1"
+          {
+            formula: {
+              ascii: "(n + 1) + 0 = (n + 1) + 0",
+              latex: "(n + 1) + 0 = (n + 1) + 0",
+              userInput: "(n + 1) + 0 = (n + 1) + 0",
+            },
+            justification: {
+              refs: [],
+              rule: "equality_intro",
+            },
+            stepType: "line",
+            uuid: "38",
           },
-          "justification": {
-            "refs": [
-              "24",
-              "25"
-            ],
-            "rule": "equality_elim"
+          {
+            formula: {
+              ascii: "n + 1 = (n + 1) + 0",
+              latex: "n + 1 = (n + 1) + 0",
+              userInput: "n + 1 = (n + 1) + 0",
+            },
+            justification: {
+              refs: ["36", "38"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "40",
           },
-          "stepType": "line",
-          "uuid": "30"
-        },
-        {
-          "formula": {
-            "ascii": "n + 0 = n",
-            "latex": "n + 0 = n",
-            "userInput": "n + 0 = n"
+          {
+            formula: {
+              ascii: "0 + (n + 1) = (n + 1) + 0",
+              latex: "0 + (n + 1) = (n + 1) + 0",
+              userInput: "0 + (n + 1) = (n + 1) + 0",
+            },
+            justification: {
+              refs: ["40", "34"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "42",
           },
-          "justification": {
-            "refs": [],
-            "rule": "peano_1"
+          {
+            formula: {
+              ascii: "0 + (n + 1) = 0 + (n + 1)",
+              latex: "0 + (n + 1) = 0 + (n + 1)",
+              userInput: "0 + (n + 1) = 0 + (n + 1)",
+            },
+            justification: {
+              refs: [],
+              rule: "equality_intro",
+            },
+            stepType: "line",
+            uuid: "44",
           },
-          "stepType": "line",
-          "uuid": "32"
-        },
-        {
-          "formula": {
-            "ascii": "0 + (n + 1) = n + 1",
-            "latex": "0 + (n + 1) = n + 1",
-            "userInput": "0 + (n + 1) = n + 1"
+          {
+            formula: {
+              ascii: "(n + 1) + 0 = 0 + (n + 1)",
+              latex: "(n + 1) + 0 = 0 + (n + 1)",
+              userInput: "(n + 1) + 0 = 0 + (n + 1)",
+            },
+            justification: {
+              refs: ["42", "44"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "60",
           },
-          "justification": {
-            "refs": [
-              "32",
-              "30"
-            ],
-            "rule": "equality_elim"
-          },
-          "stepType": "line",
-          "uuid": "34"
-        },
-        {
-          "formula": {
-            "ascii": "(n + 1) + 0 = n + 1",
-            "latex": "(n + 1) + 0 = n + 1",
-            "userInput": "(n + 1) + 0 = n + 1"
-          },
-          "justification": {
-            "refs": [],
-            "rule": "peano_1"
-          },
-          "stepType": "line",
-          "uuid": "36"
-        },
-        {
-          "formula": {
-            "ascii": "(n + 1) + 0 = (n + 1) + 0",
-            "latex": "(n + 1) + 0 = (n + 1) + 0",
-            "userInput": "(n + 1) + 0 = (n + 1) + 0"
-          },
-          "justification": {
-            "refs": [],
-            "rule": "equality_intro"
-          },
-          "stepType": "line",
-          "uuid": "38"
-        },
-        {
-          "formula": {
-            "ascii": "n + 1 = (n + 1) + 0",
-            "latex": "n + 1 = (n + 1) + 0",
-            "userInput": "n + 1 = (n + 1) + 0"
-          },
-          "justification": {
-            "refs": [
-              "36",
-              "38"
-            ],
-            "rule": "equality_elim"
-          },
-          "stepType": "line",
-          "uuid": "40"
-        },
-        {
-          "formula": {
-            "ascii": "0 + (n + 1) = (n + 1) + 0",
-            "latex": "0 + (n + 1) = (n + 1) + 0",
-            "userInput": "0 + (n + 1) = (n + 1) + 0"
-          },
-          "justification": {
-            "refs": [
-              "40",
-              "34"
-            ],
-            "rule": "equality_elim"
-          },
-          "stepType": "line",
-          "uuid": "42"
-        },
-        {
-          "formula": {
-            "ascii": "0 + (n + 1) = 0 + (n + 1)",
-            "latex": "0 + (n + 1) = 0 + (n + 1)",
-            "userInput": "0 + (n + 1) = 0 + (n + 1)"
-          },
-          "justification": {
-            "refs": [],
-            "rule": "equality_intro"
-          },
-          "stepType": "line",
-          "uuid": "44"
-        },
-        {
-          "formula": {
-            "ascii": "(n + 1) + 0 = 0 + (n + 1)",
-            "latex": "(n + 1) + 0 = 0 + (n + 1)",
-            "userInput": "(n + 1) + 0 = 0 + (n + 1)"
-          },
-          "justification": {
-            "refs": [
-              "42",
-              "44"
-            ],
-            "rule": "equality_elim"
-          },
-          "stepType": "line",
-          "uuid": "60"
-        }
-      ],
-      "stepType": "box",
-      "uuid": "bi"
-    },
-    {
-      "formula": {
-        "ascii": "forall b (b + 0 = 0 + b)",
-        "latex": "\\forall b (b + 0 = 0 + b)",
-        "userInput": "forall b (b + 0 = 0 + b)"
-      },
-      "justification": {
-        "refs": [
-          "10",
-          "bi"
         ],
-        "rule": "induction"
+        stepType: "box",
+        uuid: "bi",
       },
-      "stepType": "line",
-      "uuid": "100"
-    },
-    {
-      "boxInfo": {
-        "freshVar": "n"
-      },
-      "proof": [
-        {
-          "formula": {
-            "ascii": "forall b (b + n = n + b)",
-            "latex": "\\forall b (b + n = n + b)",
-            "userInput": "forall b (b + n = n + b)"
-          },
-          "justification": {
-            "refs": [],
-            "rule": "assumption"
-          },
-          "stepType": "line",
-          "uuid": "75dc32b3-5a08-454c-b425-69774da76fa5"
+      {
+        formula: {
+          ascii: "forall k (k + 0 = 0 + k)",
+          latex: "\\forall k (k + 0 = 0 + k)",
+          userInput: "forall k (k + 0 = 0 + k)",
         },
-        {
-          "boxInfo": {
-            "freshVar": "m"
-          },
-          "proof": [
-            {
-              "formula": {
-                "ascii": "m + n = n + m",
-                "latex": "m + n = n + m",
-                "userInput": "m + n = n + m"
-              },
-              "justification": {
-                "refs": [
-                  "75dc32b3-5a08-454c-b425-69774da76fa5"
-                ],
-                "rule": "forall_elim"
-              },
-              "stepType": "line",
-              "uuid": "29bad9bd-0067-43ac-8651-11da3116cc82"
-            },
-            {
-              "formula": {
-                "ascii": "m + (n + 1) = (m + n) + 1",
-                "latex": "m + (n + 1) = (m + n) + 1",
-                "userInput": "m + (n + 1) = (m + n) + 1"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "peano_2"
-              },
-              "stepType": "line",
-              "uuid": "4e27dc24-14e7-440f-b958-5f20f30193ff"
-            },
-            {
-              "formula": {
-                "ascii": "m + (n + 1) = (n + m) + 1",
-                "latex": "m + (n + 1) = (n + m) + 1",
-                "userInput": "m + (n + 1) = (n + m) + 1"
-              },
-              "justification": {
-                "refs": [
-                  "29bad9bd-0067-43ac-8651-11da3116cc82",
-                  "4e27dc24-14e7-440f-b958-5f20f30193ff"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "008812d3-a209-47ca-bfc9-26a4382fb811"
-            },
-            {
-              "formula": {
-                "ascii": "n + (m + 1) = (n + m) + 1",
-                "latex": "n + (m + 1) = (n + m) + 1",
-                "userInput": "n + (m + 1) = (n + m) + 1"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "peano_2"
-              },
-              "stepType": "line",
-              "uuid": "61035b9f-b65a-433f-9ba6-68274d4059f0"
-            },
-            {
-              "formula": {
-                "ascii": "n + (m + 1) = n + (m + 1)",
-                "latex": "n + (m + 1) = n + (m + 1)",
-                "userInput": "n + (m + 1) = n + (m + 1)"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "equality_intro"
-              },
-              "stepType": "line",
-              "uuid": "32a068e2-69a6-4fdd-8f04-a8191c0f3576"
-            },
-            {
-              "formula": {
-                "ascii": "(n + m) + 1 = n + (m + 1)",
-                "latex": "(n + m) + 1 = n + (m + 1)",
-                "userInput": "(n + m) + 1 = n + (m + 1)"
-              },
-              "justification": {
-                "refs": [
-                  "61035b9f-b65a-433f-9ba6-68274d4059f0",
-                  "32a068e2-69a6-4fdd-8f04-a8191c0f3576"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "04489472-5a91-405b-ad3f-99fe53951abf"
-            },
-            {
-              "formula": {
-                "ascii": "m + (n + 1) = n + (m + 1)",
-                "latex": "m + (n + 1) = n + (m + 1)",
-                "userInput": "m + (n + 1) = n + (m + 1)"
-              },
-              "justification": {
-                "refs": [
-                  "04489472-5a91-405b-ad3f-99fe53951abf",
-                  "008812d3-a209-47ca-bfc9-26a4382fb811"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "2bca103d-3f0f-47a4-858e-27617e8d2bb1"
-            },
-            {
-              "formula": {
-                "ascii": "1 + 0 = 0 + 1",
-                "latex": "1 + 0 = 0 + 1",
-                "userInput": "1 + 0 = 0 + 1"
-              },
-              "justification": {
-                "refs": [
-                  "100"
-                ],
-                "rule": "forall_elim"
-              },
-              "stepType": "line",
-              "uuid": "c9bdf795-5830-45a0-884f-81ec07b29f7b"
-            },
-            {
-              "formula": {
-                "ascii": "1 + 0 = 1 + 0",
-                "latex": "1 + 0 = 1 + 0",
-                "userInput": "1 + 0 = 1 + 0"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "equality_intro"
-              },
-              "stepType": "line",
-              "uuid": "6ba2076b-5d7b-4bf4-9b2a-4d48dd0f32a7"
-            },
-            {
-              "formula": {
-                "ascii": "0 + 1 = 1 + 0",
-                "latex": "0 + 1 = 1 + 0",
-                "userInput": "0 + 1 = 1 + 0"
-              },
-              "justification": {
-                "refs": [
-                  "c9bdf795-5830-45a0-884f-81ec07b29f7b",
-                  "6ba2076b-5d7b-4bf4-9b2a-4d48dd0f32a7"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "d9f45517-f804-4511-883a-6598f2a67a0e"
-            },
-            {
-              "formula": {
-                "ascii": "n + (0 + 1) = n + (0 + 1)",
-                "latex": "n + (0 + 1) = n + (0 + 1)",
-                "userInput": "n + (0 + 1) = n + (0 + 1)"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "equality_intro"
-              },
-              "stepType": "line",
-              "uuid": "ddeb4b8e-958c-490a-9501-31ef3960d14a"
-            },
-            {
-              "formula": {
-                "ascii": "n + (0 + 1) = n + (1 + 0)",
-                "latex": "n + (0 + 1) = n + (1 + 0)",
-                "userInput": "n + (0 + 1) = n + (1 + 0)"
-              },
-              "justification": {
-                "refs": [
-                  "d9f45517-f804-4511-883a-6598f2a67a0e",
-                  "ddeb4b8e-958c-490a-9501-31ef3960d14a"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "bddc1707-2e07-4963-81c4-23237733259b"
-            },
-            {
-              "formula": {
-                "ascii": "1 + 0 = 1",
-                "latex": "1 + 0 = 1",
-                "userInput": "1 + 0 = 1"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "peano_1"
-              },
-              "stepType": "line",
-              "uuid": "05ddaec8-f7bd-4f56-8eca-c468627b89b0"
-            },
-            {
-              "formula": {
-                "ascii": "n + (0 + 1) = n + 1",
-                "latex": "n + (0 + 1) = n + 1",
-                "userInput": "n + (0 + 1) = n + 1"
-              },
-              "justification": {
-                "refs": [
-                  "05ddaec8-f7bd-4f56-8eca-c468627b89b0",
-                  "bddc1707-2e07-4963-81c4-23237733259b"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "eb89206f-9d50-4c8d-a5a4-98d24b877158"
-            },
-            {
-              "formula": {
-                "ascii": "(n + 1) + 0 = n + 1",
-                "latex": "(n + 1) + 0 = n + 1",
-                "userInput": "n + 1 + 0 = n + 1"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "peano_1"
-              },
-              "stepType": "line",
-              "uuid": "9e9b5b1f-be80-4cbd-9881-f5a5ec3876c3"
-            },
-            {
-              "formula": {
-                "ascii": "(n + 1) + 0 = (n + 1) + 0",
-                "latex": "(n + 1) + 0 = (n + 1) + 0",
-                "userInput": "(n + 1) + 0 = n + 1 + 0"
-              },
-              "justification": {
-                "refs": [],
-                "rule": "equality_intro"
-              },
-              "stepType": "line",
-              "uuid": "4d7d71cd-8dde-496b-b0d2-b9908ce61302"
-            },
-            {
-              "formula": {
-                "ascii": "n + 1 = (n + 1) + 0",
-                "latex": "n + 1 = (n + 1) + 0",
-                "userInput": "n + 1 = n + 1 + 0"
-              },
-              "justification": {
-                "refs": [
-                  "9e9b5b1f-be80-4cbd-9881-f5a5ec3876c3",
-                  "4d7d71cd-8dde-496b-b0d2-b9908ce61302"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "26b7b788-70c6-4618-a537-89bb8d8d161b"
-            },
-            {
-              "formula": {
-                "ascii": "n + (0 + 1) = (n + 1) + 0",
-                "latex": "n + (0 + 1) = (n + 1) + 0",
-                "userInput": "n + (0 + 1) = n + 1 + 0"
-              },
-              "justification": {
-                "refs": [
-                  "26b7b788-70c6-4618-a537-89bb8d8d161b",
-                  "eb89206f-9d50-4c8d-a5a4-98d24b877158"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "3115d5d1-1137-4f62-90ea-6792499db754"
-            },
-            {
-              "boxInfo": {
-                "freshVar": "k"
-              },
-              "proof": [
-                {
-                  "formula": {
-                    "ascii": "n + (k + 1) = (n + 1) + k",
-                    "latex": "n + (k + 1) = (n + 1) + k",
-                    "userInput": "n + (k + 1) = (n + 1) + k"
-                  },
-                  "justification": {
-                    "refs": [],
-                    "rule": "assumption"
-                  },
-                  "stepType": "line",
-                  "uuid": "e51e6eb1-5fb7-42ae-8efb-5b3cd033dc0a"
-                },
-                {
-                  "formula": {
-                    "ascii": "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
-                    "latex": "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
-                    "userInput": "n + ((k + 1) + 1) = (n + (k + 1)) + 1"
-                  },
-                  "justification": {
-                    "refs": [],
-                    "rule": "peano_2"
-                  },
-                  "stepType": "line",
-                  "uuid": "8b0a032d-1d75-4f7a-ba8d-f2a343c4d671"
-                },
-                {
-                  "formula": {
-                    "ascii": "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
-                    "latex": "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
-                    "userInput": "n + ((k + 1) + 1) = ((n + 1) + k) + 1"
-                  },
-                  "justification": {
-                    "refs": [
-                      "e51e6eb1-5fb7-42ae-8efb-5b3cd033dc0a",
-                      "8b0a032d-1d75-4f7a-ba8d-f2a343c4d671"
-                    ],
-                    "rule": "equality_elim"
-                  },
-                  "stepType": "line",
-                  "uuid": "c98f923c-48f5-450d-a1ae-2ba1cd117836"
-                },
-                {
-                  "formula": {
-                    "ascii": "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
-                    "latex": "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
-                    "userInput": "(n + 1) + (k + 1) = ((n + 1) + k) + 1"
-                  },
-                  "justification": {
-                    "refs": [],
-                    "rule": "peano_2"
-                  },
-                  "stepType": "line",
-                  "uuid": "aa759b94-a16c-4435-82e3-08d55ab9d178"
-                },
-                {
-                  "formula": {
-                    "ascii": "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
-                    "latex": "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
-                    "userInput": "(n + 1) + (k + 1) = (n + 1) + (k + 1)"
-                  },
-                  "justification": {
-                    "refs": [],
-                    "rule": "equality_intro"
-                  },
-                  "stepType": "line",
-                  "uuid": "a8fe5b26-ba12-4e77-9b61-7dd7bf2d9928"
-                },
-                {
-                  "formula": {
-                    "ascii": "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
-                    "latex": "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
-                    "userInput": "((n + 1) + k) + 1 = (n + 1) + (k + 1)"
-                  },
-                  "justification": {
-                    "refs": [
-                      "aa759b94-a16c-4435-82e3-08d55ab9d178",
-                      "a8fe5b26-ba12-4e77-9b61-7dd7bf2d9928"
-                    ],
-                    "rule": "equality_elim"
-                  },
-                  "stepType": "line",
-                  "uuid": "04613c52-95df-4aea-878a-286253798a7d"
-                },
-                {
-                  "formula": {
-                    "ascii": "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
-                    "latex": "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
-                    "userInput": "n + ((k + 1) + 1) = (n + 1) + (k + 1)"
-                  },
-                  "justification": {
-                    "refs": [
-                      "04613c52-95df-4aea-878a-286253798a7d",
-                      "c98f923c-48f5-450d-a1ae-2ba1cd117836"
-                    ],
-                    "rule": "equality_elim"
-                  },
-                  "stepType": "line",
-                  "uuid": "310f6ea0-f5a7-4dae-a124-f7545fa70e94"
-                }
-              ],
-              "stepType": "box",
-              "uuid": "7d06b0dd-445f-45ed-81fa-36e4e1ae03e9"
-            },
-            {
-              "formula": {
-                "ascii": "forall i (n + (i + 1) = (n + 1) + i)",
-                "latex": "\\forall i (n + (i + 1) = (n + 1) + i)",
-                "userInput": "forall i (n + (i + 1) = (n + 1) + i)"
-              },
-              "justification": {
-                "refs": [
-                  "3115d5d1-1137-4f62-90ea-6792499db754",
-                  "7d06b0dd-445f-45ed-81fa-36e4e1ae03e9"
-                ],
-                "rule": "induction"
-              },
-              "stepType": "line",
-              "uuid": "e1ae5123-2131-4e5c-9804-2eae867ab2d5"
-            },
-            {
-              "formula": {
-                "ascii": "n + (m + 1) = (n + 1) + m",
-                "latex": "n + (m + 1) = (n + 1) + m",
-                "userInput": "n + (m + 1) = (n + 1) + m"
-              },
-              "justification": {
-                "refs": [
-                  "e1ae5123-2131-4e5c-9804-2eae867ab2d5"
-                ],
-                "rule": "forall_elim"
-              },
-              "stepType": "line",
-              "uuid": "45486f7f-5073-47e4-bf47-15864ce7cc84"
-            },
-            {
-              "formula": {
-                "ascii": "m + (n + 1) = (n + 1) + m",
-                "latex": "m + (n + 1) = (n + 1) + m",
-                "userInput": "m + (n + 1) = n + 1 + m"
-              },
-              "justification": {
-                "refs": [
-                  "45486f7f-5073-47e4-bf47-15864ce7cc84",
-                  "2bca103d-3f0f-47a4-858e-27617e8d2bb1"
-                ],
-                "rule": "equality_elim"
-              },
-              "stepType": "line",
-              "uuid": "27e18a9b-91e6-4e4f-93e2-aeeb18a88344"
-            }
-          ],
-          "stepType": "box",
-          "uuid": "de3cf44f-2161-445b-ba16-33d29e8553cb"
+        justification: {
+          refs: ["10", "bi"],
+          rule: "induction",
         },
-        {
-          "formula": {
-            "ascii": "forall b (b + (n + 1) = (n + 1) + b)",
-            "latex": "\\forall b (b + (n + 1) = (n + 1) + b)",
-            "userInput": "forall b (b + (n + 1) = n + 1 + b)"
-          },
-          "justification": {
-            "refs": [
-              "de3cf44f-2161-445b-ba16-33d29e8553cb"
-            ],
-            "rule": "forall_intro"
-          },
-          "stepType": "line",
-          "uuid": "6e1c9628-8d43-4efc-bec5-ec5f930f607e"
-        }
-      ],
-      "stepType": "box",
-      "uuid": "2cae48b6-2a69-4d4a-b3e0-2494998b0012"
-    },
-    {
-      "formula": {
-        "ascii": "forall a forall b (b + a = a + b)",
-        "latex": "\\forall a \\forall b (b + a = a + b)",
-        "userInput": "forall a forall b (b + a = a + b)"
+        stepType: "line",
+        uuid: "100",
       },
-      "justification": {
-        "refs": [
-          "100",
-          "2cae48b6-2a69-4d4a-b3e0-2494998b0012"
+    ],
+  },
+  {
+    id: "reflexivity_plus",
+    title: "b + a = a + b",
+    logicName: "arithmetic",
+    proof: [
+      {
+        formula: {
+          ascii: "0 + 0 = 0 + 0",
+          latex: "0 + 0 = 0 + 0",
+          userInput: "0 + 0 = 0 + 0",
+        },
+        justification: {
+          refs: [],
+          rule: "equality_intro",
+        },
+        stepType: "line",
+        uuid: "10",
+      },
+      {
+        boxInfo: {
+          freshVar: "n",
+        },
+        proof: [
+          {
+            formula: {
+              ascii: "n + 0 = 0 + n",
+              latex: "n + 0 = 0 + n",
+              userInput: "n + 0 = 0 + n",
+            },
+            justification: {
+              refs: [],
+              rule: "assumption",
+            },
+            stepType: "line",
+            uuid: "20",
+          },
+          {
+            formula: {
+              ascii: "n + 0 = n + 0",
+              latex: "n + 0 = n + 0",
+              userInput: "n + 0 = n + 0",
+            },
+            justification: {
+              refs: [],
+              rule: "equality_intro",
+            },
+            stepType: "line",
+            uuid: "22",
+          },
+          {
+            formula: {
+              ascii: "0 + n = n + 0",
+              latex: "0 + n = n + 0",
+              userInput: "0 + n = n + 0",
+            },
+            justification: {
+              refs: ["20", "22"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "24",
+          },
+          {
+            formula: {
+              ascii: "0 + (n + 1) = (0 + n) + 1",
+              latex: "0 + (n + 1) = (0 + n) + 1",
+              userInput: "0 + (n + 1) = (0 + n) + 1",
+            },
+            justification: {
+              refs: [],
+              rule: "peano_2",
+            },
+            stepType: "line",
+            uuid: "25",
+          },
+          {
+            formula: {
+              ascii: "0 + (n + 1) = (n + 0) + 1",
+              latex: "0 + (n + 1) = (n + 0) + 1",
+              userInput: "0 + (n + 1) = (n + 0) + 1",
+            },
+            justification: {
+              refs: ["24", "25"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "30",
+          },
+          {
+            formula: {
+              ascii: "n + 0 = n",
+              latex: "n + 0 = n",
+              userInput: "n + 0 = n",
+            },
+            justification: {
+              refs: [],
+              rule: "peano_1",
+            },
+            stepType: "line",
+            uuid: "32",
+          },
+          {
+            formula: {
+              ascii: "0 + (n + 1) = n + 1",
+              latex: "0 + (n + 1) = n + 1",
+              userInput: "0 + (n + 1) = n + 1",
+            },
+            justification: {
+              refs: ["32", "30"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "34",
+          },
+          {
+            formula: {
+              ascii: "(n + 1) + 0 = n + 1",
+              latex: "(n + 1) + 0 = n + 1",
+              userInput: "(n + 1) + 0 = n + 1",
+            },
+            justification: {
+              refs: [],
+              rule: "peano_1",
+            },
+            stepType: "line",
+            uuid: "36",
+          },
+          {
+            formula: {
+              ascii: "(n + 1) + 0 = (n + 1) + 0",
+              latex: "(n + 1) + 0 = (n + 1) + 0",
+              userInput: "(n + 1) + 0 = (n + 1) + 0",
+            },
+            justification: {
+              refs: [],
+              rule: "equality_intro",
+            },
+            stepType: "line",
+            uuid: "38",
+          },
+          {
+            formula: {
+              ascii: "n + 1 = (n + 1) + 0",
+              latex: "n + 1 = (n + 1) + 0",
+              userInput: "n + 1 = (n + 1) + 0",
+            },
+            justification: {
+              refs: ["36", "38"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "40",
+          },
+          {
+            formula: {
+              ascii: "0 + (n + 1) = (n + 1) + 0",
+              latex: "0 + (n + 1) = (n + 1) + 0",
+              userInput: "0 + (n + 1) = (n + 1) + 0",
+            },
+            justification: {
+              refs: ["40", "34"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "42",
+          },
+          {
+            formula: {
+              ascii: "0 + (n + 1) = 0 + (n + 1)",
+              latex: "0 + (n + 1) = 0 + (n + 1)",
+              userInput: "0 + (n + 1) = 0 + (n + 1)",
+            },
+            justification: {
+              refs: [],
+              rule: "equality_intro",
+            },
+            stepType: "line",
+            uuid: "44",
+          },
+          {
+            formula: {
+              ascii: "(n + 1) + 0 = 0 + (n + 1)",
+              latex: "(n + 1) + 0 = 0 + (n + 1)",
+              userInput: "(n + 1) + 0 = 0 + (n + 1)",
+            },
+            justification: {
+              refs: ["42", "44"],
+              rule: "equality_elim",
+            },
+            stepType: "line",
+            uuid: "60",
+          },
         ],
-        "rule": "induction"
+        stepType: "box",
+        uuid: "bi",
       },
-      "stepType": "line",
-      "uuid": "e44a8f06-2556-4d87-95a4-b250bf6e8120"
-    }
-  ]
-}
+      {
+        formula: {
+          ascii: "forall b (b + 0 = 0 + b)",
+          latex: "\\forall b (b + 0 = 0 + b)",
+          userInput: "forall b (b + 0 = 0 + b)",
+        },
+        justification: {
+          refs: ["10", "bi"],
+          rule: "induction",
+        },
+        stepType: "line",
+        uuid: "100",
+      },
+      {
+        boxInfo: {
+          freshVar: "n",
+        },
+        proof: [
+          {
+            formula: {
+              ascii: "forall b (b + n = n + b)",
+              latex: "\\forall b (b + n = n + b)",
+              userInput: "forall b (b + n = n + b)",
+            },
+            justification: {
+              refs: [],
+              rule: "assumption",
+            },
+            stepType: "line",
+            uuid: "75dc32b3-5a08-454c-b425-69774da76fa5",
+          },
+          {
+            boxInfo: {
+              freshVar: "m",
+            },
+            proof: [
+              {
+                formula: {
+                  ascii: "m + n = n + m",
+                  latex: "m + n = n + m",
+                  userInput: "m + n = n + m",
+                },
+                justification: {
+                  refs: ["75dc32b3-5a08-454c-b425-69774da76fa5"],
+                  rule: "forall_elim",
+                },
+                stepType: "line",
+                uuid: "29bad9bd-0067-43ac-8651-11da3116cc82",
+              },
+              {
+                formula: {
+                  ascii: "m + (n + 1) = (m + n) + 1",
+                  latex: "m + (n + 1) = (m + n) + 1",
+                  userInput: "m + (n + 1) = (m + n) + 1",
+                },
+                justification: {
+                  refs: [],
+                  rule: "peano_2",
+                },
+                stepType: "line",
+                uuid: "4e27dc24-14e7-440f-b958-5f20f30193ff",
+              },
+              {
+                formula: {
+                  ascii: "m + (n + 1) = (n + m) + 1",
+                  latex: "m + (n + 1) = (n + m) + 1",
+                  userInput: "m + (n + 1) = (n + m) + 1",
+                },
+                justification: {
+                  refs: [
+                    "29bad9bd-0067-43ac-8651-11da3116cc82",
+                    "4e27dc24-14e7-440f-b958-5f20f30193ff",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "008812d3-a209-47ca-bfc9-26a4382fb811",
+              },
+              {
+                formula: {
+                  ascii: "n + (m + 1) = (n + m) + 1",
+                  latex: "n + (m + 1) = (n + m) + 1",
+                  userInput: "n + (m + 1) = (n + m) + 1",
+                },
+                justification: {
+                  refs: [],
+                  rule: "peano_2",
+                },
+                stepType: "line",
+                uuid: "61035b9f-b65a-433f-9ba6-68274d4059f0",
+              },
+              {
+                formula: {
+                  ascii: "n + (m + 1) = n + (m + 1)",
+                  latex: "n + (m + 1) = n + (m + 1)",
+                  userInput: "n + (m + 1) = n + (m + 1)",
+                },
+                justification: {
+                  refs: [],
+                  rule: "equality_intro",
+                },
+                stepType: "line",
+                uuid: "32a068e2-69a6-4fdd-8f04-a8191c0f3576",
+              },
+              {
+                formula: {
+                  ascii: "(n + m) + 1 = n + (m + 1)",
+                  latex: "(n + m) + 1 = n + (m + 1)",
+                  userInput: "(n + m) + 1 = n + (m + 1)",
+                },
+                justification: {
+                  refs: [
+                    "61035b9f-b65a-433f-9ba6-68274d4059f0",
+                    "32a068e2-69a6-4fdd-8f04-a8191c0f3576",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "04489472-5a91-405b-ad3f-99fe53951abf",
+              },
+              {
+                formula: {
+                  ascii: "m + (n + 1) = n + (m + 1)",
+                  latex: "m + (n + 1) = n + (m + 1)",
+                  userInput: "m + (n + 1) = n + (m + 1)",
+                },
+                justification: {
+                  refs: [
+                    "04489472-5a91-405b-ad3f-99fe53951abf",
+                    "008812d3-a209-47ca-bfc9-26a4382fb811",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "2bca103d-3f0f-47a4-858e-27617e8d2bb1",
+              },
+              {
+                formula: {
+                  ascii: "1 + 0 = 0 + 1",
+                  latex: "1 + 0 = 0 + 1",
+                  userInput: "1 + 0 = 0 + 1",
+                },
+                justification: {
+                  refs: ["100"],
+                  rule: "forall_elim",
+                },
+                stepType: "line",
+                uuid: "c9bdf795-5830-45a0-884f-81ec07b29f7b",
+              },
+              {
+                formula: {
+                  ascii: "1 + 0 = 1 + 0",
+                  latex: "1 + 0 = 1 + 0",
+                  userInput: "1 + 0 = 1 + 0",
+                },
+                justification: {
+                  refs: [],
+                  rule: "equality_intro",
+                },
+                stepType: "line",
+                uuid: "6ba2076b-5d7b-4bf4-9b2a-4d48dd0f32a7",
+              },
+              {
+                formula: {
+                  ascii: "0 + 1 = 1 + 0",
+                  latex: "0 + 1 = 1 + 0",
+                  userInput: "0 + 1 = 1 + 0",
+                },
+                justification: {
+                  refs: [
+                    "c9bdf795-5830-45a0-884f-81ec07b29f7b",
+                    "6ba2076b-5d7b-4bf4-9b2a-4d48dd0f32a7",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "d9f45517-f804-4511-883a-6598f2a67a0e",
+              },
+              {
+                formula: {
+                  ascii: "n + (0 + 1) = n + (0 + 1)",
+                  latex: "n + (0 + 1) = n + (0 + 1)",
+                  userInput: "n + (0 + 1) = n + (0 + 1)",
+                },
+                justification: {
+                  refs: [],
+                  rule: "equality_intro",
+                },
+                stepType: "line",
+                uuid: "ddeb4b8e-958c-490a-9501-31ef3960d14a",
+              },
+              {
+                formula: {
+                  ascii: "n + (0 + 1) = n + (1 + 0)",
+                  latex: "n + (0 + 1) = n + (1 + 0)",
+                  userInput: "n + (0 + 1) = n + (1 + 0)",
+                },
+                justification: {
+                  refs: [
+                    "d9f45517-f804-4511-883a-6598f2a67a0e",
+                    "ddeb4b8e-958c-490a-9501-31ef3960d14a",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "bddc1707-2e07-4963-81c4-23237733259b",
+              },
+              {
+                formula: {
+                  ascii: "1 + 0 = 1",
+                  latex: "1 + 0 = 1",
+                  userInput: "1 + 0 = 1",
+                },
+                justification: {
+                  refs: [],
+                  rule: "peano_1",
+                },
+                stepType: "line",
+                uuid: "05ddaec8-f7bd-4f56-8eca-c468627b89b0",
+              },
+              {
+                formula: {
+                  ascii: "n + (0 + 1) = n + 1",
+                  latex: "n + (0 + 1) = n + 1",
+                  userInput: "n + (0 + 1) = n + 1",
+                },
+                justification: {
+                  refs: [
+                    "05ddaec8-f7bd-4f56-8eca-c468627b89b0",
+                    "bddc1707-2e07-4963-81c4-23237733259b",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "eb89206f-9d50-4c8d-a5a4-98d24b877158",
+              },
+              {
+                formula: {
+                  ascii: "(n + 1) + 0 = n + 1",
+                  latex: "(n + 1) + 0 = n + 1",
+                  userInput: "n + 1 + 0 = n + 1",
+                },
+                justification: {
+                  refs: [],
+                  rule: "peano_1",
+                },
+                stepType: "line",
+                uuid: "9e9b5b1f-be80-4cbd-9881-f5a5ec3876c3",
+              },
+              {
+                formula: {
+                  ascii: "(n + 1) + 0 = (n + 1) + 0",
+                  latex: "(n + 1) + 0 = (n + 1) + 0",
+                  userInput: "(n + 1) + 0 = n + 1 + 0",
+                },
+                justification: {
+                  refs: [],
+                  rule: "equality_intro",
+                },
+                stepType: "line",
+                uuid: "4d7d71cd-8dde-496b-b0d2-b9908ce61302",
+              },
+              {
+                formula: {
+                  ascii: "n + 1 = (n + 1) + 0",
+                  latex: "n + 1 = (n + 1) + 0",
+                  userInput: "n + 1 = n + 1 + 0",
+                },
+                justification: {
+                  refs: [
+                    "9e9b5b1f-be80-4cbd-9881-f5a5ec3876c3",
+                    "4d7d71cd-8dde-496b-b0d2-b9908ce61302",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "26b7b788-70c6-4618-a537-89bb8d8d161b",
+              },
+              {
+                formula: {
+                  ascii: "n + (0 + 1) = (n + 1) + 0",
+                  latex: "n + (0 + 1) = (n + 1) + 0",
+                  userInput: "n + (0 + 1) = n + 1 + 0",
+                },
+                justification: {
+                  refs: [
+                    "26b7b788-70c6-4618-a537-89bb8d8d161b",
+                    "eb89206f-9d50-4c8d-a5a4-98d24b877158",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "3115d5d1-1137-4f62-90ea-6792499db754",
+              },
+              {
+                boxInfo: {
+                  freshVar: "k",
+                },
+                proof: [
+                  {
+                    formula: {
+                      ascii: "n + (k + 1) = (n + 1) + k",
+                      latex: "n + (k + 1) = (n + 1) + k",
+                      userInput: "n + (k + 1) = (n + 1) + k",
+                    },
+                    justification: {
+                      refs: [],
+                      rule: "assumption",
+                    },
+                    stepType: "line",
+                    uuid: "e51e6eb1-5fb7-42ae-8efb-5b3cd033dc0a",
+                  },
+                  {
+                    formula: {
+                      ascii: "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
+                      latex: "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
+                      userInput: "n + ((k + 1) + 1) = (n + (k + 1)) + 1",
+                    },
+                    justification: {
+                      refs: [],
+                      rule: "peano_2",
+                    },
+                    stepType: "line",
+                    uuid: "8b0a032d-1d75-4f7a-ba8d-f2a343c4d671",
+                  },
+                  {
+                    formula: {
+                      ascii: "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
+                      latex: "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
+                      userInput: "n + ((k + 1) + 1) = ((n + 1) + k) + 1",
+                    },
+                    justification: {
+                      refs: [
+                        "e51e6eb1-5fb7-42ae-8efb-5b3cd033dc0a",
+                        "8b0a032d-1d75-4f7a-ba8d-f2a343c4d671",
+                      ],
+                      rule: "equality_elim",
+                    },
+                    stepType: "line",
+                    uuid: "c98f923c-48f5-450d-a1ae-2ba1cd117836",
+                  },
+                  {
+                    formula: {
+                      ascii: "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
+                      latex: "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
+                      userInput: "(n + 1) + (k + 1) = ((n + 1) + k) + 1",
+                    },
+                    justification: {
+                      refs: [],
+                      rule: "peano_2",
+                    },
+                    stepType: "line",
+                    uuid: "aa759b94-a16c-4435-82e3-08d55ab9d178",
+                  },
+                  {
+                    formula: {
+                      ascii: "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
+                      latex: "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
+                      userInput: "(n + 1) + (k + 1) = (n + 1) + (k + 1)",
+                    },
+                    justification: {
+                      refs: [],
+                      rule: "equality_intro",
+                    },
+                    stepType: "line",
+                    uuid: "a8fe5b26-ba12-4e77-9b61-7dd7bf2d9928",
+                  },
+                  {
+                    formula: {
+                      ascii: "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
+                      latex: "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
+                      userInput: "((n + 1) + k) + 1 = (n + 1) + (k + 1)",
+                    },
+                    justification: {
+                      refs: [
+                        "aa759b94-a16c-4435-82e3-08d55ab9d178",
+                        "a8fe5b26-ba12-4e77-9b61-7dd7bf2d9928",
+                      ],
+                      rule: "equality_elim",
+                    },
+                    stepType: "line",
+                    uuid: "04613c52-95df-4aea-878a-286253798a7d",
+                  },
+                  {
+                    formula: {
+                      ascii: "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
+                      latex: "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
+                      userInput: "n + ((k + 1) + 1) = (n + 1) + (k + 1)",
+                    },
+                    justification: {
+                      refs: [
+                        "04613c52-95df-4aea-878a-286253798a7d",
+                        "c98f923c-48f5-450d-a1ae-2ba1cd117836",
+                      ],
+                      rule: "equality_elim",
+                    },
+                    stepType: "line",
+                    uuid: "310f6ea0-f5a7-4dae-a124-f7545fa70e94",
+                  },
+                ],
+                stepType: "box",
+                uuid: "7d06b0dd-445f-45ed-81fa-36e4e1ae03e9",
+              },
+              {
+                formula: {
+                  ascii: "forall i (n + (i + 1) = (n + 1) + i)",
+                  latex: "\\forall i (n + (i + 1) = (n + 1) + i)",
+                  userInput: "forall i (n + (i + 1) = (n + 1) + i)",
+                },
+                justification: {
+                  refs: [
+                    "3115d5d1-1137-4f62-90ea-6792499db754",
+                    "7d06b0dd-445f-45ed-81fa-36e4e1ae03e9",
+                  ],
+                  rule: "induction",
+                },
+                stepType: "line",
+                uuid: "e1ae5123-2131-4e5c-9804-2eae867ab2d5",
+              },
+              {
+                formula: {
+                  ascii: "n + (m + 1) = (n + 1) + m",
+                  latex: "n + (m + 1) = (n + 1) + m",
+                  userInput: "n + (m + 1) = (n + 1) + m",
+                },
+                justification: {
+                  refs: ["e1ae5123-2131-4e5c-9804-2eae867ab2d5"],
+                  rule: "forall_elim",
+                },
+                stepType: "line",
+                uuid: "45486f7f-5073-47e4-bf47-15864ce7cc84",
+              },
+              {
+                formula: {
+                  ascii: "m + (n + 1) = (n + 1) + m",
+                  latex: "m + (n + 1) = (n + 1) + m",
+                  userInput: "m + (n + 1) = n + 1 + m",
+                },
+                justification: {
+                  refs: [
+                    "45486f7f-5073-47e4-bf47-15864ce7cc84",
+                    "2bca103d-3f0f-47a4-858e-27617e8d2bb1",
+                  ],
+                  rule: "equality_elim",
+                },
+                stepType: "line",
+                uuid: "27e18a9b-91e6-4e4f-93e2-aeeb18a88344",
+              },
+            ],
+            stepType: "box",
+            uuid: "de3cf44f-2161-445b-ba16-33d29e8553cb",
+          },
+          {
+            formula: {
+              ascii: "forall b (b + (n + 1) = (n + 1) + b)",
+              latex: "\\forall b (b + (n + 1) = (n + 1) + b)",
+              userInput: "forall b (b + (n + 1) = n + 1 + b)",
+            },
+            justification: {
+              refs: ["de3cf44f-2161-445b-ba16-33d29e8553cb"],
+              rule: "forall_intro",
+            },
+            stepType: "line",
+            uuid: "6e1c9628-8d43-4efc-bec5-ec5f930f607e",
+          },
+        ],
+        stepType: "box",
+        uuid: "2cae48b6-2a69-4d4a-b3e0-2494998b0012",
+      },
+      {
+        formula: {
+          ascii: "forall a forall b (b + a = a + b)",
+          latex: "\\forall a \\forall b (b + a = a + b)",
+          userInput: "forall a forall b (b + a = a + b)",
+        },
+        justification: {
+          refs: ["100", "2cae48b6-2a69-4d4a-b3e0-2494998b0012"],
+          rule: "induction",
+        },
+        stepType: "line",
+        uuid: "e44a8f06-2556-4d87-95a4-b250bf6e8120",
+      },
+    ],
+  },
 ];
 
 export default examples;

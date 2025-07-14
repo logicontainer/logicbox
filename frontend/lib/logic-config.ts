@@ -1,14 +1,18 @@
 import { LogicName } from "@/types/types";
 import { RulesetName, rulesets } from "./rules";
 
-export const logicConfig: { [K in LogicName]: { rulesets: RulesetName[] }} = {
+export const logicConfig: { [K in LogicName]: { rulesets: RulesetName[] } } = {
   propositionalLogic: {
-    rulesets: ["propositionalLogicRules"]
+    rulesets: ["propositionalLogicRules"],
   },
   predicateLogic: {
-    rulesets: ["propositionalLogicRules", "predicateLogicRules"]
+    rulesets: ["propositionalLogicRules", "predicateLogicRules"],
   },
   arithmetic: {
-    rulesets: ["propositionalLogicRules", "predicateLogicRules", "arithmeticRules"]
-  }
-}
+    rulesets: [
+      "propositionalLogicRules",
+      "predicateLogicRules",
+      "arithmeticRules",
+    ],
+  },
+};

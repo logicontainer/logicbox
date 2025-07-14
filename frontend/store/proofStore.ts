@@ -68,6 +68,6 @@ export const useProofStore = create<ProofStore>()(
       name: "proofs-storage",
       storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
       // partialize: (state) => ({ proofs: state.proofs }),
-    }
-  )
+    },
+  ),
 );

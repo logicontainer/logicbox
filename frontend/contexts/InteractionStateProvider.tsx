@@ -75,11 +75,11 @@ export type InteractionState = { enum: InteractionStateEnum } & (
 export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_LINE; lineUuid: string }
   | { enum: TransitionEnum.DOUBLE_CLICK_LINE; lineUuid: string }
-  | { 
+  | {
       enum: TransitionEnum.HOVER;
-      stepUuid: string | null
-      refIdx: number | null
-      ruleIsHovered: boolean
+      stepUuid: string | null;
+      refIdx: number | null;
+      ruleIsHovered: boolean;
     }
   | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
   | {
@@ -102,10 +102,10 @@ export type Transition = { enum: TransitionEnum } & (
 
 type FuncForStateAndTransition<
   S extends InteractionStateEnum,
-  T extends TransitionEnum
+  T extends TransitionEnum,
 > = (
   state: InteractionState & { enum: S },
-  t: Transition & { enum: T }
+  t: Transition & { enum: T },
 ) => InteractionState;
 
 type Behavior = {
@@ -120,13 +120,13 @@ export interface InteractionStateContextProps {
 }
 // Context Setup
 const InteractionStateContext =
-  React.createContext<InteractionStateContextProps | null>(null)
+  React.createContext<InteractionStateContextProps | null>(null);
 
 export function useInteractionState() {
   const context = React.useContext(InteractionStateContext);
   if (!context) {
     throw new Error(
-      "useInteractionState must be used within a InteractionStateProvider"
+      "useInteractionState must be used within a InteractionStateProvider",
     );
   }
   return context;
@@ -180,12 +180,12 @@ export function InteractionStateProvider({
     const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
     if (!currLineProofStepDetails)
       throw new Error(
-        `Updating ref, but the line we are editing ${uuid} doesn't have step details`
+        `Updating ref, but the line we are editing ${uuid} doesn't have step details`,
       );
 
     if (currLineProofStepDetails.proofStep.stepType !== "line")
       throw new Error(
-        `Updating ref, but the line we are editing doesn't have stepType 'line', has ${currLineProofStepDetails.proofStep.stepType}`
+        `Updating ref, but the line we are editing doesn't have stepType 'line', has ${currLineProofStepDetails.proofStep.stepType}`,
       );
 
     const currLineProofStep =
@@ -196,11 +196,11 @@ export function InteractionStateProvider({
   const updateRuleAndValidate = (lineUuid: string, newRule: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
-    const allRules = rulesets.flatMap(s => s.rules)
+    const allRules = rulesets.flatMap((s) => s.rules);
     const ruleSetEntry = allRules.find((r) => r.ruleName === newRule);
     if (ruleSetEntry === undefined)
       throw new Error(
-        `Updating rule, but could not find rule with name ${newRule} in rulesets ${rulesets}`
+        `Updating rule, but could not find rule with name ${newRule} in rulesets ${rulesets}`,
       );
 
     const newNumPremises = ruleSetEntry.numPremises;
@@ -208,7 +208,7 @@ export function InteractionStateProvider({
     let newRefs = currLineProofStep.justification.refs;
     if (newNumPremises > newRefs.length) {
       newRefs = newRefs.concat(
-        Array(newNumPremises - newRefs.length).fill("?")
+        Array(newNumPremises - newRefs.length).fill("?"),
       );
     } else {
       newRefs = newRefs.slice(0, newNumPremises);
@@ -223,12 +223,16 @@ export function InteractionStateProvider({
     };
 
     enqueueCommand(
-      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
+      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
-    enqueueCommand(Validate.VALIDATE)
+    enqueueCommand(Validate.VALIDATE);
   };
 
-  const updateRefAndValidate = (lineUuid: string, refIdx: number, newRefUuid: string) => {
+  const updateRefAndValidate = (
+    lineUuid: string,
+    refIdx: number,
+    newRefUuid: string,
+  ) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
     const newRefs = currLineProofStep.justification.refs.map((ref, i) => {
@@ -248,12 +252,15 @@ export function InteractionStateProvider({
     };
 
     enqueueCommand(
-      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
+      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
-    enqueueCommand(Validate.VALIDATE)
+    enqueueCommand(Validate.VALIDATE);
   };
 
-  const updateFormulaInProofAndValidate = (lineUuid: string, formula: string) => {
+  const updateFormulaInProofAndValidate = (
+    lineUuid: string,
+    formula: string,
+  ) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
     // if nothing change, don't add to history
@@ -270,9 +277,9 @@ export function InteractionStateProvider({
     };
 
     enqueueCommand(
-      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep)
+      new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
-    enqueueCommand(Validate.VALIDATE)
+    enqueueCommand(Validate.VALIDATE);
   };
 
   const startEditingFormula = (lineUuid: string) => {
@@ -284,7 +291,9 @@ export function InteractionStateProvider({
     } satisfies InteractionState;
   };
 
-  const fullyIdle = (): InteractionState & { enum: InteractionStateEnum.IDLE } => {
+  const fullyIdle = (): InteractionState & {
+    enum: InteractionStateEnum.IDLE;
+  } => {
     return {
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
@@ -296,13 +305,21 @@ export function InteractionStateProvider({
 
   const handleClickStepInIdle = (
     state: InteractionState & { enum: InteractionStateEnum.IDLE },
-    clickedUuid: string
+    clickedUuid: string,
   ): InteractionState => {
     if (!state.sticky) {
-      return { ...fullyIdle(), selectedProofStepUuid: clickedUuid, sticky: true };
+      return {
+        ...fullyIdle(),
+        selectedProofStepUuid: clickedUuid,
+        sticky: true,
+      };
     }
 
-    return { ...fullyIdle(), selectedProofStepUuid: clickedUuid, sticky: clickedUuid !== state.selectedProofStepUuid };
+    return {
+      ...fullyIdle(),
+      selectedProofStepUuid: clickedUuid,
+      sticky: clickedUuid !== state.selectedProofStepUuid,
+    };
   };
 
   const {
@@ -346,8 +363,8 @@ export function InteractionStateProvider({
           selectedProofStepUuid: lineUuid,
           sticky: false,
           hoveredRefIdx: refIdx,
-          ruleIsHovered
-        }
+          ruleIsHovered,
+        };
       },
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
       [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
@@ -463,12 +480,12 @@ export function InteractionStateProvider({
 
       [CLICK_LINE]: (
         { refIdx, lineUuid: editedLineUuid },
-        { lineUuid: clickedLineUuid }
+        { lineUuid: clickedLineUuid },
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
           updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
         }
-        return { ...fullyIdle(), selectedProofStepUuid: editedLineUuid }
+        return { ...fullyIdle(), selectedProofStepUuid: editedLineUuid };
       },
 
       [HOVER]: doNothing,
@@ -476,7 +493,7 @@ export function InteractionStateProvider({
 
       [CLICK_BOX]: (
         { refIdx, lineUuid: editedLineUuid },
-        { boxUuid: clickedBoxUuid }
+        { boxUuid: clickedBoxUuid },
       ) => {
         updateRefAndValidate(editedLineUuid, refIdx, clickedBoxUuid);
         return fullyIdle();
@@ -484,7 +501,7 @@ export function InteractionStateProvider({
 
       [CLICK_RULE]: (
         { refIdx, lineUuid: editedLineUuid },
-        { lineUuid: clickedLineUuid }
+        { lineUuid: clickedLineUuid },
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
           updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
@@ -531,8 +548,14 @@ export function InteractionStateProvider({
 
       [HOVER]: doNothing,
 
-      [CLICK_LINE]: (_, { lineUuid }) => ({ ...fullyIdle(), selectedProofStepUuid: lineUuid }),
-      [CLICK_BOX]: (_, { boxUuid }) => ({ ...fullyIdle(), selectedProofStepUuid: boxUuid }),
+      [CLICK_LINE]: (_, { lineUuid }) => ({
+        ...fullyIdle(),
+        selectedProofStepUuid: lineUuid,
+      }),
+      [CLICK_BOX]: (_, { boxUuid }) => ({
+        ...fullyIdle(),
+        selectedProofStepUuid: boxUuid,
+      }),
 
       [CLICK_RULE]: (_, { lineUuid }) => {
         return { enum: EDITING_RULE, lineUuid };
@@ -560,7 +583,7 @@ export function InteractionStateProvider({
           case ContextMenuOptions.EDIT_FORMULA:
             if (state.isBox) {
               throw new Error(
-                "Editing a box is not implemented yet. Why are you here?"
+                "Editing a box is not implemented yet. Why are you here?",
               );
             }
 
@@ -574,19 +597,22 @@ export function InteractionStateProvider({
 
           case ContextMenuOptions.EDIT_FRESH_VAR:
             if (!state.isBox) {
-              throw new Error("Editing fresh var of line. Why are you here?")
+              throw new Error("Editing fresh var of line. Why are you here?");
             }
 
-            let fv = prompt("Enter fresh var")
-            if (fv === "") fv = null
-            fv && enqueueCommand(new SetFreshVarOnBoxCommand(state.proofStepUuid, fv))
-            fv && enqueueCommand(Validate.VALIDATE)
-            
-            return fullyIdle()
+            let fv = prompt("Enter fresh var");
+            if (fv === "") fv = null;
+            fv &&
+              enqueueCommand(
+                new SetFreshVarOnBoxCommand(state.proofStepUuid, fv),
+              );
+            fv && enqueueCommand(Validate.VALIDATE);
+
+            return fullyIdle();
 
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
-            enqueueCommand(Validate.VALIDATE)
+            enqueueCommand(Validate.VALIDATE);
             return fullyIdle();
 
           case ContextMenuOptions.LINE_ABOVE:
@@ -596,10 +622,10 @@ export function InteractionStateProvider({
               new AddLineCommand(
                 state.proofStepUuid,
                 option === ContextMenuOptions.LINE_ABOVE,
-                newLineUuid
-              )
+                newLineUuid,
+              ),
             );
-            enqueueCommand(Validate.VALIDATE)
+            enqueueCommand(Validate.VALIDATE);
             return {
               enum: EDITING_FORMULA,
               lineUuid: newLineUuid,
@@ -614,10 +640,10 @@ export function InteractionStateProvider({
               new AddBoxedLineCommand(
                 state.proofStepUuid,
                 option === ContextMenuOptions.BOX_ABOVE,
-                newLineUuid
-              )
+                newLineUuid,
+              ),
             );
-            enqueueCommand(Validate.VALIDATE)
+            enqueueCommand(Validate.VALIDATE);
             return {
               enum: EDITING_FORMULA,
               lineUuid: newLineUuid,
@@ -644,7 +670,7 @@ export function InteractionStateProvider({
             InteractionStateEnum[prevState.enum]
           } and transition ${TransitionEnum[transition.enum]}`,
           prevState,
-          transition
+          transition,
         );
         return prevState;
       } else {

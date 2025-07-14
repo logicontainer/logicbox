@@ -23,7 +23,7 @@ export function ProofStepWrapper({
         !isBox &&
           highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
           "bg-blue-200",
-        !isBox && highlight === StepHighlight.REFERRED && "bg-blue-200"
+        !isBox && highlight === StepHighlight.REFERRED && "bg-blue-200",
       )}
     >
       {children}

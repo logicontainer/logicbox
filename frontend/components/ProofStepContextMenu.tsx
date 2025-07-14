@@ -81,7 +81,7 @@ export function ProofStepContextMenu() {
         "z-50 bg-white min-w-48 rounded-md shadow-md shadow-slate-400 overflow-hidden"
       }
       style={{
-        position: 'fixed',
+        position: "fixed",
         left: x,
         top: y,
       }}

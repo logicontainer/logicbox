@@ -31,7 +31,7 @@ export class AddLineCommand extends Command {
   execute(proofContext: ProofContextProps): void {
     console.log(
       "Execute AddLineCommand near line with uuid " +
-        this.position.nearProofStepWithUuid
+        this.position.nearProofStepWithUuid,
     );
     proofContext.addLine(
       {
@@ -47,13 +47,13 @@ export class AddLineCommand extends Command {
           refs: [],
         },
       },
-      this.position
+      this.position,
     );
   }
 
   undo(proofContext: ProofContextProps): void {
     console.log(
-      "Undoing AddLineCommand near line with uuid " + this.newLineUuid
+      "Undoing AddLineCommand near line with uuid " + this.newLineUuid,
     );
     proofContext.removeLine(this.newLineUuid);
   }
@@ -72,7 +72,7 @@ export class AddBoxedLineCommand extends Command {
     uuid: string,
     prepend: boolean = false,
     newLineUuid?: string,
-    newBoxUuid?: string
+    newBoxUuid?: string,
   ) {
     super();
     this.newBoxUuid = newBoxUuid ?? uuidv4();
@@ -86,14 +86,14 @@ export class AddBoxedLineCommand extends Command {
   execute(proofContext: ProofContextProps): void {
     console.log(
       "Execute AddBoxLineCommand near line with uuid " +
-        this.position.nearProofStepWithUuid
+        this.position.nearProofStepWithUuid,
     );
     proofContext.addLine(
       {
         stepType: "box",
         uuid: this.newBoxUuid,
         boxInfo: {
-          freshVar: null
+          freshVar: null,
         },
         proof: [
           {
@@ -111,13 +111,13 @@ export class AddBoxedLineCommand extends Command {
           },
         ],
       },
-      this.position
+      this.position,
     );
   }
 
   undo(proofContext: ProofContextProps): void {
     console.log(
-      "Undoing AddBoxLineCommand near line with uuid " + this.newBoxUuid
+      "Undoing AddBoxLineCommand near line with uuid " + this.newBoxUuid,
     );
     proofContext.removeLine(this.newBoxUuid);
   }
@@ -145,13 +145,13 @@ export class RemoveProofStepCommand extends Command {
 
   execute(proofContext: ProofContextProps): void {
     console.log(
-      "Execute RemoveProofStepCommand for line " + this.proofStepUuid
+      "Execute RemoveProofStepCommand for line " + this.proofStepUuid,
     );
     const { proofStepDetails: nearestDeletableProofStep, cascadeCount } =
       proofContext.getNearestDeletableProofStep(this.proofStepUuid);
     if (nearestDeletableProofStep == null) {
       throw new Error(
-        "This line cannot be deleted because it is the only line in the proof"
+        "This line cannot be deleted because it is the only line in the proof",
       );
     }
     this.proofStepUuid = nearestDeletableProofStep.proofStep.uuid;
@@ -161,7 +161,7 @@ export class RemoveProofStepCommand extends Command {
     if (cascadeCount > 0) {
       // TODO: Make a real dialog to confirm deletion
       window.alert(
-        `This action will cascade and delete ${cascadeCount} surrounding box(es) as well.`
+        `This action will cascade and delete ${cascadeCount} surrounding box(es) as well.`,
       );
     }
 
@@ -170,7 +170,7 @@ export class RemoveProofStepCommand extends Command {
 
   undo(proofContext: ProofContextProps): void {
     console.log(
-      "Undoing RemoveProofStepCommand for line " + this.proofStepUuid
+      "Undoing RemoveProofStepCommand for line " + this.proofStepUuid,
     );
 
     if (this.proofStep == null) {
@@ -197,11 +197,11 @@ export class UpdateLineProofStepCommand extends Command {
 
   execute(proofContext: ProofContextProps): void {
     console.log(
-      "Execute UpdateProofStepCommand for line " + this.proofStepUuid
+      "Execute UpdateProofStepCommand for line " + this.proofStepUuid,
     );
 
     const proofStepDetails = proofContext.getProofStepDetails(
-      this.proofStepUuid
+      this.proofStepUuid,
     );
 
     if (proofStepDetails == null) {
@@ -219,12 +219,12 @@ export class UpdateLineProofStepCommand extends Command {
 
   undo(proofContext: ProofContextProps): void {
     console.log(
-      "Undoing UpdateProofStepCommand for line " + this.proofStepUuid
+      "Undoing UpdateProofStepCommand for line " + this.proofStepUuid,
     );
 
     if (this.prevProofStep == null) {
       throw new Error(
-        "Cannot undo UpdateProofStepCommand without prevProofStep"
+        "Cannot undo UpdateProofStepCommand without prevProofStep",
       );
     }
 
@@ -236,22 +236,22 @@ export class UpdateLineProofStepCommand extends Command {
 }
 
 export class SetFreshVarOnBoxCommand extends Command {
-  private boxUuid: string
-  private freshVar: string
-  private prevFreshVar: string | null = null
+  private boxUuid: string;
+  private freshVar: string;
+  private prevFreshVar: string | null = null;
 
   constructor(uuid: string, freshVar: string) {
     super();
-    this.boxUuid = uuid
-    this.freshVar = freshVar
+    this.boxUuid = uuid;
+    this.freshVar = freshVar;
   }
 
   execute(proofContext: ProofContextProps): void {
-    const details = proofContext.getProofStepDetails(this.boxUuid)
+    const details = proofContext.getProofStepDetails(this.boxUuid);
     if (details?.proofStep.stepType !== "box") {
-      throw new Error("Cannot set freshVar on a step that is not a box")
+      throw new Error("Cannot set freshVar on a step that is not a box");
     }
-    this.prevFreshVar = details.proofStep.stepType
+    this.prevFreshVar = details.proofStep.stepType;
     proofContext.updateFreshVarOnBox(this.boxUuid, this.freshVar);
   }
 
