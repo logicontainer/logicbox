@@ -48,15 +48,17 @@ export default function UploadProofButton() {
     }
     const uploadedProof = jsonContent as ProofWithMetadata;
 
-    const existingProofsWithId = proofs.find(proof => proof.id == uploadedProof.id);
+    const postfixProofId = (proofId: string) => {
+      const existingProofsWithId = proofs.find(proof => proof.id == proofId);
 
-    if (existingProofsWithId) {
-      uploadedProof.id = existingProofsWithId.id + "-copy";
+      if (existingProofsWithId) {
+        return postfixProofId(proofId + "_copy");
+      } else {
+        return proofId;
+      }
     }
-    // TODO: Ensure that the new id is not in the list recursively
-
+    uploadedProof.id = postfixProofId(uploadedProof.id);
     addProofToStore(uploadedProof);
-
     setOpen(false);
   }
 
