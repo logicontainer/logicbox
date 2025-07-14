@@ -38,7 +38,7 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     return Promise.resolve()
       .then(async () => {
         console.log("Calling server");
-        return fetch("http://localhost:8080/verify", {
+        return fetch("https://logicbox.felixberg.dev/verify", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
