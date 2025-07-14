@@ -45,6 +45,7 @@ export type Proof = ProofStep[];
 export type ProofMetadata = {
   id: string;
   title: string;
+  createdAt: string;
   logicName: LogicName;
 };
 

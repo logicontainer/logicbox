@@ -115,6 +115,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "2",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "Some example",
     logicName: "propositionalLogic",
     proof: [
@@ -275,6 +276,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "3",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "Example 3",
     logicName: "propositionalLogic",
     proof: [
@@ -486,6 +488,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "4",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "Example 4",
     logicName: "propositionalLogic",
     proof: [
@@ -654,6 +657,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "5",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "Another proof",
     logicName: "propositionalLogic",
     proof: [
@@ -864,6 +868,7 @@ const examples: ProofWithMetadata[] = [
   {
     id: "6",
     title: "Chunky Example",
+    createdAt: "2025-06-06T00:00:00.000Z",
     logicName: "propositionalLogic",
     proof: [
       {
@@ -1380,6 +1385,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "7",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "Deeply nested example",
     logicName: "propositionalLogic",
     proof: [
@@ -1548,6 +1554,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "some-id",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "predicate logic proof",
     logicName: "predicateLogic",
     proof: [
@@ -1661,6 +1668,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "a05dabc8-0a46-4501-9941-8fa47c8cf482",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "forall/exists duality 1",
     logicName: "predicateLogic",
     proof: [
@@ -1814,6 +1822,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "5d7fb9e7-db81-452a-a784-71970cacd1a5",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "forall/exists duality 2",
     logicName: "predicateLogic",
     proof: [
@@ -1934,6 +1943,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "17bbbe22-8d24-4163-be29-4afecd21d333",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "forall/exists duality 3",
     logicName: "predicateLogic",
     proof: [
@@ -2038,6 +2048,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "2d7beef5-1983-466a-935a-bfecf9d217c0",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "forall/exists duality 4",
     logicName: "predicateLogic",
     proof: [
@@ -2158,6 +2169,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "c6d62cf0-dc60-4817-ae0b-6670872cc003",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "Drinker paradox",
     logicName: "predicateLogic",
     proof: [
@@ -2540,6 +2552,7 @@ const examples: ProofWithMetadata[] = [
   },
   {
     id: "arith_1",
+    createdAt: "2025-06-06T00:00:00.000Z",
     title: "k + 0 = 0 + k",
     logicName: "arithmetic",
     proof: [
@@ -2753,6 +2766,7 @@ const examples: ProofWithMetadata[] = [
     id: "reflexivity_plus",
     title: "b + a = a + b",
     logicName: "arithmetic",
+    createdAt: "2025-06-06T00:00:00.000Z",
     proof: [
       {
         formula: {

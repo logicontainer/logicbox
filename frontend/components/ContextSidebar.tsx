@@ -84,7 +84,7 @@ export default function ContextSidebar() {
             {errors.map((error) => {
               return (
                 <div
-                  key={error.uuid + error.violationType + JSON.stringify(error)}
+                  key={error.uuid + error.errorType + JSON.stringify(error)}
                 >
                   <div className="py-3">
                     <DiagnosticMessage diagnostic={error} />
