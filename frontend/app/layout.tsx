@@ -6,6 +6,8 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
 
+const fs = require('fs').promises;
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
