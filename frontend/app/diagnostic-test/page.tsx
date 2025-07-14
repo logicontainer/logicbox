@@ -1,30 +1,27 @@
 "use client";
 
 import { DiagnosticMessage } from "@/components/Diagnostics"
-import { ProofProvider, useProof } from "@/contexts/ProofProvider";
-import { ServerProvider } from "@/contexts/ServerProvider";
-import { Diagnostic, ProofStep, Violation } from "@/types/types"
-import { Diagnostics } from "next/dist/build/swc/types";
+import { useProof } from "@/contexts/ProofProvider";
+import { ProofStep, Diagnostic } from "@/types/types"
 import React from "react";
 
 const violations: Diagnostic[] = [
-  {uuid: "", violationType: "missingFormula", violation: { violationType: "missingFormula",   } },
-  {uuid: "", violationType: "missingRule", violation: { violationType: "missingRule",   } },
-  {uuid: "", violationType: "missingDetailInReference", violation: { violationType: "missingDetailInReference",  "expl":"Reference lacks required details","refIdx":1 } },
-  {uuid: "", violationType: "wrongNumberOfReferences", violation: { violationType: "wrongNumberOfReferences",  "actual":1,"exp":2, } },
-  {uuid: "", violationType: "referenceShouldBeBox", violation: { violationType: "referenceShouldBeBox", "refIdx":1 } },
-  {uuid: "", violationType: "referenceShouldBeLine", violation: { violationType: "referenceShouldBeLine", "refIdx":2 } },
-  {uuid: "", violationType: "referenceDoesntMatchRule", violation: { violationType: "referenceDoesntMatchRule",  "expl":"must be a disjunction (or)","refIdx":0 } },
-  {uuid: "", violationType: "referencesMismatch", violation: { violationType: "referencesMismatch",  "expl":"last lines of boxes must match","refs":[1,2] } },
-  {uuid: "", violationType: "formulaDoesntMatchReference", violation: { violationType: "formulaDoesntMatchReference",  "expl":"must match right-hand side of implication","refIdx":2 } },
-  {uuid: "", violationType: "formulaDoesntMatchRule", violation: { violationType: "formulaDoesntMatchRule",  "expl":"must be a negation" } },
-  {uuid: "", violationType: "miscellaneousViolation", violation: { violationType: "miscellaneousViolation",  "expl":"Unknown validation error occurred" } },
-  {uuid: "", violationType: "stepNotFound", violation: { violationType: "stepNotFound",  "expl":"The referenced step doesn't exist","stepId":"step5" } },
-  {uuid: "", violationType: "referenceIdNotFound", violation: { violationType: "referenceIdNotFound",  "expl":"Reference points to non-existent step","refId":"nonexistent","stepId":"step7","refIdx":1 } },
-  {uuid: "", violationType: "malformedReference", violation: { violationType: "malformedReference",  "expl":"malformed reference","refId":"bad$refIdx","stepId":"step9","refIdx":0 } },
-  {uuid: "", violationType: "referenceToLaterStep", violation: { violationType: "referenceToLaterStep",  "refId":"step4","refIdx":1,"stepId":"step2" } },
-  {uuid: "", violationType: "scopeViolation", violation: { violationType: "scopeViolation",  "refId":"box2.step1","refIdx":2,"refScope":"6c132815-cf2a-4a8f-b3b0-034bd0c6e09b","stepId":"box1.step3","stepScope":"root" } },
-  {uuid: "", violationType: "referenceToUnclosedBox", violation: { violationType: "referenceToUnclosedBox",  "boxId":"box3","refIdx":0,"stepId":"step10" } },
+  { uuid: "0",  errorType: "MissingFormula" }, 
+  { uuid: "1",  errorType: "MissingRule" }, 
+  { uuid: "2",  errorType: "MissingRef", refIdx: 0 }, 
+  { uuid: "3",  errorType: "ReferenceOutOfScope", refIdx: 1 }, 
+  { uuid: "4",  errorType: "ReferenceToLaterStep", refIdx: 0 }, 
+  { uuid: "5",  errorType: "ReferenceToUnclosedBox", refIdx: 1  }, 
+  { uuid: "6",  errorType: "ReferenceBoxMissingFreshVar", refIdx: 3  }, 
+  { uuid: "7",  errorType: "ReferenceShouldBeBox", refIdx: 2  }, 
+  { uuid: "8",  errorType: "ReferenceShouldBeLine", refIdx: 0  },
+  { uuid: "9",  errorType: "WrongNumberOfReferences", expected: 2, actual: 3 }, 
+  { uuid: "10", errorType: "ShapeMismatch", rulePosition: "premise 0", expected: "\\phi \\rightarrow \\psi", actual: "p \\land q" }, 
+  { uuid: "11", errorType: "Ambiguous", subject: "\\phi", entries: [ 
+    { rulePosition: "conclusion", meta: "\\phi", actual: "Q(x)" },
+    { rulePosition: "premise 0", meta: "\\phi[x_0/x]", actual: "P(a)" },
+  ] }, 
+  { uuid: "12", errorType: "Miscellaneous", rulePosition: "premise 1", explanation: "something wen't wrong here" }
 ]
 
 const proofExample: ProofStep[] = [

@@ -1,11 +1,9 @@
-import { Diagnostic, Violation } from "@/types/types";
+import { Diagnostic } from "@/types/types";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered, refIsBeingHovered } from "@/lib/state-helpers";
 import { useInteractionState } from "@/contexts/InteractionStateProvider";
-
-type ViolationWithUuid = Violation & { uuid: string }
 
 function prettifyLatex(math: string, tag?: string, highlight?: string) {
   let content = math + (tag !== undefined ? `\\quad \\quad (${tag})` : "")
@@ -43,12 +41,12 @@ function refIdxToString(refIdx: number, capital: boolean = true): string {
 }
 
 function MissingFormulaDiagnostic({
-}: ViolationWithUuid & { violationType: "missingFormula" }) {
+}: Diagnostic & { violationType: "missingFormula" }) {
   return <div>Formula is malformed/not specified</div>;
 }
 
 function MissingRuleDiagnostic({
-}: ViolationWithUuid & { violationType: "missingRule" }) {
+}: Diagnostic & { violationType: "missingRule" }) {
   return <div>Missing rule</div>;
 }
 
@@ -56,7 +54,7 @@ function MissingDetailInReferenceDiagnostic({
   uuid,
   refIdx,
   expl,
-}: ViolationWithUuid & { 
+}: Diagnostic & { 
   violationType: "missingDetailInReference",
 }) {
   const refLatex = useDiagnostics().getRefLatex(uuid, refIdx)
@@ -72,7 +70,7 @@ function MissingDetailInReferenceDiagnostic({
 function WrongNumberOfReferencesDiagnostic({
   exp,
   actual,
-}: ViolationWithUuid & { 
+}: Diagnostic & { 
   violationType: "wrongNumberOfReferences",
 }) {
   return <div>Expected {exp} references but found {actual}</div>;
@@ -81,7 +79,7 @@ function WrongNumberOfReferencesDiagnostic({
 function ReferenceShouldBeBoxDiagnostic({
   uuid,
   refIdx: ref,
-}: ViolationWithUuid & { violationType: "referenceShouldBeBox" }) {
+}: Diagnostic & { violationType: "referenceShouldBeBox" }) {
   const refLineNumber = useDiagnostics().getRefString(uuid, ref)
   return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a box.</div>;
 }
@@ -89,7 +87,7 @@ function ReferenceShouldBeBoxDiagnostic({
 function ReferenceShouldBeLineDiagnostic({
   uuid,
   refIdx: ref,
-}: ViolationWithUuid & { violationType: "referenceShouldBeLine" }) {
+}: Diagnostic & { violationType: "referenceShouldBeLine" }) {
   const refLineNumber = useDiagnostics().getRefString(uuid, ref)
   return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a line.</div>;
 }
@@ -98,7 +96,7 @@ function ReferenceDoesntMatchRuleDiagnostic({
   uuid,
   refIdx: ref,
   expl,
-}: ViolationWithUuid & { violationType: "referenceDoesntMatchRule" }) {
+}: Diagnostic & { violationType: "referenceDoesntMatchRule" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, ref)
   const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [ref], false, "red")
   const { interactionState } = useInteractionState()
@@ -118,7 +116,7 @@ function ReferencesMismatchDiagnostic({
   uuid,
   refs,
   expl,
-}: ViolationWithUuid & { violationType: "referencesMismatch" }) {
+}: Diagnostic & { violationType: "referencesMismatch" }) {
   const { getRefLatexWithTag } = useDiagnostics()
 
   const math = (() => {
@@ -145,7 +143,7 @@ function FormulaDoesntMatchReferenceDiagnostic({
   uuid,
   refIdx: refs,
   expl,
-}: ViolationWithUuid & { violationType: "formulaDoesntMatchReference" }) {
+}: Diagnostic & { violationType: "formulaDoesntMatchReference" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refs)
   const { interactionState } = useInteractionState()
@@ -166,7 +164,7 @@ function FormulaDoesntMatchReferenceDiagnostic({
 function FormulaDoesntMatchRuleDiagnostic({
   uuid,
   expl,
-}: ViolationWithUuid & { violationType: "formulaDoesntMatchRule" }) {
+}: Diagnostic & { violationType: "formulaDoesntMatchRule" }) {
   const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
   const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [], true, "red")
   const { interactionState } = useInteractionState()
@@ -183,7 +181,7 @@ function FormulaDoesntMatchRuleDiagnostic({
 
 function MiscellaneousViolationDiagnostic({
   expl,
-}: ViolationWithUuid & { violationType: "miscellaneousViolation" }) {
+}: Diagnostic & { violationType: "miscellaneousViolation" }) {
   return <div>
     <ServerMsg>{expl}</ServerMsg>
   </div>;
@@ -192,7 +190,7 @@ function MiscellaneousViolationDiagnostic({
 function StepNotFoundDiagnostic({
   stepId,
   expl,
-}: ViolationWithUuid & { violationType: "stepNotFound" }) {
+}: Diagnostic & { violationType: "stepNotFound" }) {
   return <div>
     Step {stepId} not found.
     <br/>
@@ -203,7 +201,7 @@ function StepNotFoundDiagnostic({
 function ReferenceIdNotFoundDiagnostic({
   refIdx: whichRef,
   expl,
-}: ViolationWithUuid & { violationType: "referenceIdNotFound" }) {
+}: Diagnostic & { violationType: "referenceIdNotFound" }) {
   return <div>
     {refIdxToString(whichRef)} was not found
     <br/>
@@ -214,7 +212,7 @@ function ReferenceIdNotFoundDiagnostic({
 function MalformedReferenceDiagnostic({
   refIdx: whichRef,
   expl,
-}: ViolationWithUuid & { violationType: "malformedReference" }) {
+}: Diagnostic & { violationType: "malformedReference" }) {
   return <div>
     {refIdxToString(whichRef)} is malformed
     <br/>
@@ -225,7 +223,7 @@ function MalformedReferenceDiagnostic({
 function ReferenceToLaterStepDiagnostic({
   uuid,
   refIdx,
-}: ViolationWithUuid & { violationType: "referenceToLaterStep" }) {
+}: Diagnostic & { violationType: "referenceToLaterStep" }) {
   const refString = useDiagnostics().getRefString(uuid, refIdx)
   return (
     <div>
@@ -239,7 +237,7 @@ function ScopeViolationDiagnostic({
   stepScope,
   refIdx,
   refScope,
-}: ViolationWithUuid & { violationType: "scopeViolation" }) {
+}: Diagnostic & { violationType: "scopeViolation" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refIdx)
   const dc = useDiagnostics()
   const stepScopeLatex = stepScope === "root" ? "\\text{(root scope)}" : dc.getStepAsLatexWithTag(stepScope)
@@ -261,7 +259,7 @@ function ScopeViolationDiagnostic({
 function ReferenceToUnclosedBoxDiagnostic({
   uuid,
   refIdx,
-}: ViolationWithUuid & { violationType: "referenceToUnclosedBox" }) {
+}: Diagnostic & { violationType: "referenceToUnclosedBox" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refIdx)
   const { interactionState } = useInteractionState()
   const refIsHovered = refIsBeingHovered(uuid, refIdx, interactionState)
@@ -280,7 +278,7 @@ export function DiagnosticMessage({ diagnostic }: {
   const v = { 
     uuid: diagnostic.uuid,
     ...diagnostic.violation
-  } as (ViolationWithUuid | undefined) // TODO: better checking
+  } as (Diagnostic | undefined) // TODO: better checking
 
   if (!v)
     return "Something went wrong when rendering violation"

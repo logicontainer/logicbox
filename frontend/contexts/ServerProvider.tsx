@@ -1,6 +1,6 @@
 "use client";
 
-import { Diagnostic, ValidationRequest, ValidationResponse, Violation } from "@/types/types";
+import { Diagnostic, ValidationRequest, ValidationResponse } from "@/types/types";
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
@@ -22,10 +22,6 @@ export function useServer() {
   return context;
 }
 
-function fixDiagnostic(d: Diagnostic) {
-  return { ...d, violation: { ...d.violation, violationType: d.violationType } as Violation}
-}
-
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
@@ -42,7 +38,7 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     return Promise.resolve()
       .then(async () => {
         console.log("Calling server");
-        return fetch("https://logicbox.felixberg.dev/verify", {
+        return fetch("http://localhost:8080/verify", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -58,7 +54,7 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
       })
       .then((serverResponse: ValidationResponse) => {
         console.log("Server response", serverResponse);
-        setProofDiagnostics(serverResponse.diagnostics.map(fixDiagnostic));
+        setProofDiagnostics(serverResponse.diagnostics);
         setProofContent(serverResponse.proof);
         return true;
       })

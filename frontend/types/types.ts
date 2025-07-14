@@ -73,32 +73,27 @@ export type ProofStepPosition = {
 
 type UUID = string;
 
-export type Violation =
-  | { violationType: "missingFormula" }
-  | { violationType: "missingRule" }
-  | { violationType: "missingDetailInReference"; refIdx: number; expl: string }
-  | { violationType: "wrongNumberOfReferences"; exp: number; actual: number; }
-  | { violationType: "referenceShouldBeBox"; refIdx: number; }
-  | { violationType: "referenceShouldBeLine"; refIdx: number; }
-  | { violationType: "referenceDoesntMatchRule"; refIdx: number; expl: string }
-  | { violationType: "referencesMismatch"; refs: number[]; expl: string }
-  | { violationType: "formulaDoesntMatchReference"; refIdx: number; expl: string }
-  | { violationType: "formulaDoesntMatchRule"; expl: string }
-  | { violationType: "miscellaneousViolation"; expl: string }
-  | { violationType: "stepNotFound"; stepId: string; expl: string }
-  | { violationType: "referenceIdNotFound"; stepId: string; refIdx: number; refId: string; expl: string }
-  | { violationType: "malformedReference"; stepId: string; refIdx: number; refId: string; expl: string }
-  | { violationType: "referenceToLaterStep"; stepId: string; refIdx: number; refId: string }
-  | { violationType: "scopeViolation"; stepId: string; stepScope: string; refIdx: number; refId: string; refScope: string }
-  | { violationType: "referenceToUnclosedBox"; stepId: string; refIdx: number; boxId: string };
+type RulePosition = "conclusion" | "premise 0" | "premise 1" | "premise 2" | "premise 3" | "premise 4" | "premise 5"
 
-export type ViolationType = Violation["violationType"]
+export type Diagnostic = { uuid: UUID } & (
+  | { errorType: "MissingFormula" }
+  | { errorType: "MissingRule" }
+  | { errorType: "MissingRef", refIdx: number }
 
-export type Diagnostic = {
-  uuid: UUID;
-  violationType: ViolationType;
-  violation: Violation;
-}
+  | { errorType: "ReferenceOutOfScope", refIdx: number }
+  | { errorType: "ReferenceToLaterStep", refIdx: number }
+  | { errorType: "ReferenceToUnclosedBox", refIdx: number  }
+  | { errorType: "ReferenceBoxMissingFreshVar", refIdx: number  }
+  | { errorType: "ReferenceShouldBeBox", refIdx: number  }
+  | { errorType: "ReferenceShouldBeLine", refIdx: number  }
+
+  | { errorType: "WrongNumberOfReferences", expected: number, actual: number }
+  | { errorType: "ShapeMismatch", rulePosition: RulePosition, expected: string, actual: string }
+  | { errorType: "Ambiguous", subject: string, entries: { rulePosition: RulePosition, meta: string, actual: string }[] }
+  | { errorType: "Miscellaneous", rulePosition: RulePosition, explanation: string }
+)
+
+export type ErrorType = Diagnostic["errorType"]
 
 export type LogicName = 'propositionalLogic' | 'predicateLogic' | 'arithmetic'
 

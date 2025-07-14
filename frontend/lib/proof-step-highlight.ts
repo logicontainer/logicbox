@@ -2,7 +2,7 @@ import { InteractionState, InteractionStateEnum } from "@/contexts/InteractionSt
 import { getSelectedStep, stepIsReferee } from "./state-helpers";
 import { ProofContextProps } from "@/contexts/ProofProvider";
 import { DiagnosticsContextProps } from "@/contexts/DiagnosticsProvider";
-import { Diagnostic, ViolationType } from "@/types/types";
+import { Diagnostic, ErrorType } from "@/types/types";
 
 export enum StepHighlight {
   NOTHING,
@@ -41,16 +41,23 @@ export enum DiagnosticHighlight {
 export function getDiagnosticHighlightForFormula(stepUuid: string, diagnosticContext: DiagnosticsContextProps) {
   const { diagnostics } = diagnosticContext
 
-  const formulaViolationTypes: string[] = [
-    "missingFormula",
-    "formulaDoesntMatchRule",
-    "formulaDoesntMatchReference",
-    "miscellaneousViolation",
-  ] satisfies ViolationType[]
-
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
-    .filter(d => formulaViolationTypes.includes(d.violationType))
+    .filter(d => {
+      switch (d.errorType) {
+        case "MissingFormula": 
+          return true
+
+        case "Ambiguous": 
+          return d.entries.some(e => e.rulePosition === "conclusion")
+
+        case "ShapeMismatch": case "Miscellaneous":
+          return d.rulePosition === "conclusion"
+        
+        default: 
+          return false
+      }
+    })
 
   return ds.length > 0 ?
     DiagnosticHighlight.YES : 
@@ -58,18 +65,11 @@ export function getDiagnosticHighlightForFormula(stepUuid: string, diagnosticCon
 }
 
 function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
-  if (d.violationType !==  d.violation.violationType) {
-    throw new Error(`Violation types on diagnostic mismatched: ${JSON.stringify(d)}`)
-  }
-
-  switch (d.violation.violationType) {
-    case "referenceShouldBeBox": case "referenceShouldBeLine": case "referenceDoesntMatchRule":
-    case "referenceIdNotFound": case "referenceToLaterStep": case "referenceToUnclosedBox":
-    case "malformedReference": case "formulaDoesntMatchReference": case "missingDetailInReference":
-      return refIdx === d.violation.refIdx
-
-    case "referencesMismatch":
-      return d.violation.refs.includes(refIdx)
+  switch (d.errorType) {
+    case "MissingRef": case "ReferenceOutOfScope": case "ReferenceToLaterStep":
+    case "ReferenceToUnclosedBox": case "ReferenceBoxMissingFreshVar": case "ReferenceShouldBeBox":
+    case "ReferenceShouldBeLine":
+      return refIdx === d.refIdx
 
     default: 
       return false
@@ -79,22 +79,19 @@ function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
 export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: number, diagnosticContext: DiagnosticsContextProps) {
   const { diagnostics } = diagnosticContext
 
-  const referenceViolationTypes: ViolationType[] = [
-    "referenceShouldBeBox",
-    "referenceShouldBeLine",
-    "referenceDoesntMatchRule",
-    "referencesMismatch",
-    "referenceIdNotFound",
-    "referenceToLaterStep",
-    "referenceToUnclosedBox",
-    "malformedReference",
-    "formulaDoesntMatchReference",
-    "missingDetailInReference",
+  const referenceViolationTypes: ErrorType[] = [
+    "MissingRef",
+    "ReferenceOutOfScope",
+    "ReferenceToLaterStep",
+    "ReferenceToUnclosedBox",
+    "ReferenceBoxMissingFreshVar",
+    "ReferenceShouldBeBox",
+    "ReferenceShouldBeLine",
   ] as const
 
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
-    .filter(d => referenceViolationTypes.includes(d.violationType))
+    .filter(d => referenceViolationTypes.includes(d.errorType))
     .filter(d => referenceIdxIsInDiagnostic(d, refIdx))
 
   return ds.length > 0 ?
@@ -105,13 +102,13 @@ export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: num
 export function getDiagnosticHighlightForRule(stepUuid: string, diagnosticContext: DiagnosticsContextProps) {
   const { diagnostics } = diagnosticContext
 
-  const ruleViolationTypes: ViolationType[] = [
-    "missingRule"
+  const ruleViolationTypes: ErrorType[] = [
+    "MissingRule"
   ] as const
   
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
-    .filter(d => ruleViolationTypes.includes(d.violationType))
+    .filter(d => ruleViolationTypes.includes(d.errorType))
 
   return ds.length > 0 ?
     DiagnosticHighlight.YES : 
