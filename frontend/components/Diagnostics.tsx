@@ -148,7 +148,7 @@ export function AmbiguousDiagnostic(d: Diagnostic & { errorType: "Ambiguous" }) 
         <th>Meta</th>
         <th>Actual</th>
       </tr>
-      {d.entries.map(entry => (<tr id={JSON.stringify(entry)}>
+      {d.entries.map(entry => (<tr key={JSON.stringify(entry)}>
         <td>{entry.rulePosition}</td>
         <td><InlineMath math={entry.meta}/></td>
         <td><InlineMath math={entry.actual}/></td>
