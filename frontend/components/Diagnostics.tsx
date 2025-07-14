@@ -2,7 +2,7 @@ import { Diagnostic } from "@/types/types";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
-import { formulaIsBeingHovered, refIsBeingHovered } from "@/lib/state-helpers";
+import { refIsBeingHovered } from "@/lib/state-helpers";
 import { useInteractionState } from "@/contexts/InteractionStateProvider";
 
 function prettifyLatex(math: string, tag?: string, highlight?: string) {
@@ -41,189 +41,60 @@ function refIdxToString(refIdx: number, capital: boolean = true): string {
 }
 
 function MissingFormulaDiagnostic({
-}: Diagnostic & { violationType: "missingFormula" }) {
+}: Diagnostic & { errorType: "MissingFormula" }) {
   return <div>Formula is malformed/not specified</div>;
 }
 
 function MissingRuleDiagnostic({
-}: Diagnostic & { violationType: "missingRule" }) {
+}: Diagnostic & { errorType: "MissingRule" }) {
   return <div>Missing rule</div>;
 }
 
-function MissingDetailInReferenceDiagnostic({
-  uuid,
-  refIdx,
-  expl,
-}: Diagnostic & { 
-  violationType: "missingDetailInReference",
-}) {
-  const refLatex = useDiagnostics().getRefLatex(uuid, refIdx)
-  const { interactionState } = useInteractionState()
-  const refIsHovered = refIsBeingHovered(uuid, refIdx, interactionState)
-  return <div>
-    {refIdxToString(refIdx)} is incomplete{" "}
-    {refLatex && <MathParagraph math={refLatex} tag={refIdx.toString()} highlight={refIsHovered ? "blue" : undefined}/>}
-    <ServerMsg>{expl}</ServerMsg>
-  </div>;
-}
-
 function WrongNumberOfReferencesDiagnostic({
-  exp,
+  expected,
   actual,
 }: Diagnostic & { 
-  violationType: "wrongNumberOfReferences",
+  errorType: "WrongNumberOfReferences",
 }) {
-  return <div>Expected {exp} references but found {actual}</div>;
+  return <div>Expected {expected} references but found {actual}</div>;
 }
 
 function ReferenceShouldBeBoxDiagnostic({
   uuid,
-  refIdx: ref,
-}: Diagnostic & { violationType: "referenceShouldBeBox" }) {
-  const refLineNumber = useDiagnostics().getRefString(uuid, ref)
-  return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a box.</div>;
+  refIdx,
+}: Diagnostic & { errorType: "ReferenceShouldBeBox" }) {
+  const refLineNumber = useDiagnostics().getRefString(uuid, refIdx)
+  return <div>{refIdxToString(refIdx)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a box.</div>;
 }
 
 function ReferenceShouldBeLineDiagnostic({
   uuid,
-  refIdx: ref,
-}: Diagnostic & { violationType: "referenceShouldBeLine" }) {
-  const refLineNumber = useDiagnostics().getRefString(uuid, ref)
-  return <div>{refIdxToString(ref)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a line.</div>;
+  refIdx,
+}: Diagnostic & { errorType: "ReferenceShouldBeLine" }) {
+  const refLineNumber = useDiagnostics().getRefString(uuid, refIdx)
+  return <div>{refIdxToString(refIdx)} {refLineNumber !== null && `(to ${refLineNumber})`} should be a line.</div>;
 }
 
-function ReferenceDoesntMatchRuleDiagnostic({
-  uuid,
-  refIdx: ref,
-  expl,
-}: Diagnostic & { violationType: "referenceDoesntMatchRule" }) {
-  const refLatex = useDiagnostics().getRefLatexWithTag(uuid, ref)
-  const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [ref], false, "red")
-  const { interactionState } = useInteractionState()
-  const refIsHovered = refIsBeingHovered(uuid, ref, interactionState)
-
+function MiscellaneousDiagnostic({
+  explanation,
+}: Diagnostic & { errorType: "Miscellaneous" }) {
   return <div>
-    {refIdxToString(ref)}{" "}
-      {refLatex !== null && <MathParagraph math={refLatex} highlight={refIsHovered ? "blue" : undefined}/>}
-    {"doesn't"} match the rule{" "}
-      {ruleLatex !== null && <MathParagraph math={ruleLatex}/>}
-    <br/>
-    <ServerMsg>{expl}</ServerMsg>
-  </div>
-}
-
-function ReferencesMismatchDiagnostic({
-  uuid,
-  refs,
-  expl,
-}: Diagnostic & { violationType: "referencesMismatch" }) {
-  const { getRefLatexWithTag } = useDiagnostics()
-
-  const math = (() => {
-    const refLatexes = refs.map(r => getRefLatexWithTag(uuid, r))
-    if (refLatexes.find(s => s === null) !== undefined)
-      return null
-    return `\\begin{aligned}${refLatexes.filter(s => s !== null).map(l => `&{${l}}`).join(' \\\\ ')}\\end{aligned}`
-  })()
-  console.log(math)
-  
-  return <div>
-   {refs.map((r, i) => refIdxToString(r, i === 0)).join(' and ')}{" "}
-    {math && <div className="text-center py-2">
-      <InlineMath math={math}/>
-    </div>
-}
-    do not match.<br/>
-
-    <ServerMsg>{expl}</ServerMsg>
-  </div>
-}
-
-function FormulaDoesntMatchReferenceDiagnostic({
-  uuid,
-  refIdx: refs,
-  expl,
-}: Diagnostic & { violationType: "formulaDoesntMatchReference" }) {
-  const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
-  const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refs)
-  const { interactionState } = useInteractionState()
-  const formulaIsHovered = formulaIsBeingHovered(uuid, interactionState)
-  const refIsHovered = refIsBeingHovered(uuid, refs, interactionState)
-
-  return <div>
-    The formula{" "}
-      {formulaLatex && <MathParagraph math={formulaLatex} highlight={formulaIsHovered ? "blue" : undefined}/>}
-    and {refIdxToString(refs, false)}
-      {refLatex && <MathParagraph math={refLatex} highlight={refIsHovered ? "blue" : undefined}/>}
-    do not match.
-    <br/>
-    <ServerMsg>{expl}</ServerMsg>
+    <ServerMsg>{explanation}</ServerMsg>
   </div>;
 }
 
-function FormulaDoesntMatchRuleDiagnostic({
-  uuid,
-  expl,
-}: Diagnostic & { violationType: "formulaDoesntMatchRule" }) {
-  const formulaLatex = useDiagnostics().getStepAsLatex(uuid)
-  const ruleLatex = useDiagnostics().getRuleAtStepAsLatex(uuid, [], true, "red")
-  const { interactionState } = useInteractionState()
-  const formulaIsHovered = formulaIsBeingHovered(uuid, interactionState)
-  return <div>
-    The formula{" "}
-      {formulaLatex && <MathParagraph math={formulaLatex} highlight={formulaIsHovered ? "blue" : undefined}/>}
-    {"doesn't"} match the rule
-      {ruleLatex && <MathParagraph math={ruleLatex}/>}
-    <br/>
-    <ServerMsg>{expl}</ServerMsg>
-  </div>;
-}
-
-function MiscellaneousViolationDiagnostic({
-  expl,
-}: Diagnostic & { violationType: "miscellaneousViolation" }) {
-  return <div>
-    <ServerMsg>{expl}</ServerMsg>
-  </div>;
-}
-
-function StepNotFoundDiagnostic({
-  stepId,
-  expl,
-}: Diagnostic & { violationType: "stepNotFound" }) {
-  return <div>
-    Step {stepId} not found.
-    <br/>
-    <ServerMsg>{expl}</ServerMsg>
-  </div>;
-}
-
-function ReferenceIdNotFoundDiagnostic({
+function MissingRefDiagnostic({
   refIdx: whichRef,
-  expl,
-}: Diagnostic & { violationType: "referenceIdNotFound" }) {
+}: Diagnostic & { errorType: "MissingRef" }) {
   return <div>
-    {refIdxToString(whichRef)} was not found
-    <br/>
-    {expl ? <ServerMsg>{expl}</ServerMsg> : null}
-  </div>
-}
-
-function MalformedReferenceDiagnostic({
-  refIdx: whichRef,
-  expl,
-}: Diagnostic & { violationType: "malformedReference" }) {
-  return <div>
-    {refIdxToString(whichRef)} is malformed
-    <br/>
-    <ServerMsg>{expl}</ServerMsg>
+    {refIdxToString(whichRef)} is missing
   </div>
 }
 
 function ReferenceToLaterStepDiagnostic({
   uuid,
   refIdx,
-}: Diagnostic & { violationType: "referenceToLaterStep" }) {
+}: Diagnostic & { errorType: "ReferenceToLaterStep" }) {
   const refString = useDiagnostics().getRefString(uuid, refIdx)
   return (
     <div>
@@ -232,34 +103,21 @@ function ReferenceToLaterStepDiagnostic({
   );
 }
 
-function ScopeViolationDiagnostic({
+function ReferenceOutOfScopeDiagnostic({
   uuid,
-  stepScope,
   refIdx,
-  refScope,
-}: Diagnostic & { violationType: "scopeViolation" }) {
-  const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refIdx)
-  const dc = useDiagnostics()
-  const stepScopeLatex = stepScope === "root" ? "\\text{(root scope)}" : dc.getStepAsLatexWithTag(stepScope)
-  const refScopeLatex = refScope === "root" ? "\\text{(root scope)}" : dc.getStepAsLatexWithTag(refScope)
-
+}: Diagnostic & { errorType: "ReferenceOutOfScope" }) {
   return (
     <div>
-      Reference is out of scope.<br/>
-      {refIdxToString(refIdx)}{" "}
-      {refLatex && <MathParagraph math={refLatex}/>}
-      has scope{" "}
-      {refScopeLatex ? <MathParagraph math={refScopeLatex}/> : "??? "}
-      but the step has scope{" "}
-      {stepScopeLatex ? <MathParagraph math={stepScopeLatex}/> : "???"}
+      {refIdxToString(refIdx)}{" "} is out of scope.
     </div>
-  );
+  )
 }
 
 function ReferenceToUnclosedBoxDiagnostic({
   uuid,
   refIdx,
-}: Diagnostic & { violationType: "referenceToUnclosedBox" }) {
+}: Diagnostic & { errorType: "ReferenceToUnclosedBox" }) {
   const refLatex = useDiagnostics().getRefLatexWithTag(uuid, refIdx)
   const { interactionState } = useInteractionState()
   const refIsHovered = refIsBeingHovered(uuid, refIdx, interactionState)
@@ -272,54 +130,80 @@ function ReferenceToUnclosedBoxDiagnostic({
   );
 }
 
+export function ReferenceBoxMissingFreshVarDiagnostic({
+  uuid,
+  refIdx
+}: Diagnostic & { errorType: "ReferenceBoxMissingFreshVar" }) {
+  return <div>
+    {refIdxToString(refIdx)}{" "} has no fresh variable
+  </div>
+}
+
+export function AmbiguousDiagnostic(d: Diagnostic & { errorType: "Ambiguous" }) {
+  return <div>
+    <InlineMath math={d.subject}/> is ambiguous <br/>
+    <table style={{width: "100%"}}>
+      <tr>
+        <th>Where</th>
+        <th>Meta</th>
+        <th>Actual</th>
+      </tr>
+      {d.entries.map(entry => (<tr id={JSON.stringify(entry)}>
+        <td>{entry.rulePosition}</td>
+        <td><InlineMath math={entry.meta}/></td>
+        <td><InlineMath math={entry.actual}/></td>
+      </tr>)
+      )}
+    </table>
+  </div>
+}
+
+export function ShapeMismatchDiagnostic({
+  uuid,
+  expected,
+  actual
+}: Diagnostic & { errorType: "ShapeMismatch" }) {
+  return <div>
+    Expected: <InlineMath math={expected}/><br/>
+    Got: <InlineMath math={actual}/>
+  </div>;
+}
+
 export function DiagnosticMessage({ diagnostic }: { 
   diagnostic: Diagnostic, 
 }) {
-  const v = { 
-    uuid: diagnostic.uuid,
-    ...diagnostic.violation
-  } as (Diagnostic | undefined) // TODO: better checking
-
-  if (!v)
+  if (!diagnostic)
     return "Something went wrong when rendering violation"
 
-  switch (v.violationType) {
-    case "missingFormula":
-      return <MissingFormulaDiagnostic {...v}/>;
-    case "missingRule":
-      return <MissingRuleDiagnostic {...v} />;
-    case "missingDetailInReference":
-      return <MissingDetailInReferenceDiagnostic {...v}/>;
-    case "wrongNumberOfReferences":
-      return <WrongNumberOfReferencesDiagnostic {...v}/>;
-    case "referenceShouldBeBox":
-      return <ReferenceShouldBeBoxDiagnostic {...v}/>;
-    case "referenceShouldBeLine":
-      return <ReferenceShouldBeLineDiagnostic {...v}/>;
-    case "referenceDoesntMatchRule":
-      return <ReferenceDoesntMatchRuleDiagnostic {...v}/>;
-    case "referencesMismatch":
-      return <ReferencesMismatchDiagnostic {...v}/>;
-    case "formulaDoesntMatchReference":
-      return <FormulaDoesntMatchReferenceDiagnostic {...v}/>;
-    case "formulaDoesntMatchRule":
-      return <FormulaDoesntMatchRuleDiagnostic {...v} />;
-    case "miscellaneousViolation":
-      return <MiscellaneousViolationDiagnostic {...v} />;
-    case "stepNotFound":
-      return <StepNotFoundDiagnostic {...v} />;
-    case "referenceIdNotFound":
-      return <ReferenceIdNotFoundDiagnostic {...v} />;
-    case "malformedReference":
-      return <MalformedReferenceDiagnostic {...v} />;
-    case "referenceToLaterStep":
-      return <ReferenceToLaterStepDiagnostic {...v} />;
-    case "scopeViolation":
-      return <ScopeViolationDiagnostic {...v} />;
-    case "referenceToUnclosedBox":
-      return <ReferenceToUnclosedBoxDiagnostic {...v} />;
+  switch (diagnostic.errorType) {
+    case "MissingFormula":
+      return <MissingFormulaDiagnostic {...diagnostic}/>;
+    case "MissingRule":
+      return <MissingRuleDiagnostic {...diagnostic} />;
+    case "MissingRef":
+      return <MissingRefDiagnostic {...diagnostic}/>;
+    case "WrongNumberOfReferences":
+      return <WrongNumberOfReferencesDiagnostic {...diagnostic}/>;
+    case "ReferenceShouldBeBox":
+      return <ReferenceShouldBeBoxDiagnostic {...diagnostic}/>;
+    case "ReferenceShouldBeLine":
+      return <ReferenceShouldBeLineDiagnostic {...diagnostic}/>;
+    case "ReferenceToUnclosedBox":
+      return <ReferenceToUnclosedBoxDiagnostic {...diagnostic} />;
+    case "ReferenceOutOfScope":
+      return <ReferenceOutOfScopeDiagnostic {...diagnostic}/>;
+    case "Miscellaneous":
+      return <MiscellaneousDiagnostic {...diagnostic}/>;
+    case "ReferenceToLaterStep": 
+      return <ReferenceToLaterStepDiagnostic {...diagnostic}/>;
+    case "ReferenceBoxMissingFreshVar":
+      return <ReferenceBoxMissingFreshVarDiagnostic {...diagnostic}/>;
+    case "Ambiguous":
+      return <AmbiguousDiagnostic {...diagnostic}/>;
+    case "ShapeMismatch":
+      return <ShapeMismatchDiagnostic {...diagnostic}/>;
     default:
-      const _: never = v;
+      const _: never = diagnostic;
       return _;
   }
 }
