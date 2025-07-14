@@ -37,7 +37,7 @@ import zio.http.template.Template
 
 object RuleMaps {
   val PHI = RulePart.MetaFormula(RulePart.Formulas.Phi)
-  val PSI = RulePart.MetaFormula(RulePart.Formulas.Phi)
+  val PSI = RulePart.MetaFormula(RulePart.Formulas.Psi)
 
   def getPropLogicInfRule(rule: PropLogicRule): InfRule = {
     import logicbox.framework.RulePart._

@@ -236,18 +236,18 @@ object Stringifiers {
     import logicbox.framework.RulePart._
     def b(f: TemplateFormula) = templateFormulaWithBracks(f, templateFormulaToLaTeX, "(", ")")
     formula match {
-      case MetaFormula(Formulas.Phi) => "\\phi"
+      case MetaFormula(Formulas.Phi) => "\\varphi"
       case MetaFormula(Formulas.Psi) => "\\psi"
       case MetaFormula(Formulas.Chi) => "\\chi"
       case Substitution(phi, t, x) => s"${b(phi)}[${templateTermToLaTeX(t)}/${templateTermToLaTeX(x)}]"
       case Contradiction() => "false"
       case Equals(t1, t2) => s"${templateTermToLaTeX(t1)} = ${templateTermToLaTeX(t2)}"
-      case And(phi, psi) => s"${b(phi)} and ${b(psi)}"
-      case Or(phi, psi) => s"${b(phi)} or ${b(psi)}"
-      case Implies(phi, psi) => s"${b(phi)} -> ${b(psi)}"
-      case Not(phi) => s"not ${b(phi)}"
-      case ForAll(x, phi) => s"forall ${templateTermToLaTeX(x)} ${b(phi)}"
-      case Exists(x, phi) => s"exists ${templateTermToLaTeX(x)} ${b(phi)}"
+      case And(phi, psi) => s"${b(phi)} \\land ${b(psi)}"
+      case Or(phi, psi) => s"${b(phi)} \\lor ${b(psi)}"
+      case Implies(phi, psi) => s"${b(phi)} \\rightarrow ${b(psi)}"
+      case Not(phi) => s"\\lnot ${b(phi)}"
+      case ForAll(x, phi) => s"\\forall ${templateTermToLaTeX(x)} ${b(phi)}"
+      case Exists(x, phi) => s"\\exists ${templateTermToLaTeX(x)} ${b(phi)}"
     }
   }
 }
