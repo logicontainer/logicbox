@@ -22,7 +22,14 @@ class ProofValidatorServiceImpl[F, R, B](
     val errorConverter = createErrorConverter(proof)
     Right(ValidationResult(
       proof = outputRawProof,
-      diagnostics = errors.flatMap((id, e) => errorConverter.convert(id, e))
+      diagnostics = errors.flatMap((id, e) => errorConverter.convert(id, e) match {
+        case Some(e) => Some(e)
+        case None => 
+          println("Found invalid error:")
+          println(e)
+          println("")
+          None
+      })
     ))
   }
 }
