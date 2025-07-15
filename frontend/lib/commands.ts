@@ -43,7 +43,7 @@ export class AddLineCommand extends Command {
           latex: null,
         },
         justification: {
-          rule: "no_rule",
+          rule: null,
           refs: [],
         },
       },
@@ -105,7 +105,7 @@ export class AddBoxedLineCommand extends Command {
               latex: null,
             },
             justification: {
-              rule: "assumption",
+              rule: null,
               refs: [],
             },
           },
