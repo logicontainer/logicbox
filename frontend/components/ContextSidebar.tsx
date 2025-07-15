@@ -6,7 +6,6 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import Card from "./Card";
-import { DiagnosticMessage } from "./Diagnostics";
 import { InlineMath } from "react-katex";
 import RulePanel from "./RulePanel";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
@@ -18,6 +17,7 @@ import { useProof } from "@/contexts/ProofProvider";
 import { Button } from "./ui/button";
 import { DownloadIcon } from "lucide-react";
 import DownloadProofButton from "./DownloadProofButton";
+import { DiagnosticsPanel } from "./DiagnosticsPanel";
 
 export default function ContextSidebar() {
   const { proof } = useProof();
@@ -81,18 +81,7 @@ export default function ContextSidebar() {
               <InlineMath math={ruleLatex ?? "???"} />
             </p>
             {errors.length > 0 ? <hr className="mt-2" /> : null}
-            {errors.map((error) => {
-              return (
-                <div
-                  key={error.uuid + error.errorType + JSON.stringify(error)}
-                >
-                  <div className="py-3">
-                    <DiagnosticMessage diagnostic={error} />
-                  </div>
-                  <hr />
-                </div>
-              );
-            })}
+            <DiagnosticsPanel diagnostics={errors} key={stepInFocus}/>
           </Card>
         )}
         {isEditingRule && (

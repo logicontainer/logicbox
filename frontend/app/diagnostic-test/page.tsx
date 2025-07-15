@@ -1,6 +1,5 @@
 "use client";
 
-import { DiagnosticMessage } from "@/components/Diagnostics"
 import { useProof } from "@/contexts/ProofProvider";
 import { ProofStep, Diagnostic } from "@/types/types"
 import React from "react";
@@ -258,7 +257,7 @@ function InnerThing() {
 
   const elms = violations.map((v, idx) => 
     <div className="p-4" key={JSON.stringify(v) + `${idx}`}>
-      <DiagnosticMessage diagnostic={{...v, uuid }}/>
+      {/*TODO make the test page work again <DiagnosticMessage diagnostic={v}/>*/}
     </div>
   )
 

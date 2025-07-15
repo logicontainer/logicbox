@@ -74,7 +74,7 @@ export type ProofStepPosition = {
 
 type UUID = string;
 
-type RulePosition = "conclusion" | "premise 0" | "premise 1" | "premise 2" | "premise 3" | "premise 4" | "premise 5"
+export type RulePosition = "conclusion" | "premise 0" | "premise 1" | "premise 2" | "premise 3" | "premise 4" | "premise 5"
 
 export type Diagnostic = { uuid: UUID } & (
   | { errorType: "MissingFormula" }
