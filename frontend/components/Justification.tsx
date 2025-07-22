@@ -36,14 +36,13 @@ export function Justification({
   onClickRef: (idx: number) => void;
 }) {
   const { rulesets } = useRuleset();
-  const { handleHover } = useHovering();
+  const { hoveringState, handleHover } = useHovering();
   const diagnosticsContext = useDiagnostics();
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
 
   const { interactionState } = useInteractionState();
-  const { doTransition } = useInteractionState();
   const rule = rulesets
     .map((set) => set.rules)
     .flat()
@@ -74,7 +73,7 @@ export function Justification({
     <>
       <span
         className={cn(
-          (isEditingRule || ruleIsBeingHovered(uuid, interactionState)) && "text-blue-600",
+          (isEditingRule || ruleIsBeingHovered(uuid, hoveringState)) && "text-blue-600",
           ruleNameHighlight === DiagnosticHighlight.YES && "text-red-500",
         )}
         onClick={(e) => {
@@ -92,32 +91,6 @@ export function Justification({
         <>
           <InlineMath math={`\\,`} />
           {justification.refs.map((ref, i) => {
-            const isCurrentlyBeingChanged =
-              interactionState.enum === InteractionStateEnum.EDITING_REF &&
-              interactionState.lineUuid === uuid &&
-              interactionState.refIdx === i;
-
-            if (isCurrentlyBeingChanged) {
-              return (
-                <RefSelect
-                  key={i}
-                  value={ref}
-                  isCurrentlyBeingChanged={
-                    interactionState.enum === InteractionStateEnum.EDITING_REF &&
-                    interactionState.lineUuid === uuid &&
-                    interactionState.refIdx === i
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    doTransition({
-                      enum: TransitionEnum.CLICK_REF,
-                      lineUuid: uuid,
-                      refIdx: i,
-                    });
-                  }}
-                ></RefSelect>
-              );
-            } else {
               let refLatex = "";
               const referencedLine = lines.find((line) => line.uuid == ref);
               if (referencedLine?.stepType === "box") {
@@ -128,12 +101,14 @@ export function Justification({
                 refLatex = "?";
               }
 
-              const referenceHighlight = getDiagnosticHighlightForReference(
-                uuid,
-                i,
-                diagnosticsContext,
-              );
-              if (referenceHighlight === DiagnosticHighlight.YES) {
+              const diagnosticHighlight = getDiagnosticHighlightForReference(uuid, i, diagnosticsContext);
+              const isCurrentlyBeingChanged =
+                interactionState.enum === InteractionStateEnum.EDITING_REF &&
+                interactionState.lineUuid === uuid &&
+                interactionState.refIdx === i;
+              if (isCurrentlyBeingChanged) {
+                refLatex = `\\boxed{${refLatex}}`
+              } else if (diagnosticHighlight === DiagnosticHighlight.YES) {
                 refLatex = `\\textbf{\\underline{${refLatex}}}`;
               }
 
@@ -142,9 +117,9 @@ export function Justification({
                 <span
                   key={i}
                   className={cn(
-                    referenceHighlight === DiagnosticHighlight.YES &&
+                    diagnosticHighlight === DiagnosticHighlight.YES &&
                       "text-red-500",
-                    refIsBeingHovered(uuid, i, interactionState) &&
+                    refIsBeingHovered(uuid, i, hoveringState) &&
                       "text-blue-600",
                   )}
                   onClick={(e) => {
@@ -152,8 +127,8 @@ export function Justification({
                     e.preventDefault();
                     onClickRef(i);
                   }}
-                  onMouseOver={(e) => {
-                    e.stopPropagation();
+                  onMouseMove={(e) => {
+                    e.stopPropagation()
                     handleHover({
                       enum: HoveringEnum.HOVERING_REF,
                       stepUuid: uuid,
@@ -165,7 +140,7 @@ export function Justification({
                 </span>
               );
             }
-          })}
+          )}
         </>
       )}
     </>

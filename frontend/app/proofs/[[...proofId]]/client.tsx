@@ -22,7 +22,6 @@ export default function Client({ proofId }: { proofId: string | null }) {
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
-  const { handleHover } = useHovering();
 
   React.useEffect(() => {
     if (proofId) proofContext.loadProofFromId(proofId);

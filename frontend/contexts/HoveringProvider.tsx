@@ -7,6 +7,7 @@ import {
 import _ from "lodash";
 
 export interface HoveringContextProps {
+  hoveringState: HoveringState | null;
   handleHover: (_: HoveringState | null) => void;
 }
 
@@ -25,26 +26,22 @@ export function HoveringProvider({
   children,
 }: React.PropsWithChildren<object>) {
   const { doTransition } = useInteractionState();
-  const [currentlyHoveredUuid, setCurrentlyHoveredUuid] = React.useState<
-    string | null
-  >(null);
-
-  const lastHover = React.useRef<HoveringState | null>(null);
+  const [currentState, setCurrentState] = React.useState<HoveringState | null>(null);
+  const lastState = React.useRef<HoveringState | null>(null);
 
   const handleHover = (hovering: HoveringState | null) => {
-    setCurrentlyHoveredUuid(hovering?.stepUuid ?? null);
-
-    if (!_.isEqual(hovering, lastHover.current)) {
+    if (!_.isEqual(hovering, lastState.current)) {
       doTransition({
         enum: TransitionEnum.HOVER,
         hovering: hovering
       });
-      lastHover.current = hovering;
+      setCurrentState(hovering);
+      lastState.current = hovering;
     }
   };
 
   return (
-    <HoveringContext.Provider value={{ handleHover }}>
+    <HoveringContext.Provider value={{ hoveringState: currentState, handleHover }}>
       {children}
     </HoveringContext.Provider>
   );
