@@ -3,31 +3,11 @@ import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { HoveringEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
-import { JSX } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { toInteger } from "lodash";
 
-function prettifyLatex(math: string, tag?: string, highlight?: string) {
-  let content = math + (tag !== undefined ? `\\quad \\quad (${tag})` : "")
-  if (highlight) {
-    content = `{\\color{${highlight}}\\underline{${content}}}`
-  }
-  return content
-}
-
-function DiagnosticMsgImpl({
-  title,
-  body,
-  value
-}: {
-  title: JSX.Element,
-  body: JSX.Element,
-  value: string,
-}) {
-  return 
-}
 
 function refIdxToString(refIdx: number, capital: boolean = true): string {
   switch(refIdx) {
@@ -39,29 +19,48 @@ function refIdxToString(refIdx: number, capital: boolean = true): string {
     default: return `${capital ? "R" : "r"}eference ${(refIdx + 1).toString()}`
   }
 }
-export function AmbiguousDiagnostic(d: Diagnostic & { errorType: "Ambiguous" }) {
-  return <div>
-    <InlineMath math={d.subject}/> is ambiguous <br/>
-  </div>
-}
 
-export function TitleOnlyDiagnostic({
+function TitleOnlyDiagnostic({
   iconLatex,
   title,
-  value
+  value,
+  onHover,
 }: {
   iconLatex: string
   title: string
   value: string
+  onHover?: () => void
 }) {
-  return <AccordionItem key={value} value={value}>
-    <AccordionTrigger disabled className="py-2">
-      <div className="flex justify-start gap-2">
+  return <AccordionItem key={value} value={value} onMouseMove={e => {
+    e.stopPropagation()
+    onHover?.()
+  }}>
+    <AccordionTrigger disabled className="py-2" >
+      <div className="flex justify-start gap-2" >
         <div className="flex w-10 justify-center items-center"><InlineMath math={iconLatex}/></div>
         {title}
       </div>
     </AccordionTrigger>
   </AccordionItem>
+}
+
+function RefTitleOnlyDiagnostic({
+  iconLatex,
+  title,
+  value,
+  stepUuid,
+  refIdx,
+}: {
+  iconLatex: string
+  title: string
+  value: string
+  stepUuid: string
+  refIdx: number
+}) {
+  const { handleHover } = useHovering() 
+  return <TitleOnlyDiagnostic iconLatex={iconLatex} title={title} value={value} onHover={() => {
+    handleHover({ enum: HoveringEnum.HOVERING_REF, stepUuid: stepUuid, refIdx: refIdx })
+  }}/>
 }
 
 export function DiagnosticsPanel({
@@ -83,7 +82,6 @@ export function DiagnosticsPanel({
   }
 
   const { getRuleNameAtStepAsLatex } = useDiagnostics()
-  const { doTransition } = useInteractionState()
   const { handleHover } = useHovering()
 
   return <Accordion
@@ -94,14 +92,14 @@ export function DiagnosticsPanel({
     switch (d.errorType) {
       case "MissingFormula": return <TitleOnlyDiagnostic iconLatex="?" title="Missing formula" value={value} key={value}/>
       case "MissingRule": return <TitleOnlyDiagnostic iconLatex="?" title="Missing rule" value={value} key={value}/>
-      case "MissingRef": return <TitleOnlyDiagnostic iconLatex={`?_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} is missing`} value={value} key={value}/>
 
-      case "ReferenceOutOfScope": return <TitleOnlyDiagnostic iconLatex={`\\dashrightarrow_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} is out of scope`} value={value} key={value}/>
-      case "ReferenceShouldBeBox": return <TitleOnlyDiagnostic iconLatex={`\\square_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} should be a box`} value={value} key={value}/>
-      case "ReferenceShouldBeLine": return <TitleOnlyDiagnostic iconLatex={`-_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} should be a line`} value={value} key={value}/>
+      case "MissingRef": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`?_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} is missing`} value={value} key={value}/>
+      case "ReferenceOutOfScope": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\dashrightarrow_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} is out of scope`} value={value} key={value}/>
+      case "ReferenceShouldBeBox": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\square_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} should be a box`} value={value} key={value}/>
+      case "ReferenceShouldBeLine": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`-_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} should be a line`} value={value} key={value}/>
 
-      case "ReferenceToLaterStep": return <TitleOnlyDiagnostic iconLatex={`\\dashrightarrow_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} refers to a later step`} value={value} key={value}/>
-      case "ReferenceToUnclosedBox": return <TitleOnlyDiagnostic iconLatex={`\\boxtimes_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} refers to an unclosed box`} value={value} key={value}/>
+      case "ReferenceToLaterStep": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\dashrightarrow_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} refers to a later step`} value={value} key={value}/>
+      case "ReferenceToUnclosedBox": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\boxtimes_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} refers to an unclosed box`} value={value} key={value}/>
 
       case "Miscellaneous": 
         const expl = d.explanation.split('')
