@@ -36,6 +36,7 @@ export default function RulePanel() {
       ruleName,
     });
   };
+
   return (
     <div className="flex flex-col gap-2">
       <h2 className="text-lg font-bold">Select a rule</h2>

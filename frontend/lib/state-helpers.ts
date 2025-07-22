@@ -1,4 +1,5 @@
 import {
+    HoveringEnum,
   InteractionState,
   InteractionStateEnum,
 } from "@/contexts/InteractionStateProvider";
@@ -48,10 +49,8 @@ export function formulaIsBeingHovered(
 ): boolean {
   return (
     state.enum === InteractionStateEnum.IDLE &&
-    state.selectedProofStepUuid === stepUuid &&
-    !state.sticky &&
-    state.hoveredRefIdx === null &&
-    !state.ruleIsHovered
+    state.hovering?.enum === HoveringEnum.HOVERING_FORMULA &&
+    state.hovering.stepUuid === stepUuid
   );
 }
 
@@ -62,8 +61,9 @@ export function refIsBeingHovered(
 ): boolean {
   return (
     state.enum === InteractionStateEnum.IDLE &&
-    state.selectedProofStepUuid === stepUuid &&
-    state.hoveredRefIdx === refIdx
+    state.hovering?.enum === HoveringEnum.HOVERING_REF &&
+    state.hovering.stepUuid === stepUuid &&
+    state.hovering.refIdx === refIdx
   );
 }
 
@@ -73,8 +73,8 @@ export function ruleIsBeingHovered(
 ): boolean {
   return (
     state.enum === InteractionStateEnum.IDLE &&
-    state.selectedProofStepUuid === stepUuid &&
-    state.ruleIsHovered
+    state.hovering?.enum === HoveringEnum.HOVERING_RULE &&
+    state.hovering.stepUuid === stepUuid
   );
 }
 
@@ -85,12 +85,12 @@ export function stepIsReferee(
 ): boolean {
   const { getProofStepDetails } = proofContext;
   const refererStepId =
-    interactionState.enum === InteractionStateEnum.IDLE
-      ? interactionState.selectedProofStepUuid
+    interactionState.enum === InteractionStateEnum.IDLE && interactionState.hovering !== null
+      ? interactionState.hovering.stepUuid
       : null;
   const hoveredRefIdx =
-    interactionState.enum === InteractionStateEnum.IDLE
-      ? interactionState.hoveredRefIdx
+    interactionState.enum === InteractionStateEnum.IDLE && interactionState.hovering?.enum === HoveringEnum.HOVERING_REF
+      ? interactionState.hovering.refIdx
       : null;
   const refererStep = refererStepId ? getProofStepDetails(refererStepId) : null;
   if (hoveredRefIdx === null || refererStep?.proofStep.stepType !== "line") {

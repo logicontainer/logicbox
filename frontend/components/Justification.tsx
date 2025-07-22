@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    HoveringEnum,
   InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
@@ -35,7 +36,7 @@ export function Justification({
   onClickRef: (idx: number) => void;
 }) {
   const { rulesets } = useRuleset();
-  const { handleHoverStep } = useHovering();
+  const { handleHover } = useHovering();
   const diagnosticsContext = useDiagnostics();
 
   const proofContext = useProof();
@@ -53,7 +54,15 @@ export function Justification({
     uuid,
     diagnosticsContext,
   );
-  if (ruleNameHighlight === DiagnosticHighlight.YES) {
+
+  const isEditingRule =
+    interactionState.enum === InteractionStateEnum.EDITING_RULE &&
+    interactionState.lineUuid === uuid;
+
+  if (isEditingRule) {
+    ruleNameLatex = `\\boxed{${ruleNameLatex}}`
+  }
+  else if (ruleNameHighlight === DiagnosticHighlight.YES) {
     ruleNameLatex = `\\underline{${ruleNameLatex}}`;
   }
 
@@ -61,16 +70,11 @@ export function Justification({
     return null;
   }
 
-  const isEditingRule =
-    interactionState.enum === InteractionStateEnum.EDITING_RULE &&
-    interactionState.lineUuid === uuid;
-
   return (
     <>
       <span
         className={cn(
-          isEditingRule && "bg-blue-400 text-white",
-          ruleIsBeingHovered(uuid, interactionState) && "text-blue-600",
+          (isEditingRule || ruleIsBeingHovered(uuid, interactionState)) && "text-blue-600",
           ruleNameHighlight === DiagnosticHighlight.YES && "text-red-500",
         )}
         onClick={(e) => {
@@ -79,7 +83,7 @@ export function Justification({
         }}
         onMouseOver={(e) => {
           e.stopPropagation();
-          handleHoverStep(uuid, null, true);
+          handleHover({ enum: HoveringEnum.HOVERING_RULE, stepUuid: uuid });
         }}
       >
         <InlineMath math={ruleNameLatex ?? "???"}></InlineMath>
@@ -99,8 +103,7 @@ export function Justification({
                   key={i}
                   value={ref}
                   isCurrentlyBeingChanged={
-                    interactionState.enum ===
-                      InteractionStateEnum.EDITING_REF &&
+                    interactionState.enum === InteractionStateEnum.EDITING_REF &&
                     interactionState.lineUuid === uuid &&
                     interactionState.refIdx === i
                   }
@@ -151,7 +154,11 @@ export function Justification({
                   }}
                   onMouseOver={(e) => {
                     e.stopPropagation();
-                    handleHoverStep(uuid, i, false);
+                    handleHover({
+                      enum: HoveringEnum.HOVERING_REF,
+                      stepUuid: uuid,
+                      refIdx: i,
+                    });
                   }}
                 >
                   <InlineMath math={`${refLatex}${comma}`} />

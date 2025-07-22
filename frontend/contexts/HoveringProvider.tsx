@@ -1,16 +1,13 @@
 import React from "react";
 import {
+    HoveringState,
   TransitionEnum,
   useInteractionState,
 } from "./InteractionStateProvider";
+import _ from "lodash";
 
 export interface HoveringContextProps {
-  currentlyHoveredUuid: string | null;
-  handleHoverStep: (
-    uuid: string | null,
-    refIdx: number | null,
-    ruleIsHovered: boolean,
-  ) => void;
+  handleHover: (_: HoveringState | null) => void;
 }
 
 // Context Setup
@@ -32,36 +29,22 @@ export function HoveringProvider({
     string | null
   >(null);
 
-  const lastHover = React.useRef<{
-    uuid: string | null;
-    refIdx: number | null;
-    ruleIsHovered: boolean;
-  }>(null);
+  const lastHover = React.useRef<HoveringState | null>(null);
 
-  const handleHoverStep = (
-    uuid: string | null,
-    refIdx: number | null = null,
-    ruleIsHovered: boolean = false,
-  ) => {
-    setCurrentlyHoveredUuid(uuid);
+  const handleHover = (hovering: HoveringState | null) => {
+    setCurrentlyHoveredUuid(hovering?.stepUuid ?? null);
 
-    if (
-      uuid !== lastHover.current?.uuid ||
-      refIdx !== lastHover.current?.refIdx ||
-      ruleIsHovered !== lastHover.current?.ruleIsHovered
-    ) {
+    if (!_.isEqual(hovering, lastHover.current)) {
       doTransition({
         enum: TransitionEnum.HOVER,
-        stepUuid: uuid,
-        refIdx,
-        ruleIsHovered,
+        hovering: hovering
       });
-      lastHover.current = { uuid: uuid, refIdx, ruleIsHovered };
+      lastHover.current = hovering;
     }
   };
 
   return (
-    <HoveringContext.Provider value={{ currentlyHoveredUuid, handleHoverStep }}>
+    <HoveringContext.Provider value={{ handleHover }}>
       {children}
     </HoveringContext.Provider>
   );

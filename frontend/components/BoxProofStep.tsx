@@ -4,6 +4,7 @@ import {
   TLineNumber,
 } from "@/types/types";
 import {
+    HoveringEnum,
   InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
@@ -31,11 +32,10 @@ export function BoxProofStep({
 }) {
   const { doTransition, interactionState } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
-  const { currentlyHoveredUuid, handleHoverStep } = useHovering();
+  const { handleHover } = useHovering();
 
   const highlight = getStepHighlight(
     props.uuid,
-    currentlyHoveredUuid,
     interactionState,
     useProof(),
   );
@@ -78,7 +78,10 @@ export function BoxProofStep({
         }}
         onMouseMove={(e) => {
           e.stopPropagation();
-          handleHoverStep(props.uuid, null, false);
+          handleHover({ 
+            enum: HoveringEnum.HOVERING_STEP,
+            stepUuid: props.uuid
+          });
         }}
       >
         <Proof
