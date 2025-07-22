@@ -22,7 +22,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
-  const { handleHoverStep } = useHovering();
+  const { handleHover } = useHovering();
 
   React.useEffect(() => {
     if (proofId) proofContext.loadProofFromId(proofId);
@@ -45,7 +45,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
   }, [keybindTransition]);
 
   return (
-    <>
+    <div>
       <ProofStepContextMenu />
       <div
         className="flex flex-col items-center w-full  max-h-screen overflow-auto justify-between sm:h-screen sm:gap-2"
@@ -63,10 +63,6 @@ export default function Client({ proofId }: { proofId: string | null }) {
             <div
               className="flex box-content gap-2 mt-[64px] w-full select-none"
               onClick={(e) => e.stopPropagation()}
-              onMouseLeave={(e) => {
-                e.stopPropagation();
-                handleHoverStep(null, null, false);
-              }}
             >
               <Proof
                 proof={proofContext.proof.proof}
@@ -81,6 +77,6 @@ export default function Client({ proofId }: { proofId: string | null }) {
           <Footer />
         </div>
       </div>
-    </>
+    </div>
   );
 }

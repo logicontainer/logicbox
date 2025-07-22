@@ -2,10 +2,12 @@ import { Diagnostic, RulePosition } from "@/types/types";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
-import { refIsBeingHovered } from "@/lib/state-helpers";
-import { useInteractionState } from "@/contexts/InteractionStateProvider";
+import { HoveringEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
 import { JSX } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { useHovering } from "@/contexts/HoveringProvider";
+import { toInteger } from "lodash";
 
 function prettifyLatex(math: string, tag?: string, highlight?: string) {
   let content = math + (tag !== undefined ? `\\quad \\quad (${tag})` : "")
@@ -40,19 +42,6 @@ function refIdxToString(refIdx: number, capital: boolean = true): string {
 export function AmbiguousDiagnostic(d: Diagnostic & { errorType: "Ambiguous" }) {
   return <div>
     <InlineMath math={d.subject}/> is ambiguous <br/>
-    <table style={{width: "100%"}}>
-      <tr>
-        <th>Where</th>
-        <th>Meta</th>
-        <th>Actual</th>
-      </tr>
-      {d.entries.map(entry => (<tr key={JSON.stringify(entry)}>
-        <td>{entry.rulePosition}</td>
-        <td><InlineMath math={entry.meta}/></td>
-        <td><InlineMath math={entry.actual}/></td>
-      </tr>)
-      )}
-    </table>
   </div>
 }
 
@@ -94,6 +83,8 @@ export function DiagnosticsPanel({
   }
 
   const { getRuleNameAtStepAsLatex } = useDiagnostics()
+  const { doTransition } = useInteractionState()
+  const { handleHover } = useHovering()
 
   return <Accordion
     type="single"
@@ -125,7 +116,28 @@ export function DiagnosticsPanel({
       case "ShapeMismatch": {
         const icon = getRuleNameAtStepAsLatex(d.uuid) ?? "?"
 
-        return <AccordionItem key={value} value={value}>
+        return <AccordionItem 
+          key={value} value={value}
+          onMouseMove={e => {
+            e.stopPropagation()
+            switch (d.rulePosition) {
+              case "conclusion":
+                handleHover({ 
+                  enum: HoveringEnum.HOVERING_FORMULA,
+                  stepUuid: d.uuid
+                })
+                break;
+
+              case "premise 0": case "premise 1": case "premise 2": case "premise 3": case "premise 4": case "premise 5":
+                handleHover({
+                  enum: HoveringEnum.HOVERING_REF,
+                  stepUuid: d.uuid,
+                  refIdx: toInteger(d.rulePosition[d.rulePosition.length - 1])
+                })
+                break;
+            }
+          }}
+        >
           <AccordionTrigger className="py-2">
             <div className="flex justify-start gap-2">
               <div className="flex w-10 justify-center items-center"><InlineMath math={icon}/></div>
@@ -133,21 +145,24 @@ export function DiagnosticsPanel({
             </div>
           </AccordionTrigger>
           <AccordionContent className="flex-col justify-center items-center">
-            <div className="px-16 py-1 flex justify-start">
-              <div className="w-24 font-bold">Expected:</div>
-              <div><InlineMath math={d.expected}/></div>
-            </div>
-            <div className="px-16 py-1 flex justify-start">
-              <div className="w-24 font-bold">Got:</div>
-              <div><InlineMath math={d.actual}/></div>
-            </div>
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="w-[120px]">Expected</TableCell>
+                  <TableCell className="flex justify-center"><InlineMath math={d.expected}/></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="w-[120px]">Actual</TableCell>
+                  <TableCell className="flex justify-center"><InlineMath math={d.actual}/></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </AccordionContent>
         </AccordionItem>
       }
 
       case "Ambiguous": {
         const icon = getRuleNameAtStepAsLatex(d.uuid) ?? "?"
-
         const shouldShowMetaColumn = d.entries.some(e => e.meta !== d.subject)
 
         return <AccordionItem key={value} value={value}>
@@ -158,13 +173,35 @@ export function DiagnosticsPanel({
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            {d.entries.map(e => 
-              <div className="px-16 py-1 flex justify-start" key={JSON.stringify(e)}>
-                <div className="w-24 font-bold">{e.rulePosition}</div>
-                {shouldShowMetaColumn ? <div><InlineMath math={e.meta}/></div> : null}
-                <div><InlineMath math={e.actual}/></div>
-              </div>
-            )}
+            <Table>
+              <TableBody>
+                {d.entries.map((e, idx) => 
+                  <TableRow key={idx.toString()} onMouseMove={ev => {
+                    ev.stopPropagation()
+                    switch (e.rulePosition) {
+                      case "conclusion":
+                        handleHover({ 
+                          enum: HoveringEnum.HOVERING_FORMULA,
+                          stepUuid: d.uuid
+                        })
+                        break;
+
+                      case "premise 0": case "premise 1": case "premise 2": case "premise 3": case "premise 4": case "premise 5":
+                        handleHover({
+                          enum: HoveringEnum.HOVERING_REF,
+                          stepUuid: d.uuid,
+                          refIdx: toInteger(e.rulePosition[e.rulePosition.length - 1])
+                        })
+                        break;
+                    }
+                  }}>
+                    <TableCell className="w-[120px]">{e.rulePosition}</TableCell>
+                    <TableCell className="w-[100px]" hidden={!shouldShowMetaColumn}><InlineMath math={e.meta}/></TableCell>
+                    <TableCell className="flex justify-center"><InlineMath math={e.actual}/></TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </AccordionContent>
         </AccordionItem>
       }

@@ -8,6 +8,7 @@ import {
   LineProofStep as TLineProofStep,
 } from "@/types/types";
 import {
+    HoveringEnum,
   InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
@@ -29,6 +30,7 @@ import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
+import { formulaIsBeingHovered } from "@/lib/state-helpers";
 
 export function LineProofStep({
   ...props
@@ -40,7 +42,7 @@ export function LineProofStep({
   const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const { interactionState } = useInteractionState();
-  const { currentlyHoveredUuid, handleHoverStep } = useHovering();
+  const { handleHover } = useHovering();
   const proofContext = useProof();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
@@ -67,7 +69,6 @@ export function LineProofStep({
   }
   const stepHighlight = getStepHighlight(
     props.uuid,
-    currentlyHoveredUuid,
     interactionState,
     proofContext,
   );
@@ -101,7 +102,7 @@ export function LineProofStep({
         onMouseMove={(e) => {
           e.stopPropagation();
           if (e.currentTarget !== e.target) return;
-          handleHoverStep(props.uuid, null, false);
+          handleHover({ enum: HoveringEnum.HOVERING_STEP, stepUuid: props.uuid });
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -164,7 +165,7 @@ function Formula({
   isSyncedWithServer: boolean;
 }) {
   const { interactionState, doTransition } = useInteractionState();
-  const { handleHoverStep } = useHovering();
+  const { handleHover } = useHovering();
   const diagnosticContext = useDiagnostics();
 
   const isEditingFormula =
@@ -209,15 +210,12 @@ function Formula({
       onDoubleClickCapture={(e) => e.stopPropagation()}
       onMouseOver={(e) => {
         e.stopPropagation();
-        handleHoverStep(lineUuid, null, false);
+        handleHover({ enum: HoveringEnum.HOVERING_FORMULA, stepUuid: lineUuid });
       }}
-      onChange={(e) => {
-        console.log(e);
-        doTransition({
-          enum: TransitionEnum.UPDATE_FORMULA,
-          formula: e.target.value,
-        });
-      }}
+      onChange={(e) => doTransition({
+        enum: TransitionEnum.UPDATE_FORMULA,
+        formula: e.target.value,
+      })}
       autoFocus={isEditingFormula}
       onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
       title="Write a formula"
@@ -228,24 +226,28 @@ function Formula({
       inputClassName="px-2"
     />
   ) : (
-    <p
-      className={cn("shrink", formulaIsWrong && "text-red-500")}
-      onMouseOver={(e) => {
-        e.stopPropagation();
-        handleHoverStep(lineUuid, null, false);
+    <div
+      className={cn(
+        "shrink", 
+        formulaIsWrong && "text-red-500",
+        formulaIsBeingHovered(lineUuid, interactionState) && "text-blue-600",
+      )}
+      onClick={e => {
+        e.stopPropagation()
+        doTransition({ 
+          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE, 
+          lineUuid 
+        })
+      }}
+      onMouseMove={e => {
+        handleHover({ enum: HoveringEnum.HOVERING_FORMULA, stepUuid: lineUuid })
       }}
     >
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
         currentFormulaValue
       ) : (
-        <span
-          onClickCapture={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
-        </span>
+        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
       )}
-    </p>
+    </div>
   );
 }

@@ -50,13 +50,26 @@ export enum InteractionStateEnum {
   VIEWING_CONTEXT_MENU,
 }
 
+export enum HoveringEnum {
+  HOVERING_STEP,
+  HOVERING_FORMULA,
+  HOVERING_REF,
+  HOVERING_RULE,
+}
+
+export type HoveringState = { enum: HoveringEnum } & (
+  | { enum: HoveringEnum.HOVERING_STEP, stepUuid: string }
+  | { enum: HoveringEnum.HOVERING_FORMULA, stepUuid: string }
+  | { enum: HoveringEnum.HOVERING_RULE, stepUuid: string }
+  | { enum: HoveringEnum.HOVERING_REF, stepUuid: string, refIdx: number }
+)
+
 export type InteractionState = { enum: InteractionStateEnum } & (
   | {
       enum: InteractionStateEnum.IDLE;
       selectedProofStepUuid: string | null;
       sticky: boolean;
-      hoveredRefIdx: number | null;
-      ruleIsHovered: boolean;
+      hovering: HoveringState | null;
     }
   | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string }
   | {
@@ -77,9 +90,7 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.DOUBLE_CLICK_LINE; lineUuid: string }
   | {
       enum: TransitionEnum.HOVER;
-      stepUuid: string | null;
-      refIdx: number | null;
-      ruleIsHovered: boolean;
+      hovering: HoveringState | null; // null if we are hovering nothing
     }
   | { enum: TransitionEnum.CLICK_BOX; boxUuid: string }
   | {
@@ -140,8 +151,7 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
       sticky: false,
-      hoveredRefIdx: null,
-      ruleIsHovered: false,
+      hovering: null,
     });
 
   const serverContext = useServer();
@@ -298,8 +308,7 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
       sticky: false,
-      hoveredRefIdx: null,
-      ruleIsHovered: false,
+      hovering: null,
     };
   };
 
@@ -311,6 +320,7 @@ export function InteractionStateProvider({
       return {
         ...fullyIdle(),
         selectedProofStepUuid: clickedUuid,
+        hovering: state.hovering,
         sticky: true,
       };
     }
@@ -318,6 +328,7 @@ export function InteractionStateProvider({
     return {
       ...fullyIdle(),
       selectedProofStepUuid: clickedUuid,
+      hovering: state.hovering,
       sticky: clickedUuid !== state.selectedProofStepUuid,
     };
   };
@@ -354,17 +365,12 @@ export function InteractionStateProvider({
       [CLICK_LINE]: (state, { lineUuid }) =>
         handleClickStepInIdle(state, lineUuid),
       [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
-      [HOVER]: (state, { stepUuid: lineUuid, refIdx, ruleIsHovered }) => {
-        if (state.sticky) {
-          return { ...state, refIdx, ruleIsHovered };
-        }
+      [HOVER]: (state, { hovering }) => {
         return {
-          enum: IDLE,
-          selectedProofStepUuid: lineUuid,
-          sticky: false,
-          hoveredRefIdx: refIdx,
-          ruleIsHovered,
-        };
+          ...state,
+          selectedProofStepUuid: state.sticky ? state.selectedProofStepUuid : (hovering?.stepUuid ?? null),
+          hovering: hovering,
+        }
       },
       [CLICK_RULE]: (_, { lineUuid }) => ({ enum: EDITING_RULE, lineUuid }),
       [CLICK_REF]: (_, { lineUuid, refIdx }) => ({
@@ -675,11 +681,11 @@ export function InteractionStateProvider({
         return prevState;
       } else {
         const newState = func(prevState, transition);
-        // console.log(
-        //   `${TransitionEnum[transition.enum]}: ${
-        //     InteractionStateEnum[prevState.enum]
-        //   } -> ${InteractionStateEnum[newState.enum]}`
-        // );
+        console.log(
+          `${TransitionEnum[transition.enum]}: ${
+            InteractionStateEnum[prevState.enum]
+          } -> ${InteractionStateEnum[newState.enum]}`
+        );
 
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
           return prevState;

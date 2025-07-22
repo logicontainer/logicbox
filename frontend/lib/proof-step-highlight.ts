@@ -12,8 +12,8 @@ export enum StepHighlight {
   REFERRED,
 }
 
-export function getStepHighlight(stepUuid: string, currentlyHoveredUuid: string | null, interactionState: InteractionState, proofContext: ProofContextProps) {
-  const currentlyBeingHovered = currentlyHoveredUuid === stepUuid
+export function getStepHighlight(stepUuid: string, interactionState: InteractionState, proofContext: ProofContextProps) {
+  const currentlyBeingHovered = interactionState.enum === InteractionStateEnum.IDLE && interactionState.hovering?.stepUuid === stepUuid
   const currentlySelected = getSelectedStep(interactionState) == stepUuid;
   const refBeingEdited = interactionState.enum === InteractionStateEnum.EDITING_REF && interactionState.lineUuid === stepUuid
   const otherIsEditingRef = interactionState.enum === InteractionStateEnum.EDITING_REF && interactionState.lineUuid !== stepUuid
@@ -71,6 +71,9 @@ function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
     case "ReferenceShouldBeLine":
       return refIdx === d.refIdx
 
+    case "Ambiguous":
+      return d.entries.some(e => e.rulePosition === `premise ${refIdx}`)
+
     default: 
       return false
   }
@@ -79,19 +82,8 @@ function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
 export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: number, diagnosticContext: DiagnosticsContextProps) {
   const { diagnostics } = diagnosticContext
 
-  const referenceViolationTypes: ErrorType[] = [
-    "MissingRef",
-    "ReferenceOutOfScope",
-    "ReferenceToLaterStep",
-    "ReferenceToUnclosedBox",
-    "ReferenceBoxMissingFreshVar",
-    "ReferenceShouldBeBox",
-    "ReferenceShouldBeLine",
-  ] as const
-
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
-    .filter(d => referenceViolationTypes.includes(d.errorType))
     .filter(d => referenceIdxIsInDiagnostic(d, refIdx))
 
   return ds.length > 0 ?

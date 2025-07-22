@@ -11,11 +11,9 @@ import RulePanel from "./RulePanel";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useServer } from "@/contexts/ServerProvider";
-import { getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
+import { formulaIsBeingHovered, getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
 import Link from "next/link";
 import { useProof } from "@/contexts/ProofProvider";
-import { Button } from "./ui/button";
-import { DownloadIcon } from "lucide-react";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 
@@ -41,7 +39,7 @@ export default function ContextSidebar() {
       ? `Fresh var: ${proofStep.boxInfo.freshVar}`
       : null) ?? "";
 
-  const hoveredRefs =
+  const refHighlights =
     stepInFocus && proofStep?.stepType === "line"
       ? proofStep.justification.refs
           .map((_, idx) => idx)
@@ -52,7 +50,8 @@ export default function ContextSidebar() {
 
   const ruleLatex =
     stepInFocus &&
-    getRuleAtStepAsLatex(stepInFocus, hoveredRefs, false, "blue");
+    getRuleAtStepAsLatex(stepInFocus, refHighlights, formulaIsBeingHovered(stepInFocus, interactionState), "blue");
+
   const isEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
