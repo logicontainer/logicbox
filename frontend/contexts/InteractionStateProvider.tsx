@@ -676,11 +676,11 @@ export function InteractionStateProvider({
         return prevState;
       } else {
         const newState = func(prevState, transition);
-        console.log(
-          `${TransitionEnum[transition.enum]}: ${
-            InteractionStateEnum[prevState.enum]
-          } -> ${InteractionStateEnum[newState.enum]}`
-        );
+        // console.log(
+        //   `${TransitionEnum[transition.enum]}: ${
+        //     InteractionStateEnum[prevState.enum]
+        //   } -> ${InteractionStateEnum[newState.enum]}`
+        // );
 
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
           return prevState;
