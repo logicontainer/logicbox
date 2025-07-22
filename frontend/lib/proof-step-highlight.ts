@@ -1,4 +1,4 @@
-import { InteractionState, InteractionStateEnum } from "@/contexts/InteractionStateProvider";
+import { HoveringState, InteractionState, InteractionStateEnum } from "@/contexts/InteractionStateProvider";
 import { getSelectedStep, stepIsReferee } from "./state-helpers";
 import { ProofContextProps } from "@/contexts/ProofProvider";
 import { DiagnosticsContextProps } from "@/contexts/DiagnosticsProvider";
@@ -12,8 +12,8 @@ export enum StepHighlight {
   REFERRED,
 }
 
-export function getStepHighlight(stepUuid: string, interactionState: InteractionState, proofContext: ProofContextProps) {
-  const currentlyBeingHovered = interactionState.enum === InteractionStateEnum.IDLE && interactionState.hovering?.stepUuid === stepUuid
+export function getStepHighlight(stepUuid: string, interactionState: InteractionState, hoveringState: HoveringState | null, proofContext: ProofContextProps) {
+  const currentlyBeingHovered = hoveringState?.stepUuid === stepUuid
   const currentlySelected = getSelectedStep(interactionState) == stepUuid;
   const refBeingEdited = interactionState.enum === InteractionStateEnum.EDITING_REF && interactionState.lineUuid === stepUuid
   const otherIsEditingRef = interactionState.enum === InteractionStateEnum.EDITING_REF && interactionState.lineUuid !== stepUuid
@@ -22,7 +22,7 @@ export function getStepHighlight(stepUuid: string, interactionState: Interaction
     return StepHighlight.NOTHING;
   } else if (currentlyBeingHovered && otherIsEditingRef) {
     return StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF;
-  } else if (stepIsReferee(stepUuid, interactionState, proofContext)) {
+  } else if (stepIsReferee(stepUuid, hoveringState, proofContext)) {
     return StepHighlight.REFERRED;
   } else if (currentlySelected) {
     return StepHighlight.SELECTED;

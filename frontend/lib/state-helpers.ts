@@ -1,5 +1,6 @@
 import {
     HoveringEnum,
+  HoveringState,
   InteractionState,
   InteractionStateEnum,
 } from "@/contexts/InteractionStateProvider";
@@ -45,53 +46,44 @@ export function stepIsSelected(
 
 export function formulaIsBeingHovered(
   stepUuid: string,
-  state: InteractionState,
+  state: HoveringState | null,
 ): boolean {
   return (
-    state.enum === InteractionStateEnum.IDLE &&
-    state.hovering?.enum === HoveringEnum.HOVERING_FORMULA &&
-    state.hovering.stepUuid === stepUuid
+    state?.enum === HoveringEnum.HOVERING_FORMULA &&
+    state.stepUuid === stepUuid
   );
 }
 
 export function refIsBeingHovered(
   stepUuid: string,
   refIdx: number,
-  state: InteractionState,
+  state: HoveringState | null,
 ): boolean {
   return (
-    state.enum === InteractionStateEnum.IDLE &&
-    state.hovering?.enum === HoveringEnum.HOVERING_REF &&
-    state.hovering.stepUuid === stepUuid &&
-    state.hovering.refIdx === refIdx
+    state?.enum === HoveringEnum.HOVERING_REF &&
+    state.stepUuid === stepUuid &&
+    state.refIdx === refIdx
   );
 }
 
 export function ruleIsBeingHovered(
   stepUuid: string,
-  state: InteractionState,
+  state: HoveringState | null,
 ): boolean {
   return (
-    state.enum === InteractionStateEnum.IDLE &&
-    state.hovering?.enum === HoveringEnum.HOVERING_RULE &&
-    state.hovering.stepUuid === stepUuid
+    state?.enum === HoveringEnum.HOVERING_RULE &&
+    state.stepUuid === stepUuid
   );
 }
 
 export function stepIsReferee(
   stepUuid: string,
-  interactionState: InteractionState,
+  hoveringState: HoveringState | null,
   proofContext: ProofContextProps,
 ): boolean {
   const { getProofStepDetails } = proofContext;
-  const refererStepId =
-    interactionState.enum === InteractionStateEnum.IDLE && interactionState.hovering !== null
-      ? interactionState.hovering.stepUuid
-      : null;
-  const hoveredRefIdx =
-    interactionState.enum === InteractionStateEnum.IDLE && interactionState.hovering?.enum === HoveringEnum.HOVERING_REF
-      ? interactionState.hovering.refIdx
-      : null;
+  const refererStepId = hoveringState?.stepUuid || null
+  const hoveredRefIdx = hoveringState?.enum === HoveringEnum.HOVERING_REF ? hoveringState.refIdx : null
   const refererStep = refererStepId ? getProofStepDetails(refererStepId) : null;
   if (hoveredRefIdx === null || refererStep?.proofStep.stepType !== "line") {
     return false;

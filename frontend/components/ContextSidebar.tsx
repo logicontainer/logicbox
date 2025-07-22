@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
+import { useHovering } from "@/contexts/HoveringProvider";
 
 export default function ContextSidebar() {
   const { proof } = useProof();
@@ -23,6 +24,7 @@ export default function ContextSidebar() {
   const diagnosticContext = useDiagnostics();
   const { getRuleAtStepAsLatex, getStep } = diagnosticContext;
   const { interactionState } = useInteractionState();
+  const { hoveringState } = useHovering()
 
   const stepInFocus = getSelectedStep(interactionState);
   const proofLine = lines.find((line) => line.uuid === stepInFocus);
@@ -44,13 +46,13 @@ export default function ContextSidebar() {
       ? proofStep.justification.refs
           .map((_, idx) => idx)
           .filter((idx) =>
-            refIsBeingHovered(stepInFocus, idx, interactionState),
+            refIsBeingHovered(stepInFocus, idx, hoveringState),
           )
       : [];
 
   const ruleLatex =
     stepInFocus &&
-    getRuleAtStepAsLatex(stepInFocus, refHighlights, formulaIsBeingHovered(stepInFocus, interactionState), "blue");
+    getRuleAtStepAsLatex(stepInFocus, refHighlights, formulaIsBeingHovered(stepInFocus, hoveringState), "blue");
 
   const isEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE;

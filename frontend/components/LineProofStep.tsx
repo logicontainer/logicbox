@@ -42,7 +42,7 @@ export function LineProofStep({
   const { doTransition } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const { interactionState } = useInteractionState();
-  const { handleHover } = useHovering();
+  const { handleHover, hoveringState } = useHovering();
   const proofContext = useProof();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
@@ -70,6 +70,7 @@ export function LineProofStep({
   const stepHighlight = getStepHighlight(
     props.uuid,
     interactionState,
+    hoveringState,
     proofContext,
   );
 
@@ -165,7 +166,7 @@ function Formula({
   isSyncedWithServer: boolean;
 }) {
   const { interactionState, doTransition } = useInteractionState();
-  const { handleHover } = useHovering();
+  const { handleHover, hoveringState } = useHovering();
   const diagnosticContext = useDiagnostics();
 
   const isEditingFormula =
@@ -230,7 +231,7 @@ function Formula({
       className={cn(
         "shrink", 
         formulaIsWrong && "text-red-500",
-        formulaIsBeingHovered(lineUuid, interactionState) && "text-blue-600",
+        formulaIsBeingHovered(lineUuid, hoveringState) && "text-blue-600",
       )}
       onClick={e => {
         e.stopPropagation()

@@ -69,7 +69,6 @@ export type InteractionState = { enum: InteractionStateEnum } & (
       enum: InteractionStateEnum.IDLE;
       selectedProofStepUuid: string | null;
       sticky: boolean;
-      hovering: HoveringState | null;
     }
   | { enum: InteractionStateEnum.EDITING_RULE; lineUuid: string }
   | {
@@ -151,7 +150,6 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
       sticky: false,
-      hovering: null,
     });
 
   const serverContext = useServer();
@@ -308,7 +306,6 @@ export function InteractionStateProvider({
       enum: InteractionStateEnum.IDLE,
       selectedProofStepUuid: null,
       sticky: false,
-      hovering: null,
     };
   };
 
@@ -320,7 +317,6 @@ export function InteractionStateProvider({
       return {
         ...fullyIdle(),
         selectedProofStepUuid: clickedUuid,
-        hovering: state.hovering,
         sticky: true,
       };
     }
@@ -328,7 +324,6 @@ export function InteractionStateProvider({
     return {
       ...fullyIdle(),
       selectedProofStepUuid: clickedUuid,
-      hovering: state.hovering,
       sticky: clickedUuid !== state.selectedProofStepUuid,
     };
   };

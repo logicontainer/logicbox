@@ -32,11 +32,12 @@ export function BoxProofStep({
 }) {
   const { doTransition, interactionState } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
-  const { handleHover } = useHovering();
+  const { handleHover, hoveringState } = useHovering();
 
   const highlight = getStepHighlight(
     props.uuid,
     interactionState,
+    hoveringState,
     useProof(),
   );
 
