@@ -71,6 +71,9 @@ function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
     case "ReferenceShouldBeLine":
       return refIdx === d.refIdx
 
+    case "ShapeMismatch":
+      return d.rulePosition === `premise ${refIdx}`
+
     case "Ambiguous":
       return d.entries.some(e => e.rulePosition === `premise ${refIdx}`)
 
