@@ -240,7 +240,7 @@ object Stringifiers {
       case MetaFormula(Formulas.Psi) => "\\psi"
       case MetaFormula(Formulas.Chi) => "\\chi"
       case Substitution(phi, t, x) => s"${b(phi)}[${templateTermToLaTeX(t)}/${templateTermToLaTeX(x)}]"
-      case Contradiction() => "false"
+      case Contradiction() => "\\bot"
       case Equals(t1, t2) => s"${templateTermToLaTeX(t1)} = ${templateTermToLaTeX(t2)}"
       case And(phi, psi) => s"${b(phi)} \\land ${b(psi)}"
       case Or(phi, psi) => s"${b(phi)} \\lor ${b(psi)}"
