@@ -22,7 +22,7 @@ class TemplateFormulaAndTermToLaTeXTest extends AnyFunSpec {
             Not(MetaFormula(Formulas.Chi))
           )
         )
-      ) shouldBe "forall x ((x_0 = t_1 + t) and \\psi) -> (\\psi or not \\chi)"
+      ) shouldBe "\\forall x ((x_0 = t_1 + t) \\land \\psi) \\rightarrow (\\psi \\lor \\lnot \\chi)"
     }
   }
 }
