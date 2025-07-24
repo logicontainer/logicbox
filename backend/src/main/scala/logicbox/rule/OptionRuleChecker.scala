@@ -26,7 +26,7 @@ case class OptionRuleChecker[F, R, B, V](
       case Line(None) =>
         Left(Error.Miscellaneous(Location.premise(refIdx), "missing formula"))
 
-      case Box(None, _, _) => 
+      case Box(None, _, _) | _ => 
         Left(Error.Miscellaneous(Location.premise(refIdx), "missing box info"))
     }
   }

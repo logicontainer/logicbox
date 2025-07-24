@@ -81,6 +81,7 @@ class ErrorConverterImpl[F, R, B, O](
     case MissingRef(refIdx) => Some(OutputError.RefErr(stepId, "MissingRef", refIdx))
 
     case PremiseInsideBox() => Some(OutputError.Simple(stepId, "PremiseInsideBox"))
+    case InvalidAssumption() => Some(OutputError.Simple(stepId, "InvalidAssumption"))
 
     case ReferenceOutOfScope(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceOutOfScope", refIdx))
     case ReferenceToLaterStep(refIdx) => Some(OutputError.RefErr(stepId, "ReferenceToLaterStep", refIdx))

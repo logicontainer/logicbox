@@ -15,15 +15,13 @@ import logicbox.framework.Error._
 class StructuralProofCheckerTest extends AnyFunSpec {
   import ProofStubs._
   describe("check") {
-    type Premise = Bad
-    def prem: Premise = Bad()
-    val checker = StructuralProofChecker[ProofStubs.StubRule, String](prem)
+    val checker = StructuralProofChecker[ProofStubs.StubRule, String](Premise(), Assumption())
     it("should not allow premise inside box") {
       val pf = StubProof(
         rootSteps = Seq("box"),
         map = Map(
           "box" -> StubBox(StubBoxInfo(), Seq("line")),
-          "line" -> StubLine(StubFormula(), prem)
+          "line" -> StubLine(StubFormula(), Premise())
         )
       )
 
@@ -38,7 +36,7 @@ class StructuralProofCheckerTest extends AnyFunSpec {
         map = Map(
           "outer" -> StubBox(StubBoxInfo(), Seq("inner")),
           "inner" -> StubBox(StubBoxInfo(), Seq("line")),
-          "line" -> StubLine(StubFormula(), prem)
+          "line" -> StubLine(StubFormula(), Premise())
         )
       )
 
@@ -63,11 +61,37 @@ class StructuralProofCheckerTest extends AnyFunSpec {
       val pf = StubProof(
         rootSteps = Seq("line"),
         map = Map(
-          "line" -> StubLine(StubFormula(), prem)
+          "line" -> StubLine(StubFormula(), Premise())
         )
       )
 
       checker.check(pf) shouldBe Nil
+    }
+
+    it("should not allow assumption in root scope") {
+      val pf = StubProof(
+        rootSteps = Seq("line"),
+        map = Map(
+          "line" -> StubLine(StubFormula(), Assumption())
+        )
+      )
+
+      checker.check(pf) shouldBe List(("line", InvalidAssumption()))
+    }
+
+    it("should not allow assumption if it is second line of box") {
+      val pf = StubProof(
+        rootSteps = Seq("box"),
+        map = Map(
+          "box" -> StubBox(StubBoxInfo(), Seq("l1", "l2")),
+          "l1" -> StubLine(StubFormula(), Assumption()), // fine
+          "l2" -> StubLine(StubFormula(), Assumption()), // not fine
+        )
+      )
+
+      checker.check(pf) shouldBe List(
+        ("l2", InvalidAssumption())
+      )
     }
   }
 }

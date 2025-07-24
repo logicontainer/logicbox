@@ -10,6 +10,8 @@ object ProofStubs {
   sealed trait StubRule
   case class Good() extends StubRule
   case class Bad() extends StubRule
+  case class Premise() extends StubRule
+  case class Assumption() extends StubRule
 
   case class StubBoxInfo(info: String = "")
 
@@ -44,8 +46,8 @@ object ProofStubs {
     override def check(rule: StubRule, formula: StubFormula, refs: List[Reference[StubFormula, StubBoxInfo]]): List[Error] = 
       refsCalledWith = Some(refs)
       rule match {
-        case Good() => Nil
         case Bad() => List(Miscellaneous(Location.conclusion, "test"))
+        case _ => Nil
       }
   }
 }
