@@ -9,28 +9,34 @@ import spray.json.JsonParser.ParsingException
 import logicbox.server.format.RawProof
 import logicbox.server.format.RawProofConverter
 import logicbox.server.format.OutputError
+import logicbox.server.ProofValidatorServiceImpl.ErrorNotConvertible
+
+object ProofValidatorServiceImpl {
+  sealed trait Error
+  case class ErrorNotConvertible(id: String, error: logicbox.framework.Error) extends Error
+}
 
 class ProofValidatorServiceImpl[F, R, B](
   val rawProofConverter: RawProofConverter[Proof[F, R, B, String]],
   val proofChecker: ProofChecker[F, R, B, String],
   val createErrorConverter: Proof[F, R, B, String] => ErrorConverter
-) extends ProofValidatorService[Unit] {
-  override def validateProof(rawProof: RawProof): Either[Unit, ValidationResult] = {
+) extends ProofValidatorService[ProofValidatorServiceImpl.Error] {
+  override def validateProof(rawProof: RawProof): Either[ProofValidatorServiceImpl.Error, ValidationResult] = {
     val proof = rawProofConverter.convertFromRaw(rawProof)
     val errors = proofChecker.check(proof)
     val outputRawProof = rawProofConverter.convertToRaw(proof)
     val errorConverter = createErrorConverter(proof)
-    println(errors)
-    Right(ValidationResult(
-      proof = outputRawProof,
-      diagnostics = errors.flatMap((id, e) => errorConverter.convert(id, e) match {
-        case Some(e) => Some(e)
-        case None => 
-          println("Found invalid error:")
-          println(e)
-          println("")
-          None
-      })
-    ))
+  
+    val outputDiagnostics = errors.map((id, e) => errorConverter.convert(id, e))
+    if outputDiagnostics.forall(_.isDefined) then
+      Right(ValidationResult(
+        proof = outputRawProof,
+        diagnostics = outputDiagnostics.flatten
+      ))
+    else {
+      val lilRascalIdx = outputDiagnostics.indexOf(None)
+      val (id, err) = errors(lilRascalIdx)
+      Left(ErrorNotConvertible(id, err))
+    }
   }
 }
