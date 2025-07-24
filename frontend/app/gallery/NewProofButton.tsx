@@ -1,65 +1,121 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { LogicName } from "@/types/types";
+import { LogicName, Proof } from "@/types/types";
 import { useRouter } from "next/navigation";
 import { v4 as uuid } from "uuid";
 import { useProofStore } from "@/store/proofStore";
 import { PlusIcon } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { v4 as uuidv4 } from "uuid";
+import { cn } from "@/lib/utils";
+import { InlineMath } from "react-katex";
+import React from "react";
+import "katex/dist/katex.min.css";
+
+const NEW_PROOF: Proof = [
+  {
+    stepType: "line",
+    uuid: uuidv4(),
+    formula: {
+      userInput: "",
+      ascii: null,
+      latex: null
+    },
+    justification: {
+      rule: null,
+      refs: []
+    }
+  }
+]
+
+function LogicOption({
+  name,
+  latex,
+  chosen,
+  onClick,
+}: {
+  name: string
+  latex: string
+  chosen: boolean
+  onClick: () => void
+}) {
+  return <div className={cn(
+    "w-full h-9 flex items-center justify-between px-3 border-[1px] border-solid border-slate-200 rounded hover:bg-slate-200",
+    chosen && "bg-slate-200"
+  )} onClick={onClick}>
+    <div className="text-base text-sm">{name}</div>
+    <InlineMath math={latex}/>
+  </div>
+}
 
 export default function NewProofButton() {
   const addProof = useProofStore((state) => state.addProof);
   const router = useRouter();
-  return (
-    <Button
-      size="icon"
-      variant="outline"
-      onClick={() => {
-        const newProofId = uuid();
-        let logicName: LogicName | null = null;
+  
+  const [proofName, setProofName] = React.useState<string>("");
+  const [chosenLogic, setChosenLogic] = React.useState<LogicName | null>(null)
 
-        while (logicName === null) {
-          const p = prompt(
-            "Which logic should your proof be in?\nMust be either \n - 'prop' (propositional logic),\n - 'pred' (predicate logic),\n - 'arith' (arithmetic)",
-          );
-          if (p === null) return;
-          switch (p) {
-            case "prop":
-              logicName = "propositionalLogic";
-              break;
-            case "pred":
-              logicName = "predicateLogic";
-              break;
-            case "arith":
-              logicName = "arithmetic";
-              break;
-          }
-        }
+  const onCreate = () => {
+    if (proofName === "") {
+      alert("Proof must have a name")
+      return;
+    }
 
-        addProof({
-          id: newProofId,
-          title: "New proof",
-          logicName: logicName,
-          createdAt: new Date().toISOString(),
-          proof: [
-            {
-              formula: {
-                ascii: null,
-                latex: null,
-                userInput: "",
-              },
-              justification: {
-                refs: [],
-                rule: "premise",
-              },
-              stepType: "line",
-              uuid: uuid(),
-            },
-          ],
-        });
-        router.push(`/proofs/${newProofId}`);
-      }}
-    >
-      <PlusIcon className="h-4 w-4"></PlusIcon>
-    </Button>
-  );
+    if (chosenLogic === null) {
+      alert("You must choose a logic")
+      return;
+    }
+
+    const newProofId = uuidv4()
+    addProof({
+      id: newProofId,
+      createdAt: new Date().toISOString(),
+      title: proofName,
+      logicName: chosenLogic,
+      proof: NEW_PROOF
+    })
+    router.push(`/proofs/${newProofId}`)
+  }
+
+  return <AlertDialog>
+    <AlertDialogTrigger asChild>
+      <Button size="icon" variant="outline" onClick={_ => {
+        setProofName("")
+        setChosenLogic(null)
+      }}>
+        <PlusIcon className="h-4 w-4"></PlusIcon>
+      </Button>
+    </AlertDialogTrigger>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Create a new proof</AlertDialogTitle>
+      </AlertDialogHeader>
+
+      <div className="flex flex-col gap-6">
+        <div className="grid gap-2">
+          <Label>Choose a name</Label>
+          <Input
+            id="proof_name"
+            value={proofName}
+            onChange={e => setProofName(e.target.value)}
+            placeholder="Proof of Goldbach's conjecture"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>Select logic</Label>
+        <div className="flex flex-col gap-1">
+          <LogicOption name="Propositional logic" latex="p, q, \land, \lor, \rightarrow, \bot" chosen={chosenLogic === "propositionalLogic"} onClick={() => setChosenLogic("propositionalLogic")}/>
+          <LogicOption name="Predicate logic" latex="\forall, \exists, Q(a, b), x = y" chosen={chosenLogic === "predicateLogic"} onClick={() => setChosenLogic("predicateLogic")}/>
+          <LogicOption name="Arithmetic" latex="0, 1, +, *" chosen={chosenLogic === "arithmetic"} onClick={() => setChosenLogic("arithmetic")}/>
+        </div>
+      </div>
+
+      <AlertDialogFooter>
+        <AlertDialogAction onClick={onCreate}>Create</AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 }

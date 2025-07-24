@@ -2,7 +2,7 @@
 import { useProofStore } from "@/store/proofStore";
 import GalleryItem from "./GalleryItem";
 import { ProofWithMetadata } from "@/types/types";
-import NewProofButton from "./NewProofButton";
+import NewProofDialog from "./NewProofButton";
 import UploadProofButton from "@/components/UploadProofButton";
 
 export default function Gallery() {
@@ -12,7 +12,7 @@ export default function Gallery() {
     <div className="pt-8 lg:px-4 w-screen">
       <div className="flex gap-2 px-4">
         <p className="text text-2xl font-bold">My proofs</p>
-        <NewProofButton />
+        <NewProofDialog />
         <UploadProofButton />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 w-full p-4">
