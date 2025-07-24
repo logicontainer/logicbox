@@ -81,6 +81,8 @@ export type Diagnostic = { uuid: UUID } & (
   | { errorType: "MissingRule" }
   | { errorType: "MissingRef", refIdx: number }
 
+  | { errorType: "PremiseInsideBox" }
+
   | { errorType: "ReferenceOutOfScope", refIdx: number }
   | { errorType: "ReferenceToLaterStep", refIdx: number }
   | { errorType: "ReferenceToUnclosedBox", refIdx: number  }
