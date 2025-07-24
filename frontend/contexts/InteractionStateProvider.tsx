@@ -328,6 +328,14 @@ export function InteractionStateProvider({
     };
   };
 
+  const stickySelectStep = (step: string) => {
+    return {
+      ...fullyIdle(),
+      selectedProofStepUuid: step,
+      sticky: true,
+    }
+  }
+
   const {
     IDLE,
     EDITING_REF,
@@ -359,6 +367,7 @@ export function InteractionStateProvider({
 
       [CLICK_LINE]: (state, { lineUuid }) =>
         handleClickStepInIdle(state, lineUuid),
+
       [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => startEditingFormula(lineUuid),
       [HOVER]: (state, { hovering }) => {
         return {
@@ -390,10 +399,10 @@ export function InteractionStateProvider({
     [EDITING_FORMULA]: {
       [CLICK_OUTSIDE]: (state, _) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
-        return fullyIdle();
+        return stickySelectStep(state.lineUuid)
       },
 
-      [CLICK_LINE]: fullyIdle,
+      [CLICK_LINE]: (_, { lineUuid }) => stickySelectStep(lineUuid),
       [HOVER]: doNothing,
 
       [DOUBLE_CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
@@ -414,7 +423,10 @@ export function InteractionStateProvider({
         return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx };
       },
 
-      [CLICK_BOX]: doNothing,
+      [CLICK_BOX]: (state, { boxUuid }) => {
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
+        return stickySelectStep(boxUuid)
+      },
 
       [UPDATE_FORMULA]: (state, { formula }) => {
         return { ...state, currentFormula: formula };
@@ -422,12 +434,12 @@ export function InteractionStateProvider({
 
       [VALIDATE_PROOF]: (state, _) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
-        return fullyIdle();
+        return stickySelectStep(state.lineUuid);
       },
 
       [CLOSE]: (state, _) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
-        return fullyIdle();
+        return stickySelectStep(state.lineUuid);
       },
 
       [RIGHT_CLICK_STEP]: (state, { proofStepUuid, isBox }) => {
@@ -441,7 +453,7 @@ export function InteractionStateProvider({
 
       [CLICK_LINE]: (state, { lineUuid }) => {
         if (state.lineUuid === lineUuid) {
-          return { ...fullyIdle(), selectedProofStepUuid: lineUuid };
+          return stickySelectStep(state.lineUuid);
         } else {
           return fullyIdle();
         }
@@ -457,16 +469,16 @@ export function InteractionStateProvider({
         refIdx,
       }),
 
-      [CLICK_BOX]: doNothing,
+      [CLICK_BOX]: (_, { boxUuid }) => stickySelectStep(boxUuid),
 
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
         updateRuleAndValidate(lineUuid, ruleName);
-        return fullyIdle();
+        return stickySelectStep(lineUuid);
       },
 
-      [VALIDATE_PROOF]: () => {
+      [VALIDATE_PROOF]: (state, _) => {
         enqueueCommand(Validate.VALIDATE);
-        return fullyIdle();
+        return stickySelectStep(state.lineUuid);
       },
 
       [CLOSE]: () => fullyIdle(),
@@ -486,7 +498,7 @@ export function InteractionStateProvider({
         if (editedLineUuid !== clickedLineUuid) {
           updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
         }
-        return { ...fullyIdle(), selectedProofStepUuid: editedLineUuid };
+        return stickySelectStep(editedLineUuid);
       },
 
       [HOVER]: doNothing,
@@ -497,7 +509,7 @@ export function InteractionStateProvider({
         { boxUuid: clickedBoxUuid },
       ) => {
         updateRefAndValidate(editedLineUuid, refIdx, clickedBoxUuid);
-        return fullyIdle();
+        return stickySelectStep(editedLineUuid)
       },
 
       [CLICK_RULE]: (
@@ -506,7 +518,7 @@ export function InteractionStateProvider({
       ) => {
         if (editedLineUuid !== clickedLineUuid) {
           updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
-          return fullyIdle();
+          return stickySelectStep(editedLineUuid);
         }
         return { enum: EDITING_RULE, lineUuid: clickedLineUuid };
       },
@@ -514,7 +526,7 @@ export function InteractionStateProvider({
       [CLICK_REF]: (state, trans) => {
         if (trans.lineUuid !== state.lineUuid) {
           updateRefAndValidate(state.lineUuid, state.refIdx, trans.lineUuid);
-          return fullyIdle();
+          return stickySelectStep(state.lineUuid);
         }
 
         if (trans.refIdx === state.refIdx) {
@@ -540,6 +552,7 @@ export function InteractionStateProvider({
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
     },
+
     [VIEWING_CONTEXT_MENU]: {
       [CLICK_OUTSIDE]: () => fullyIdle(),
 
