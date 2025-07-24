@@ -203,35 +203,19 @@ function Formula({
     ? errorHighlight(formulaContent)
     : formulaContent;
 
-  return isEditingFormula ? (
-    <AutosizeInput
-      inputRef={handleInputRefChange}
-      value={currentFormulaValue}
-      onClickCapture={(e) => e.stopPropagation()}
-      onDoubleClickCapture={(e) => e.stopPropagation()}
-      onMouseOver={(e) => {
-        e.stopPropagation();
-        handleHover({ enum: HoveringEnum.HOVERING_FORMULA, stepUuid: lineUuid });
-      }}
-      onChange={(e) => doTransition({
-        enum: TransitionEnum.UPDATE_FORMULA,
-        formula: e.target.value,
-      })}
-      autoFocus={isEditingFormula}
-      onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-      title="Write a formula"
-      className={cn(
-        "text-slate-800 grow resize shrink",
-        formulaIsWrong && "text-red-500",
-      )}
-      inputClassName="px-2"
-    />
-  ) : (
-    <div
+  React.useEffect(() => {
+    if (isEditingFormula) {
+      formulaInputRef?.current?.focus()
+    }
+  }, [isEditingFormula])
+
+  return <>
+    <div 
       className={cn(
         "shrink", 
         formulaIsWrong && "text-red-500",
         formulaIsBeingHovered(lineUuid, hoveringState) && "text-blue-600",
+        isEditingFormula && "opacity-0"
       )}
       onClick={e => {
         e.stopPropagation()
@@ -240,9 +224,6 @@ function Formula({
           lineUuid 
         })
       }}
-      onMouseMove={e => {
-        handleHover({ enum: HoveringEnum.HOVERING_FORMULA, stepUuid: lineUuid })
-      }}
     >
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
         currentFormulaValue
@@ -250,5 +231,31 @@ function Formula({
         <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
       )}
     </div>
-  );
+    <div
+      className={cn(
+        "absolute bg-white z-10"
+      )}
+      style={isEditingFormula ? {} : {display: "none"}}
+    >
+      <AutosizeInput
+        inputRef={handleInputRefChange}
+        value={currentFormulaValue}
+        onClickCapture={(e) => e.stopPropagation()}
+        onDoubleClickCapture={(e) => e.stopPropagation()}
+        onChange={(e) => doTransition({
+          enum: TransitionEnum.UPDATE_FORMULA,
+          formula: e.target.value,
+        })}
+        onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
+        className={cn(
+          "text-slate-800 grow resize shrink",
+        )}
+        placeholder="???"
+        inputClassName={cn(
+          formulaIsWrong ? "text-red-500" : "",
+          "px-1 min-w-4"
+        )}
+      />
+    </div>
+  </>
 }
