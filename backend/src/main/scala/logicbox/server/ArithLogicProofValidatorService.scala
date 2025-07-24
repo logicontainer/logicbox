@@ -21,10 +21,9 @@ object ArithLogicProofValidatorService {
     val boxAssumptionProofChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
     val boxContraintsProofChecker = PredLogicBoxConstraintsProofChecker[R, Id](PropLogicRule.Assumption())
 
+    val substitutor = ArithLogicFormulaSubstitutor()
     val propLogicChecker: RuleChecker[F, PropLogicRule, B] = PropLogicRuleChecker[F]()
-    val predLogicChecker = PredLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](
-      ArithLogicFormulaSubstitutor()
-    )
+    val predLogicChecker = PredLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](substitutor)
     val arithLogicChecker = ArithLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](
       ArithLogicFormulaSubstitutor()
     )
@@ -37,6 +36,10 @@ object ArithLogicProofValidatorService {
       }))
 
     val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise())
+
+    val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], ArithLogicTerm.Var](
+      (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
+    )
 
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
@@ -59,7 +62,16 @@ object ArithLogicProofValidatorService {
           case _ => None
         })
 
-        ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof) ++
+        val cleanFreshVarsProofView: Proof[Option[F], ?, B, Id] = OptionProofView(optProofView, {
+          case (_, Proof.Line(f, r, refs)) => 
+            Some(ProofLineImpl(f, r, refs))
+          case (_, Proof.Box(Some(info), steps)) => Some(ProofBoxImpl(info, steps))
+          case _ => None
+        })
+
+        ruleBasedProofChecker.check(optProofView) ++ 
+        scopedChecker.check(proof) ++
+        freshVarEscapeChecker.check(cleanFreshVarsProofView) ++
         boxContraintsProofChecker.check(cleanRulesProofView) ++
         boxAssumptionProofChecker.check(cleanRulesProofView) ++
         structuralProofChecker.check(cleanRulesProofView)

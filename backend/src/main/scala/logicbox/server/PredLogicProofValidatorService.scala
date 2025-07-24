@@ -21,9 +21,8 @@ object PredLogicProofValidatorService {
     val boxAssumptionProofChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
     val boxContraintsProofChecker = PredLogicBoxConstraintsProofChecker[R, Id](PropLogicRule.Assumption())
 
-    val predLogicChecker = PredLogicRuleChecker[F, PredLogicTerm, PredLogicTerm.Var](
-      PredLogicFormulaSubstitutor()
-    )
+    val substitutor = PredLogicFormulaSubstitutor()
+    val predLogicChecker = PredLogicRuleChecker[F, PredLogicTerm, PredLogicTerm.Var](substitutor)
 
     val propLogicChecker: RuleChecker[F, PropLogicRule, B] = PropLogicRuleChecker[F]()
 
@@ -34,6 +33,10 @@ object PredLogicProofValidatorService {
       }))
 
     val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise())
+
+    val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], PredLogicTerm.Var](
+      (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
+    )
 
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
@@ -51,12 +54,21 @@ object PredLogicProofValidatorService {
         val cleanRulesProofView: Proof[?, R, ?, Id] = OptionProofView(optProofView, {
           case (_, Proof.Line(f, Some(r), refs)) => 
             Some(ProofLineImpl(f, r, refs))
-          case (_, Proof.Box(Some(info), steps)) => 
+          case (_, Proof.Box(info, steps)) => 
             Some(ProofBoxImpl(info, steps))
           case _ => None
         })
 
-        ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof) ++
+        val cleanFreshVarsProofView: Proof[Option[F], ?, B, Id] = OptionProofView(optProofView, {
+          case (_, Proof.Line(f, r, refs)) => 
+            Some(ProofLineImpl(f, r, refs))
+          case (_, Proof.Box(Some(info), steps)) => Some(ProofBoxImpl(info, steps))
+          case _ => None
+        })
+
+        ruleBasedProofChecker.check(optProofView) ++ 
+        freshVarEscapeChecker.check(cleanFreshVarsProofView) ++
+        scopedChecker.check(proof) ++
         boxContraintsProofChecker.check(cleanRulesProofView) ++
         boxAssumptionProofChecker.check(cleanRulesProofView) ++
         structuralProofChecker.check(cleanRulesProofView)
