@@ -82,6 +82,7 @@ export type Diagnostic = { uuid: UUID } & (
   | { errorType: "MissingRef", refIdx: number }
 
   | { errorType: "PremiseInsideBox" }
+  | { errorType: "FreshVarEscaped", boxId: string, freshVar: string }
 
   | { errorType: "ReferenceOutOfScope", refIdx: number }
   | { errorType: "ReferenceToLaterStep", refIdx: number }
