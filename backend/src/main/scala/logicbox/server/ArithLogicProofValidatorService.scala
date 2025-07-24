@@ -35,7 +35,7 @@ object ArithLogicProofValidatorService {
         case r: ArithLogicRule => 3
       }))
 
-    val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise())
+    val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise(), PropLogicRule.Assumption())
 
     val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], ArithLogicTerm.Var](
       (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)

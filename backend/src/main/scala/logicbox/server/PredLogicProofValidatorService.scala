@@ -32,7 +32,7 @@ object PredLogicProofValidatorService {
         case _ => false
       }))
 
-    val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise())
+    val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise(), PropLogicRule.Assumption())
 
     val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], PredLogicTerm.Var](
       (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
