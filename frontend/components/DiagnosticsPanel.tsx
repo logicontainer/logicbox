@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { toInteger } from "lodash";
+import { Title } from "@radix-ui/react-dialog";
 
 
 function refIdxToString(refIdx: number, capital: boolean = true): string {
@@ -27,7 +28,7 @@ function TitleOnlyDiagnostic({
   onHover,
 }: {
   iconLatex: string
-  title: string
+  title: string | React.ReactNode
   value: string
   onHover?: () => void
 }) {
@@ -113,6 +114,10 @@ export function DiagnosticsPanel({
 
       case "PremiseInsideBox":
         return <TitleOnlyDiagnostic iconLatex={"\\times"} title={"Premise must not occur inside box"} value={value} key={value}/>
+
+      case "FreshVarEscaped":
+        // TODO: highlight the box when hovering
+        return <TitleOnlyDiagnostic iconLatex={d.freshVar} title={<>Occurance of <InlineMath math={d.freshVar}/> outside the box in which it is defined</>} value={value} key={value}/>
 
       case "ShapeMismatch": {
         const icon = getRuleNameAtStepAsLatex(d.uuid) ?? "?"
