@@ -20,6 +20,7 @@ object Error {
   case class ReferenceShouldBeLine(refIdx: Int) extends Error
 
   case class PremiseInsideBox() extends Error
+  case class FreshVarEscaped(boxId: String) extends Error
 
   case class ShapeMismatch(loc: Location) extends Error
   case class Ambiguous(what: RulePart, entries: List[Location]) extends Error
