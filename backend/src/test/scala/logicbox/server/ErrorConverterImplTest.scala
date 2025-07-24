@@ -571,8 +571,8 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val (cvtr, pnav, _, _) = fix(pf)
-      when(pnav.get((pf, "box1"), Location.freshVar)).thenReturn(Some(152))
-      when(pnav.get((pf, "box2"), Location.freshVar)).thenReturn(Some(153))
+      when(pnav.get((pf, "box1"), Location.conclusion.freshVar)).thenReturn(Some(152))
+      when(pnav.get((pf, "box2"), Location.conclusion.freshVar)).thenReturn(Some(153))
 
       // says that the fresh var is "152"
       
@@ -599,7 +599,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       )
 
       val (cvtr, pnav, _, _) = fix(pf)
-      when(pnav.get((pf, "box"), Location.freshVar)).thenReturn(None) // can't find fresh variable of box
+      when(pnav.get((pf, "box"), Location.conclusion.freshVar)).thenReturn(None) // can't find fresh variable of box
 
       cvtr.convert("line", Error.FreshVarEscaped("box")) shouldBe None
     }

@@ -90,6 +90,12 @@ object SprayFormatters extends DefaultJsonProtocol {
         "rulePosition" -> JsString(rulePosition),
         "explanation" -> JsString(explanation)
       )
+      case obj @ logicbox.server.format.OutputError.FreshVarEscaped(uuid, boxId, freshVar) => JsObject(
+        "uuid" -> JsString(uuid),
+        "errorType" -> JsString(obj.errorType),
+        "boxId" -> JsString(boxId),
+        "freshVar" -> JsString(freshVar)
+      )
     }
   }
 }
