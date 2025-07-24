@@ -113,7 +113,10 @@ export function DiagnosticsPanel({
         return <TitleOnlyDiagnostic iconLatex={`\\emptyset${rulePositionToSubscript(d.rulePosition)}`} title={expl.join('')} value={value} key={value}/>
 
       case "PremiseInsideBox":
-        return <TitleOnlyDiagnostic iconLatex={"\\times"} title={"Premise must not occur inside box"} value={value} key={value}/>
+        return <TitleOnlyDiagnostic iconLatex={"\\times"} title={"A premise must not occur inside a box"} value={value} key={value}/>
+
+      case "InvalidAssumption":
+        return <TitleOnlyDiagnostic iconLatex={"\\times"} title={"An assumption must be on the first line of a box"} value={value} key={value}/>
 
       case "FreshVarEscaped":
         // TODO: highlight the box when hovering
