@@ -34,11 +34,7 @@ object ProofStubs {
     override val rootSteps: Seq[Id] = Seq(),
     val map: Map[Id, Proof.Step[F, R, B, Id]] = Map.empty
   ) extends Proof[F, R, B, Id] {
-    override def getStep(id: Id): Either[Proof.StepNotFound[Id], Proof.Step[F, R, B, Id]] = 
-      map.get(id) match {
-        case None => Left(Proof.StepNotFound(id))
-        case Some(value) => Right(value)
-      }
+    override def getStep(id: Id): Option[Proof.Step[F, R, B, Id]] = map.get(id)
   }
 
   val stubError = Miscellaneous(Location.conclusion, "test")

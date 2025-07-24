@@ -24,7 +24,7 @@ class ErrorConverterImpl[F, R, B, O](
   }
 
   private def getRuleFromStep(stepId: String): Option[R] = {
-    proof.getStep(stepId).toOption.collect {
+    proof.getStep(stepId).collect {
       case Proof.Line(_, rule, _) => rule
     }
   }

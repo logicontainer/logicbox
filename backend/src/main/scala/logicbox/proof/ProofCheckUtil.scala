@@ -7,7 +7,7 @@ object ProofCheckUtil {
   def getFirstLine[F, R, Id](proof: Proof[F, R, ?, Id], box: Proof.Box[?, Id]): Option[Proof.Line[F, R, Id]] = box match {
     case Proof.Box(_, lines) => for {
       firstStepId <- lines.headOption
-      firstStep <- proof.getStep(firstStepId).toOption
+      firstStep <- proof.getStep(firstStepId)
       line <- firstStep match {
         case l: Proof.Line[F, R, Id] => Some(l)
         case _ => None
@@ -23,7 +23,7 @@ object ProofCheckUtil {
     check: (Id, Proof.Line[F, R, Id]) => List[(Id, Error)]
   ): List[(Id, Error)] = {
     val firstLine = line.refs.drop(refIdx).headOption.flatMap {
-      case id => proof.getStep(id).toOption.map((id, _))
+      case id => proof.getStep(id).map((id, _))
     }.collect { 
       case (id, box: Proof.Box[Any, Id]) => getFirstLine(proof, box).map((id, _))
     }.flatten
@@ -58,9 +58,9 @@ object ProofCheckUtil {
     def checkSteps(steps: Seq[Id]): List[(Id, Error)] = for {
       stepId <- steps.toList
       diag <- pf.getStep(stepId) match {
-        case Right(l: Proof.Line[F, R, Id]) => f(stepId, l)
-        case Right(b: Proof.Box[B, Id]) => checkSteps(b.steps)
-        case _ => Nil
+        case Some(l: Proof.Line[F, R, Id]) => f(stepId, l)
+        case Some(b: Proof.Box[B, Id]) => checkSteps(b.steps)
+        case None => Nil
       }
     } yield diag
 

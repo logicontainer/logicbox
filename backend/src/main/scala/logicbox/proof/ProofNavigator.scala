@@ -20,12 +20,12 @@ class ProofNavigator[F, B, Id, O](
   private def derefFirstStep(proof: Proof[F, ?, B, Id], stepId: Id, firstStep: Location.Step): Option[Proof.Step[F, ?, B, Id]] = {
     firstStep match {
       case Step.Premise(idx) => 
-        proof.getStep(stepId).toOption.collect {
+        proof.getStep(stepId).collect {
           case Proof.Line(_, _, refs) => refs
         }.flatMap(_.lift(idx))
-         .flatMap(proof.getStep(_).toOption)
+         .flatMap(proof.getStep(_))
 
-      case Step.Conclusion => proof.getStep(stepId).toOption
+      case Step.Conclusion => proof.getStep(stepId)
       case _ => None
     }
   }
@@ -39,9 +39,9 @@ class ProofNavigator[F, B, Id, O](
       }
       (step, rest) <- (rest, derefFirstStep(proof, stepId, fst)) match {
         case (Step.FirstLine :: rest, Some(Proof.Box(_, first :: _))) => 
-          proof.getStep(first).toOption.map((_, rest))
+          proof.getStep(first).map((_, rest))
         case (Step.LastLine :: rest, Some(Proof.Box(_, _ :+ last))) =>
-          proof.getStep(last).toOption.map((_, rest))
+          proof.getStep(last).map((_, rest))
         case (rest, Some(step)) => Some(step, rest)
         case _ => None
       }
