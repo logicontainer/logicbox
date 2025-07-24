@@ -101,6 +101,9 @@ export function DiagnosticsPanel({
       case "ReferenceToLaterStep": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\dashrightarrow_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} refers to a later step`} value={value} key={value}/>
       case "ReferenceToUnclosedBox": return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\boxtimes_{${(d.refIdx + 1).toString()}}`} title={`${refIdxToString(d.refIdx)} refers to an unclosed box`} value={value} key={value}/>
 
+      case "ReferenceBoxMissingFreshVar":
+        return <RefTitleOnlyDiagnostic stepUuid={d.uuid} refIdx={d.refIdx} iconLatex={`\\square_${(d.refIdx + 1).toString()}`} title={`${refIdxToString(d.refIdx)} has no fresh variable`} value={value} key={value}/>
+
       case "Miscellaneous": 
         const expl = d.explanation.split('')
         if (expl[0] >= 'a' && expl[0] <= 'z') 
@@ -108,8 +111,8 @@ export function DiagnosticsPanel({
 
         return <TitleOnlyDiagnostic iconLatex={`\\emptyset${rulePositionToSubscript(d.rulePosition)}`} title={expl.join('')} value={value} key={value}/>
 
-      case "ReferenceBoxMissingFreshVar":
-        return <TitleOnlyDiagnostic iconLatex={`\\square_${(d.refIdx + 1).toString()}`} title={`${refIdxToString(d.refIdx)} has no fresh variable`} value={value} key={value}/>
+      case "PremiseInsideBox":
+        return <TitleOnlyDiagnostic iconLatex={"\\times"} title={"Premise must not occur inside box"} value={value} key={value}/>
 
       case "ShapeMismatch": {
         const icon = getRuleNameAtStepAsLatex(d.uuid) ?? "?"
