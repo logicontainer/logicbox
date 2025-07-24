@@ -572,6 +572,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert("id", Error.MissingRef(4)) shouldBe Some(OutputError.RefErr("id", "MissingRef", 4))
       cvtr.convert("id", Error.MissingFormula()) shouldBe Some(OutputError.Simple("id", "MissingFormula"))
       cvtr.convert("id", Error.MissingRule()) shouldBe Some(OutputError.Simple("id", "MissingRule"))
+      cvtr.convert("id", Error.PremiseInsideBox()) shouldBe Some(OutputError.Simple("id", "PremiseInsideBox"))
 
       cvtr.convert("id", Error.WrongNumberOfReferences(14, 15)) shouldBe Some(
         OutputError.WrongNumberOfReferences("id", 14, 15)

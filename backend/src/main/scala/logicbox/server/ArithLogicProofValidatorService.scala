@@ -36,6 +36,8 @@ object ArithLogicProofValidatorService {
         case r: ArithLogicRule => 3
       }))
 
+    val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise())
+
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
 
@@ -59,7 +61,8 @@ object ArithLogicProofValidatorService {
 
         ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof) ++
         boxContraintsProofChecker.check(cleanRulesProofView) ++
-        boxAssumptionProofChecker.check(cleanRulesProofView)
+        boxAssumptionProofChecker.check(cleanRulesProofView) ++
+        structuralProofChecker.check(cleanRulesProofView)
       }
     }
   }

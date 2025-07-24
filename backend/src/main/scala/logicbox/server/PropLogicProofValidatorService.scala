@@ -27,6 +27,8 @@ object PropLogicProofValidatorService {
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
 
+    val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise())
+
     new ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] {
       override def check(proof: Proof[IncompleteFormula[F], Option[R], Option[B], Id]): List[(Id, Error)] = {
         val optProofView = ProofView(proof, { 
@@ -46,7 +48,8 @@ object PropLogicProofValidatorService {
         })
 
         ruleBasedProofChecker.check(optProofView) ++ scopedChecker.check(proof) ++
-        boxFirstRuleIsAssumptionChecker.check(cleanRulesProofView)
+        boxFirstRuleIsAssumptionChecker.check(cleanRulesProofView) ++
+        structuralProofChecker.check(cleanRulesProofView)
       }
     }
   }
