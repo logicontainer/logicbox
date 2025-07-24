@@ -1,0 +1,50 @@
+{
+  "logicName": "propositionalLogic",
+  "proof": [{
+    "formula": {
+      "ascii": "false",
+      "latex": "\\bot",
+      "userInput": "false"
+    },
+    "justification": {
+      "refs": [],
+      "rule": "premise"
+    },
+    "stepType": "line",
+    "uuid": "9dcf0e54-d039-4cf3-b80e-6bce55037121"
+  }, {
+    "boxInfo": {},
+    "proof": [{
+      "formula": {
+        "userInput": "p"
+      },
+      "justification": {
+        "refs": []
+      },
+      "stepType": "line",
+      "uuid": "a304dc0e-4376-4a1d-a49c-4ba3c2e1d64a"
+    }, {
+      "formula": {
+        "userInput": "false"
+      },
+      "justification": {
+        "refs": ["9dcf0e54-d039-4cf3-b80e-6bce55037121"],
+        "rule": "copy"
+      },
+      "stepType": "line",
+      "uuid": "9c3aee5a-c7b8-4b95-9698-bb74f622af9a"
+    }],
+    "stepType": "box",
+    "uuid": "147de048-3e83-4617-9347-43732a37578e"
+  }, {
+    "formula": {
+      "userInput": "not q"
+    },
+    "justification": {
+      "refs": ["147de048-3e83-4617-9347-43732a37578e"],
+      "rule": "not_intro"
+    },
+    "stepType": "line",
+    "uuid": "d71f2d48-c0ad-4736-baaf-4aea617a23ad"
+  }]
+}
