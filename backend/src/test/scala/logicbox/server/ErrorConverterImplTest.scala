@@ -557,6 +557,53 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert("line", Error.Miscellaneous(Location.firstLine, "msg 010")) shouldBe None
     }
   }
+
+  describe("convert FreshVarEscaped") {
+    it("should convert correctly when proof nav gives a variable") {
+      val pf = StubProof(
+        Seq("line1", "box1", "line2", "box2"),
+        Map(
+          "box1" -> StubBox(),
+          "line1" -> StubLine(),
+          "box2" -> StubBox(),
+          "line2" -> StubLine()
+        )
+      )
+
+      val (cvtr, pnav, _, _) = fix(pf)
+      when(pnav.get((pf, "box1"), Location.freshVar)).thenReturn(Some(152))
+      when(pnav.get((pf, "box2"), Location.freshVar)).thenReturn(Some(153))
+
+      // says that the fresh var is "152"
+      
+      cvtr.convert("line1", Error.FreshVarEscaped("box1")) shouldBe Some(OutputError.FreshVarEscaped(
+        uuid = "line1",
+        boxUuid = "box1",
+        freshVar = "152",
+      ))
+
+      cvtr.convert("line2", Error.FreshVarEscaped("box2")) shouldBe Some(OutputError.FreshVarEscaped(
+        uuid = "line2",
+        boxUuid = "box2",
+        freshVar = "153",
+      ))
+    } 
+
+    it("should return none when fresh var cannot be located") {
+      val pf = StubProof(
+        Seq("line", "box"),
+        Map(
+          "box" -> StubBox(),
+          "line" -> StubLine()
+        )
+      )
+
+      val (cvtr, pnav, _, _) = fix(pf)
+      when(pnav.get((pf, "box"), Location.freshVar)).thenReturn(None) // can't find fresh variable of box
+
+      cvtr.convert("line", Error.FreshVarEscaped("box")) shouldBe None
+    }
+  }
   
   describe("convert rest") {
     it("should convert rest fine") {

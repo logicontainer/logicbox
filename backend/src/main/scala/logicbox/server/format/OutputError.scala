@@ -16,6 +16,10 @@ object OutputError {
     override def errorType = "WrongNumberOfReferences"
   }
 
+  case class FreshVarEscaped(uuid: String, boxUuid: String, freshVar: String) extends OutputError {
+    override def errorType: String = "FreshVarEscaped"
+  }
+
   case class ShapeMismatch(
     uuid: String, 
     rulePosition: OutputRulePos, // in which part of rule the mismatch is

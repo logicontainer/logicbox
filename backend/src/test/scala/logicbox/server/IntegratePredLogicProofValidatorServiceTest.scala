@@ -34,5 +34,27 @@ class IntegratePredLogicProofValidatorServiceImplTest extends AnyFunSpec {
         case Right(_) =>
       }
     }
+
+    it("should report error when var occurs") {
+      val req = List(
+        RawProofLine(
+          uuid = "id",
+          stepType = "line",
+          formula = RawFormula(
+            userInput = "forall y Q(y)",
+            ascii = None,
+            latex = None
+          ),
+          justification = RawJustification(
+            rule = Some("SOME_INVALID_RULE_NAME"), // burh
+            refs = List()
+          )
+        )
+      )
+
+      PredLogicProofValidatorService().validateProof(req) should matchPattern {
+        case Right(_) =>
+      }
+    }
   }
 }
