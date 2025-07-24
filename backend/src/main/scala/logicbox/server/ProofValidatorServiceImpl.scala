@@ -20,6 +20,7 @@ class ProofValidatorServiceImpl[F, R, B](
     val errors = proofChecker.check(proof)
     val outputRawProof = rawProofConverter.convertToRaw(proof)
     val errorConverter = createErrorConverter(proof)
+    println(errors)
     Right(ValidationResult(
       proof = outputRawProof,
       diagnostics = errors.flatMap((id, e) => errorConverter.convert(id, e) match {
