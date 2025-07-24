@@ -22,13 +22,13 @@ class RuleBasedProofChecker[F, R, B, Id](
 
   private def resolveReference(proof: Pf, stepId: Id, refId: Id, refIdx: Int): Either[List[D], Reference[F, B]] = {
     (proof.getStep(refId): @unchecked) match {
-      case Left(Proof.StepNotFound(_)) => 
+      case None =>
         Left(List((stepId, MissingRef(refIdx))))
 
-      case Right(Proof.Line(formula, _, _)) => 
+      case Some(Proof.Line(formula, _, _)) => 
         Right(ReferenceLineImpl(formula))
 
-      case Right(b: Proof.Box[B, Id]) => 
+      case Some(b: Proof.Box[B, Id]) => 
         Right(resolveBoxReference(proof, stepId, refIdx, refId, b))
     }
   }
@@ -66,8 +66,8 @@ class RuleBasedProofChecker[F, R, B, Id](
     for {
       (either, id) <- ids.map(proof.getStep).zip(ids)
       res <- either match {
-        case Right(step) => checkStep(proof, id, step)
-        case Left(Proof.StepNotFound(id)) => Nil // ignore invalid steps
+        case Some(step) => checkStep(proof, id, step)
+        case None => Nil // ignore invalid steps
       }
     } yield res
 

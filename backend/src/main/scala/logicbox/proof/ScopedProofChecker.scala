@@ -16,7 +16,7 @@ class ScopedProofChecker[Id]
     steps.map {
       case stepId => 
         val optBoxSteps = proof.getStep(stepId) match {
-          case Right(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) =>
+          case Some(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) =>
             collectScopes(proof, boxSteps, stepId)
           case _ => Map.empty
         }
@@ -38,7 +38,7 @@ class ScopedProofChecker[Id]
       refsInProof.zipWithIndex.flatMap {
         case (refId, refIdx) =>
           val List(stepScope, refScope) = List(stepId, refId).map(scopes.apply)
-          val Right(refStep) = proof.getStep(refId): @unchecked // unchecked because of above filter
+          val Some(refStep) = proof.getStep(refId): @unchecked // unchecked because of above filter
 
           if (!isSubscope(stepScope, refScope, scopes)) {
             Some((stepId, ReferenceOutOfScope(refIdx)))
@@ -56,10 +56,10 @@ class ScopedProofChecker[Id]
       steps match {
         case Nil => Nil
         case stepId +: rest => (proof.getStep(stepId) match {
-          case Right(Proof.Line(_, _, refs: Seq[Id] @unchecked)) => 
+          case Some(Proof.Line(_, _, refs: Seq[Id] @unchecked)) => 
             checkRefs(stepId, refs, seenSteps, openedBoxes)
 
-          case Right(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) => 
+          case Some(Proof.Box(_, boxSteps: Seq[Id] @unchecked)) => 
             checkImpl(proof, boxSteps, seenSteps, openedBoxes + stepId)
 
           case _ => Nil

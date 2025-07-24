@@ -46,7 +46,7 @@ class RawProofToIncompleteProofConverter[F, R, B](
 
   private def convertStepsToRaw(pf: IncompleteProof[F, R, B, String], steps: Seq[String]): List[RawProofStep] = for {
     id <- steps.toList
-    step <- pf.getStep(id).toOption.toList
+    step <- pf.getStep(id).toList
     rawStep = step match {
       case l: Line[IncompleteFormula[F], Option[R], String] => convertLineToRaw(id, l)
       case b: Box[Option[B], String] => convertBoxToRaw(id, b, pf)

@@ -10,10 +10,10 @@ class StructuralProofChecker[R, Id](
 ) extends ProofChecker[Any, R, Any, Id] {
   private def checkSteps(proof: Proof[Any, R, Any, Id], steps: Seq[Id]): List[(Id, Error)] = {
     steps.map(id => (id, proof.getStep(id))).flatMap {
-      case (id, Right(Proof.Line(_, rule, _))) if rule == premiseRule => 
+      case (id, Some(Proof.Line(_, rule, _))) if rule == premiseRule => 
         List((id, PremiseInsideBox()))
 
-      case (id, Right(Proof.Box(_, steps))) => 
+      case (id, Some(Proof.Box(_, steps))) => 
         checkSteps(proof, steps)
 
       case _ => Nil
@@ -22,7 +22,7 @@ class StructuralProofChecker[R, Id](
 
   override def check(proof: Proof[Any, R, Any, Id]): List[(Id, Error)] = {
     proof.rootSteps.map(proof.getStep(_)).flatMap {
-      case Right(Proof.Box(_, steps)) => checkSteps(proof, steps)
+      case Some(Proof.Box(_, steps)) => checkSteps(proof, steps)
       case _ => Nil
     }.toList
   }

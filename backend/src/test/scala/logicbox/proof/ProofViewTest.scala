@@ -38,11 +38,11 @@ class ProofViewTest extends AnyFunSpec {
       val view = ProofView(proof, transformation)
 
       view.getStep("box") should matchPattern {
-        case Right(Proof.Box(B2(StubBoxInfo("something")), Seq())) =>
+        case Some(Proof.Box(B2(StubBoxInfo("something")), Seq())) =>
       }
       
       view.getStep("line") should matchPattern {
-        case Right(Proof.Line(F2(StubFormula(200)), R2(Bad()), Seq("box"))) =>
+        case Some(Proof.Line(F2(StubFormula(200)), R2(Bad()), Seq("box"))) =>
       }
     }
   }

@@ -27,11 +27,9 @@ object Proof {
       case _ => None
     }
   }
-
-  case class StepNotFound[Id](id: Id)
 }
 
 trait Proof[+F, +R, +B, Id] {
-  def getStep(id: Id): Either[Proof.StepNotFound[Id], Proof.Step[F, R, B, Id]]
+  def getStep(id: Id): Option[Proof.Step[F, R, B, Id]]
   def rootSteps: Seq[Id]
 }
