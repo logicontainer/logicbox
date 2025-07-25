@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { v4 as uuid } from "uuid";
 import { useProofStore } from "@/store/proofStore";
 import { PlusIcon } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { InlineMath } from "react-katex";
 import React from "react";
 import "katex/dist/katex.min.css";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const NEW_PROOF: Proof = [
   {
@@ -45,7 +45,7 @@ function LogicOption({
     "w-full h-9 flex items-center justify-between px-3 border-[1px] border-solid border-slate-200 rounded hover:bg-slate-200",
     chosen && "bg-slate-200"
   )} onClick={onClick}>
-    <div className="text-base text-sm">{name}</div>
+    <div className="text-sm">{name}</div>
     <InlineMath math={latex}/>
   </div>
 }
@@ -79,19 +79,19 @@ export default function NewProofButton() {
     router.push(`/proofs/${newProofId}`)
   }
 
-  return <AlertDialog>
-    <AlertDialogTrigger asChild>
+  return <Dialog>
+    <DialogTrigger asChild>
       <Button size="icon" variant="outline" onClick={_ => {
         setProofName("")
         setChosenLogic(null)
       }}>
         <PlusIcon className="h-4 w-4"></PlusIcon>
       </Button>
-    </AlertDialogTrigger>
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>Create a new proof</AlertDialogTitle>
-      </AlertDialogHeader>
+    </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Create a new proof</DialogTitle>
+      </DialogHeader>
 
       <div className="flex flex-col gap-6">
         <div className="grid gap-2">
@@ -113,9 +113,10 @@ export default function NewProofButton() {
         </div>
       </div>
 
-      <AlertDialogFooter>
-        <AlertDialogAction onClick={onCreate}>Create</AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+      <DialogFooter>
+        <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+        <Button onClick={onCreate}>Create</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 }
