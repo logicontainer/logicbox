@@ -237,10 +237,10 @@ export class UpdateLineProofStepCommand extends Command {
 
 export class SetFreshVarOnBoxCommand extends Command {
   private boxUuid: string;
-  private freshVar: string;
+  private freshVar: string | null;
   private prevFreshVar: string | null = null;
 
-  constructor(uuid: string, freshVar: string) {
+  constructor(uuid: string, freshVar: string | null) {
     super();
     this.boxUuid = uuid;
     this.freshVar = freshVar;

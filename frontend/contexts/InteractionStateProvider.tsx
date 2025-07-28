@@ -1,6 +1,6 @@
 "use client";
 
-import { LineProofStep } from "@/types/types";
+import { BoxProofStep, LineProofStep } from "@/types/types";
 import React from "react";
 
 import { useProof } from "./ProofProvider";
@@ -23,6 +23,8 @@ export enum TransitionEnum {
   CLICK_BOX,
   RIGHT_CLICK_STEP,
 
+  DOUBLE_CLICK_BOX,
+
   CLICK_LINE,
   DOUBLE_CLICK_LINE,
   HOVER,
@@ -31,7 +33,7 @@ export enum TransitionEnum {
   CLICK_REF,
 
   UPDATE_RULE,
-  UPDATE_FORMULA,
+  UPDATE_CONTENT,
 
   VALIDATE_PROOF,
 
@@ -46,6 +48,7 @@ export enum InteractionStateEnum {
   EDITING_REF,
   EDITING_FORMULA,
   EDITING_RULE,
+  EDITING_FRESH_VAR,
 
   VIEWING_CONTEXT_MENU,
 }
@@ -61,7 +64,7 @@ export type HoveringState = { enum: HoveringEnum } & (
   | { enum: HoveringEnum.HOVERING_STEP, stepUuid: string }
   | { enum: HoveringEnum.HOVERING_FORMULA, stepUuid: string }
   | { enum: HoveringEnum.HOVERING_RULE, stepUuid: string }
-  | { enum: HoveringEnum.HOVERING_REF, stepUuid: string, refIdx: number }
+  | { enum: HoveringEnum.HOVERING_REF, stepUuid: string, refIdx: number}
 )
 
 export type InteractionState = { enum: InteractionStateEnum } & (
@@ -77,6 +80,7 @@ export type InteractionState = { enum: InteractionStateEnum } & (
       currentFormula: string;
     }
   | { enum: InteractionStateEnum.EDITING_REF; lineUuid: string; refIdx: number }
+  | { enum: InteractionStateEnum.EDITING_FRESH_VAR; boxUuid: string; freshVar: string | null; }
   | {
       enum: InteractionStateEnum.VIEWING_CONTEXT_MENU;
       proofStepUuid: string;
@@ -103,11 +107,12 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_REF; lineUuid: string; refIdx: number }
   | { enum: TransitionEnum.VALIDATE_PROOF }
   | { enum: TransitionEnum.UPDATE_RULE; ruleName: string }
-  | { enum: TransitionEnum.UPDATE_FORMULA; formula: string }
+  | { enum: TransitionEnum.UPDATE_CONTENT; content: string }
   | {
       enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION;
       option: ContextMenuOptions;
     }
+  | { enum: TransitionEnum.DOUBLE_CLICK_BOX; boxUuid: string }
 );
 
 type FuncForStateAndTransition<
@@ -201,6 +206,22 @@ export function InteractionStateProvider({
     return currLineProofStep;
   };
 
+  const getBoxProofStep = (uuid: string) => {
+    const details = proofContext.getProofStepDetails(uuid);
+    if (!details)
+      throw new Error(
+        `Attempting to get box proof step ${uuid}, but details are null`,
+      );
+
+    if (details.proofStep.stepType !== "box")
+      throw new Error(
+        `Attempting to get box proof step ${uuid}, but has stepType = ${details.proofStep.stepType}`,
+      );
+
+    const currBoxProofStep = details.proofStep as BoxProofStep;
+    return currBoxProofStep;
+  };
+
   const updateRuleAndValidate = (lineUuid: string, newRule: string) => {
     const currLineProofStep = getLineProofStep(lineUuid);
 
@@ -290,12 +311,31 @@ export function InteractionStateProvider({
     enqueueCommand(Validate.VALIDATE);
   };
 
+  const updateFreshVarInProofAndValidate = (
+    boxUuid: string,
+    freshVar: string | null,
+  ) => {
+    enqueueCommand(
+      new SetFreshVarOnBoxCommand(boxUuid, freshVar),
+    );
+    enqueueCommand(Validate.VALIDATE);
+  };
+
   const startEditingFormula = (lineUuid: string) => {
     const line = getLineProofStep(lineUuid);
     return {
       enum: InteractionStateEnum.EDITING_FORMULA,
       lineUuid,
       currentFormula: line.formula.userInput,
+    } satisfies InteractionState;
+  };
+
+  const startEditingFreshVar = (boxUuid: string) => {
+    const box = getBoxProofStep(boxUuid);
+    return {
+      enum: InteractionStateEnum.EDITING_FRESH_VAR,
+      boxUuid,
+      freshVar: box.boxInfo.freshVar ?? ""
     } satisfies InteractionState;
   };
 
@@ -340,6 +380,7 @@ export function InteractionStateProvider({
     IDLE,
     EDITING_REF,
     EDITING_RULE,
+    EDITING_FRESH_VAR,
     EDITING_FORMULA,
     VIEWING_CONTEXT_MENU,
   } = InteractionStateEnum;
@@ -348,12 +389,13 @@ export function InteractionStateProvider({
     CLICK_RULE,
     CLICK_LINE,
     DOUBLE_CLICK_LINE,
+    DOUBLE_CLICK_BOX,
     HOVER,
     CLICK_BOX,
     RIGHT_CLICK_STEP,
     UPDATE_RULE,
     CLOSE,
-    UPDATE_FORMULA,
+    UPDATE_CONTENT,
     CLICK_OUTSIDE,
     VALIDATE_PROOF,
     CLICK_CONTEXT_MENU_OPTION,
@@ -394,6 +436,10 @@ export function InteractionStateProvider({
         enqueueCommand(Validate.VALIDATE);
         return state;
       },
+
+      [DOUBLE_CLICK_BOX]: (_, { boxUuid }) => {
+        return startEditingFreshVar(boxUuid)
+      }
     },
 
     [EDITING_FORMULA]: {
@@ -428,7 +474,7 @@ export function InteractionStateProvider({
         return stickySelectStep(boxUuid)
       },
 
-      [UPDATE_FORMULA]: (state, { formula }) => {
+      [UPDATE_CONTENT]: (state, { content: formula }) => {
         return { ...state, currentFormula: formula };
       },
 
@@ -446,6 +492,11 @@ export function InteractionStateProvider({
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
+
+      [DOUBLE_CLICK_BOX]: (state, { boxUuid }) => {
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula)
+        return startEditingFreshVar(boxUuid)
+      }
     },
 
     [EDITING_RULE]: {
@@ -486,6 +537,10 @@ export function InteractionStateProvider({
       [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
+
+      [DOUBLE_CLICK_BOX]: (_, { boxUuid }) => {
+        return startEditingFreshVar(boxUuid)
+      }
     },
 
     [EDITING_REF]: {
@@ -551,6 +606,64 @@ export function InteractionStateProvider({
       [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
         return { enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox };
       },
+
+      [DOUBLE_CLICK_BOX]: ({ lineUuid: editedLineUuid, refIdx }, { boxUuid }) => {
+        updateRefAndValidate(editedLineUuid, refIdx, boxUuid);
+        return stickySelectStep(editedLineUuid)
+      },
+    },
+    
+    [EDITING_FRESH_VAR]: {
+      [HOVER]: doNothing,
+      [CLICK_OUTSIDE]: (_, {}) => fullyIdle(),
+      [CLICK_BOX]: (_, { boxUuid }) => stickySelectStep(boxUuid),
+      [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => ({ enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox }),
+
+      [DOUBLE_CLICK_BOX]: (state, { boxUuid }) => {
+        if (state.boxUuid !== boxUuid) {
+          updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+          return startEditingFreshVar(boxUuid)
+        }
+        return state
+      },
+
+      [CLICK_LINE]: (state, { lineUuid }) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return stickySelectStep(lineUuid)
+      },
+
+      [DOUBLE_CLICK_LINE]: (state, { lineUuid }) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return startEditingFormula(lineUuid)
+      },
+
+      [CLICK_RULE]: (state, { lineUuid }) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return { enum: EDITING_RULE, lineUuid }
+      },
+
+      [CLICK_REF]: (state, { lineUuid, refIdx }) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return { enum: EDITING_REF, lineUuid, refIdx }
+      },
+
+
+      [UPDATE_CONTENT]: (state, { content }) => {
+        return { 
+          ...state,
+          freshVar: content === "" ? null : content
+        }
+      },
+
+      [VALIDATE_PROOF]: (state, {}) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return fullyIdle()
+      },
+
+      [CLOSE]: (state, _) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return stickySelectStep(state.boxUuid)
+      },
     },
 
     [VIEWING_CONTEXT_MENU]: {
@@ -591,6 +704,10 @@ export function InteractionStateProvider({
       },
 
       [CLOSE]: () => fullyIdle(),
+
+      [DOUBLE_CLICK_BOX]: (_, { boxUuid }) => {
+        return startEditingFreshVar(boxUuid)
+      },
 
       [CLICK_CONTEXT_MENU_OPTION]: (state, { option }) => {
         switch (option) {

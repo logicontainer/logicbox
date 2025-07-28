@@ -229,15 +229,15 @@ function Formula({
         onClickCapture={(e) => e.stopPropagation()}
         onDoubleClickCapture={(e) => e.stopPropagation()}
         onChange={(e) => doTransition({
-          enum: TransitionEnum.UPDATE_FORMULA,
-          formula: e.target.value,
+          enum: TransitionEnum.UPDATE_CONTENT,
+          content: e.target.value,
         })}
         onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
         placeholder="???"
         inputClassName={cn(
           "px-1 py-2 focus:border-black focus:border outline-none rounded",
           "bg-transparent",
-          "font-mono text-sm",
+          "font-mono text-sm tracking-tighter",
         )}
       />
     </div>
@@ -255,7 +255,7 @@ function Formula({
       }}
     >
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
-        <div className="h-full font-mono text-sm flex items-center">{userInput}</div>
+        <div className="h-full font-mono text-sm tracking-tighter flex items-center">{userInput}</div>
       ) : (
         <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
       )}
