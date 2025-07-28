@@ -24,6 +24,14 @@ export function lineIsBeingEdited(
   return lineUuid === getLineBeingEdited(state);
 }
 
+export function freshVarIsBeingEdited(
+  boxUuid: string,
+  state: InteractionState
+) {
+  return state.enum === InteractionStateEnum.EDITING_FRESH_VAR &&
+    state.boxUuid === boxUuid
+}
+
 export function getSelectedStep(state: InteractionState): string | null {
   if (
     state.enum === InteractionStateEnum.EDITING_REF ||

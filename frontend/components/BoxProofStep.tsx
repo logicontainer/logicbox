@@ -43,15 +43,13 @@ export function BoxProofStep({
 
   return (
     <ProofStepWrapper isOuterProofStep={props.isOuterProofStep} isBox={true}>
-      <FreshVars value={freshVar} />
+      <FreshVars value={freshVar} boxUuid={props.uuid}/>
       <div
         className={cn(
           "pointer-events-auto border-2 overflow-x-visible pt-1 mb-1",
           "border-black",
           freshVar && "mt-1.5 pt-1.5",
-
           highlight === StepHighlight.SELECTED && "border-red-500",
-
           highlight === StepHighlight.SELECTED && "bg-slate-100",
           highlight === StepHighlight.HOVERED && "bg-slate-50",
           highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
@@ -74,6 +72,13 @@ export function BoxProofStep({
             enum: TransitionEnum.CLICK_BOX,
             boxUuid: props.uuid,
           });
+        }}
+        onDoubleClick={e => {
+          e.stopPropagation()
+          doTransition({
+            enum: TransitionEnum.DOUBLE_CLICK_BOX,
+            boxUuid: props.uuid
+          })
         }}
         onMouseMove={(e) => {
           e.stopPropagation();
