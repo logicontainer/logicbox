@@ -11,6 +11,7 @@ import _ from "lodash";
 export enum ContextMenuOptions {
   EDIT_FORMULA,
   EDIT_FRESH_VAR,
+  REMOVE_FRESH_VAR,
   DELETE,
   LINE_ABOVE,
   LINE_BELOW,

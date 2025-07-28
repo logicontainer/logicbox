@@ -732,6 +732,11 @@ export function InteractionStateProvider({
             }
             return startEditingFreshVar(state.proofStepUuid)
 
+          case ContextMenuOptions.REMOVE_FRESH_VAR:
+            enqueueCommand(new SetFreshVarOnBoxCommand(state.proofStepUuid, null))
+            enqueueCommand(Validate.VALIDATE)
+            return fullyIdle()
+
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
             enqueueCommand(Validate.VALIDATE);
@@ -772,6 +777,7 @@ export function InteractionStateProvider({
               currentFormula: "",
             };
           }
+
         }
       },
     },

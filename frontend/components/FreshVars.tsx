@@ -7,6 +7,7 @@ import { freshVarIsBeingEdited } from "@/lib/state-helpers";
 import { useProof } from "@/contexts/ProofProvider";
 import { getStepHighlight, StepHighlight } from "@/lib/proof-step-highlight";
 import { useHovering } from "@/contexts/HoveringProvider";
+import { useContextMenu } from "@/contexts/ContextMenuProvider";
 
 export default function FreshVars({
   value: latexFormula,
@@ -41,6 +42,7 @@ export default function FreshVars({
   }, [currentlyBeingEdited])
 
   const { hoveringState, handleHover } = useHovering()
+  const { setContextMenuPosition } = useContextMenu()
 
   const highlight = getStepHighlight(
     boxUuid,
@@ -62,6 +64,12 @@ export default function FreshVars({
     onMouseMove={e => {
       e.stopPropagation()
       handleHover({ enum: HoveringEnum.HOVERING_STEP, stepUuid: boxUuid })
+    }}
+    onContextMenu={e => {
+      e.stopPropagation()
+      e.preventDefault()
+      setContextMenuPosition({ x: e.pageX, y: e.pageY })
+      doTransition({ enum: TransitionEnum.RIGHT_CLICK_STEP, proofStepUuid: boxUuid, isBox: true })
     }}
   >
     <div
