@@ -12,12 +12,10 @@ import {
 
 import FreshVars from "./FreshVars";
 import { StepHighlight } from "@/lib/proof-step-highlight";
-import { InlineMath } from "react-katex";
 import { Proof } from "./Proof";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { getSelectedStep } from "@/lib/state-helpers";
 import { getStepHighlight } from "@/lib/proof-step-highlight";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
@@ -48,7 +46,7 @@ export function BoxProofStep({
       <FreshVars value={freshVar} />
       <div
         className={cn(
-          "pointer-events-auto border-2 overflow-visible pt-1 mb-1",
+          "pointer-events-auto border-2 overflow-x-visible pt-1 mb-1",
           "border-black",
           freshVar && "mt-1.5 pt-1.5",
 

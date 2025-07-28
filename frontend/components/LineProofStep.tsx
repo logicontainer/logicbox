@@ -32,31 +32,6 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered } from "@/lib/state-helpers";
 
-import { flushSync } from 'react-dom';
-import { createRoot } from 'react-dom/client'
-
-function measureElementWidthSync(element: React.ReactElement): number {
-  const hiddenDiv = document.createElement('div');
-  hiddenDiv.style.position = 'absolute';
-  hiddenDiv.style.visibility = 'hidden';
-  hiddenDiv.style.height = '0';
-  hiddenDiv.style.overflow = 'hidden';
-  
-  document.body.appendChild(hiddenDiv);
-  
-  let width = 0;
-  flushSync(() => {
-    const root = createRoot(hiddenDiv);
-    root.render(element);
-    const childNode = hiddenDiv.firstChild as HTMLElement;
-    width = childNode?.offsetWidth || 0;
-    root.unmount();
-  });
-  
-  document.body.removeChild(hiddenDiv);
-  return width;
-}
-
 export function LineProofStep({
   ...props
 }: TLineProofStep & {
@@ -243,7 +218,7 @@ function Formula({
   >
     <div
       className={cn(
-        "absolute left-0 top-0",
+        "absolute left-[-4px] top-[-1px] border-black",
         "bg-slate-100 z-10"
       )}
       style={isEditingFormula ? {} : {display: "none"}}
@@ -260,8 +235,9 @@ function Formula({
         onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
         placeholder="???"
         inputClassName={cn(
-          "outline-none bg-transparent",
-          "font-mono text-sm"
+          "px-1 py-2 focus:border-black focus:border outline-none rounded",
+          "bg-transparent",
+          "font-mono text-sm",
         )}
       />
     </div>
