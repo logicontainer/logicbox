@@ -32,6 +32,31 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered } from "@/lib/state-helpers";
 
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client'
+
+function measureElementWidthSync(element: React.ReactElement): number {
+  const hiddenDiv = document.createElement('div');
+  hiddenDiv.style.position = 'absolute';
+  hiddenDiv.style.visibility = 'hidden';
+  hiddenDiv.style.height = '0';
+  hiddenDiv.style.overflow = 'hidden';
+  
+  document.body.appendChild(hiddenDiv);
+  
+  let width = 0;
+  flushSync(() => {
+    const root = createRoot(hiddenDiv);
+    root.render(element);
+    const childNode = hiddenDiv.firstChild as HTMLElement;
+    width = childNode?.offsetWidth || 0;
+    root.unmount();
+  });
+  
+  document.body.removeChild(hiddenDiv);
+  return width;
+}
+
 export function LineProofStep({
   ...props
 }: TLineProofStep & {
@@ -127,7 +152,6 @@ export function LineProofStep({
         />
 
         <div
-          title="Select a rule"
           className="flex items-center gap-2 whitespace-nowrap"
         >
           <Justification
@@ -209,31 +233,18 @@ function Formula({
     }
   }, [isEditingFormula])
 
-  return <>
-    <div 
-      className={cn(
-        "shrink", 
-        formulaIsWrong && "text-red-500",
-        formulaIsBeingHovered(lineUuid, hoveringState) && "text-blue-600",
-        isEditingFormula && "opacity-0"
-      )}
-      onClick={e => {
-        e.stopPropagation()
-        doTransition({ 
-          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE, 
-          lineUuid 
-        })
-      }}
-    >
-      {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
-        currentFormulaValue
-      ) : (
-        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
-      )}
-    </div>
+  return <div 
+    className={cn(
+      "relative",
+      formulaIsWrong ? "text-red-500" : "",
+      formulaIsBeingHovered(lineUuid, hoveringState) && "text-blue-600",
+    )}
+    onMouseMove={_ => handleHover({ enum: HoveringEnum.HOVERING_FORMULA, stepUuid: lineUuid })}
+  >
     <div
       className={cn(
-        "absolute bg-white z-10"
+        "absolute left-0 top-0",
+        "bg-slate-100 z-10"
       )}
       style={isEditingFormula ? {} : {display: "none"}}
     >
@@ -247,15 +258,31 @@ function Formula({
           formula: e.target.value,
         })}
         onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-        className={cn(
-          "text-slate-800 grow resize shrink",
-        )}
         placeholder="???"
         inputClassName={cn(
-          formulaIsWrong ? "text-red-500" : "",
-          "px-1 min-w-4"
+          "outline-none bg-transparent",
+          "font-mono text-sm"
         )}
       />
     </div>
-  </>
+    <div 
+      className={cn(
+        "h-full",
+        isEditingFormula ? "opacity-0" : "",
+      )}
+      onClick={e => {
+        e.stopPropagation()
+        doTransition({ 
+          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE, 
+          lineUuid 
+        })
+      }}
+    >
+      {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
+        <div className="h-full font-mono text-sm flex items-center">{userInput}</div>
+      ) : (
+        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
+      )}
+    </div>
+  </div>
 }

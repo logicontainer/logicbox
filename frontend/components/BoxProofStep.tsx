@@ -48,7 +48,7 @@ export function BoxProofStep({
       <FreshVars value={freshVar} />
       <div
         className={cn(
-          "pointer-events-auto border-2 overflow-hidden pt-1 mb-1",
+          "pointer-events-auto border-2 overflow-visible pt-1 mb-1",
           "border-black",
           freshVar && "mt-1.5 pt-1.5",
 
