@@ -2,12 +2,12 @@
 
 import {
   InteractionStateEnum,
+  TransitionEnum,
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
 
 import Card from "./Card";
 import { InlineMath } from "react-katex";
-import RulePanel from "./RulePanel";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useServer } from "@/contexts/ServerProvider";
@@ -17,8 +17,21 @@ import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { BoxProofStep, LineProofStep } from "@/types/types";
+import { BoxProofStep, LineProofStep, Rule } from "@/types/types";
 import { Label } from "./ui/label";
+import { createHighlightedLatexRule } from "@/lib/rules";
+import { useRuleset } from "@/contexts/RulesetProvider";
+import React from "react";
+
+function RuleShowPanel({
+  ruleLatex
+}: {
+  ruleLatex: string
+}) {
+  return <div className="w-full h-full flex justify-center items-center text-md border border-black rounded-sm">
+    <InlineMath math={ruleLatex} />
+  </div>
+}
 
 function LineFocusPanel({
   lineUuid,
@@ -42,7 +55,7 @@ function LineFocusPanel({
     .map(n => n === null ? "?" : n)
     .map(n => n.replace("-", "\\text{-}"))
 
-  const ruleLatex = lineUuid && getRuleAtStepAsLatex(lineUuid, refHighlights, formulaIsBeingHovered(lineUuid, hoveringState), "blue");
+  const ruleLatex = getRuleAtStepAsLatex(lineUuid, refHighlights, formulaIsBeingHovered(lineUuid, hoveringState), "blue") ?? "???";
 
   const { proofDiagnostics } = useServer();
   const errors = proofDiagnostics.filter((d) => d.uuid === lineUuid);
@@ -54,13 +67,12 @@ function LineFocusPanel({
           <InlineMath math={"\\textbf{Line }\\mathbf{" + (getReferenceString(lineUuid) ?? "???") + "}"}/>
         </Label>
         {lineStep.justification.refs.length === 0 ? [] : 
-          <Label>References: <span className="text-xs"
-          ><InlineMath math={refLineNumbers.join(", ")}/></span></Label>
+          <Label>References: <span className="text-xs">
+            <InlineMath math={refLineNumbers.join(", ")}/>
+          </span></Label>
         }
       </div>
-      <div className="flex justify-center items-center text-md border border-black rounded-sm">
-        <InlineMath math={ruleLatex ?? "???"} />
-      </div>
+      <RuleShowPanel ruleLatex={ruleLatex}/>
     </div>
     {errors.length > 0 ? <hr className="mt-2"/> : null}
     <DiagnosticsPanel diagnostics={errors}/>
@@ -86,6 +98,64 @@ function BoxFocusPanel({
           Fresh variable: <InlineMath math={boxStep.boxInfo.freshVar}/>
         </> : null}
       </Label>
+    </div>
+  </Card>
+}
+
+function RulePanel() {
+  const { rulesets } = useRuleset();
+  const { doTransition } = useInteractionState();
+  const [hoveredRule, setHoveredRule] = React.useState<string | null>(null);
+
+  const allRules = rulesets.map((s) => s.rules).flat();
+  const hoveredRuleDetails = allRules.find(
+    (rule) => rule.ruleName === hoveredRule,
+  );
+
+  const hoveredRuleDetailsLatex = hoveredRuleDetails
+    ? createHighlightedLatexRule(
+        hoveredRuleDetails.latex.ruleName,
+        hoveredRuleDetails.latex.premises,
+        hoveredRuleDetails.latex.conclusion,
+        [],
+        false,
+      )
+    : "";
+
+  const handleChangeRule = (ruleName: string) => {
+    if (ruleName == null) {
+      return;
+    }
+    doTransition({
+      enum: TransitionEnum.UPDATE_RULE,
+      ruleName,
+    });
+  };
+
+  const createRuleElement = (rule: Rule) => (
+    <div
+      key={rule.ruleName}
+      className="flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
+      onMouseOver={() => setHoveredRule(rule.ruleName)}
+      onMouseLeave={() => setHoveredRule(null)}
+      onClick={() => handleChangeRule(rule.ruleName)}
+    >
+      <h3 className="text">
+        <InlineMath math={rule.latex.ruleName}></InlineMath>
+      </h3>
+      <p className="text-sm text-gray-600"></p>
+    </div>
+  )
+
+  const [first, ...rest] = allRules.map(createRuleElement)
+
+  return <Card className="w-full flex flex-col gap-5">
+    <div className="grid grid-cols-3 gap-2">
+      {first}
+      <div className="col-span-2 row-span-3">
+        <RuleShowPanel ruleLatex={hoveredRuleDetailsLatex}/>
+      </div>
+      {rest}
     </div>
   </Card>
 }
