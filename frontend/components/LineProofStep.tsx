@@ -45,6 +45,7 @@ export function LineProofStep({
   const { interactionState } = useInteractionState();
   const { handleHover, hoveringState } = useHovering();
   const proofContext = useProof();
+  const { handleDragOver, handleDragStop, handleDragStart } = useStepDrag()
 
   const parentRef = React.useRef<HTMLDivElement>(null);
   const lineNumberRef = React.useRef<HTMLDivElement>(null);
@@ -75,7 +76,6 @@ export function LineProofStep({
     proofContext,
   );
 
-  const { handleDragOver, handleDragStop, handleDragStart } = useStepDrag()
 
   const dropZoneDirection: 'above' | 'below' | null = 
     interactionState.enum === InteractionStateEnum.MOVING_STEP && interactionState.toUuid === props.uuid ? interactionState.direction : null
