@@ -56,7 +56,7 @@ export default function Client({ proofId }: { proofId: string | null }) {
         >
           <Toolbar />
         </div>
-        <div className="grid grid-cols-[1fr_auto_1fr] w-full">
+        <div className="grid grid-cols-[0.5fr_auto_4fr] w-full">
           <div></div>
           <div className="relative pl-16 p-4 flex flex-col justify-between items-center rounded-sm">
             <div
