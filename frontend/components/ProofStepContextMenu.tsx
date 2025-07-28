@@ -34,6 +34,12 @@ export function ProofStepContextMenu() {
           option: ContextMenuOptions.EDIT_FRESH_VAR,
         });
         break;
+      case "remove-fresh-var":
+        doTransition({
+          enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
+          option: ContextMenuOptions.REMOVE_FRESH_VAR,
+        });
+        break;
       case "line-above":
         doTransition({
           enum: TransitionEnum.CLICK_CONTEXT_MENU_OPTION,
@@ -92,9 +98,14 @@ export function ProofStepContextMenu() {
         </Item>
       )}
       {interactionState.isBox && (
+        <>
         <Item id="edit-fresh-var" onClick={handleItemClick}>
           Edit fresh variable
         </Item>
+        <Item id="remove-fresh-var" className="text-red-500" onClick={handleItemClick}>
+          Remove fresh variable
+        </Item>
+        </>
       )}
       <hr />
       <Item className="flex justify-between gap-2 items-center">
