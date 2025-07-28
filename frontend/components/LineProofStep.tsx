@@ -127,7 +127,6 @@ export function LineProofStep({
         />
 
         <div
-          title="Select a rule"
           className="flex items-center gap-2 whitespace-nowrap"
         >
           <Justification
@@ -209,31 +208,18 @@ function Formula({
     }
   }, [isEditingFormula])
 
-  return <>
-    <div 
-      className={cn(
-        "shrink", 
-        formulaIsWrong && "text-red-500",
-        formulaIsBeingHovered(lineUuid, hoveringState) && "text-blue-600",
-        isEditingFormula && "opacity-0"
-      )}
-      onClick={e => {
-        e.stopPropagation()
-        doTransition({ 
-          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE, 
-          lineUuid 
-        })
-      }}
-    >
-      {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
-        currentFormulaValue
-      ) : (
-        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
-      )}
-    </div>
+  return <div 
+    className={cn(
+      "relative",
+      formulaIsWrong ? "text-red-500" : "",
+      formulaIsBeingHovered(lineUuid, hoveringState) && "text-blue-600",
+    )}
+    onMouseMove={_ => handleHover({ enum: HoveringEnum.HOVERING_FORMULA, stepUuid: lineUuid })}
+  >
     <div
       className={cn(
-        "absolute bg-white z-10"
+        "absolute left-[-4px] top-[-1px] border-black",
+        "bg-slate-100 z-10"
       )}
       style={isEditingFormula ? {} : {display: "none"}}
     >
@@ -247,15 +233,32 @@ function Formula({
           formula: e.target.value,
         })}
         onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
-        className={cn(
-          "text-slate-800 grow resize shrink",
-        )}
         placeholder="???"
         inputClassName={cn(
-          formulaIsWrong ? "text-red-500" : "",
-          "px-1 min-w-4"
+          "px-1 py-2 focus:border-black focus:border outline-none rounded",
+          "bg-transparent",
+          "font-mono text-sm",
         )}
       />
     </div>
-  </>
+    <div 
+      className={cn(
+        "h-full",
+        isEditingFormula ? "opacity-0" : "",
+      )}
+      onClick={e => {
+        e.stopPropagation()
+        doTransition({ 
+          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE, 
+          lineUuid 
+        })
+      }}
+    >
+      {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
+        <div className="h-full font-mono text-sm flex items-center">{userInput}</div>
+      ) : (
+        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
+      )}
+    </div>
+  </div>
 }
