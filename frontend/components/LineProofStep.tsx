@@ -277,7 +277,7 @@ function Formula({
       }}
     >
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
-        <div className="h-full font-mono text-sm tracking-tighter flex items-center">{userInput}</div>
+        <div className="h-full font-mono text-sm tracking-tighter flex items-center">{userInput === "" ? "???" : userInput}</div>
       ) : (
         <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
       )}
