@@ -172,7 +172,6 @@ export function DiagnosticsPanel({
 
       case "Ambiguous": {
         const icon = getRuleNameAtStepAsLatex(d.uuid) ?? "?"
-        const shouldShowMetaColumn = d.entries.some(e => e.meta !== d.subject)
 
         return <AccordionItem key={value} value={value}>
           <AccordionTrigger className="py-2">
@@ -205,7 +204,7 @@ export function DiagnosticsPanel({
                     }
                   }}>
                     <TableCell className="w-[120px]">{e.rulePosition}</TableCell>
-                    <TableCell className="w-[100px]" hidden={!shouldShowMetaColumn}><InlineMath math={e.meta}/></TableCell>
+                    <TableCell className="w-[100px]"><InlineMath math={e.meta}/></TableCell>
                     <TableCell className="flex justify-center"><InlineMath math={e.actual}/></TableCell>
                   </TableRow>
                 )}
