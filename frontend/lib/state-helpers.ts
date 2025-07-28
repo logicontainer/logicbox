@@ -41,6 +41,10 @@ export function getSelectedStep(state: InteractionState): string | null {
     return state.lineUuid;
   } else if (state.enum === InteractionStateEnum.IDLE) {
     return state.selectedProofStepUuid;
+  } else if (state.enum === InteractionStateEnum.VIEWING_CONTEXT_MENU) {
+    return state.proofStepUuid
+  } else if (state.enum === InteractionStateEnum.EDITING_FRESH_VAR) {
+    return state.boxUuid
   }
   return null;
 }
