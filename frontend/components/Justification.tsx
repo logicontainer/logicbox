@@ -80,7 +80,7 @@ export function Justification({
           e.stopPropagation();
           onClickRule();
         }}
-        onMouseOver={(e) => {
+        onMouseMove={(e) => {
           e.stopPropagation();
           handleHover({ enum: HoveringEnum.HOVERING_RULE, stepUuid: uuid });
         }}

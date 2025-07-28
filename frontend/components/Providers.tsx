@@ -9,6 +9,7 @@ import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
 import { RulesetProvider } from "@/contexts/RulesetProvider";
 import { ServerProvider } from "@/contexts/ServerProvider";
+import { StepDragProvider } from "@/contexts/StepDragProvider";
 
 type ProviderProps = {
   children: React.ReactNode;
@@ -24,7 +25,11 @@ export function Providers({ children }: ProviderProps) {
               <HistoryProvider>
                 <InteractionStateProvider>
                   <ContextMenuProvider>
-                    <HoveringProvider>{children}</HoveringProvider>
+                    <HoveringProvider>
+                      <StepDragProvider>
+                        {children}
+                      </StepDragProvider>
+                    </HoveringProvider>
                   </ContextMenuProvider>
                 </InteractionStateProvider>
               </HistoryProvider>

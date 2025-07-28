@@ -3,6 +3,8 @@ import { LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
 import { ProofContextProps } from "@/contexts/ProofProvider";
 // import { ProofStep } from "@/types/types";
 import { v4 as uuidv4 } from "uuid";
+import { isWebpackClientOnlyLayer } from "next/dist/build/utils";
+import { profile } from "console";
 
 export abstract class Command {
   private commandUuid: string;
@@ -33,7 +35,7 @@ export class AddLineCommand extends Command {
       "Execute AddLineCommand near line with uuid " +
         this.position.nearProofStepWithUuid,
     );
-    proofContext.addLine(
+    proofContext.addStep(
       {
         stepType: "line",
         uuid: this.newLineUuid,
@@ -55,7 +57,7 @@ export class AddLineCommand extends Command {
     console.log(
       "Undoing AddLineCommand near line with uuid " + this.newLineUuid,
     );
-    proofContext.removeLine(this.newLineUuid);
+    proofContext.removeStep(this.newLineUuid);
   }
   getDescription(): string {
     return `Add line ${
@@ -88,7 +90,7 @@ export class AddBoxedLineCommand extends Command {
       "Execute AddBoxLineCommand near line with uuid " +
         this.position.nearProofStepWithUuid,
     );
-    proofContext.addLine(
+    proofContext.addStep(
       {
         stepType: "box",
         uuid: this.newBoxUuid,
@@ -119,7 +121,7 @@ export class AddBoxedLineCommand extends Command {
     console.log(
       "Undoing AddBoxLineCommand near line with uuid " + this.newBoxUuid,
     );
-    proofContext.removeLine(this.newBoxUuid);
+    proofContext.removeStep(this.newBoxUuid);
   }
   getDescription(): string {
     return `Add box line ${
@@ -165,7 +167,7 @@ export class RemoveProofStepCommand extends Command {
       );
     }
 
-    proofContext.removeLine(this.proofStepUuid);
+    proofContext.removeStep(this.proofStepUuid);
   }
 
   undo(proofContext: ProofContextProps): void {
@@ -176,7 +178,7 @@ export class RemoveProofStepCommand extends Command {
     if (this.proofStep == null) {
       throw new Error("Cannot undo RemoveProofStepCommand without proofStep");
     }
-    proofContext.addLine(this.proofStep, this.position);
+    proofContext.addStep(this.proofStep, this.position);
   }
   getDescription(): string {
     return `Remove line with uuid ${this.proofStepUuid}`;
@@ -261,5 +263,70 @@ export class SetFreshVarOnBoxCommand extends Command {
 
   getDescription(): string {
     return `Set freshVar to ${this.freshVar} on box ${this.boxUuid}`;
+  }
+}
+
+export class MoveProofStepCommand extends Command {
+  private fromUuid: string;
+  private toUuid: string;
+  private prepend: boolean;
+
+  private recoveryPosition: ProofStepPosition | null = null
+
+  constructor(from: string, to: string, prepend: boolean) {
+    super();
+    this.fromUuid = from
+    this.toUuid = to
+    this.prepend = prepend
+  }
+
+  execute(proofContext: ProofContextProps): void {
+
+    if (proofContext.isDescendant(this.fromUuid, this.toUuid)) {
+      console.warn(`Cannot move a box into itself...`)
+      return;
+    }
+
+    // while we are only-child, keep recursing outwards
+    while (proofContext.isOnlyChild(this.fromUuid)) {
+      const parent = proofContext.getParentUuid(this.fromUuid)
+      if (!parent) {
+        // this shouldn't happen -> means 
+        console.warn(`Unable to move`)
+        return;
+      }
+      this.fromUuid = parent
+    }
+
+    const proofStep = proofContext.getProofStepDetails(this.fromUuid)?.proofStep
+    if (!proofStep) {
+      console.warn(`Proof step ${this.fromUuid} doesn't exist`)
+      return;
+    }
+
+    this.recoveryPosition = proofContext.getNeighbour(this.fromUuid)
+    if (!this.recoveryPosition) {
+      console.warn(`Couldn't find valid neighbour of ${this.fromUuid}`)
+    }
+
+    proofContext.removeStep(this.fromUuid)
+    proofContext.addStep(proofStep, {
+      nearProofStepWithUuid: this.toUuid,
+      prepend: this.prepend
+    })
+  }
+
+  undo(proofContext: ProofContextProps): void {
+    const proofStep = proofContext.getProofStepDetails(this.fromUuid)?.proofStep
+    if (!proofStep || !this.recoveryPosition) {
+      console.warn("Unable to move back.")
+      return;
+    }
+    proofContext.removeStep(this.fromUuid)
+    proofContext.addStep(proofStep, this.recoveryPosition)
+  }
+
+  getDescription(): string {
+    return `Move step ${this.fromUuid} to ${this.toUuid} (prepend? ${this.prepend ? "yes" : "no"})`
   }
 }

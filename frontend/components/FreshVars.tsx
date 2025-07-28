@@ -63,7 +63,7 @@ export default function FreshVars({
     )}
     onMouseMove={e => {
       e.stopPropagation()
-      handleHover({ enum: HoveringEnum.HOVERING_STEP, stepUuid: boxUuid })
+      handleHover({ enum: HoveringEnum.HOVERING_STEP, stepUuid: boxUuid, aboveOrBelow: 'above' })
     }}
     onContextMenu={e => {
       e.stopPropagation()

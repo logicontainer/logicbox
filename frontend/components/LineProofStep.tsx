@@ -20,7 +20,7 @@ import { Justification } from "./Justification";
 import LineNumber from "./LineNumber";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn, isOnLowerHalf } from "@/lib/utils";
 import {
   getDiagnosticHighlightForFormula,
   getStepHighlight,
@@ -31,6 +31,7 @@ import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered } from "@/lib/state-helpers";
+import { useStepDrag } from "@/contexts/StepDragProvider";
 
 export function LineProofStep({
   ...props
@@ -44,6 +45,7 @@ export function LineProofStep({
   const { interactionState } = useInteractionState();
   const { handleHover, hoveringState } = useHovering();
   const proofContext = useProof();
+  const { handleDragOver, handleDragStop, handleDragStart } = useStepDrag()
 
   const parentRef = React.useRef<HTMLDivElement>(null);
   const lineNumberRef = React.useRef<HTMLDivElement>(null);
@@ -74,6 +76,10 @@ export function LineProofStep({
     proofContext,
   );
 
+
+  const dropZoneDirection: 'above' | 'below' | null = 
+    interactionState.enum === InteractionStateEnum.MOVING_STEP && interactionState.toUuid === props.uuid ? interactionState.direction : null
+  
   return (
     <ProofStepWrapper
       highlight={stepHighlight}
@@ -85,7 +91,19 @@ export function LineProofStep({
         className={cn(
           "text-nowrap pointer-events-auto",
           "flex justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
+          dropZoneDirection === "above" && "border-t-[4px] border-black",
+          dropZoneDirection === "below" && "border-b-[4px] border-black",
         )}
+        draggable
+        onDragStart={_ => handleDragStart(props.uuid)}
+        onDragOver={e => {
+          e.stopPropagation()
+          handleDragOver(props.uuid, isOnLowerHalf(e))
+        }}
+        onDragEnd={e => {
+          e.stopPropagation()
+          handleDragStop()
+        }}
         onClick={(e) => {
           e.stopPropagation();
           return doTransition({
@@ -102,8 +120,12 @@ export function LineProofStep({
         }}
         onMouseMove={(e) => {
           e.stopPropagation();
-          if (e.currentTarget !== e.target) return;
-          handleHover({ enum: HoveringEnum.HOVERING_STEP, stepUuid: props.uuid });
+          if (e.currentTarget !== e.target) return
+          handleHover({ 
+            enum: HoveringEnum.HOVERING_STEP, 
+            stepUuid: props.uuid,
+            aboveOrBelow: isOnLowerHalf(e) ? "below" : "above",
+          });
         }}
         onContextMenu={(e) => {
           e.preventDefault();

@@ -15,11 +15,12 @@ import { StepHighlight } from "@/lib/proof-step-highlight";
 import { Proof } from "./Proof";
 import { ProofStepWrapper } from "./ProofStepWrapper";
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn, isOnLowerHalf } from "@/lib/utils";
 import { getStepHighlight } from "@/lib/proof-step-highlight";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { useStepDrag } from "@/contexts/StepDragProvider";
 
 export function BoxProofStep({
   ...props
@@ -31,6 +32,7 @@ export function BoxProofStep({
   const { doTransition, interactionState } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const { handleHover, hoveringState } = useHovering();
+  const { handleDragStart, handleDragOver, handleDragStop } = useStepDrag()
 
   const highlight = getStepHighlight(
     props.uuid,
@@ -41,6 +43,9 @@ export function BoxProofStep({
 
   const freshVar = props.boxInfo?.freshVar;
 
+  const dropZoneDirection: 'above' | 'below' | null = 
+    interactionState.enum === InteractionStateEnum.MOVING_STEP && interactionState.toUuid === props.uuid ? interactionState.direction : null
+
   return (
     <ProofStepWrapper isOuterProofStep={props.isOuterProofStep} isBox={true}>
       <FreshVars value={freshVar} boxUuid={props.uuid}/>
@@ -49,6 +54,8 @@ export function BoxProofStep({
           "pointer-events-auto border-2 overflow-x-visible pt-1 mb-1",
           "border-black",
           freshVar && "mt-1.5 pt-1.5",
+          dropZoneDirection === "above" && "border-t-[4px]",
+          dropZoneDirection === "below" && "border-b-[4px]",
           highlight === StepHighlight.SELECTED && "border-red-500",
           highlight === StepHighlight.SELECTED && "bg-slate-100",
           highlight === StepHighlight.HOVERED && "bg-slate-50",
@@ -56,6 +63,14 @@ export function BoxProofStep({
             "bg-blue-200",
           highlight === StepHighlight.REFERRED && "bg-blue-200",
         )}
+        draggable
+        onDragStart={_ => handleDragStart(props.uuid)}
+        onDragOver={e => {
+          e.stopPropagation()
+          if (e.currentTarget !== e.target) return
+          handleDragOver(props.uuid, isOnLowerHalf(e))
+        }}
+        onDragEnd={handleDragStop}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -84,7 +99,8 @@ export function BoxProofStep({
           e.stopPropagation();
           handleHover({ 
             enum: HoveringEnum.HOVERING_STEP,
-            stepUuid: props.uuid
+            stepUuid: props.uuid,
+            aboveOrBelow: isOnLowerHalf(e) ? "below" : "above"
           });
         }}
       >
