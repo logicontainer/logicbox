@@ -21,9 +21,13 @@ export interface ProofContextProps {
   setProofContent: (proof: Proof) => void;
 
   setStringProof: (proof: string) => unknown;
-  addLine: (proofStep: ProofStep, position: ProofStepPosition) => unknown;
-  removeLine: (uuid: string) => unknown;
+  addStep: (proofStep: ProofStep, position: ProofStepPosition) => unknown;
+  removeStep: (uuid: string) => unknown;
   updateLine: (uuid: string, updatedLineProofStep: LineProofStep) => unknown;
+  isDescendant: (parentUuid: string, childUuid: string) => boolean;
+  isOnlyChild: (stepUuid: string) => boolean;
+  getParentUuid: (stepUuid: string) => string | null;
+  getNeighbour: (stepUuid: string) => ProofStepPosition | null;
   updateFreshVarOnBox: (uuid: string, freshVar: string | null) => unknown;
   getProofStepDetails: (
     uuid: string,
@@ -55,7 +59,7 @@ const FALLBACK_PROOF: ProofWithMetadata = {
 export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   const [proofId, setProofId] = React.useState<string | null>(null);
   const { updateProofContent, getProof } = useProofStore();
-  const proof = (proofId !== null ? getProof(proofId) : null) ?? FALLBACK_PROOF;
+  const proof = (proofId !== null && getProof(proofId)) || FALLBACK_PROOF;
 
   const setProofContent = (updater: (_: Proof) => Proof) => {
     if (!proofId) {
@@ -103,7 +107,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     return false;
   };
 
-  const addLine = (proofStep: ProofStep, position: ProofStepPosition) => {
+  const addStep = (proofStep: ProofStep, position: ProofStepPosition) => {
     setProofContent((prev) => {
       const newProof = _.cloneDeep(prev);
       const insertProofStepAtUuid = (
@@ -127,7 +131,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     });
   };
 
-  const removeLine = (uuid: string) => {
+  const removeStep = (uuid: string) => {
     setProofContent((prev) => {
       const newProof = _.cloneDeep(prev);
       const removeProofStepAtUuid = (
@@ -156,6 +160,62 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       return newProof;
     });
   };
+
+  const isOnlyChild = (stepUuid: string): boolean => {
+    let result = true
+    const visit = (
+      proof: ProofStep[],
+      indexInCurrLayer: number,
+      parentBox: BoxProofStep | null,
+    ) => {
+      result = proof.length === 1
+    };
+    interactWithProofNearUuid(proof.proof, stepUuid, null, visit)
+    return result;
+  }
+
+  const getParentUuid = (stepUuid: string): string | null => {
+    let result: string | null = null
+    const visit = (
+      proof: ProofStep[],
+      indexInCurrLayer: number,
+      parentBox: BoxProofStep | null,
+    ) => {
+      result = parentBox?.uuid ?? null
+    };
+    interactWithProofNearUuid(proof.proof, stepUuid, null, visit)
+    return result
+  }
+
+  const isDescendant = (parentUuid: string, targetUuid: string): boolean => {
+    const parent = getProofStepDetails(parentUuid)?.proofStep
+    if (parent?.stepType !== "box") 
+      return false
+
+    return parent.proof.some(
+      ({ uuid }) => uuid === targetUuid || isDescendant(uuid, targetUuid)
+    )
+  }
+
+  const getNeighbour = (stepUuid: string): ProofStepPosition | null => {
+    let result: ProofStepPosition | null = null
+    const visit = (
+      proof: ProofStep[],
+      indexInCurrLayer: number,
+      parentBox: BoxProofStep | null,
+    ) => {
+      if (proof.length <= 1) // no valid nearby position, step is only child
+        return;
+
+      if (indexInCurrLayer === proof.length - 1)
+        result = { nearProofStepWithUuid: proof[proof.length - 2].uuid, prepend: false }  satisfies ProofStepPosition
+      else result = {
+        nearProofStepWithUuid: proof[indexInCurrLayer + 1].uuid, prepend: true
+      }
+    };
+    interactWithProofNearUuid(proof.proof, stepUuid, null, visit)
+    return result
+  }
 
   const updateFreshVarOnBox = (uuid: string, freshVar: string | null) => {
     setProofContent((prev) => {
@@ -246,9 +306,13 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         loadProofFromId: setProofId,
         setProofContent: (pf) => setProofContent((_) => pf),
         setStringProof,
+        isDescendant,
+        isOnlyChild,
+        getParentUuid,
+        getNeighbour: getNeighbour,
         updateFreshVarOnBox,
-        addLine,
-        removeLine,
+        addStep,
+        removeStep,
         updateLine,
         getProofStepDetails,
         getNearestDeletableProofStep,

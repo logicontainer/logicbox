@@ -8,6 +8,7 @@ import {
   AddBoxedLineCommand,
   AddLineCommand,
   Command,
+  MoveProofStepCommand,
   RemoveProofStepCommand,
   SetFreshVarOnBoxCommand,
   UpdateLineProofStepCommand,
@@ -66,7 +67,7 @@ export enum HoveringEnum {
 }
 
 export type HoveringState = { enum: HoveringEnum } & (
-  | { enum: HoveringEnum.HOVERING_STEP, stepUuid: string, topOrBottomHalf: 'top' | 'bottom' }
+  | { enum: HoveringEnum.HOVERING_STEP, stepUuid: string, aboveOrBelow: 'above' | 'below' }
   | { enum: HoveringEnum.HOVERING_FORMULA, stepUuid: string }
   | { enum: HoveringEnum.HOVERING_RULE, stepUuid: string }
   | { enum: HoveringEnum.HOVERING_REF, stepUuid: string, refIdx: number}
@@ -115,7 +116,7 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
   | { enum: TransitionEnum.START_DRAG_STEP; stepUuid: string }
-  | { enum: TransitionEnum.STOP_DRAG_STEP; stepUuid: string }
+  | { enum: TransitionEnum.STOP_DRAG_STEP }
   | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_REF; lineUuid: string; refIdx: number }
   | { enum: TransitionEnum.VALIDATE_PROOF }
@@ -214,8 +215,7 @@ export function InteractionStateProvider({
         `Updating ref, but the line we are editing doesn't have stepType 'line', has ${currLineProofStepDetails.proofStep.stepType}`,
       );
 
-    const currLineProofStep =
-      currLineProofStepDetails.proofStep as LineProofStep;
+    const currLineProofStep = currLineProofStepDetails.proofStep as LineProofStep;
     return currLineProofStep;
   };
 
@@ -396,6 +396,7 @@ export function InteractionStateProvider({
     EDITING_FRESH_VAR,
     EDITING_FORMULA,
     VIEWING_CONTEXT_MENU,
+    MOVING_STEP,
   } = InteractionStateEnum;
   const {
     CLICK_REF,
@@ -404,6 +405,8 @@ export function InteractionStateProvider({
     DOUBLE_CLICK_LINE,
     DOUBLE_CLICK_BOX,
     HOVER,
+    START_DRAG_STEP,
+    STOP_DRAG_STEP,
     CLICK_BOX,
     RIGHT_CLICK_STEP,
     UPDATE_RULE,
@@ -452,6 +455,10 @@ export function InteractionStateProvider({
 
       [DOUBLE_CLICK_BOX]: (_, { boxUuid }) => {
         return startEditingFreshVar(boxUuid)
+      },
+      
+      [START_DRAG_STEP]: (_, { stepUuid }) => {
+        return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
       }
     },
 
@@ -679,6 +686,27 @@ export function InteractionStateProvider({
       },
     },
 
+    [MOVING_STEP]: {
+      [START_DRAG_STEP]: doNothing, // TODO: how does this happen?
+
+      [HOVER]: (state, { hovering }) => {
+        return {
+          ...state,
+          toUuid: hovering?.stepUuid ?? null,
+          direction: (hovering?.enum === HoveringEnum.HOVERING_STEP && hovering.aboveOrBelow) || null,
+        } satisfies InteractionState
+      },
+
+      [STOP_DRAG_STEP]: (state, _) => {
+        if (!state.toUuid || state.toUuid === state.fromUuid) {
+          return stickySelectStep(state.fromUuid)
+        }
+        enqueueCommand(new MoveProofStepCommand(state.fromUuid, state.toUuid, state.direction === "above"))
+        enqueueCommand(Validate.VALIDATE)
+        return fullyIdle()
+      },
+    },
+
     [VIEWING_CONTEXT_MENU]: {
       [CLICK_OUTSIDE]: () => fullyIdle(),
 
@@ -816,11 +844,11 @@ export function InteractionStateProvider({
         return prevState;
       } else {
         const newState = func(prevState, transition);
-        console.log(
-          `${TransitionEnum[transition.enum]}: ${
-            InteractionStateEnum[prevState.enum]
-          } -> ${InteractionStateEnum[newState.enum]}`
-        );
+        // console.log(
+        //   `${TransitionEnum[transition.enum]}: ${
+        //     InteractionStateEnum[prevState.enum]
+        //   } -> ${InteractionStateEnum[newState.enum]}`
+        // );
 
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
           return prevState;

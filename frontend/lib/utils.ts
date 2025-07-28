@@ -16,3 +16,8 @@ export function download(
   a.download = fileName;
   a.click();
 }
+
+export function isOnLowerHalf(e: React.MouseEvent): boolean {
+  const { top, height } = e.currentTarget.getBoundingClientRect()
+  return (e.pageY - top) >= height / 2
+}

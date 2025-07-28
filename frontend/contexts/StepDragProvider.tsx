@@ -2,11 +2,11 @@
 
 import React from "react";
 import { useHovering } from "./HoveringProvider";
-import { HoveringEnum, useInteractionState } from "./InteractionStateProvider";
+import { HoveringEnum, TransitionEnum, useInteractionState } from "./InteractionStateProvider";
 
 export interface StepDragContext {
   handleDragStart: (stepUuid: string) => void;
-  handleDragOver: (stepUuid: string) => void;
+  handleDragOver: (stepUuid: string, isOnLowerHalf: boolean) => void;
   handleDragStop: () => void;
 }
 
@@ -30,19 +30,25 @@ export function StepDragProvider({ children }: React.PropsWithChildren<object>) 
   const handleDragStart = (stepUuid: string) => {
     if (currentlyDragged !== stepUuid) {
       setCurrentlyDragged(stepUuid)
+      doTransition({
+        enum: TransitionEnum.START_DRAG_STEP,
+        stepUuid
+      })
     }
   }
 
-  const handleDragOver = (stepUuid: string) => {
+  const handleDragOver = (stepUuid: string, isOnLowerHalf: boolean) => {
     handleHover({
       enum: HoveringEnum.HOVERING_STEP,
-      stepUuid
+      stepUuid,
+      aboveOrBelow: isOnLowerHalf ? "below" : "above"
     })
   }
 
   const handleDragStop = () => {
     if (currentlyDragged !== null) {
       setCurrentlyDragged(null)
+      doTransition({ enum: TransitionEnum.STOP_DRAG_STEP })
     }
   }
 
