@@ -31,6 +31,7 @@ import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered } from "@/lib/state-helpers";
+import { useStepDrag } from "@/contexts/StepDragProvider";
 
 export function LineProofStep({
   ...props
@@ -74,6 +75,8 @@ export function LineProofStep({
     proofContext,
   );
 
+  const { handleDragOver, handleDragStop, handleDragStart } = useStepDrag()
+  
   return (
     <ProofStepWrapper
       highlight={stepHighlight}
@@ -86,6 +89,13 @@ export function LineProofStep({
           "text-nowrap pointer-events-auto",
           "flex justify-between gap-8 text-lg/10 text-slate-800 px-1 pointer transition-colors items-stretch",
         )}
+        draggable
+        onDragStart={_ => handleDragStart(props.uuid)}
+        onDragOver={e => {
+          e.stopPropagation()
+          handleDragOver(props.uuid)}
+        }
+        onDragEnd={_ => handleDragStop()}
         onClick={(e) => {
           e.stopPropagation();
           return doTransition({
@@ -102,7 +112,7 @@ export function LineProofStep({
         }}
         onMouseMove={(e) => {
           e.stopPropagation();
-          if (e.currentTarget !== e.target) return;
+          if (e.currentTarget !== e.target) return
           handleHover({ enum: HoveringEnum.HOVERING_STEP, stepUuid: props.uuid });
         }}
         onContextMenu={(e) => {

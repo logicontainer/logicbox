@@ -129,6 +129,7 @@ export function Justification({
                   }}
                   onMouseMove={(e) => {
                     e.stopPropagation()
+                    if (e.currentTarget !== e.target) return 
                     handleHover({
                       enum: HoveringEnum.HOVERING_REF,
                       stepUuid: uuid,

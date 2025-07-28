@@ -20,6 +20,7 @@ import { getStepHighlight } from "@/lib/proof-step-highlight";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { useStepDrag } from "@/contexts/StepDragProvider";
 
 export function BoxProofStep({
   ...props
@@ -31,6 +32,7 @@ export function BoxProofStep({
   const { doTransition, interactionState } = useInteractionState();
   const { setContextMenuPosition } = useContextMenu();
   const { handleHover, hoveringState } = useHovering();
+  const { handleDragStart, handleDragOver, handleDragStop } = useStepDrag()
 
   const highlight = getStepHighlight(
     props.uuid,
@@ -56,6 +58,14 @@ export function BoxProofStep({
             "bg-blue-200",
           highlight === StepHighlight.REFERRED && "bg-blue-200",
         )}
+        draggable
+        onDragStart={_ => handleDragStart(props.uuid)}
+        onDragOver={e => {
+          e.stopPropagation()
+          if (e.currentTarget !== e.target) return
+          handleDragOver(props.uuid)
+        }}
+        onDragEnd={handleDragStop}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();

@@ -29,6 +29,9 @@ export enum TransitionEnum {
   DOUBLE_CLICK_LINE,
   HOVER,
 
+  START_DRAG_STEP,
+  STOP_DRAG_STEP,
+
   CLICK_RULE,
   CLICK_REF,
 
@@ -50,6 +53,8 @@ export enum InteractionStateEnum {
   EDITING_RULE,
   EDITING_FRESH_VAR,
 
+  MOVING_STEP,
+
   VIEWING_CONTEXT_MENU,
 }
 
@@ -61,7 +66,7 @@ export enum HoveringEnum {
 }
 
 export type HoveringState = { enum: HoveringEnum } & (
-  | { enum: HoveringEnum.HOVERING_STEP, stepUuid: string }
+  | { enum: HoveringEnum.HOVERING_STEP, stepUuid: string, topOrBottomHalf: 'top' | 'bottom' }
   | { enum: HoveringEnum.HOVERING_FORMULA, stepUuid: string }
   | { enum: HoveringEnum.HOVERING_RULE, stepUuid: string }
   | { enum: HoveringEnum.HOVERING_REF, stepUuid: string, refIdx: number}
@@ -86,6 +91,12 @@ export type InteractionState = { enum: InteractionStateEnum } & (
       proofStepUuid: string;
       isBox: boolean;
     }
+  | {
+    enum: InteractionStateEnum.MOVING_STEP;
+    fromUuid: string;
+    toUuid: string | null;
+    direction: 'above' | 'below' | null;
+  }
 );
 
 export type Transition = { enum: TransitionEnum } & (
@@ -103,6 +114,8 @@ export type Transition = { enum: TransitionEnum } & (
     }
   | { enum: TransitionEnum.CLICK_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
+  | { enum: TransitionEnum.START_DRAG_STEP; stepUuid: string }
+  | { enum: TransitionEnum.STOP_DRAG_STEP; stepUuid: string }
   | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_REF; lineUuid: string; refIdx: number }
   | { enum: TransitionEnum.VALIDATE_PROOF }
@@ -803,11 +816,11 @@ export function InteractionStateProvider({
         return prevState;
       } else {
         const newState = func(prevState, transition);
-        // console.log(
-        //   `${TransitionEnum[transition.enum]}: ${
-        //     InteractionStateEnum[prevState.enum]
-        //   } -> ${InteractionStateEnum[newState.enum]}`
-        // );
+        console.log(
+          `${TransitionEnum[transition.enum]}: ${
+            InteractionStateEnum[prevState.enum]
+          } -> ${InteractionStateEnum[newState.enum]}`
+        );
 
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
           return prevState;
