@@ -730,16 +730,7 @@ export function InteractionStateProvider({
             if (!state.isBox) {
               throw new Error("Editing fresh var of line. Why are you here?");
             }
-
-            let fv = prompt("Enter fresh var");
-            if (fv === "") fv = null;
-            fv &&
-              enqueueCommand(
-                new SetFreshVarOnBoxCommand(state.proofStepUuid, fv),
-              );
-            fv && enqueueCommand(Validate.VALIDATE);
-
-            return fullyIdle();
+            return startEditingFreshVar(state.proofStepUuid)
 
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
