@@ -22,6 +22,7 @@ import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import React from "react";
+import RenameProofButton from "./RenameProofButton";
 
 function RuleShowPanel({
   ruleLatex
@@ -177,7 +178,7 @@ export default function ContextSidebar() {
   return (
     <div className="lg:h-screen p-2 overflow-auto">
       <div className="flex flex-col gap-2">
-        <Card className="flex items-center justify-start gap-3 py-2">
+        <Card className="grid grid-cols-[150px_1px_auto_auto] items-center gap-3 py-2">
           <Link href={"/gallery"} title="Go to your proof gallery">
             <div className="flex items-cetner justify-center gap-2 py-2">
               <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
@@ -185,8 +186,11 @@ export default function ContextSidebar() {
             </div>
           </Link>
           <div className="w-[1px] self-stretch bg-gray-600 my-3"></div>
-          <div className="flex justify-between grow items-center">
-            <p className="text-xl">{proof.title}</p>
+          <div className="flex justify-between items-center overflow-scroll">
+            <p className="text-xl text-clip text-nowrap">{proof.title}</p>
+          </div>
+          <div className="flex justify-end gap-1">
+            <RenameProofButton proofId={proof.id} />
             <DownloadProofButton proofId={proof.id} />
           </div>
         </Card>
