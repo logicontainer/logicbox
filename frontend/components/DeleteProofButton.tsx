@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 export default function DeleteProofButton({ proofId }: { proofId: string }) {
   const deleteProof = useProofStore((state) => state.deleteProof);
-  const getTitle = () => useProofStore(state => state.getProof)(proofId)?.title
+  const title = useProofStore(state => state.getProof)(proofId)?.title ?? ""
 
   return <Button
     variant="outline"
@@ -15,7 +15,7 @@ export default function DeleteProofButton({ proofId }: { proofId: string }) {
       e.preventDefault();
       if (
         window.confirm(
-          `Are you sure you want to delete the proof: ${getTitle()}`,
+          `Are you sure you want to delete the proof: ${title}`,
         )
       ) {
         deleteProof(proofId);
