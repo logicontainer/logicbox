@@ -4,7 +4,7 @@ import { Diagnostic, ValidationRequest, ValidationResponse } from "@/types/types
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
-import { useProof } from "./ProofProvider";
+import { FALLBACK_PROOF, useProof } from "./ProofProvider";
 
 export interface ServerContextProps {
   syncingStatus: string;
@@ -29,6 +29,10 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const { proof, setProofContent } = useProof()
 
   useEffect(() => {
+    // don't validate if no proof is chosen
+    if (proof.id === FALLBACK_PROOF.id)
+      return;
+
     validateProof({ proof: proof.proof, logicName: proof.logicName });
   }, [proof.id]);
 
