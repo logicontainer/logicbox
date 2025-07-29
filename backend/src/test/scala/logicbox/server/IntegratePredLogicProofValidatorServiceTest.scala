@@ -9,7 +9,6 @@ import org.scalatest.Inspectors
 
 import spray.json._
 import logicbox.server.format._
-import zio.schema.validation.Validation
 import logicbox.framework.ValidationResult
 
 

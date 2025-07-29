@@ -33,7 +33,6 @@ import logicbox.rule.PredLogicRule.ExistsElim
 import logicbox.rule.PredLogicRule.ExistsIntro
 import logicbox.rule.PredLogicRule.EqualityIntro
 import logicbox.rule.PredLogicRule.EqualityElim
-import zio.http.template.Template
 
 object RuleMaps {
   val PHI = RulePart.MetaFormula(RulePart.Formulas.Phi)

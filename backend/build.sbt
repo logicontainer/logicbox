@@ -9,10 +9,6 @@ libraryDependencies ++= Seq(
 
   // for JSON marshalling/unmarshalling
   "io.spray" %%  "spray-json" % "1.3.6",
-
-  // HTTP
-  "dev.zio"       %% "zio"            % "2.0.19",
-  "dev.zio"       %% "zio-http"       % "3.0.1"
 )
 
 enablePlugins(JavaAppPackaging)
@@ -30,4 +26,16 @@ dockerRepository := sys.props.get("docker.registry")
 
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
-Compile / run / mainClass := Some("logicbox.Main")
+assembly / assemblyJarName := "logicbox_lib.jar"  // Output JAR name
+assembly / test := {}  // Skip tests during assembly
+
+// Merge strategy for conflicts
+assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+  case PathList("META-INF", "versions", _*) => MergeStrategy.discard
+  case PathList("META-INF", _*) => MergeStrategy.first
+  case "module-info.class" => MergeStrategy.discard
+  case x => 
+    val oldStrategy = (assembly / assemblyMergeStrategy).value
+    oldStrategy(x)
+}
