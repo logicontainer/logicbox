@@ -2,7 +2,10 @@ import type { Proof, ProofWithMetadata } from "../types/types";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { create } from "zustand";
-import examples from "@/examples/proof-examples";
+import jsonExamples from "@/examples/examples.json"
+
+// TODO: something better than type coercion?
+const proofExamples: ProofWithMetadata[] = jsonExamples as ProofWithMetadata[]
 
 type ProofStore = {
   proofs: ProofWithMetadata[];
@@ -17,7 +20,7 @@ type ProofStore = {
 export const useProofStore = create<ProofStore>()(
   persist(
     (set, get) => ({
-      proofs: examples,
+      proofs: proofExamples,
 
       addProof: (proof) =>
         set((state) => ({
