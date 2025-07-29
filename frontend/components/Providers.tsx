@@ -10,6 +10,7 @@ import { ProofProvider } from "@/contexts/ProofProvider";
 import { RulesetProvider } from "@/contexts/RulesetProvider";
 import { ServerProvider } from "@/contexts/ServerProvider";
 import { StepDragProvider } from "@/contexts/StepDragProvider";
+import Script from "next/script";
 
 type ProviderProps = {
   children: React.ReactNode;

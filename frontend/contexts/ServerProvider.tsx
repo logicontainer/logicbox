@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
 import { useProof } from "./ProofProvider";
+import Script from "next/script";
 
 export interface ServerContextProps {
   syncingStatus: string;
@@ -28,6 +29,8 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
 
   const { proof, setProofContent } = useProof()
 
+  const validateProofAsync = React.useRef<(req: string) => Promise<string>>(null)
+
   useEffect(() => {
     validateProof({ proof: proof.proof, logicName: proof.logicName });
   }, [proof.id]);
@@ -37,20 +40,20 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     console.trace(proof);
     return Promise.resolve()
       .then(async () => {
-        console.log("Calling server");
-        return fetch("https://logicbox.felixberg.dev/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(request),
-        });
+        if (validateProofAsync.current === null)
+          return Promise.resolve("")
+
+        return validateProofAsync.current?.(JSON.stringify(request))
+        // return fetch("https://logicbox.felixberg.dev/verify", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify(request),
+        // });
       })
-      .then(async (serverResponse: Response) => {
-        if (!serverResponse.ok) {
-          throw new Error(`Server error: ${serverResponse.statusText}`);
-        }
-        return await serverResponse.json();
+      .then(async (serverResponse: string) => {
+        return JSON.parse(serverResponse);
       })
       .then((serverResponse: ValidationResponse) => {
         console.log("Server response", serverResponse);
@@ -69,14 +72,28 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   };
 
   return (
-    <ServerContext.Provider
-      value={{
-        syncingStatus,
-        proofDiagnostics,
-        validateProof,
-      }}
-    >
-      {children}
-    </ServerContext.Provider>
+    <>
+      <Script
+        src="https://cjrtnc.leaningtech.com/4.2/loader.js"
+        strategy="afterInteractive" // or 'afterInteractive', 'lazyOnload'
+        onLoad={async () => {
+          console.log('Script has loaded');
+          // Initialize library here
+          const _ = await (window as any).cheerpjInit()
+          const lib = await (window as any).cheerpjRunLibrary("/app/logicbox_lib.jar")
+          const Main = await lib.logicbox.Main
+          validateProofAsync.current = async (str: string) => { return await Main.verify(str) }
+        }}
+      />
+      <ServerContext.Provider
+        value={{
+          syncingStatus,
+          proofDiagnostics,
+          validateProof,
+        }}
+      >
+        {children}
+      </ServerContext.Provider>
+    </>
   );
 }
