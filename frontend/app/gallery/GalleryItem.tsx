@@ -2,11 +2,15 @@
 import Card from "@/components/Card";
 import { Button } from "@/components/ui/button";
 import { LogicName, ProofWithMetadata } from "@/types/types";
-import { TrashIcon } from "lucide-react";
+import { DotIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useProofStore } from "@/store/proofStore";
 import DownloadProofButton from "@/components/DownloadProofButton";
 import { InlineMath } from "react-katex";
+import DeleteProofButton from "@/components/DeleteProofButton";
+import RenameProofButton from "@/components/RenameProofButton";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
 function logicNameToString(name: LogicName): string {
   switch (name) {
@@ -36,8 +40,7 @@ function logicNameToIconLatex(name: LogicName, seed: string): string {
   return options[number % options.length]
 }
 
-export default function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
-  const deleteProof = useProofStore((state) => state.deleteProof);
+export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
   const createdAtString = () => {
     let isoString = proof.createdAt;
     if (!isoString) isoString = new Date().toISOString();
@@ -46,38 +49,45 @@ export default function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
   };
   return (
     <Link href={`/proofs/${proof.id}`}>
-      <Card className="grid grid-cols-[100px_auto] hover:brightness-95 p-0 overflow-hidden"> 
+      <Card className="grid grid-cols-[75px_auto_auto] h-24 gap-2 hover:brightness-95 p-0 overflow-hidden"> 
         <div className="flex items-center justify-center bg-gray-100">
           <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)}/>
         </div>
-        <div className="flex pl-2 py-2 gap-2 items-center justify-between cursor-pointer">
-          <div className="flex flex-col gap-2">
-            <p className="text text-xl font-bold">{proof.title}</p>
-            <p className="text-sm text-gray-500">{logicNameToString(proof.logicName)}, {createdAtString()}</p>
-          </div>
-          <div className="flex items-center justify-end gap-1 pr-2">
-            <Button
-              variant="outline"
-              className="hover:text-red-500"
-              onMouseOver={(e) => e.stopPropagation()}
-              title="Delete proof"
-              onClick={(e) => {
-                e.preventDefault();
-                if (
-                  window.confirm(
-                    `Are you sure you want to delete the proof: ${proof.title}`,
-                  )
-                ) {
-                  deleteProof(proof.id);
-                }
-              }}
-            >
-              <TrashIcon />
-            </Button>
-            <DownloadProofButton proofId={proof.id} />
-          </div>
+        <div className="flex flex-col gap-2 justify-center overflow-hidden">
+          <p className="text text-lg font-bold text-nowrap overflow-scroll">{proof.title}</p>
+          <p className="text-xs text-gray-500">
+            {logicNameToString(proof.logicName)}<br/>
+            {createdAtString()}
+          </p>
+        </div>
+        <div className="flex items-center justify-end gap-1 pr-2">
+          <DeleteProofButton proofId={proof.id}/>
+          <RenameProofButton proofId={proof.id}/>
+          <DownloadProofButton proofId={proof.id} />
         </div>
       </Card>
     </Link>
+  );
+}
+
+export function GalleryItemSkeleton() {
+  return (
+    <Card className="grid grid-cols-[75px_auto_auto] h-24 gap-2 p-0 overflow-hidden"> 
+      <div className="flex items-center justify-center bg-gray-100">
+        <Skeleton className="size-8"/>
+      </div>
+      <div className="flex flex-col gap-2 justify-center overflow-hidden">
+        <Skeleton className="w-24 h-4"/>
+        <div className="flex flex-col gap-1">
+          <Skeleton className="w-32 h-2"/>
+          <Skeleton className="w-40 h-2"/>
+        </div>
+      </div>
+      <div className="flex items-center justify-end gap-1 pr-2">
+        <Skeleton className="w-12 h-8"/>
+        <Skeleton className="w-12 h-8"/>
+        <Skeleton className="w-12 h-8"/>
+      </div>
+    </Card>
   );
 }
