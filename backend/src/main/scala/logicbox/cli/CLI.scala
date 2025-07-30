@@ -77,8 +77,6 @@ object CLIMain {
   }
 
   def main(args: Array[String]): Unit = {
-    import logicbox.server.format.SprayFormatters._
-
     val validator = args.headOption match {
       case Some("prop") => PropLogicProofValidatorService()
       case Some("pred") => PredLogicProofValidatorService()
@@ -94,7 +92,6 @@ object CLIMain {
       ds = validator.validateProof(proof) match {
         case Left(value) => List(value.toString)
         case Right(value) => 
-          println(logicbox.server.format.SprayFormatters.rawProofFormat.write(value.proof).prettyPrint)
           value.diagnostics
       }
     } yield ds.foreach(println)
