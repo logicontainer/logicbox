@@ -7,11 +7,8 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
-import spray.json._
 import logicbox.server.format._
-import zio.schema.validation.Validation
 import logicbox.framework.ValidationResult
-
 
 class IntegratePredLogicProofValidatorServiceImplTest extends AnyFunSpec {
   describe("a bug i found") {

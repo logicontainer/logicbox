@@ -1,6 +1,5 @@
 package logicbox.framework
 
-import spray.json._
 import logicbox.server.format.RawProof
 import logicbox.server.format.OutputError
 
