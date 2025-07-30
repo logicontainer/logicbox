@@ -15,19 +15,7 @@ libraryDependencies ++= Seq(
   "dev.zio"       %% "zio-http"       % "3.0.1"
 )
 
-enablePlugins(JavaAppPackaging)
-enablePlugins(DockerPlugin)
-
 // use java version 11 for compiled sources
 javacOptions ++= Seq("-source", "11", "-target", "11")
-
-// require that docker JVM supports java 11
-dockerBaseImage := "openjdk:11"
-dockerExposedPorts := Seq(8080)
-
-dockerUsername   := sys.props.get("docker.username")
-dockerRepository := sys.props.get("docker.registry")
-
-resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
 Compile / run / mainClass := Some("logicbox.Main")
