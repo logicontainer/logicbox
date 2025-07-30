@@ -16,6 +16,7 @@ class ErrorConverterImpl[F, R, B, O](
   actualExpToString: O => String,
   rulePartToString: RulePart => String,
   proof: Proof[F, R, B, String],
+  unknownFormulaString: String, // what to display in case a navigator cannot find the located part
 ) extends ErrorConverter {
   private def getRulePosition(firstStep: Location.Step): Option[String] = firstStep match {
     case Step.Premise(idx) => Some(s"premise $idx")
@@ -33,14 +34,20 @@ class ErrorConverterImpl[F, R, B, O](
     case ShapeMismatch(loc) => for {
       rulePosition <- loc.steps.headOption.flatMap(getRulePosition(_))
       rule <- getRuleFromStep(stepId) 
-      infrule <- getInfRule(rule)
-      rulePart <- infRuleNavigator.get(infrule, loc)
-      actual <- proofNavigator.get((proof, stepId), loc)
+      rulePartStr = getInfRule(rule)
+        .flatMap(infRuleNavigator.get(_, loc))
+        .map(rulePartToString(_))
+        .getOrElse(unknownFormulaString)
+
+      actualStr = proofNavigator.get((proof, stepId), loc)
+        .map(actualExpToString(_))
+        .getOrElse(unknownFormulaString)
+
     } yield OutputError.ShapeMismatch(
       uuid = stepId,
       rulePosition = rulePosition,
-      expected = rulePartToString(rulePart),
-      actual = actualExpToString(actual)
+      expected = rulePartStr,
+      actual = actualStr,
     )
 
     case Ambiguous(what, entries) => 
@@ -49,13 +56,17 @@ class ErrorConverterImpl[F, R, B, O](
           firstStep <- loc.steps.headOption
           rulePosition <- getRulePosition(firstStep)
           rule <- getRuleFromStep(stepId)
-          infRule <- getInfRule(rule)
-          rulePart <- infRuleNavigator.get(infRule, loc)
-          actual <- proofNavigator.get((proof, stepId), loc)
+          rulePartStr = getInfRule(rule)
+            .flatMap(infRuleNavigator.get(_, loc))
+            .map(rulePartToString(_))
+            .getOrElse(unknownFormulaString)
+
+          actualStr = proofNavigator.get((proof, stepId), loc)
+            .map(actualExpToString(_)).getOrElse(unknownFormulaString)
         } yield OutputError.AmbiguityEntry(
           rulePosition = rulePosition,
-          meta = rulePartToString(rulePart),
-          actual = actualExpToString(actual)
+          meta = rulePartStr,
+          actual = actualStr,
         ) :: es
         case _ => None
       }.map { es =>
