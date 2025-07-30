@@ -9,14 +9,8 @@ lazy val root = (project in file("."))
       "io.circe" %%% "circe-core" % circeVersion,
       "io.circe" %%% "circe-generic" % circeVersion,
       "io.circe" %%% "circe-parser" % circeVersion,
+
       "org.scalatest" %% "scalatest" % "3.2.19" % Test,
       "org.scalatestplus" %% "mockito-5-12" % "3.2.19.0" % Test
     )
-  )
-
-lazy val js = (project in file("js"))
-  .enablePlugins(ScalaJSPlugin)
-  .dependsOn(root)
-  .settings(
-    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
-  )
+  ).enablePlugins(ScalaJSPlugin)
