@@ -148,7 +148,7 @@ export class RemoveProofStepCommand extends Command {
   execute(proofContext: ProofContextProps): void {
     const { proofStepDetails: nearestDeletableProofStep, cascadeCount } =
       proofContext.getNearestDeletableProofStep(this.proofStepUuid);
-    if (nearestDeletableProofStep == null || !nearestDeletableProofStep.proofStep) {
+    if (nearestDeletableProofStep == null) {
       console.warn(
         "This line cannot be deleted because it is the only line in the proof",
       );
@@ -279,7 +279,6 @@ export class MoveProofStepCommand extends Command {
   }
 
   execute(proofContext: ProofContextProps): void {
-
     if (proofContext.isDescendant(this.fromUuid, this.toUuid)) {
       console.warn(`Cannot move a box into itself...`)
       return;
@@ -289,7 +288,6 @@ export class MoveProofStepCommand extends Command {
     while (proofContext.isOnlyChild(this.fromUuid)) {
       const parent = proofContext.getParentUuid(this.fromUuid)
       if (!parent) {
-        // this shouldn't happen -> means 
         console.warn(`Unable to move`)
         return;
       }

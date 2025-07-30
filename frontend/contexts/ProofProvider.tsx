@@ -20,7 +20,6 @@ export interface ProofContextProps {
   loadProofFromId: (id: string) => void;
   setProofContent: (proof: Proof) => void;
 
-  setStringProof: (proof: string) => unknown;
   addStep: (proofStep: ProofStep, position: ProofStepPosition) => unknown;
   removeStep: (uuid: string) => unknown;
   updateLine: (uuid: string, updatedLineProofStep: LineProofStep) => unknown;
@@ -29,6 +28,7 @@ export interface ProofContextProps {
   getParentUuid: (stepUuid: string) => string | null;
   getNeighbour: (stepUuid: string) => ProofStepPosition | null;
   updateFreshVarOnBox: (uuid: string, freshVar: string | null) => unknown;
+
   getProofStepDetails: (
     uuid: string,
   ) => (ProofStepDetails & { isOnlyChildInBox: boolean }) | null;
@@ -67,10 +67,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       return;
     }
     updateProofContent(proofId, updater);
-  };
-
-  const setStringProof = (stringProof: string) => {
-    setProofContent(JSON.parse(stringProof));
   };
 
   const interactWithProofNearUuid = (
@@ -237,12 +233,28 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     });
   };
 
+  const getParentBox = (uuid: string): BoxProofStep | null => {
+    const visit = (steps: ProofStep[], parent: BoxProofStep | null): BoxProofStep | null => {
+      if (steps.some(step => step.uuid === uuid)) 
+        return parent
+      
+      for (const box of steps.filter(s => s.stepType === "box")) {
+        const result = visit(box.proof, box)
+        if (result !== null) {
+          return result
+        }
+      }
+
+      return null
+    }
+
+    return visit(proof.proof, null)
+  }
+
   const getProofStepDetails = (
     uuid: string,
   ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
-    let proofStepDetails = {} as
-      | (ProofStepDetails & { isOnlyChildInBox: boolean })
-      | null;
+    let proofStepDetails: (ProofStepDetails & { isOnlyChildInBox: boolean }) | null = null
     const extractProofStepDetails = (
       proof: ProofStep[],
       indexInCurrLayer: number,
@@ -305,7 +317,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         proof,
         loadProofFromId: setProofId,
         setProofContent: (pf) => setProofContent((_) => pf),
-        setStringProof,
         isDescendant,
         isOnlyChild,
         getParentUuid,
