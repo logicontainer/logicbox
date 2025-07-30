@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { useHovering } from "@/contexts/HoveringProvider";
 import { toInteger } from "lodash";
 import { Title } from "@radix-ui/react-dialog";
+import { LinesContextProps, useLines } from "@/contexts/LinesProvider";
+import { ProofContextProps, useProof } from "@/contexts/ProofProvider";
 
 
 function refIdxToString(refIdx: number, capital: boolean = true): string {
@@ -18,6 +20,23 @@ function refIdxToString(refIdx: number, capital: boolean = true): string {
     case 3: return `${capital ? "T" : "t"}he fourth reference`
     case 4: return `${capital ? "T" : "t"}he fifth reference`
     default: return `${capital ? "R" : "r"}eference ${(refIdx + 1).toString()}`
+  }
+}
+
+function rulePositionToLineNumber(rulePos: RulePosition, stepUuid: string, proofContext: ProofContextProps, linesContext: LinesContextProps): string | null {
+  switch (rulePos) {
+    case "conclusion":
+      return linesContext.getReferenceString(stepUuid)
+
+    case "premise 0": case "premise 1": case "premise 2": case "premise 3": case "premise 4": case "premise 5":
+      const step = proofContext.getProofStepDetails(stepUuid)?.proofStep
+      if (step?.stepType !== "line") {
+        return null
+      }
+
+      const idx = toInteger(rulePos[rulePos.length - 1])
+      if (idx >= step.justification.refs.length) return null
+      return linesContext.getReferenceString(step.justification.refs[idx])
   }
 }
 
@@ -81,6 +100,9 @@ export function DiagnosticsPanel({
       case "conclusion": return ""
     }
   }
+
+  const proofContext = useProof()
+  const linesContext = useLines()
 
   const { getRuleNameAtStepAsLatex } = useDiagnostics()
   const { handleHover } = useHovering()
@@ -184,7 +206,7 @@ export function DiagnosticsPanel({
             <Table>
               <TableBody>
                 {d.entries.map((e, idx) => 
-                  <TableRow key={idx.toString()} onMouseMove={ev => {
+                  <TableRow key={idx.toString()} className="flex justify-start" onMouseMove={ev => {
                     ev.stopPropagation()
                     switch (e.rulePosition) {
                       case "conclusion":
@@ -203,9 +225,19 @@ export function DiagnosticsPanel({
                         break;
                     }
                   }}>
-                    <TableCell className="w-[120px]">{e.rulePosition}</TableCell>
-                    <TableCell className="w-[100px]"><InlineMath math={e.meta}/></TableCell>
-                    <TableCell className="flex justify-center"><InlineMath math={e.actual}/></TableCell>
+                    <TableCell className="flex w-[100px] gap-4 items-center">{(() => {
+                      switch (e.rulePosition) {
+                        case "conclusion": return "Conclusion"
+                        case "premise 0":  return "Premise 1"
+                        case "premise 1":  return "Premise 2"
+                        case "premise 2":  return "Premise 3"
+                        case "premise 3":  return "Premise 4"
+                        case "premise 4":  return "Premise 5"
+                      }
+                    })()}
+                    </TableCell>
+                    <TableCell className="flex justify-center items-center w-[80px]"><InlineMath math={e.meta}/></TableCell>
+                    <TableCell className="flex justify-center grow"><InlineMath math={e.actual}/></TableCell>
                   </TableRow>
                 )}
               </TableBody>
