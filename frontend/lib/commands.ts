@@ -3,8 +3,6 @@ import { LineProofStep, ProofStep, ProofStepPosition } from "@/types/types";
 import { ProofContextProps } from "@/contexts/ProofProvider";
 // import { ProofStep } from "@/types/types";
 import { v4 as uuidv4 } from "uuid";
-import { isWebpackClientOnlyLayer } from "next/dist/build/utils";
-import { profile } from "console";
 
 export abstract class Command {
   private commandUuid: string;
@@ -18,6 +16,7 @@ export abstract class Command {
   abstract undo(proofContext: ProofContextProps): void;
   abstract getDescription(): string;
 }
+
 export class AddLineCommand extends Command {
   private newLineUuid: string;
   private position: ProofStepPosition;
@@ -59,6 +58,7 @@ export class AddLineCommand extends Command {
     );
     proofContext.removeStep(this.newLineUuid);
   }
+
   getDescription(): string {
     return `Add line ${
       this.position.prepend ? "before" : "after"
@@ -146,15 +146,13 @@ export class RemoveProofStepCommand extends Command {
   }
 
   execute(proofContext: ProofContextProps): void {
-    console.log(
-      "Execute RemoveProofStepCommand for line " + this.proofStepUuid,
-    );
     const { proofStepDetails: nearestDeletableProofStep, cascadeCount } =
       proofContext.getNearestDeletableProofStep(this.proofStepUuid);
-    if (nearestDeletableProofStep == null) {
-      throw new Error(
+    if (nearestDeletableProofStep == null || !nearestDeletableProofStep.proofStep) {
+      console.warn(
         "This line cannot be deleted because it is the only line in the proof",
       );
+      return;
     }
     this.proofStepUuid = nearestDeletableProofStep.proofStep.uuid;
     this.proofStep = nearestDeletableProofStep.proofStep;
