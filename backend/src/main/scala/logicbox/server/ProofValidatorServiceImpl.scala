@@ -2,9 +2,7 @@ package logicbox.server
 
 import logicbox.framework._
 
-import spray.json._
 import scala.util.Try
-import spray.json.JsonParser.ParsingException
 
 import logicbox.server.format.RawProof
 import logicbox.server.format.RawProofConverter

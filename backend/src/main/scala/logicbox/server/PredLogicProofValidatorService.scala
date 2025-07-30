@@ -13,8 +13,6 @@ object PredLogicProofValidatorService {
   private type B = FreshVarBoxInfo[PredLogicTerm.Var]
   private type Id = String
 
-  import logicbox.server.format.SprayFormatters._
-
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] = {
     val scopedChecker = ScopedProofChecker[Id]()
 
