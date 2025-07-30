@@ -1,4 +1,5 @@
 scalaVersion := "3.4.3"
+val circeVersion = "0.14.14"
 libraryDependencies ++= Seq(
   "org.scala-lang" %% "toolkit" % "0.1.7",
   // for parsing
@@ -7,12 +8,14 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.19" % Test,
   "org.scalatestplus" %% "mockito-5-12" % "3.2.19.0" % Test, // mocks
 
-  // for JSON marshalling/unmarshalling
-  "io.spray" %%  "spray-json" % "1.3.6",
-
   // HTTP
   "dev.zio"       %% "zio"            % "2.0.19",
-  "dev.zio"       %% "zio-http"       % "3.0.1"
+  "dev.zio"       %% "zio-http"       % "3.0.1",
+  
+  // JSON
+  "io.circe" %% "circe-core" % circeVersion,
+  "io.circe" %% "circe-generic" % circeVersion,
+  "io.circe" %% "circe-parser" % circeVersion,
 )
 
 // use java version 11 for compiled sources
