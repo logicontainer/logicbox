@@ -5,11 +5,17 @@ import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
 import { useProof } from "./ProofProvider";
+import Script from "next/script";
+import { verify } from "crypto";
 
 export interface ServerContextProps {
   syncingStatus: string;
   proofDiagnostics: Diagnostic[];
   validateProof: (proof: ValidationRequest) => Promise<boolean>;
+}
+
+declare const Main: {
+  verify: (req: string) => string
 }
 
 const ServerContext = React.createContext<ServerContextProps | null>(null);
@@ -25,6 +31,8 @@ export function useServer() {
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
   const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
+  const verifyFunction = React.useRef<((req: string) => string) | null>(null)
+
 
   const { proof, setProofContent } = useProof()
 
@@ -34,41 +42,36 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
 
   const validateProof = async (request: ValidationRequest): Promise<boolean> => {
     setServerSyncingStatus("syncing");
-    console.trace(proof);
-    return Promise.resolve()
-      .then(async () => {
-        console.log("Calling server");
-        return fetch("https://logicbox.felixberg.dev/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(request),
-        });
-      })
-      .then(async (serverResponse: Response) => {
-        if (!serverResponse.ok) {
-          throw new Error(`Server error: ${serverResponse.statusText}`);
-        }
-        return await serverResponse.json();
-      })
-      .then((serverResponse: ValidationResponse) => {
-        console.log("Server response", serverResponse);
-        setProofDiagnostics(serverResponse.diagnostics);
-        setProofContent(serverResponse.proof);
-        return true;
-      })
-      .finally(() => {
-        setServerSyncingStatus("idle");
-      })
-      .catch((error) => {
-        console.error("Error", error);
-        setServerSyncingStatus("error");
-        return false;
-      });
+
+    return Promise.resolve((() => {
+      if (verifyFunction.current === null)
+        return false
+
+      const result = verifyFunction.current(JSON.stringify(request))
+      const jsonResult = JSON.parse(result) as ValidationResponse
+      
+      setProofDiagnostics(jsonResult.diagnostics);
+      setProofContent(jsonResult.proof);
+
+      setServerSyncingStatus("idle")
+
+      return true
+    })())
   };
 
-  return (
+  return <>
+    <Script
+      src="/logicbox_backend.js"
+      strategy="afterInteractive"
+      onLoad={() => {
+        if (!Main)
+          console.error("Backend didn't load correctly")
+
+        console.log("Loaded backend")
+
+        verifyFunction.current = Main.verify
+      }}
+    />
     <ServerContext.Provider
       value={{
         syncingStatus,
@@ -78,5 +81,5 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     >
       {children}
     </ServerContext.Provider>
-  );
+  </>
 }
