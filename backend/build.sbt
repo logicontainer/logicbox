@@ -16,7 +16,7 @@ lazy val root = (project in file("."))
 
 lazy val js = (project in file("js"))
   .enablePlugins(ScalaJSPlugin)
-  .dependsOn(shared)
+  .dependsOn(root)
   .settings(
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
   )
