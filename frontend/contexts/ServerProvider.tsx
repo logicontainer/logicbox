@@ -37,20 +37,19 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
 
   const validateProof = async (request: ValidationRequest): Promise<boolean> => {
     setServerSyncingStatus("syncing");
-    console.trace(proof);
     return Promise.resolve()
       .then(async () => {
         if (validateProofAsync.current === null)
           return Promise.resolve("")
 
+        console.time("1")
+        const jstr = JSON.stringify(request)
+        console.timeEnd("1")
+        console.time("2")
+        const val = await validateProofAsync.current?.(jstr)
+        console.timeEnd("2")
+
         return validateProofAsync.current?.(JSON.stringify(request))
-        // return fetch("https://logicbox.felixberg.dev/verify", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify(request),
-        // });
       })
       .then(async (serverResponse: string) => {
         return JSON.parse(serverResponse);
