@@ -28,6 +28,7 @@ resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
 assembly / assemblyJarName := "logicbox_lib.jar"  // Output JAR name
 assembly / test := {}  // Skip tests during assembly
+assembly / mainClass := Some("logicbox.Main")
 
 // Merge strategy for conflicts
 assembly / assemblyMergeStrategy := {
