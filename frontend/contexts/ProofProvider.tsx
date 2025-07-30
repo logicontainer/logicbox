@@ -233,24 +233,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     });
   };
 
-  const getParentBox = (uuid: string): BoxProofStep | null => {
-    const visit = (steps: ProofStep[], parent: BoxProofStep | null): BoxProofStep | null => {
-      if (steps.some(step => step.uuid === uuid)) 
-        return parent
-      
-      for (const box of steps.filter(s => s.stepType === "box")) {
-        const result = visit(box.proof, box)
-        if (result !== null) {
-          return result
-        }
-      }
-
-      return null
-    }
-
-    return visit(proof.proof, null)
-  }
-
   const getProofStepDetails = (
     uuid: string,
   ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
@@ -333,8 +315,3 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     </ProofContext.Provider>
   );
 }
-
-// isDraft?: boolean,
-// hasChanges ?: boolean
-// isActiveEdit?: boolean
-// Should use Command pattern and history
