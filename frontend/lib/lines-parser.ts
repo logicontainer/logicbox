@@ -8,8 +8,8 @@ function extractLineUuids(
   boxes: TLineNumber[];
   currLineNumber: number;
 } {
-  let lines = [] as TLineNumber[];
-  let boxes = [] as TLineNumber[];
+  let lines: TLineNumber[] = [];
+  let boxes: TLineNumber[] = [];
 
   proof.forEach((proofStep: ProofStep) => {
     if (proofStep.stepType == "line") {

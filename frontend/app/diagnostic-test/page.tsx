@@ -248,7 +248,7 @@ function InnerThing() {
 
   React.useEffect(() => {
     setTimeout(() => {
-      proofContext.setStringProof(JSON.stringify(proofExample))
+      // proofContext.setStringProof(JSON.stringify(proofExample))
     }, 100)
   }, [])
 
