@@ -14,7 +14,7 @@ export interface ServerContextProps {
   validateProof: (proof: ValidationRequest) => Promise<boolean>;
 }
 
-declare const Main: {
+declare const JSLogicboxVerifier: {
   verify: (req: string) => string
 }
 
@@ -48,7 +48,11 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         return false
 
       const result = verifyFunction.current(JSON.stringify(request))
-      const jsonResult = JSON.parse(result) as ValidationResponse
+      const jsonResult = JSON.parse(result)
+      if (jsonResult.message !== undefined) {
+        console.error(jsonResult)
+        return false
+      }
       
       setProofDiagnostics(jsonResult.diagnostics);
       setProofContent(jsonResult.proof);
@@ -64,12 +68,12 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
       src="/logicbox_backend.js"
       strategy="afterInteractive"
       onLoad={() => {
-        if (!Main)
+        if (!JSLogicboxVerifier)
           console.error("Backend didn't load correctly")
 
         console.log("Loaded backend")
 
-        verifyFunction.current = Main.verify
+        verifyFunction.current = JSLogicboxVerifier.verify
       }}
     />
     <ServerContext.Provider
