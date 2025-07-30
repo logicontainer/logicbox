@@ -23,6 +23,7 @@ import logicbox.framework.RulePart
 class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
   import logicbox.ProofStubs._
 
+  val UNKNOWN_STR = "!!!!€!()€=!%!?"
   def fix(pf: Proof[F, R, B, String]) = {
     def expToString(f: Int): String = f.toString
     def rulePartToLaTeX(r: RulePart): String = s"--${r.toString}"
@@ -31,7 +32,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
     val rnav = mock[Navigator[InfRule, RulePart]]
     val getInfRule = mock[R => Option[InfRule]]
 
-    (ErrorConverterImpl[F, R, B, Int](pnav, rnav, getInfRule, expToString, rulePartToLaTeX, pf): ErrorConverter, pnav, rnav, getInfRule)
+    (ErrorConverterImpl[F, R, B, Int](pnav, rnav, getInfRule, expToString, rulePartToLaTeX, pf, UNKNOWN_STR): ErrorConverter, pnav, rnav, getInfRule)
   }
 
   describe("convert ShapeMismatch") {
@@ -153,7 +154,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert("box", Error.ShapeMismatch(conclLoc)) shouldBe None
     }
 
-    it("should return none if infrulenav fails") {
+    it("should return unknown string if infrulenav fails") {
       val pf = StubProof(
         rootSteps = Seq("l1"),
         map = Map(
@@ -167,10 +168,15 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
 
       val prem0Loc = Location.premise(0).root
       when(getInfRule(Good())).thenReturn(Some(ir))
-      when(pnav.get((pf, "l1"), prem0Loc)).thenReturn(Some(2)) 
+      when(pnav.get((pf, "l1"), prem0Loc)).thenReturn(Some(10)) 
       when(rnav.get(ir, prem0Loc)).thenReturn(None) // fail!
 
-      cvtr.convert("l1", Error.ShapeMismatch(prem0Loc)) shouldBe None
+      cvtr.convert("l1", Error.ShapeMismatch(prem0Loc)) shouldBe Some(OutputError.ShapeMismatch(
+        uuid = "l1",
+        rulePosition = "premise 0",
+        expected = UNKNOWN_STR,
+        actual = "10"
+      ))
     }
 
     it("should ret. none if proofnav fails") {
@@ -191,10 +197,15 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       when(pnav.get((pf, "l3"), prem0Loc)).thenReturn(None) // fail!
       when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0)) 
 
-      cvtr.convert("l3", Error.ShapeMismatch(prem0Loc)) shouldBe None
+      cvtr.convert("l3", Error.ShapeMismatch(prem0Loc)) shouldBe Some(OutputError.ShapeMismatch(
+        uuid = "l3",
+        rulePosition = "premise 0",
+        expected = s"--${prem0.toString}",
+        actual = UNKNOWN_STR
+      ))
     }
 
-    it("should ret. none if getInfRule fails") {
+    it("should ret. unknown formula if getInfRule fails") {
       val pf = StubProof(
         rootSteps = Seq("l1"),
         map = Map(
@@ -208,11 +219,16 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       val ir = InfRule(List(prem0), Contradiction())
 
       val prem0Loc = Location.premise(0).root
-      when(getInfRule(Good())).thenReturn(None)
-      when(pnav.get((pf, "l3"), prem0Loc)).thenReturn(Some(2)) // fail!
+      when(getInfRule(Good())).thenReturn(None) // fail
+      when(pnav.get((pf, "l3"), prem0Loc)).thenReturn(Some(2))
       when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0)) 
 
-      cvtr.convert("l3", Error.ShapeMismatch(prem0Loc)) shouldBe None
+      cvtr.convert("l3", Error.ShapeMismatch(prem0Loc)) shouldBe Some(OutputError.ShapeMismatch(
+        uuid = "l3",
+        rulePosition = "premise 0",
+        expected = UNKNOWN_STR,
+        actual = "2"
+      ))
     }
   }
 
@@ -360,12 +376,12 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       val concl = MetaFormula(Formulas.Psi)
       val ir = InfRule(Nil, concl)
 
-      val conclLoc = Location.root // LOCATION EMPTY
-      val entries = List(conclLoc)
+      val invalidLoc = Location.root // LOCATION EMPTY
+      val entries = List(invalidLoc)
 
       when(getInfRule(Good())).thenReturn(Some(ir))
-      when(pnav.get((pf, "ll"), conclLoc)).thenReturn(Some(10))
-      when(rnav.get(ir, conclLoc)).thenReturn(Some(concl))
+      when(pnav.get((pf, "ll"), invalidLoc)).thenReturn(Some(10))
+      when(rnav.get(ir, invalidLoc)).thenReturn(Some(concl))
 
       cvtr.convert("ll", Error.Ambiguous(what, entries)) shouldBe None
     }
@@ -419,7 +435,7 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert("invalid_id", Error.Ambiguous(what, entries)) shouldBe None
     }
 
-    it("should fail when getInfRule fails") {
+    it("should be unknown str when getInfRule fails") {
       val pf = StubProof(
         rootSteps = Seq("line"),
         map = Map(
@@ -440,7 +456,15 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       when(pnav.get((pf, "line"), prem0Loc)).thenReturn(Some(5))
       when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0.phi))
 
-      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe None
+      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "line",
+        subject = s"--${what.toString}",
+        entries = List(AmbiguityEntry(
+          rulePosition = "premise 0",
+          meta = UNKNOWN_STR,
+          actual = "5"
+        ))
+      ))
     }
 
     it("should fail when proof nav fails") {
@@ -464,7 +488,15 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       when(pnav.get((pf, "line"), prem0Loc)).thenReturn(None) // FAILS
       when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0.phi))
 
-      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe None
+      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "line",
+        subject = s"--${what.toString}",
+        entries = List(AmbiguityEntry(
+          rulePosition = "premise 0",
+          meta = s"--${prem0.phi.toString}",
+          actual = UNKNOWN_STR,
+        ))
+      ))
     }
 
     it("should fail when rule part nav fails") {
@@ -485,10 +517,18 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       val entries = List(prem0Loc)
 
       when(getInfRule(Bad())).thenReturn(Some(ir))
-      when(pnav.get((pf, "line"), prem0Loc)).thenReturn(Some(124)) // FAILS
-      when(rnav.get(ir, prem0Loc)).thenReturn(None)
+      when(pnav.get((pf, "line"), prem0Loc)).thenReturn(Some(124)) 
+      when(rnav.get(ir, prem0Loc)).thenReturn(None) // FAILS
 
-      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe None
+      cvtr.convert("line", Error.Ambiguous(what, entries)) shouldBe Some(OutputError.Ambiguous(
+        uuid = "line",
+        subject = s"--${what.toString}",
+        entries = List(AmbiguityEntry(
+          rulePosition = "premise 0",
+          meta = UNKNOWN_STR,
+          actual = "124",
+        ))
+      ))
     }
 
     it("should fail when only second entry fails") {
@@ -506,13 +546,13 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       val concl = And(Contradiction(), MetaFormula(Formulas.Psi))
       val ir = InfRule(List(prem0), concl)
 
-      val prem0Loc = Location.premise(0).root
-      val conclLoc = Location.conclusion.rhs
-      val entries = List(prem0Loc, conclLoc) // concl is second location in entries
+      val prem0Loc = Location.premise(0).root 
+      val conclLoc = Location.operand(141252).rhs // VERY INVALID
+      val entries = List(prem0Loc, conclLoc)
 
       when(getInfRule(Bad())).thenReturn(Some(ir))
       when(pnav.get((pf, "id"), prem0Loc)).thenReturn(Some(6))
-      when(pnav.get((pf, "id"), conclLoc)).thenReturn(None) // concl will fail!
+      when(pnav.get((pf, "id"), conclLoc)).thenReturn(Some(8))
       when(rnav.get(ir, prem0Loc)).thenReturn(Some(prem0))
       when(rnav.get(ir, conclLoc)).thenReturn(Some(concl.psi))
 

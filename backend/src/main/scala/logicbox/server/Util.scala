@@ -42,6 +42,7 @@ def createErrorConverter[F, B, R, O](
       case f: RulePart.TemplateFormula => Stringifiers.templateFormulaToLaTeX(f)
       case _ => "???"
     },
-    optProofView
+    optProofView,
+    "???"
   )
 }
