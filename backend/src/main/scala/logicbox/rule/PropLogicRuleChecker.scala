@@ -43,7 +43,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             failIf(rhs != formula, Ambiguous(
               MetaFormula(Formulas.Phi), List(
                 Location.conclusion.root,
-                Location.premise(1).rhs
+                Location.premise(0).rhs
               )
             ))
         }

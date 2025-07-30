@@ -14,7 +14,7 @@ import java.awt.Shape
 
 import logicbox.rule.PropLogicRule._
 import logicbox.rule.PropLogicRule.Premise => PremiseRULE // rename to avoid collisions with RulePosition.Premise
-class PLRuleTest extends AnyFunSpec {
+class PropLogicRuleCheckerTest extends AnyFunSpec {
   import logicbox.formula._
 
   private val lexer = PropLogicLexer()
@@ -98,7 +98,7 @@ class PLRuleTest extends AnyFunSpec {
       checker.check(rightRule, l.formula, List(ref)) shouldBe List(
         Ambiguous(MetaFormula(Formulas.Phi), List(
           Location.conclusion.root,
-          Location.premise(1).rhs
+          Location.premise(0).rhs
         ))
       )
     }
