@@ -76,7 +76,7 @@ export default function NewProofButton() {
       logicName: chosenLogic,
       proof: NEW_PROOF
     })
-    router.push(`/proofs/${newProofId}`)
+    router.push(`/proof/?id=${newProofId}`)
   }
 
   return <Dialog>
