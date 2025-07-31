@@ -1,0 +1,19 @@
+10: exists x P(x) or exists x Q(x)     : premise
+bp ------------------------------------
+  20: exists x P(x)                    : premise
+  ba a --------------------------------
+    30: P(a)                           : assumption
+    40: P(a) or Q(a)                   : or_intro_1 30
+    45: exists x (P(x) or Q(x))        : exists_intro 40
+  -------------------------------------
+  50: exists x (P(x) or Q(x))          : exists_elim 20, ba
+---------------------------------------
+bq ------------------------------------
+  60: exists x Q(x)                    : assumption
+  bb a  -------------------------------
+    70: P(a)                           : premise
+    80: P(a) or Q(a)                   : or_intro_1 70
+  -------------------------------------
+  90: exists x (P(x) or R(x))          : exists_elim 60, bb
+---------------------------------------
+100: exists x (P(x) or Q(x))           : or_elim 10, bp, bq

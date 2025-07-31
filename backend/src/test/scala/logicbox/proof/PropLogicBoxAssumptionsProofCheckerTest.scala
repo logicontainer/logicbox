@@ -1,0 +1,197 @@
+package logicbox.proof
+
+import org.scalatest.matchers.should.*
+import org.scalatest.matchers.should.Matchers.*
+import org.scalatest.Inspectors
+
+import org.scalatest.funspec.AnyFunSpec
+
+import logicbox.rule.PropLogicRule
+import logicbox.formula.PropLogicFormula
+import logicbox.framework.Proof
+
+import logicbox.rule.PropLogicRule._
+import logicbox.framework.Error
+import logicbox.framework.Error.Miscellaneous
+import logicbox.framework.Location
+
+class PropLogicBoxAssumptionsProofCheckerTest extends AnyFunSpec {
+
+  describe("check") {
+    val checker = PropLogicBoxAssumptionsProofChecker[PropLogicRule, String]()
+    import Location.Step
+    it("should reject if ImplIntro doesn't have assumption on first line") {
+      val proof = ProofImpl(
+        map = Map(
+          "box" -> ProofBoxImpl((), Seq("l1")),
+          "l1" -> ProofLineImpl((), Premise(), Seq()),
+          "l2" -> ProofLineImpl((), ImplicationIntro(), Seq("box"))
+        ),
+        rootSteps = Seq("box", "l2")
+      )
+
+      checker.check(proof) should matchPattern {
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
+      }
+    }
+
+    it("should not say anything for implication intro box is empty") {
+      val proof = ProofImpl(
+        map = Map(
+          "box" -> ProofBoxImpl((), Seq()),
+          "l" -> ProofLineImpl((), ImplicationIntro(), Seq("box"))
+        ),
+        rootSteps = Seq("box", "l")
+      )
+      
+      checker.check(proof) shouldBe Nil
+    }
+    
+    it("should say nothing for implication intro with no refs") {
+      val proof = ProofImpl(
+        map = Map(
+          "l" -> ProofLineImpl((), ImplicationIntro(), Seq())
+        ),
+        rootSteps = Seq("l")
+      )
+      
+      checker.check(proof) shouldBe Nil
+    }
+
+    it("should ignore other rules") {
+      val proof = ProofImpl(
+        map = Map(
+          "m" -> ProofLineImpl((), Premise(), Seq()),
+        ),
+        rootSteps = Seq("m")
+      )
+      
+      checker.check(proof) shouldBe Nil
+    }
+
+    it("should ignore malformed reference") {
+      val proof = ProofImpl(
+        map = Map(
+          "m" -> ProofLineImpl((), ImplicationIntro(), Seq("asldjLAKsdj")),
+        ),
+        rootSteps = Seq("m")
+      )
+      
+      checker.check(proof) shouldBe Nil
+
+    }
+
+    it("should say nothing for implication intro with ref to line") {
+      val proof = ProofImpl(
+        map = Map(
+          "m" -> ProofLineImpl((), Premise(), Seq()),
+          "l" -> ProofLineImpl((), ImplicationIntro(), Seq("m"))
+        ),
+        rootSteps = Seq("m", "l")
+      )
+      
+      checker.check(proof) shouldBe Nil
+    }
+
+    it("should reject if NotIntro doesn't have assumption on first line") {
+      val proof = ProofImpl(
+        map = Map(
+          "box" -> ProofBoxImpl((), Seq("l1")),
+          "l1" -> ProofLineImpl((), Premise(), Seq()),
+          "l2" -> ProofLineImpl((), NotIntro(), Seq("box"))
+        ),
+        rootSteps = Seq("box", "l2")
+      )
+
+      checker.check(proof) should matchPattern {
+        case List(("l2", Error.Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
+      }
+    }
+
+    it("should reject if PBC doesn't have assumption on first line") {
+      val proof = ProofImpl(
+        map = Map(
+          "box" -> ProofBoxImpl((), Seq("l1")),
+          "l1" -> ProofLineImpl((), Premise(), Seq()),
+          "l2" -> ProofLineImpl((), ProofByContradiction(), Seq("box"))
+        ),
+        rootSteps = Seq("box", "l2")
+      )
+
+      checker.check(proof) should matchPattern {
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
+      }
+    }
+
+    it("should reject if OrElim doesn't have assumption on first line of second ref") {
+      val proof = ProofImpl(
+        map = Map(
+          "l1" -> ProofLineImpl((), Premise(), Seq()),
+          "box1" -> ProofBoxImpl((), Seq("l1")),
+
+          "l2" -> ProofLineImpl((), Assumption(), Seq()),
+          "box2" -> ProofBoxImpl((), Seq("l2")),
+
+          "l4" -> ProofLineImpl((), OrElim(), Seq("l3", "box1", "box2")),
+          "l3" -> ProofLineImpl((), Premise(), Seq()),
+        ),
+        rootSteps = Seq("box1", "box2", "l3", "l4")
+      )
+      
+      checker.check(proof) should matchPattern {
+        case List(("l4", Miscellaneous(Location(Step.Premise(1) :: Step.FirstLine :: Nil), _))) =>
+      }
+    }
+
+    it("should reject if OrElim doesn't have assumption on first line of third ref") {
+      val proof = ProofImpl(
+        map = Map(
+          "l1" -> ProofLineImpl((), Assumption(), Seq()),
+          "box1" -> ProofBoxImpl((), Seq("l1")),
+
+          "l2" -> ProofLineImpl((), Premise(), Seq()),
+          "box2" -> ProofBoxImpl((), Seq("l2")),
+
+          "l4" -> ProofLineImpl((), OrElim(), Seq("l3", "box1", "box2")),
+          "l3" -> ProofLineImpl((), Premise(), Seq()),
+        ),
+        rootSteps = Seq("box1", "box2", "l3", "l4")
+      )
+      
+      checker.check(proof) should matchPattern {
+        case List(("l4", Miscellaneous(Location(Step.Premise(2) :: Step.FirstLine :: Nil), _))) =>
+      }
+    }
+
+    it("should say nothing if first step in box is box") {
+      val proof = ProofImpl(
+        map = Map(
+          "box1" -> ProofBoxImpl((), Seq()),
+          "box2" -> ProofBoxImpl((), Seq("box1")),
+          "l" -> ProofLineImpl((), ImplicationIntro(), Seq("box2")),
+        ),
+        rootSteps = Seq("l")
+      )
+      
+      checker.check(proof) shouldBe Nil
+    }
+
+    it("should notice when it happens inside box...") {
+      val proof = ProofImpl(
+        map = Map(
+          "l1" -> ProofLineImpl((), Premise(), Seq()), // should be assumption
+          "innerbox" -> ProofBoxImpl((), Seq("l1")),
+
+          "l2" -> ProofLineImpl((), ImplicationIntro(), Seq("innerbox")),
+          "box" -> ProofBoxImpl((), Seq("innerbox", "l2")),
+
+        ),
+        rootSteps = Seq("box")
+      )
+      
+      checker.check(proof) should matchPattern {
+        case List(("l2", Miscellaneous(Location(Step.Premise(0) :: Step.FirstLine :: Nil), _))) =>
+      }
+    }
+  }
+}

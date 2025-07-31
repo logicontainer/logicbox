@@ -1,0 +1,9 @@
+10: forall x forall y (P(x) and P(y))       : premise
+bu a ----------------------------------------
+  bv b --------------------------------------
+    30: forall y (P(a) and P(y))            : forall_elim 10
+    40: P(a) and P(b)                       : forall_elim 30
+  -------------------------------------------
+  50: forall v (P(a) and P(v))              : forall_intro bv
+---------------------------------------------
+100: forall u forall v (P(u) and P(v))      : forall_intro bu

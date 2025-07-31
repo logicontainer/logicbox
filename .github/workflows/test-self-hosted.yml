@@ -1,0 +1,11 @@
+name: Test self-hosted runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  self-hosted-test:
+    runs-on: self-hosted
+    steps:
+    - name: Say something
+      run: hostname

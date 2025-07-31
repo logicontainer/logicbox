@@ -1,20 +1,24 @@
-scalaVersion := "2.13.12"
-
+scalaVersion := "3.4.3"
+val circeVersion = "0.14.14"
 libraryDependencies ++= Seq(
+  "org.scala-lang" %% "toolkit" % "0.1.7",
+  // for parsing
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0",
+  // unit testing library
+  "org.scalatest" %% "scalatest" % "3.2.19" % Test,
+  "org.scalatestplus" %% "mockito-5-12" % "3.2.19.0" % Test, // mocks
+
+  // HTTP
   "dev.zio"       %% "zio"            % "2.0.19",
-  "dev.zio"       %% "zio-json"       % "0.6.2",
-  "dev.zio"       %% "zio-http"       % "3.0.0-RC6+36-d283e073-SNAPSHOT",
-  "io.getquill"   %% "quill-zio"      % "4.7.0",
-  "io.getquill"   %% "quill-jdbc-zio" % "4.7.0",
-  "com.h2database" % "h2"             % "2.2.224"
+  "dev.zio"       %% "zio-http"       % "3.0.1",
+  
+  // JSON
+  "io.circe" %% "circe-core" % circeVersion,
+  "io.circe" %% "circe-generic" % circeVersion,
+  "io.circe" %% "circe-parser" % circeVersion,
 )
 
-enablePlugins(JavaAppPackaging)
-enablePlugins(DockerPlugin)
+// use java version 11 for compiled sources
+javacOptions ++= Seq("-source", "11", "-target", "11")
 
-dockerExposedPorts := Seq(8080)
-
-dockerUsername   := sys.props.get("docker.username")
-dockerRepository := sys.props.get("docker.registry")
-
-resolvers ++= Resolver.sonatypeOssRepos("snapshots")
+Compile / run / mainClass := Some("logicbox.Main")

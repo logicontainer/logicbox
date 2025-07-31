@@ -1,0 +1,56 @@
+{
+  "logicName": "propositionalLogic",
+  "proof": [
+    {
+      "uuid": "l1", 
+      "stepType": "line",
+      "formula": {
+        "userInput": "p -> q"
+      },
+      "justification": {
+        "rule": "premise",
+        "refs": []
+      }
+    }, {
+      "uuid": "l2", 
+      "stepType": "line",
+      "formula": {
+        "userInput": "not not p"
+      },
+      "justification": {
+        "rule": "premise",
+        "refs": []
+      }
+    }, {
+      "uuid": "l3", 
+      "stepType": "line",
+      "formula": {
+        "userInput": "p"
+      },
+      "justification": {
+        "rule": "not_not_elim",
+        "refs": ["l2"]
+      }
+    }, {
+      "uuid": "l4", 
+      "stepType": "line",
+      "formula": {
+        "userInput": "q"
+      },
+      "justification": {
+        "rule": "implies_elim",
+        "refs": ["l3", "l1"]
+      }
+    }, {
+      "uuid": "l5", 
+      "stepType": "line",
+      "formula": {
+        "userInput": "not not q"
+      },
+      "justification": {
+        "rule": "not_not_intro",
+        "refs": ["l3"]
+      }
+    }
+  ]
+}
