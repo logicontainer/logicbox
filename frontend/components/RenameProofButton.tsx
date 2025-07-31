@@ -27,8 +27,11 @@ export default function RenameProofButton({ proofId }: { proofId: string }) {
     <DialogTrigger asChild>
       <Button variant="outline" onClick={_ => {
         const title = getProof(proofId)?.title ?? null
-        if (!title) console.warn(`Renaming proof that doesn't exist ${proofId}...`)
-        title && setProofName(title)
+        if (!title) {
+          console.warn(`Renaming proof that doesn't exist ${proofId}...`)
+        } else {
+          setProofName(title)
+        }
       }}>
         <PencilIcon className="h-4 w-4"></PencilIcon>
       </Button>
