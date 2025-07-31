@@ -169,7 +169,6 @@ export default function ContextSidebar() {
 
   const stepInFocus = getSelectedStep(interactionState);
 
-
   const proofStep = stepInFocus !== null ? getStep(stepInFocus) : null;
 
   const isEditingRule =
