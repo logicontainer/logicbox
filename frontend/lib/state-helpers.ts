@@ -5,6 +5,7 @@ import {
   InteractionStateEnum,
 } from "@/contexts/InteractionStateProvider";
 import { ProofContextProps } from "@/contexts/ProofProvider";
+import { Inter } from "next/font/google";
 
 export function getLineBeingEdited(state: InteractionState): string | null {
   if (
@@ -104,4 +105,16 @@ export function stepIsReferee(
   const referredStepUuid =
     refererStep.proofStep.justification.refs[hoveredRefIdx];
   return stepUuid === referredStepUuid;
+}
+
+export function stepIsDraggable(stepUuid: string, state: InteractionState) {
+  return [ 
+    InteractionStateEnum.IDLE,
+    InteractionStateEnum.EDITING_RULE,
+    InteractionStateEnum.EDITING_FORMULA,
+    InteractionStateEnum.EDITING_FRESH_VAR,
+    InteractionStateEnum.VIEWING_CONTEXT_MENU,
+    InteractionStateEnum.MOVING_STEP, // TODO: really?
+    // note: EDITING_REF is not here
+  ].includes(state.enum)
 }
