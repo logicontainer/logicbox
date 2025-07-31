@@ -97,13 +97,11 @@ export function LineProofStep({
         draggable
         onDragStart={_ => handleDragStart(props.uuid)}
         onDragOver={e => {
+          e.preventDefault()
           e.stopPropagation()
           handleDragOver(props.uuid, isOnLowerHalf(e))
         }}
-        onDragEnd={e => {
-          e.stopPropagation()
-          handleDragStop()
-        }}
+        onDrop={_ => handleDragStop()}
         onClick={(e) => {
           e.stopPropagation();
           return doTransition({
