@@ -24,7 +24,7 @@ export default function ProofEditor({ proofId }: { proofId: string | null }) {
 
   React.useEffect(() => {
     if (proofId) proofContext.loadProofFromId(proofId);
-  }, [proofId]);
+  }, [proofId, proofContext]);
 
   const [keybindTransition, setKeybindTransition] =
     React.useState<Transition | null>();
@@ -36,7 +36,7 @@ export default function ProofEditor({ proofId }: { proofId: string | null }) {
     };
     window.addEventListener("keydown", listener);
     return () => window.removeEventListener("keydown", listener);
-  }, [interactionState]);
+  }, [interactionState, doTransition]);
 
   React.useEffect(() => {
     if (keybindTransition) doTransition(keybindTransition);
