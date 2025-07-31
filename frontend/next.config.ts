@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  redirects: async () => [
+    {
+      source: "/",
+      destination: "/gallery",
+      statusCode: 301
+    }
+  ]
 };
 
 export default nextConfig;
