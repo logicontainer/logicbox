@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build-frontend": "cd ../frontend/ && pnpm build && cd ../electron && cp -r ../frontend/out app",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
