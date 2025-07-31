@@ -516,6 +516,11 @@ export function InteractionStateProvider({
       [DOUBLE_CLICK_BOX]: (state, { boxUuid }) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula)
         return startEditingFreshVar(boxUuid)
+      },
+
+      [START_DRAG_STEP]: (state, { stepUuid }) => {
+        updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula)
+        return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
       }
     },
 
@@ -560,6 +565,10 @@ export function InteractionStateProvider({
 
       [DOUBLE_CLICK_BOX]: (_, { boxUuid }) => {
         return startEditingFreshVar(boxUuid)
+      },
+
+      [START_DRAG_STEP]: (_, { stepUuid }) => {
+        return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
       }
     },
 
@@ -631,6 +640,9 @@ export function InteractionStateProvider({
         updateRefAndValidate(editedLineUuid, refIdx, boxUuid);
         return stickySelectStep(editedLineUuid)
       },
+
+      [START_DRAG_STEP]: doNothing,
+      [STOP_DRAG_STEP]: doNothing,
     },
     
     [EDITING_FRESH_VAR]: {
@@ -684,6 +696,11 @@ export function InteractionStateProvider({
         updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
         return stickySelectStep(state.boxUuid)
       },
+
+      [START_DRAG_STEP]: (state, { stepUuid }) => {
+        updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
+        return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
+      }
     },
 
     [MOVING_STEP]: {
@@ -818,9 +835,12 @@ export function InteractionStateProvider({
               currentFormula: "",
             };
           }
-
         }
       },
+
+      [START_DRAG_STEP]: (_, { stepUuid }) => {
+        return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
+      }
     },
   };
 

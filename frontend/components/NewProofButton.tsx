@@ -41,7 +41,7 @@ function LogicOption({
   onClick: () => void
 }) {
   return <div className={cn(
-    "w-full h-9 flex items-center justify-between px-3 border-[1px] border-solid border-slate-200 rounded hover:bg-slate-200",
+    "w-full h-9 flex items-center justify-between px-3 border-[1px] border-solid border-slate-200 rounded hover:bg-accent cursor-pointer",
     chosen && "bg-slate-200"
   )} onClick={onClick}>
     <div className="text-sm">{name}</div>
@@ -80,7 +80,7 @@ export default function NewProofButton() {
 
   return <Dialog>
     <DialogTrigger asChild>
-      <Button variant="outline" onClick={e => {
+      <Button variant="outline" onClick={_ => {
         setProofName("")
         setChosenLogic(null)
       }}>

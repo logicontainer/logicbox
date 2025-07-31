@@ -30,8 +30,9 @@ import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
-import { formulaIsBeingHovered } from "@/lib/state-helpers";
+import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
+import { intersection } from "lodash";
 
 export function LineProofStep({
   ...props
@@ -94,14 +95,14 @@ export function LineProofStep({
           dropZoneDirection === "above" && "border-t-[4px] border-black",
           dropZoneDirection === "below" && "border-b-[4px] border-black",
         )}
-        draggable
+        draggable={stepIsDraggable(props.uuid, interactionState)}
         onDragStart={_ => handleDragStart(props.uuid)}
         onDragOver={e => {
           e.preventDefault()
           e.stopPropagation()
           handleDragOver(props.uuid, isOnLowerHalf(e))
         }}
-        onDrop={_ => handleDragStop()}
+        onDrop={handleDragStop}
         onClick={(e) => {
           e.stopPropagation();
           return doTransition({
