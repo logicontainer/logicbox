@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  output: 'export',
   /* config options here */
   experimental: {
     turbo: {
@@ -12,20 +13,6 @@ const nextConfig: NextConfig = {
         },
       },
     },
-  },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/gallery",
-        permanent: true,
-      },
-      {
-        source: "/proofs",
-        destination: "/gallery",
-        permanent: true,
-      },
-    ];
   },
 };
 

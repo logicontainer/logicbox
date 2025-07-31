@@ -1,17 +1,19 @@
-"use client"
-
+import { useHovering } from "@/contexts/HoveringProvider";
 import ContextSidebar from "@/components/ContextSidebar";
 import Footer from "@/components/Footer";
-import { useHovering } from "@/contexts/HoveringProvider";
+import ProofEditor from "./ProofEditor";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function ProofEditorPage({ proofId }: { proofId: string }) {
   const { handleHover } = useHovering()
+
   return (
     <div onMouseMove={_ => handleHover(null)} className="h-screen grid grid-cols-[550px_1fr]">
       <div className="overflow-auto relative">
         <ContextSidebar />
       </div>
-      <div className="overflow-auto relative">{children}</div>
+      <div className="overflow-auto relative">
+        <ProofEditor proofId={proofId}/>
+      </div>
       <div className="sm:hidden">
         <Footer />
       </div>
