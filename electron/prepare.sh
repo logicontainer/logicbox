@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd backend
+cd ../backend
 echo "------------ COMPILING BACKEND"
 
 sbt fullLinkJS
@@ -21,6 +21,11 @@ echo "\
 
 cat $SBTOUTPUTFILE >> $DSTFILE
 
-cd frontend
 echo "------------ RUNNING pnpm build"
-pnpm build
+NEXT_OUTPUT_MODE=export pnpm build
+
+cd ..
+echo "------------ COPYING pnpm OUTPUT TO electron/app"
+cp -rv frontend/out electron/app
+
+cd electron
