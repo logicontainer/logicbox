@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { LogicName, Proof } from "@/types/types";
 import { useRouter } from "next/navigation";
-import { v4 as uuid } from "uuid";
 import { useProofStore } from "@/store/proofStore";
 import { PlusIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -81,7 +80,7 @@ export default function NewProofButton() {
 
   return <Dialog>
     <DialogTrigger asChild>
-      <Button size="icon" variant="outline" onClick={_ => {
+      <Button variant="outline" onClick={e => {
         setProofName("")
         setChosenLogic(null)
       }}>

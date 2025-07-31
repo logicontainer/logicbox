@@ -1,12 +1,12 @@
 "use client";
 import Card from "@/components/Card";
 import { LogicName, ProofWithMetadata } from "@/types/types";
-import Link from 'next/link'
 import DownloadProofButton from "@/components/DownloadProofButton";
 import { InlineMath } from "react-katex";
 import DeleteProofButton from "@/components/DeleteProofButton";
 import RenameProofButton from "@/components/RenameProofButton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 function logicNameToString(name: LogicName): string {
   switch (name) {
@@ -37,6 +37,8 @@ function logicNameToIconLatex(name: LogicName, seed: string): string {
 }
 
 export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
+  const router = useRouter()
+
   const createdAtString = () => {
     let isoString = proof.createdAt;
     if (!isoString) isoString = new Date().toISOString();
@@ -45,8 +47,12 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
   };
 
   return (
-    <Link href={`/proof?id=${proof.id}`}>
-      <Card className="grid grid-cols-[75px_auto_auto] h-24 gap-2 hover:brightness-95 p-0 overflow-hidden"> 
+    <div onClick={_ => {
+      router.push(`/proof?id=${proof.id}`)
+    }}>
+    <Card 
+      className="grid grid-cols-[75px_auto_auto] h-24 gap-2 hover:brightness-95 p-0 overflow-hidden"
+    > 
         <div className="flex items-center justify-center bg-gray-100">
           <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)}/>
         </div>
@@ -57,13 +63,16 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
             {createdAtString()}
           </p>
         </div>
-        <div className="flex items-center justify-end gap-1 pr-2">
+        <div 
+          className="flex items-center justify-end gap-1 pr-2" 
+          onClick={e => e.stopPropagation() /* don't let button clicks through to selecting this */}
+        >
           <DeleteProofButton proofId={proof.id}/>
           <RenameProofButton proofId={proof.id}/>
           <DownloadProofButton proofId={proof.id} />
         </div>
       </Card>
-    </Link>
+    </div>
   );
 }
 
