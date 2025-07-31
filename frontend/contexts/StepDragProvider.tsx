@@ -22,14 +22,14 @@ export function useStepDrag() {
 }
 
 export function StepDragProvider({ children }: React.PropsWithChildren<object>) {
-  const [currentlyDragged, setCurrentlyDragged] = React.useState<string | null>(null)
+  const currentlyDragged = React.useRef<string | null>(null)
 
   const { handleHover } = useHovering()
   const { doTransition } = useInteractionState()
 
   const handleDragStart = (stepUuid: string) => {
-    if (currentlyDragged !== stepUuid) {
-      setCurrentlyDragged(stepUuid)
+    if (currentlyDragged.current !== stepUuid) {
+      currentlyDragged.current = stepUuid
       doTransition({
         enum: TransitionEnum.START_DRAG_STEP,
         stepUuid
@@ -46,8 +46,8 @@ export function StepDragProvider({ children }: React.PropsWithChildren<object>) 
   }
 
   const handleDragStop = () => {
-    if (currentlyDragged !== null) {
-      setCurrentlyDragged(null)
+    if (currentlyDragged.current !== null) {
+      currentlyDragged.current = null
       doTransition({ enum: TransitionEnum.STOP_DRAG_STEP })
     }
   }
