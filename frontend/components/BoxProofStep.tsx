@@ -21,6 +21,7 @@ import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useStepDrag } from "@/contexts/StepDragProvider";
+import { stepIsDraggable } from "@/lib/state-helpers";
 
 export function BoxProofStep({
   ...props
@@ -62,7 +63,7 @@ export function BoxProofStep({
           highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200",
           highlight === StepHighlight.REFERRED && "bg-blue-200",
         )}
-        draggable
+        draggable={stepIsDraggable(props.uuid, interactionState)}
         onDragStart={_ => handleDragStart(props.uuid)}
         onDragOver={e => {
           e.stopPropagation()
