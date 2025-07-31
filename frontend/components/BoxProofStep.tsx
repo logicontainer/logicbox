@@ -59,8 +59,7 @@ export function BoxProofStep({
           highlight === StepHighlight.SELECTED && "border-red-500",
           highlight === StepHighlight.SELECTED && "bg-slate-100",
           highlight === StepHighlight.HOVERED && "bg-slate-50",
-          highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
-            "bg-blue-200",
+          highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200",
           highlight === StepHighlight.REFERRED && "bg-blue-200",
         )}
         draggable
