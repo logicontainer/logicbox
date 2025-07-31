@@ -67,10 +67,10 @@ export function BoxProofStep({
         onDragStart={_ => handleDragStart(props.uuid)}
         onDragOver={e => {
           e.stopPropagation()
-          if (e.currentTarget !== e.target) return
+          e.preventDefault()
           handleDragOver(props.uuid, isOnLowerHalf(e))
         }}
-        onDragEnd={handleDragStop}
+        onDrop={handleDragStop}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
