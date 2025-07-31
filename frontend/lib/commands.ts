@@ -152,6 +152,7 @@ export class RemoveProofStepCommand extends Command {
       console.warn(
         "This line cannot be deleted because it is the only line in the proof",
       );
+      return;
     }
     this.proofStepUuid = nearestDeletableProofStep.proofStep.uuid;
     this.proofStep = nearestDeletableProofStep.proofStep;

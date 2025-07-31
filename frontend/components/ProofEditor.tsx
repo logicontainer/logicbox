@@ -12,12 +12,11 @@ import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
 import Toolbar from "@/components/Toolbar";
-import { useHovering } from "@/contexts/HoveringProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { useServer } from "@/contexts/ServerProvider";
 
-export default function Client({ proofId }: { proofId: string | null }) {
+export default function ProofEditor({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
   const { proofDiagnostics } = useServer();
   const { interactionState, doTransition } = useInteractionState();

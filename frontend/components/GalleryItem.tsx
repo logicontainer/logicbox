@@ -1,16 +1,12 @@
 "use client";
 import Card from "@/components/Card";
-import { Button } from "@/components/ui/button";
 import { LogicName, ProofWithMetadata } from "@/types/types";
-import { DotIcon, TrashIcon } from "lucide-react";
-import Link from "next/link";
-import { useProofStore } from "@/store/proofStore";
+import Link from 'next/link'
 import DownloadProofButton from "@/components/DownloadProofButton";
 import { InlineMath } from "react-katex";
 import DeleteProofButton from "@/components/DeleteProofButton";
 import RenameProofButton from "@/components/RenameProofButton";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
 function logicNameToString(name: LogicName): string {
   switch (name) {
@@ -47,8 +43,9 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
     const createdAtDate = new Date(isoString);
     return createdAtDate.toLocaleString();
   };
+
   return (
-    <Link href={`/proofs/${proof.id}`}>
+    <Link href={`/proof?id=${proof.id}`}>
       <Card className="grid grid-cols-[75px_auto_auto] h-24 gap-2 hover:brightness-95 p-0 overflow-hidden"> 
         <div className="flex items-center justify-center bg-gray-100">
           <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)}/>

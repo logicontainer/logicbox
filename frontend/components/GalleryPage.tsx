@@ -1,14 +1,14 @@
 "use client";
 
 import { useProofStore } from "@/store/proofStore";
-import { GalleryItemSkeleton, GalleryItem } from "./GalleryItem";
+import { GalleryItemSkeleton, GalleryItem } from "@/components/GalleryItem";
 import { ProofWithMetadata } from "@/types/types";
-import NewProofDialog from "./NewProofButton";
+import NewProofDialog from "@/components/NewProofButton";
 import UploadProofButton from "@/components/UploadProofButton";
 import React from "react";
 import _ from "lodash";
 
-export default function Gallery() {
+export default function GalleryPage() {
   const proofs = useProofStore((state) => state.proofs);
 
   const [isHydrated, setIsHydrated] = React.useState<boolean>(false)
@@ -25,10 +25,6 @@ export default function Gallery() {
       setIsHydrated(true);
     });
     return unsub;
-  }, []);
-
-  // Or check immediately if already hydrated
-  React.useEffect(() => {
   }, []);
 
   return (
