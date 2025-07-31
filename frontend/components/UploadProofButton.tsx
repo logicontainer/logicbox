@@ -1,5 +1,5 @@
-import { Button } from "./ui/button";
 import { UploadIcon } from "lucide-react";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogClose,
@@ -84,7 +84,7 @@ export default function UploadProofButton() {
                 type="file"
                 accept=".json,application/json"
                 onChange={(e) => handleFileChange(e)}
-                className="w-full"
+                className="w-full hover:bg-accent cursor-pointer"
               />
             </div>
             {error && <p className="text-red-600">{error}</p>}
