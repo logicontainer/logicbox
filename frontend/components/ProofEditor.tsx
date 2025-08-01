@@ -7,7 +7,6 @@ import {
   useInteractionState,
 } from "@/contexts/InteractionStateProvider";
 
-import Footer from "@/components/Footer";
 import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
@@ -45,8 +44,7 @@ export default function ProofEditor({ proofId }: { proofId: string | null }) {
     <div>
       <ProofStepContextMenu />
       <div
-        className="flex flex-col items-center w-full  max-h-screen overflow-auto justify-between sm:h-screen sm:gap-2"
-        onClick={() => doTransition({ enum: TransitionEnum.CLICK_OUTSIDE })}
+        className="max-h-[calc(100vh-282px)] sm:max-h-max grid items-start w-full  overflow-auto sm:h-screen sm:gap-2"
       >
         <div className="flex flex-col items-center sm:grid sm:grid-cols-[0.5fr_auto_4fr] w-full">
           <div></div>

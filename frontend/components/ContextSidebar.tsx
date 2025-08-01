@@ -192,6 +192,7 @@ export default function ContextSidebar() {
   const showBoxFocusPanel = !isEditingRule && stepInFocus && proofStep?.stepType === "box";
   const showRulePanel = isEditingRule;
   const noPanelIsShown = !(showLineFocusPanel || showBoxFocusPanel || showRulePanel)
+
   return (
     <div className="lg:h-screen p-2 overflow-auto">
       <div className="flex flex-col gap-2">
