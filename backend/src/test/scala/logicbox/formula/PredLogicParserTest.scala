@@ -20,6 +20,20 @@ class PredLogicParserTest extends AnyFunSpec {
 
       PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List(Var("x")))
     }
+    
+    it("should parse the empty predicate") {
+      val ts = List(
+        Ident("P")
+      )
+
+      PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List())
+
+      val ts2 = List(
+        Ident("P"), PredLogicToken.Implies(), Ident("Q")
+      )
+
+      PredLogicParser().parseFormula(ts2) shouldBe PredLogicFormula.Implies(Predicate("P", List()), Predicate("Q", List()))
+    }
 
     it("should parse predicate of function vars") {
       val ts = List(
