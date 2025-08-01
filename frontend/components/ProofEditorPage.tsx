@@ -11,7 +11,7 @@ export default function ProofEditorPage({ proofId }: { proofId: string }) {
     <div className="flex justify-center items-start"
       onClick={() => doTransition({ enum: TransitionEnum.CLICK_OUTSIDE })}
     >
-      <div onMouseMove={_ => handleHover(null)} className="h-screen w-full sm:w-auto sm:grid sm:grid-cols-[550px_1fr]">
+      <div onMouseMove={_ => handleHover(null)} className="h-screen w-[min(100%,550px)] md:w-auto md:grid md:grid-cols-[550px_1fr]">
         <div className="overflow-auto relative">
           <ContextSidebar />
         </div>

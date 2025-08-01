@@ -30,6 +30,7 @@ import ProofValidityIcon from "./ProofValidityIcon";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { logicNameToString } from "./GalleryItem";
 function RuleShowPanel({
   ruleLatex
 }: {
@@ -197,26 +198,26 @@ export default function ContextSidebar() {
     <div className="lg:h-screen p-2 overflow-auto">
       <div className="flex flex-col gap-2">
         <Card className="flex items-center justify-between gap-1 py-2">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <Link href={"/gallery"} title="Go to your proof gallery">
               <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
             </Link>
             <div className="w-[1px] self-stretch bg-gray-600 my-1"></div>
             <div className="flex justify-between items-center overflow-scroll">
               <div className="flex flex-col items-start">
-                <p className="text-xl text-clip text-nowrap">{proof.title}</p>
-                <p className="text-sm font-light text-clip text-nowrap">{proof.title}</p>
+                <p className="text md:text-xl text-clip text-nowrap">{proof.title}</p>
+                <p className="text-xs md:text-sm font-light text-clip text-nowrap cursor-pointer">{logicNameToString(proof.logicName)}</p>
               </div>
             </div>
           </div>
           <Toolbar.Root
-            className="flex gap-3 items-center"
+            className="flex gap-1 md:gap-3 items-center"
             aria-label="Formatting options"
           >
             <Toolbar.ToolbarButton className="cursor-auto">
               <ProofValidityIcon />
             </Toolbar.ToolbarButton>
-            <DownloadProofButton className="flex items-center h-full" proofId={proof.id} />
+            <DownloadProofButton className="hidden md:flex items-center h-full" proofId={proof.id} />
 
             <ButtonGroup className="flex items-center">
               <Button
@@ -240,7 +241,7 @@ export default function ContextSidebar() {
 
           </Toolbar.Root>
         </Card>
-        <Card className={cn("max-h-48 sm:max-h-max overflow-scroll", noPanelIsShown && "min-h-48 h-12")}>
+        <Card className={cn("max-h-48 md:max-h-max overflow-scroll", noPanelIsShown && "min-h-48 h-12")}>
           {showLineFocusPanel && <>
             <LineFocusPanel lineUuid={stepInFocus} lineStep={proofStep} />
           </>}
