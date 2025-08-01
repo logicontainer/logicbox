@@ -48,7 +48,7 @@ export default function ProofEditor({ proofId }: { proofId: string | null }) {
         className="flex flex-col items-center w-full  max-h-screen overflow-auto justify-between sm:h-screen sm:gap-2"
         onClick={() => doTransition({ enum: TransitionEnum.CLICK_OUTSIDE })}
       >
-        <div className="grid grid-cols-[0.5fr_auto_4fr] w-full">
+        <div className="flex flex-col items-center sm:grid sm:grid-cols-[0.5fr_auto_4fr] w-full">
           <div></div>
           <div className="relative pl-16 p-4 flex flex-col justify-between items-center rounded-sm">
             <div
@@ -63,9 +63,6 @@ export default function ProofEditor({ proofId }: { proofId: string | null }) {
               />
             </div>
           </div>
-        </div>
-        <div className="w-full hidden sm:block">
-          <Footer />
         </div>
       </div>
     </div>
