@@ -91,6 +91,7 @@ object Stringifiers {
     formula match {
       case Contradiction() => "\\bot"
       case Tautology() => "\\top"
+      case Predicate(p, Nil) => p
       case Predicate(p, ps) => s"$p(${ps.map(predLogicTermAsString).mkString(", ")})"
       case Equals(t1, t2) => s"${predLogicTermAsString(t1)} = ${predLogicTermAsString(t2)}"
       case And(phi, psi) => s"${b(phi)} \\land ${b(psi)}"
