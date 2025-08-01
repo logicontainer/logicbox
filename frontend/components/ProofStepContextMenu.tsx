@@ -84,7 +84,7 @@ export function ProofStepContextMenu() {
   return (
     <div
       className={
-        "z-50 bg-white min-w-48 rounded-md shadow-md shadow-slate-400 overflow-hidden"
+        "z-50 bg-white min-w-48 rounded-md shadow-md shadow-slate-400 overflow-hidden select-none"
       }
       style={{
         position: "fixed",
@@ -171,7 +171,7 @@ function Item({
 }) {
   return (
     <div
-      className={cn("p-2 hover:bg-slate-200 cursor-pointer h-10", className)}
+      className={cn("p-2 hover:bg-slate-200 cursor-pointer h-10 select-none", className)}
       onClick={(e) => {
         e.stopPropagation();
         if (id) onClick?.(id);

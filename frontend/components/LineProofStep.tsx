@@ -49,6 +49,9 @@ export function LineProofStep({
   const proofContext = useProof();
   const { handleDragOver, handleDragStop, handleDragStart } = useStepDrag()
 
+  const touchTimeout = React.useRef<NodeJS.Timeout | null>(null)
+  const touchPosition = React.useRef<{ x: number, y: number, target: HTMLElement } | null>(null)
+
   const parentRef = React.useRef<HTMLDivElement>(null);
   const lineNumberRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -78,8 +81,6 @@ export function LineProofStep({
     proofContext,
   );
 
-  const touchTimeout = React.useRef<NodeJS.Timeout | null>(null)
-  const touchPosition = React.useRef<{ x: number, y: number, target: HTMLElement } | null>(null)
 
   const TOUCH_RIGHT_CLICK_MS = 400
 
@@ -91,28 +92,38 @@ export function LineProofStep({
 
   const extractPosition = (e: TouchEvent<HTMLDivElement>): { x: number, y: number, target: HTMLElement } | null => {
     if (e.changedTouches.length <= 0) return null
-    const { pageX, pageY } = e.changedTouches.item(e.changedTouches.length - 1)
-    return { x: pageX, y: pageY, target: e.currentTarget }
+    const { clientX, clientY } = e.changedTouches.item(e.changedTouches.length - 1)
+    return { x: clientX, y: clientY, target: e.currentTarget }
   }
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     touchPosition.current = extractPosition(e)
     touchTimeout.current = setTimeout(() => {
       console.log(touchPosition.current)
       if (touchPosition.current && isWithinBounds(touchPosition.current)) {
         setContextMenuPosition(touchPosition.current)
         doTransition({ enum: TransitionEnum.RIGHT_CLICK_STEP, proofStepUuid: props.uuid, isBox: false })
+        touchTimeout.current = null
+        touchPosition.current = null
       }
     }, TOUCH_RIGHT_CLICK_MS)
   }
 
   const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     touchPosition.current = extractPosition(e)
   }
 
   const handleTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
+    const pos = extractPosition(e)
+    if (pos && isWithinBounds(pos) && touchTimeout.current != null) {
+      doTransition({ enum: TransitionEnum.CLICK_LINE, lineUuid: props.uuid })
+    }
+
     touchPosition.current = null
-    touchTimeout.current && clearTimeout(touchTimeout.current)
+    if (touchTimeout.current) 
+      clearTimeout(touchTimeout.current)
   }
 
   const dropZoneDirection: 'above' | 'below' | null =
