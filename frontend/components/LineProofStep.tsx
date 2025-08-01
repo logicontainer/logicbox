@@ -8,7 +8,7 @@ import {
   LineProofStep as TLineProofStep,
 } from "@/types/types";
 import {
-    HoveringEnum,
+  HoveringEnum,
   InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
@@ -32,8 +32,6 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
-import { intersection } from "lodash";
-import _ from "lodash";
 
 export function LineProofStep({
   ...props
@@ -79,9 +77,9 @@ export function LineProofStep({
   );
 
 
-  const dropZoneDirection: 'above' | 'below' | null = 
+  const dropZoneDirection: 'above' | 'below' | null =
     interactionState.enum === InteractionStateEnum.MOVING_STEP && interactionState.toUuid === props.uuid ? interactionState.direction : null
-  
+
   return (
     <ProofStepWrapper
       highlight={stepHighlight}
@@ -121,8 +119,8 @@ export function LineProofStep({
         onMouseMove={(e) => {
           e.stopPropagation();
           if (e.currentTarget !== e.target) return
-          handleHover({ 
-            enum: HoveringEnum.HOVERING_STEP, 
+          handleHover({
+            enum: HoveringEnum.HOVERING_STEP,
             stepUuid: props.uuid,
             aboveOrBelow: isOnLowerHalf(e) ? "below" : "above",
           });
@@ -141,12 +139,13 @@ export function LineProofStep({
         <div ref={lineNumberRef} className="w-16 left-0 absolute">
           <LineNumber line={line} />
         </div>
-        <Formula 
+        <Formula
           latexFormula={props.formula.latex ?? null}
           isSyncedWithServer={!props.formula.unsynced}
           userInput={props.formula.userInput}
           lineUuid={props.uuid}
         />
+
         <div
           className="flex items-center gap-2 whitespace-nowrap"
         >
@@ -174,19 +173,17 @@ export function LineProofStep({
   );
 }
 
-type FormulaProps = {
-  userInput: string;
-  latexFormula: string | null;
-  lineUuid: string;
-  isSyncedWithServer: boolean;
-}
-
 function Formula({
   userInput,
   latexFormula,
   lineUuid,
   isSyncedWithServer,
-}: FormulaProps) {
+}: {
+  userInput: string;
+  latexFormula: string | null;
+  lineUuid: string;
+  isSyncedWithServer: boolean;
+}) {
   const { interactionState, doTransition } = useInteractionState();
   const { handleHover, hoveringState } = useHovering();
   const diagnosticContext = useDiagnostics();
@@ -231,7 +228,7 @@ function Formula({
     }
   }, [isEditingFormula])
 
-  return <div 
+  return <div
     className={cn(
       "relative",
       formulaIsWrong ? "text-red-500" : "",
@@ -244,7 +241,7 @@ function Formula({
         "absolute left-[-4px] top-[-1px] border-black",
         "bg-slate-100 z-10"
       )}
-      style={isEditingFormula ? {} : {display: "none"}}
+      style={isEditingFormula ? {} : { display: "none" }}
     >
       <AutosizeInput
         inputRef={handleInputRefChange}
@@ -264,16 +261,16 @@ function Formula({
         )}
       />
     </div>
-    <div 
+    <div
       className={cn(
         "h-full",
         isEditingFormula ? "opacity-0" : "",
       )}
       onClick={e => {
         e.stopPropagation()
-        doTransition({ 
-          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE, 
-          lineUuid 
+        doTransition({
+          enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE,
+          lineUuid
         })
       }}
     >
