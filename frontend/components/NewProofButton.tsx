@@ -12,6 +12,7 @@ import { InlineMath } from "react-katex";
 import React from "react";
 import "katex/dist/katex.min.css";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { log } from "console";
 
 const NEW_PROOF: Proof = [
   {
@@ -40,14 +41,27 @@ function LogicOption({
   chosen: boolean
   onClick: () => void
 }) {
-  return <div className={cn(
-    "w-full h-9 flex items-center justify-between px-3 border-[1px] border-solid border-slate-200 rounded hover:bg-accent cursor-pointer",
-    chosen && "bg-slate-200"
-  )} onClick={onClick}>
-    <div className="text-sm">{name}</div>
-    <InlineMath math={latex}/>
+  return <div 
+    className={cn(
+      "w-full h-9 flex items-center justify-between px-3 border-[1px] border-solid border-slate-200 rounded  cursor-pointer",
+      !chosen && "hover:bg-accent",
+      chosen && "bg-slate-200",
+      "text-sm",
+    )} 
+    onClick={onClick}
+    tabIndex={0}
+    onKeyDown={e => {
+      if (["Enter", " "].includes(e.key)) {
+        onClick()
+      }
+    }}
+  >
+    {name}
+    <span className="text-slate-500"><InlineMath math={latex}/></span>
   </div>
 }
+
+
 
 export default function NewProofButton() {
   const addProof = useProofStore((state) => state.addProof);
@@ -55,6 +69,12 @@ export default function NewProofButton() {
   
   const [proofName, setProofName] = React.useState<string>("");
   const [chosenLogic, setChosenLogic] = React.useState<LogicName | null>(null)
+
+  const handleToggleLogicOption = (logicName: LogicName) => {
+    setChosenLogic(
+      logicName === chosenLogic ? null : logicName
+    )
+  }
 
   const onCreate = () => {
     if (proofName === "") {
@@ -103,12 +123,15 @@ export default function NewProofButton() {
           />
         </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <Label>Select logic</Label>
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-between">
+          <Label>Select logic</Label>
+          <Label className="text-xs font-normal text-slate-500">Example symbols</Label>
+        </div>
         <div className="flex flex-col gap-1">
-          <LogicOption name="Propositional logic" latex="p, q, \land, \lor, \rightarrow, \bot" chosen={chosenLogic === "propositionalLogic"} onClick={() => setChosenLogic("propositionalLogic")}/>
-          <LogicOption name="Predicate logic" latex="\forall, \exists, Q(a, b), x = y" chosen={chosenLogic === "predicateLogic"} onClick={() => setChosenLogic("predicateLogic")}/>
-          <LogicOption name="Arithmetic" latex="0, 1, +, *" chosen={chosenLogic === "arithmetic"} onClick={() => setChosenLogic("arithmetic")}/>
+          <LogicOption name="Propositional logic" latex="p, q, \land, \lor, \rightarrow, \bot" chosen={chosenLogic === "propositionalLogic"} onClick={() => handleToggleLogicOption("propositionalLogic")}/>
+          <LogicOption name="Predicate logic" latex="\forall, \exists, Q(a, b), x = y" chosen={chosenLogic === "predicateLogic"} onClick={() => handleToggleLogicOption("predicateLogic")}/>
+          <LogicOption name="Arithmetic" latex="0, 1, +, *" chosen={chosenLogic === "arithmetic"} onClick={() => handleToggleLogicOption("arithmetic")}/>
         </div>
       </div>
 

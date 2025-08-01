@@ -30,9 +30,13 @@ class PredLogicParser extends PackratParsers {
   private def contrexp: Parser[Contradiction] = elem(PredLogicToken.Contradiction()) ^^^ Contradiction()
   private def tautexp: Parser[Tautology] = elem(PredLogicToken.Tautology()) ^^^ Tautology()
   private def predsymb: Parser[String] = accept("predicate symbol", { case PredLogicToken.Ident(c) => c })
-  private def predexp: Parser[Predicate] = (predsymb ~ withParens(termlistexp)) ^^ {
-    case p ~ ts => Predicate(p, ts)
-  }
+
+  private def predexp: Parser[Predicate] = 
+    ((predsymb ~ withParens(termlistexp)) ^^ {
+      case p ~ ts => Predicate(p, ts)
+    }) | predsymb ^^ {
+      case p => Predicate(p, Nil)
+    }
   private def equalityexp: Parser[Equals] = (termexp ~ PredLogicToken.Equals() ~ termexp) ^^ {
     case t1 ~ _ ~ t2 => PredLogicFormula.Equals(t1, t2)
   }

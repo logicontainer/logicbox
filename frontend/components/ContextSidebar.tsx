@@ -22,8 +22,14 @@ import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import React from "react";
-import RenameProofButton from "./RenameProofButton";
+import { CaretLeftIcon, CaretRightIcon } from "@radix-ui/react-icons";
 
+import { Toolbar } from "radix-ui";
+import { useHistory } from "@/contexts/HistoryProvider";
+import ProofValidityIcon from "./ProofValidityIcon";
+import { useProofStore } from "@/store/proofStore";
+import { ButtonGroup } from "./ui/button-group";
+import { Button } from "./ui/button";
 function RuleShowPanel({
   ruleLatex
 }: {
@@ -65,18 +71,18 @@ function LineFocusPanel({
     <div className="h-32 grid grid-cols-[1fr_2fr]">
       <div className="overflow-x-hidden flex flex-col gap-4">
         <Label className="text-lg">
-          <InlineMath math={"\\textbf{Line }\\mathbf{" + (getReferenceString(lineUuid) ?? "???") + "}"}/>
+          <InlineMath math={"\\textbf{Line }\\mathbf{" + (getReferenceString(lineUuid) ?? "???") + "}"} />
         </Label>
-        {lineStep.justification.refs.length === 0 ? [] : 
+        {lineStep.justification.refs.length === 0 ? [] :
           <Label>References: <span className="text-xs">
-            <InlineMath math={refLineNumbers.join(", ")}/>
+            <InlineMath math={refLineNumbers.join(", ")} />
           </span></Label>
         }
       </div>
-      <RuleShowPanel ruleLatex={ruleLatex}/>
+      <RuleShowPanel ruleLatex={ruleLatex} />
     </div>
-    {errors.length > 0 ? <hr className="mt-2"/> : null}
-    <DiagnosticsPanel diagnostics={errors}/>
+    {errors.length > 0 ? <hr className="mt-2" /> : null}
+    <DiagnosticsPanel diagnostics={errors} />
   </Card>
 }
 
@@ -92,11 +98,11 @@ function BoxFocusPanel({
   return <Card className="w-full h-40">
     <div className="overflow-x-hidden flex flex-col gap-4">
       <Label className="text-lg">
-        <InlineMath math={"\\textbf{Box " + (getReferenceString(boxUuid) ?? "???") + "}"}/>
+        <InlineMath math={"\\textbf{Box " + (getReferenceString(boxUuid) ?? "???") + "}"} />
       </Label>
       <Label>
         {boxStep.boxInfo.freshVar ? <>
-          Fresh variable: <InlineMath math={boxStep.boxInfo.freshVar}/>
+          Fresh variable: <InlineMath math={boxStep.boxInfo.freshVar} />
         </> : null}
       </Label>
     </div>
@@ -115,12 +121,12 @@ function RulePanel() {
 
   const hoveredRuleDetailsLatex = hoveredRuleDetails
     ? createHighlightedLatexRule(
-        hoveredRuleDetails.latex.ruleName,
-        hoveredRuleDetails.latex.premises,
-        hoveredRuleDetails.latex.conclusion,
-        [],
-        false,
-      )
+      hoveredRuleDetails.latex.ruleName,
+      hoveredRuleDetails.latex.premises,
+      hoveredRuleDetails.latex.conclusion,
+      [],
+      false,
+    )
     : "";
 
   const handleChangeRule = (ruleName: string) => {
@@ -154,7 +160,7 @@ function RulePanel() {
     <div className="grid grid-cols-3 gap-2">
       {first}
       <div className="col-span-2 row-span-3">
-        <RuleShowPanel ruleLatex={hoveredRuleDetailsLatex}/>
+        <RuleShowPanel ruleLatex={hoveredRuleDetailsLatex} />
       </div>
       {rest}
     </div>
@@ -165,7 +171,9 @@ export default function ContextSidebar() {
   const { proof } = useProof();
   const diagnosticContext = useDiagnostics();
   const { getStep } = diagnosticContext;
-  const { interactionState } = useInteractionState();
+  const { interactionState, doTransition } = useInteractionState();
+  const historyContext = useHistory();
+  const proofs = useProofStore((state) => state.proofs);
 
   const stepInFocus = getSelectedStep(interactionState);
 
@@ -174,32 +182,67 @@ export default function ContextSidebar() {
   const isEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
+  const handleUndo = () => {
+    doTransition({ enum: TransitionEnum.UNDO })
+  };
+  const handleRedo = () => {
+    doTransition({ enum: TransitionEnum.REDO })
+  };
+
   return (
     <div className="lg:h-screen p-2 overflow-auto">
       <div className="flex flex-col gap-2">
-        <Card className="grid grid-cols-[150px_1px_auto_auto] items-center gap-3 py-2">
-          <Link href={"/gallery"} title="Go to your proof gallery">
-            <div className="flex items-cetner justify-center gap-2 py-2">
+        <Card className="flex items-center justify-between gap-1 py-2">
+          <div className="flex items-center gap-3">
+            <Link href={"/gallery"} title="Go to your proof gallery">
               <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
-              <h1 className="text-left text-2xl font-bold py-2">LogicBox</h1>
+            </Link>
+            <div className="w-[1px] self-stretch bg-gray-600 my-1"></div>
+            <div className="flex justify-between items-center overflow-scroll">
+              <div className="flex flex-col items-start">
+                <p className="text-xl text-clip text-nowrap">{proof.title}</p>
+                <p className="text-sm font-light text-clip text-nowrap">{proof.title}</p>
+              </div>
             </div>
-          </Link>
-          <div className="w-[1px] self-stretch bg-gray-600 my-3"></div>
-          <div className="flex justify-between items-center overflow-scroll">
-            <p className="text-xl text-clip text-nowrap">{proof.title}</p>
           </div>
-          <div className="flex justify-end gap-1">
-            <RenameProofButton proofId={proof.id} />
-            <DownloadProofButton proofId={proof.id} />
-          </div>
+          <Toolbar.Root
+            className="flex gap-3"
+            aria-label="Formatting options"
+          >
+            <Toolbar.ToolbarButton className="cursor-auto">
+              <ProofValidityIcon />
+            </Toolbar.ToolbarButton>
+            <DownloadProofButton className={"flex"} proofId={proof.id} />
+
+            <ButtonGroup className="flex items-center">
+              <Button
+                variant={"outline"}
+                title="Undo latest action"
+                onClick={handleUndo}
+                disabled={!historyContext.canUndo}
+                className="py-0"
+              >
+                <CaretLeftIcon className="w-20 h-20" />
+              </Button>
+              <Button
+                variant={"outline"}
+                title="Redo latest action"
+                onClick={handleRedo}
+                disabled={!historyContext.canRedo}
+              >
+                <CaretRightIcon className="w-8 h-8" />
+              </Button>
+            </ButtonGroup>
+
+          </Toolbar.Root>
         </Card>
-          {!isEditingRule && stepInFocus && proofStep?.stepType === "line" && <>
-            <LineFocusPanel lineUuid={stepInFocus} lineStep={proofStep}/>
-          </>}
-          {!isEditingRule && stepInFocus && proofStep?.stepType === "box" && (
-            <BoxFocusPanel boxUuid={stepInFocus} boxStep={proofStep}/>
-          )}
-          {isEditingRule && <RulePanel />}
+        {!isEditingRule && stepInFocus && proofStep?.stepType === "line" && <>
+          <LineFocusPanel lineUuid={stepInFocus} lineStep={proofStep} />
+        </>}
+        {!isEditingRule && stepInFocus && proofStep?.stepType === "box" && (
+          <BoxFocusPanel boxUuid={stepInFocus} boxStep={proofStep} />
+        )}
+        {isEditingRule && <RulePanel />}
       </div>
     </div>
   );

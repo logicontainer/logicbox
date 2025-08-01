@@ -4,14 +4,12 @@ import { Diagnostic, ValidationRequest, ValidationResponse } from "@/types/types
 import React, { useEffect, useState } from "react";
 
 import _ from "lodash";
-import { useProof } from "./ProofProvider";
+import { FALLBACK_PROOF, useProof } from "./ProofProvider";
 import Script from "next/script";
-import { verify } from "crypto";
 
 export interface ServerContextProps {
-  syncingStatus: string;
   proofDiagnostics: Diagnostic[];
-  validateProof: (proof: ValidationRequest) => Promise<boolean>;
+  validateProof: (proof: ValidationRequest) => void;
 }
 
 declare const JSLogicboxVerifier: {
@@ -29,38 +27,39 @@ export function useServer() {
 }
 
 export function ServerProvider({ children }: React.PropsWithChildren<object>) {
-  const [syncingStatus, setServerSyncingStatus] = useState<string>("idle");
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
   const verifyFunction = React.useRef<((req: string) => string) | null>(null)
 
-
   const { proof, setProofContent } = useProof()
 
-  useEffect(() => {
-    validateProof({ proof: proof.proof, logicName: proof.logicName });
-  }, [proof.id]);
+  const initialValidation = () => {
+    if (proof.id !== FALLBACK_PROOF.id && verifyFunction.current !== null) {
+      validateProof({ proof: proof.proof, logicName: proof.logicName });
+    } else {
+      setTimeout(() => initialValidation(), 0)
+    }
+  }
 
-  const validateProof = async (request: ValidationRequest): Promise<boolean> => {
-    setServerSyncingStatus("syncing");
+  React.useEffect(() => {
+    initialValidation()
+  }, [proof.id])
 
-    return Promise.resolve((() => {
-      if (verifyFunction.current === null)
-        return false
+  const validateProof = async (request: ValidationRequest) => {
+    if (verifyFunction.current === null) {
+      console.warn("Can't validate proof! Backend is not loaded.")
+      return;
+    }
 
-      const result = verifyFunction.current(JSON.stringify(request))
-      const jsonResult = JSON.parse(result)
-      if (jsonResult.message !== undefined) {
-        console.error(jsonResult)
-        return false
-      }
-      
-      setProofDiagnostics(jsonResult.diagnostics);
-      setProofContent(jsonResult.proof);
+    const result = verifyFunction.current(JSON.stringify(request))
+    const jsonResult = JSON.parse(result)
 
-      setServerSyncingStatus("idle")
-
-      return true
-    })())
+    if (jsonResult.message !== undefined) {
+      console.warn(jsonResult)
+      return;
+    }
+    
+    setProofDiagnostics(jsonResult.diagnostics);
+    setProofContent(jsonResult.proof);
   };
 
   return <>
@@ -78,7 +77,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
     />
     <ServerContext.Provider
       value={{
-        syncingStatus,
         proofDiagnostics,
         validateProof,
       }}

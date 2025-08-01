@@ -35,8 +35,15 @@ export function useHistory() {
 
 export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   const proofContext = useProof();
+
   const [history, setHistory] = useState<Command[]>([]);
   const [now, setNow] = useState<number>(0);
+
+  React.useEffect(() => {
+    // clear the history if the proof id changes
+    setHistory([])
+    setNow(0)
+  }, [proofContext.proof.id])
 
   const addToHistory = (command: Command, deferExecution: boolean = false) => {
     const newHistory = [...history.slice(0, now), command];
@@ -49,7 +56,6 @@ export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   const executeStep = (history: Command[]) => {
     if (now + 1 <= history.length) {
       const step = history[now];
-      console.log("Executing step", step);
       step.execute(proofContext);
       setNow(now + 1);
     }

@@ -9,13 +9,13 @@ function PageImpl() {
   const proofId = params.get("id")
 
   if (proofId === null)
-    return "bruh"
+    return "No id provided"
 
-  return <ProofEditorPage proofId={proofId}/>
+  return <ProofEditorPage proofId={proofId} />
 }
 
 export default function Page() {
   return <Suspense> {/* needed so next doesn't just fucking ignore "use client" */}
-    <PageImpl/>
+    <PageImpl />
   </Suspense>
 }
