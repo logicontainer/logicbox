@@ -56,7 +56,6 @@ export function HistoryProvider({ children }: React.PropsWithChildren<object>) {
   const executeStep = (history: Command[]) => {
     if (now + 1 <= history.length) {
       const step = history[now];
-      console.log("Executing step", step);
       step.execute(proofContext);
       setNow(now + 1);
     }

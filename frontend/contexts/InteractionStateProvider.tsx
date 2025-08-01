@@ -186,6 +186,10 @@ export function InteractionStateProvider({
   const [flushTrigger, setFlushTrigger] = React.useState(0);
 
   React.useEffect(() => {
+    setInteractionStateValue(fullyIdle())
+  }, [proofContext.proof.id])
+
+  React.useEffect(() => {
     if (commandQueue.current.length === 0) return;
 
     // execute a single command
