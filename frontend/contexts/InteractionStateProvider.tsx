@@ -18,6 +18,7 @@ import { useRuleset } from "./RulesetProvider";
 import { useServer } from "./ServerProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
 import { v4 as uuidv4 } from "uuid";
+import _ from "lodash";
 
 export enum TransitionEnum {
   CLICK_OUTSIDE,
@@ -40,6 +41,8 @@ export enum TransitionEnum {
   UPDATE_CONTENT,
 
   VALIDATE_PROOF,
+  UNDO,
+  REDO,
 
   CLICK_CONTEXT_MENU_OPTION,
 
@@ -120,6 +123,8 @@ export type Transition = { enum: TransitionEnum } & (
   | { enum: TransitionEnum.CLICK_RULE; lineUuid: string }
   | { enum: TransitionEnum.CLICK_REF; lineUuid: string; refIdx: number }
   | { enum: TransitionEnum.VALIDATE_PROOF }
+  | { enum: TransitionEnum.UNDO }
+  | { enum: TransitionEnum.REDO }
   | { enum: TransitionEnum.UPDATE_RULE; ruleName: string }
   | { enum: TransitionEnum.UPDATE_CONTENT; content: string }
   | {
@@ -177,12 +182,13 @@ export function InteractionStateProvider({
   const historyContext = useHistory();
 
   // keep command queue of state modifying things which must be executed fully in order
-  enum Validate {
+  enum ExtraCommands {
     VALIDATE,
+    UNDO,
+    REDO
   }
-  const commandQueue = React.useRef<(Validate | Command)[]>([]);
-  const enqueueCommand = (f: Validate | Command) =>
-    commandQueue.current.push(f);
+  const commandQueue = React.useRef<(Command | ExtraCommands)[]>([]);
+  const enqueueCommand = (f: Command | ExtraCommands) => commandQueue.current.push(f);
   const [flushTrigger, setFlushTrigger] = React.useState(0);
 
   React.useEffect(() => {
@@ -194,10 +200,19 @@ export function InteractionStateProvider({
 
     // execute a single command
     const cmd = commandQueue.current.shift()!;
-    if (cmd === Validate.VALIDATE) {
-      serverContext.validateProof(proofContext.proof);
-    } else {
-      historyContext.addToHistory(cmd);
+    switch (cmd) {
+      case ExtraCommands.VALIDATE:
+        serverContext.validateProof(proofContext.proof)
+        break;
+      case ExtraCommands.UNDO:
+        historyContext.undo();
+        break;
+      case ExtraCommands.REDO:
+        historyContext.redo();
+        break;
+      default:
+        historyContext.addToHistory(cmd);
+        break;
     }
 
     if (commandQueue.current.length > 0) {
@@ -271,7 +286,7 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
-    enqueueCommand(Validate.VALIDATE);
+    enqueueCommand(ExtraCommands.VALIDATE);
   };
 
   const updateRefAndValidate = (
@@ -300,7 +315,7 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
-    enqueueCommand(Validate.VALIDATE);
+    enqueueCommand(ExtraCommands.VALIDATE);
   };
 
   const updateFormulaInProofAndValidate = (
@@ -325,7 +340,7 @@ export function InteractionStateProvider({
     enqueueCommand(
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
-    enqueueCommand(Validate.VALIDATE);
+    enqueueCommand(ExtraCommands.VALIDATE);
   };
 
   const updateFreshVarInProofAndValidate = (
@@ -335,7 +350,7 @@ export function InteractionStateProvider({
     enqueueCommand(
       new SetFreshVarOnBoxCommand(boxUuid, freshVar),
     );
-    enqueueCommand(Validate.VALIDATE);
+    enqueueCommand(ExtraCommands.VALIDATE);
   };
 
   const startEditingFormula = (lineUuid: string) => {
@@ -365,6 +380,16 @@ export function InteractionStateProvider({
       sticky: false,
     };
   };
+
+  const undoAndValidate = () => {
+    enqueueCommand(ExtraCommands.UNDO)
+    enqueueCommand(ExtraCommands.VALIDATE)
+  }
+
+  const redoAndValidate = () => {
+    enqueueCommand(ExtraCommands.REDO)
+    enqueueCommand(ExtraCommands.VALIDATE)
+  }
 
   const handleClickStepInIdle = (
     state: InteractionState & { enum: InteractionStateEnum.IDLE },
@@ -414,6 +439,8 @@ export function InteractionStateProvider({
     CLICK_BOX,
     RIGHT_CLICK_STEP,
     UPDATE_RULE,
+    UNDO,
+    REDO,
     CLOSE,
     UPDATE_CONTENT,
     CLICK_OUTSIDE,
@@ -453,7 +480,7 @@ export function InteractionStateProvider({
       },
 
       [VALIDATE_PROOF]: (state, _) => {
-        enqueueCommand(Validate.VALIDATE);
+        enqueueCommand(ExtraCommands.VALIDATE);
         return state;
       },
 
@@ -463,7 +490,17 @@ export function InteractionStateProvider({
       
       [START_DRAG_STEP]: (_, { stepUuid }) => {
         return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
-      }
+      },
+
+      [UNDO]: (state, _) => {
+        undoAndValidate()
+        return state
+      },
+
+      [REDO]: (state, _) => {
+        redoAndValidate()
+        return state
+      },
     },
 
     [EDITING_FORMULA]: {
@@ -525,7 +562,16 @@ export function InteractionStateProvider({
       [START_DRAG_STEP]: (state, { stepUuid }) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula)
         return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
-      }
+      },
+
+      [UNDO]: (state, _) => {
+        return stickySelectStep(state.lineUuid)
+      },
+
+      [REDO]: (state, _) => {
+        redoAndValidate()
+        return stickySelectStep(state.lineUuid)
+      },
     },
 
     [EDITING_RULE]: {
@@ -557,7 +603,7 @@ export function InteractionStateProvider({
       },
 
       [VALIDATE_PROOF]: (state, _) => {
-        enqueueCommand(Validate.VALIDATE);
+        enqueueCommand(ExtraCommands.VALIDATE);
         return stickySelectStep(state.lineUuid);
       },
 
@@ -573,7 +619,16 @@ export function InteractionStateProvider({
 
       [START_DRAG_STEP]: (_, { stepUuid }) => {
         return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
-      }
+      },
+
+      [UNDO]: (state, _) => {
+        return fullyIdle();
+      },
+
+      [REDO]: (state, _) => {
+        redoAndValidate()
+        return state;
+      },
     },
 
     [EDITING_REF]: {
@@ -630,7 +685,7 @@ export function InteractionStateProvider({
       },
 
       [VALIDATE_PROOF]: () => {
-        enqueueCommand(Validate.VALIDATE);
+        enqueueCommand(ExtraCommands.VALIDATE);
         return fullyIdle();
       },
 
@@ -647,6 +702,15 @@ export function InteractionStateProvider({
 
       [START_DRAG_STEP]: doNothing,
       [STOP_DRAG_STEP]: doNothing,
+
+      [UNDO]: (state, _) => {
+        return stickySelectStep(state.lineUuid);
+      },
+
+      [REDO]: (state, _) => {
+        redoAndValidate()
+        return stickySelectStep(state.lineUuid);
+      },
     },
     
     [EDITING_FRESH_VAR]: {
@@ -704,7 +768,16 @@ export function InteractionStateProvider({
       [START_DRAG_STEP]: (state, { stepUuid }) => {
         updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
         return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
-      }
+      },
+
+      [UNDO]: (state, _) => {
+        return stickySelectStep(state.boxUuid)
+      },
+
+      [REDO]: (state, _) => {
+        redoAndValidate()
+        return stickySelectStep(state.boxUuid)
+      },
     },
 
     [MOVING_STEP]: {
@@ -723,7 +796,7 @@ export function InteractionStateProvider({
           return stickySelectStep(state.fromUuid)
         }
         enqueueCommand(new MoveProofStepCommand(state.fromUuid, state.toUuid, state.direction === "above"))
-        enqueueCommand(Validate.VALIDATE)
+        enqueueCommand(ExtraCommands.VALIDATE)
         return fullyIdle()
       },
     },
@@ -761,7 +834,7 @@ export function InteractionStateProvider({
       },
 
       [VALIDATE_PROOF]: () => {
-        enqueueCommand(Validate.VALIDATE);
+        enqueueCommand(ExtraCommands.VALIDATE);
         return fullyIdle();
       },
 
@@ -796,12 +869,12 @@ export function InteractionStateProvider({
 
           case ContextMenuOptions.REMOVE_FRESH_VAR:
             enqueueCommand(new SetFreshVarOnBoxCommand(state.proofStepUuid, null))
-            enqueueCommand(Validate.VALIDATE)
+            enqueueCommand(ExtraCommands.VALIDATE)
             return fullyIdle()
 
           case ContextMenuOptions.DELETE:
             enqueueCommand(new RemoveProofStepCommand(state.proofStepUuid));
-            enqueueCommand(Validate.VALIDATE);
+            enqueueCommand(ExtraCommands.VALIDATE);
             return fullyIdle();
 
           case ContextMenuOptions.LINE_ABOVE:
@@ -814,7 +887,7 @@ export function InteractionStateProvider({
                 newLineUuid,
               ),
             );
-            enqueueCommand(Validate.VALIDATE);
+            enqueueCommand(ExtraCommands.VALIDATE);
             return {
               enum: EDITING_FORMULA,
               lineUuid: newLineUuid,
@@ -832,7 +905,7 @@ export function InteractionStateProvider({
                 newLineUuid,
               ),
             );
-            enqueueCommand(Validate.VALIDATE);
+            enqueueCommand(ExtraCommands.VALIDATE);
             return {
               enum: EDITING_FORMULA,
               lineUuid: newLineUuid,
@@ -844,6 +917,15 @@ export function InteractionStateProvider({
 
       [START_DRAG_STEP]: (_, { stepUuid }) => {
         return { enum: MOVING_STEP, fromUuid: stepUuid, toUuid: null, direction: null }
+      },
+
+      [UNDO]: (state, _) => {
+        undoAndValidate()
+        return fullyIdle()
+      },
+      [REDO]: (state, _) => {
+        redoAndValidate()
+        return fullyIdle()
       }
     },
   };
@@ -867,18 +949,7 @@ export function InteractionStateProvider({
         );
         return prevState;
       } else {
-        const newState = func(prevState, transition);
-        // console.log(
-        //   `${TransitionEnum[transition.enum]}: ${
-        //     InteractionStateEnum[prevState.enum]
-        //   } -> ${InteractionStateEnum[newState.enum]}`
-        // );
-
-        if (JSON.stringify(prevState) === JSON.stringify(newState)) {
-          return prevState;
-        } else {
-          return newState;
-        }
+        return func(prevState, transition)
       }
     });
 
