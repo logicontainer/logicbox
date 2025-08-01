@@ -103,7 +103,7 @@ export function LineProofStep({
       console.log(touchPosition.current)
       if (touchPosition.current && isWithinBounds(touchPosition.current)) {
         setContextMenuPosition(touchPosition.current)
-        doTransition({ enum: TransitionEnum.RIGHT_CLICK_STEP, proofStepUuid: props.uuid, isBox: true })
+        doTransition({ enum: TransitionEnum.RIGHT_CLICK_STEP, proofStepUuid: props.uuid, isBox: false })
         touchTimeout.current = null
         touchPosition.current = null
       }
