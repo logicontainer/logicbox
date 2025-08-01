@@ -16,6 +16,7 @@ class PrettyPropLogicFormulaTest extends AnyFunSpec {
     }
 
     it("should do predicates") {
+      asLaTeX(Predicate("P", Nil)) shouldBe "P"
       asLaTeX(Predicate("P", List(Var("x")))) shouldBe "P(x)"
       asLaTeX(Predicate("P", List(Var("x"), Var("y"), Var("z")))) shouldBe "P(x, y, z)"
       asLaTeX(Predicate("Q", List(FunAppl("f", List(Var("x"), Var("y")))))) shouldBe "Q(f(x, y))"
