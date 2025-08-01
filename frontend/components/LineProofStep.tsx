@@ -19,7 +19,7 @@ import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
 import LineNumber from "./LineNumber";
 import { ProofStepWrapper } from "./ProofStepWrapper";
-import React from "react";
+import React, { TouchEvent } from "react";
 import { cn, isOnLowerHalf } from "@/lib/utils";
 import {
   getDiagnosticHighlightForFormula,
@@ -32,6 +32,8 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
+
+import { isMobile } from 'react-device-detect'
 
 export function LineProofStep({
   ...props
@@ -76,6 +78,42 @@ export function LineProofStep({
     proofContext,
   );
 
+  const touchTimeout = React.useRef<NodeJS.Timeout | null>(null)
+  const touchPosition = React.useRef<{ x: number, y: number, target: HTMLElement } | null>(null)
+
+  const TOUCH_RIGHT_CLICK_MS = 400
+
+  const isWithinBounds = (pos: { x: number, y: number, target: HTMLElement }): boolean => {
+    const { x, y } = pos
+    const rect = pos.target.getBoundingClientRect()
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  }
+
+  const extractPosition = (e: TouchEvent<HTMLDivElement>): { x: number, y: number, target: HTMLElement } | null => {
+    if (e.changedTouches.length <= 0) return null
+    const { pageX, pageY } = e.changedTouches.item(e.changedTouches.length - 1)
+    return { x: pageX, y: pageY, target: e.currentTarget }
+  }
+
+  const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    touchPosition.current = extractPosition(e)
+    touchTimeout.current = setTimeout(() => {
+      console.log(touchPosition.current)
+      if (touchPosition.current && isWithinBounds(touchPosition.current)) {
+        setContextMenuPosition(touchPosition.current)
+        doTransition({ enum: TransitionEnum.RIGHT_CLICK_STEP, proofStepUuid: props.uuid, isBox: false })
+      }
+    }, TOUCH_RIGHT_CLICK_MS)
+  }
+
+  const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
+    touchPosition.current = extractPosition(e)
+  }
+
+  const handleTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
+    touchPosition.current = null
+    touchTimeout.current && clearTimeout(touchTimeout.current)
+  }
 
   const dropZoneDirection: 'above' | 'below' | null =
     interactionState.enum === InteractionStateEnum.MOVING_STEP && interactionState.toUuid === props.uuid ? interactionState.direction : null
@@ -94,29 +132,34 @@ export function LineProofStep({
           dropZoneDirection === "above" && "border-t-[4px] border-black",
           dropZoneDirection === "below" && "border-b-[4px] border-black",
         )}
-        draggable={stepIsDraggable(props.uuid, interactionState)}
-        onDragStart={_ => handleDragStart(props.uuid)}
-        onDragOver={e => {
+
+        onTouchStart={isMobile ? handleTouchStart : undefined}
+        onTouchMove={isMobile ? handleTouchMove : undefined}
+        onTouchEnd={isMobile ? handleTouchEnd : undefined}
+
+        draggable={!isMobile && stepIsDraggable(props.uuid, interactionState)}
+        onDragStart={isMobile ? undefined : (_ => handleDragStart(props.uuid))}
+        onDragOver={isMobile ? undefined : (e => {
           e.preventDefault()
           e.stopPropagation()
           handleDragOver(props.uuid, isOnLowerHalf(e))
-        }}
-        onDrop={handleDragStop}
-        onClick={(e) => {
+        })}
+        onDrop={isMobile ? undefined : handleDragStop}
+        onClick={isMobile ? undefined : ((e) => {
           e.stopPropagation();
           return doTransition({
             enum: TransitionEnum.CLICK_LINE,
             lineUuid: props.uuid,
           });
-        }}
-        onDoubleClick={(e) => {
+        })}
+        onDoubleClick={isMobile ? undefined : (e) => {
           e.stopPropagation();
           return doTransition({
             enum: TransitionEnum.DOUBLE_CLICK_LINE,
             lineUuid: props.uuid,
           });
         }}
-        onMouseMove={(e) => {
+        onMouseMove={isMobile ? undefined : (e) => {
           e.stopPropagation();
           if (e.currentTarget !== e.target) return
           handleHover({
@@ -125,7 +168,7 @@ export function LineProofStep({
             aboveOrBelow: isOnLowerHalf(e) ? "below" : "above",
           });
         }}
-        onContextMenu={(e) => {
+        onContextMenu={isMobile ? undefined : ((e) => {
           e.preventDefault();
           e.stopPropagation();
           setContextMenuPosition({ x: e.pageX, y: e.pageY });
@@ -134,7 +177,7 @@ export function LineProofStep({
             proofStepUuid: props.uuid,
             isBox: false,
           });
-        }}
+        })}
       >
         <div ref={lineNumberRef} className="w-16 left-0 absolute">
           <LineNumber line={line} />
@@ -266,13 +309,13 @@ function Formula({
         "h-full",
         isEditingFormula ? "opacity-0" : "",
       )}
-      onClick={e => {
+      onClick={isMobile ? undefined : (e => {
         e.stopPropagation()
         doTransition({
           enum: e.detail <= 1 ? TransitionEnum.CLICK_LINE : TransitionEnum.DOUBLE_CLICK_LINE,
           lineUuid
         })
-      }}
+      })}
     >
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
         <div className="h-full font-mono text-sm tracking-tighter flex items-center">{userInput === "" ? "???" : userInput}</div>
