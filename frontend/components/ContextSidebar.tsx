@@ -171,7 +171,7 @@ export default function ContextSidebar() {
   const { proof } = useProof();
   const diagnosticContext = useDiagnostics();
   const { getStep } = diagnosticContext;
-  const { interactionState } = useInteractionState();
+  const { interactionState, doTransition } = useInteractionState();
   const historyContext = useHistory();
   const proofs = useProofStore((state) => state.proofs);
 
@@ -183,10 +183,10 @@ export default function ContextSidebar() {
     interactionState.enum === InteractionStateEnum.EDITING_RULE;
 
   const handleUndo = () => {
-    historyContext.undo();
+    doTransition({ enum: TransitionEnum.UNDO })
   };
   const handleRedo = () => {
-    historyContext.redo();
+    doTransition({ enum: TransitionEnum.REDO })
   };
 
   return (
