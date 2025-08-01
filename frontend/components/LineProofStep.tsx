@@ -33,6 +33,7 @@ import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
 import { intersection } from "lodash";
+import _ from "lodash";
 
 export function LineProofStep({
   ...props
@@ -140,13 +141,12 @@ export function LineProofStep({
         <div ref={lineNumberRef} className="w-16 left-0 absolute">
           <LineNumber line={line} />
         </div>
-        <Formula
+        <Formula 
           latexFormula={props.formula.latex ?? null}
           isSyncedWithServer={!props.formula.unsynced}
           userInput={props.formula.userInput}
           lineUuid={props.uuid}
         />
-
         <div
           className="flex items-center gap-2 whitespace-nowrap"
         >
@@ -174,17 +174,19 @@ export function LineProofStep({
   );
 }
 
+type FormulaProps = {
+  userInput: string;
+  latexFormula: string | null;
+  lineUuid: string;
+  isSyncedWithServer: boolean;
+}
+
 function Formula({
   userInput,
   latexFormula,
   lineUuid,
   isSyncedWithServer,
-}: {
-  userInput: string;
-  latexFormula: string | null;
-  lineUuid: string;
-  isSyncedWithServer: boolean;
-}) {
+}: FormulaProps) {
   const { interactionState, doTransition } = useInteractionState();
   const { handleHover, hoveringState } = useHovering();
   const diagnosticContext = useDiagnostics();

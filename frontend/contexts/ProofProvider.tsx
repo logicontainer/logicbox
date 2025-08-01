@@ -48,7 +48,7 @@ export function useProof() {
   return context;
 }
 
-const FALLBACK_PROOF: ProofWithMetadata = {
+export const FALLBACK_PROOF: ProofWithMetadata = {
   id: "fallback_proof",
   createdAt: "2025-06-06T00:00:00.000Z",
   title: "YOU SHOULD NOT BE SEEING THIS!",

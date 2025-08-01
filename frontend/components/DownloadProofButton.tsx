@@ -4,7 +4,7 @@ import { useProofStore } from "@/store/proofStore";
 import { MouseEvent } from "react";
 import { download } from "@/lib/utils";
 
-export default function DownloadProofButton({ proofId }: { proofId: string }) {
+export default function DownloadProofButton({ proofId, className }: { proofId: string, className?: string }) {
   const proofs = useProofStore((state) => state.proofs);
   function handleDownloadProof(e: MouseEvent) {
     e.preventDefault();
@@ -21,6 +21,7 @@ export default function DownloadProofButton({ proofId }: { proofId: string }) {
       variant="outline"
       title="Download proof as JSON"
       onClick={(e) => handleDownloadProof(e)}
+      className={className}
     >
       <DownloadIcon />
     </Button>
