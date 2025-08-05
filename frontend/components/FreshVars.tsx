@@ -2,12 +2,27 @@ import { InlineMath } from "react-katex";
 import { cn } from "@/lib/utils";
 import AutosizeInput from "react-input-autosize";
 import React from "react";
-import { HoveringEnum, InteractionStateEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
+import { HoveringEnum, HoveringState, InteractionState, InteractionStateEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
 import { freshVarIsBeingEdited } from "@/lib/state-helpers";
-import { useProof } from "@/contexts/ProofProvider";
+import { ProofContextProps, useProof } from "@/contexts/ProofProvider";
 import { getStepHighlight, StepHighlight } from "@/lib/proof-step-highlight";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
+
+function computeBackgroundColor(boxUuid: string, interactionState: InteractionState, proofContext: ProofContextProps, hoveringState: HoveringState | null): string {
+  const highlight = getStepHighlight(boxUuid, interactionState, hoveringState, useProof());
+  switch (highlight) {
+    case StepHighlight.SELECTED: return "bg-slate-100"
+    case StepHighlight.HOVERED: return "bg-slate-50"
+    case StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF: return "bg-blue-200"
+    case StepHighlight.REFERRED: return "bg-blue-200"
+    default: {
+      const parent = proofContext.getParentUuid(boxUuid)
+      if (!parent) return ""
+      return computeBackgroundColor(parent, interactionState, proofContext, hoveringState)
+    }
+  }
+}
 
 export default function FreshVars({
   value: latexFormula,
@@ -17,7 +32,6 @@ export default function FreshVars({
   boxUuid: string;
 }) {
   const { interactionState, doTransition } = useInteractionState()
-
 
   const formulaInputRef = React.useRef<HTMLInputElement>(null);
   const handleInputRefChange = (ref: HTMLInputElement | null) => {
@@ -44,22 +58,10 @@ export default function FreshVars({
   const { hoveringState, handleHover } = useHovering()
   const { setContextMenuPosition } = useContextMenu()
 
-  const highlight = getStepHighlight(
-    boxUuid,
-    interactionState,
-    hoveringState,
-    useProof(),
-  );
-
   return <div 
     className={cn(
       "absolute bg-white -translate-y-1/2 translate-x-3 px-1 rounded-sm overflow-visible",
-      highlight === StepHighlight.SELECTED && "border-red-500",
-      highlight === StepHighlight.SELECTED && "bg-slate-100",
-      highlight === StepHighlight.HOVERED && "bg-slate-50",
-      highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF &&
-        "bg-blue-200",
-      highlight === StepHighlight.REFERRED && "bg-blue-200",
+      computeBackgroundColor(boxUuid, interactionState, useProof(), hoveringState)
     )}
     onMouseMove={e => {
       e.stopPropagation()
