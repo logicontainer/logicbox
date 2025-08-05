@@ -106,12 +106,13 @@ export function ProofStepContextMenu() {
   return (
     <div
       className={
-        `z-50 bg-white w-[${CONTEXT_MENU_WIDTH}px] rounded-md shadow-md shadow-slate-400 overflow-hidden select-none`
+        `z-50 bg-white rounded-md shadow-md shadow-slate-400 overflow-hidden select-none`
       }
       style={{
         position: "fixed",
         left: boundedX,
         top: boundedY,
+        width: `${CONTEXT_MENU_WIDTH}px`
       }}
     >
       {!interactionState.isBox && (
@@ -194,7 +195,8 @@ function Item({
 }) {
   return (
     <div
-      className={cn(`p-2 hover:bg-slate-200 cursor-pointer h-[${CONTEXT_MENU_ITEM_HEIGHT}px] select-none`, className)}
+      className={cn(`p-2 hover:bg-slate-200 cursor-pointer select-none`, className)}
+      style={{ height: `${CONTEXT_MENU_ITEM_HEIGHT}px` }}
       onClick={(e) => {
         e.stopPropagation();
         if (id) onClick?.(id);
