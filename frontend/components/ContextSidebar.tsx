@@ -17,7 +17,7 @@ import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { BoxProofStep, LineProofStep, ProofMetadata, Rule } from "@/types/types";
+import { BoxProofStep, LineProofStep, ProofMetadata, ProofWithMetadata, Rule } from "@/types/types";
 import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
