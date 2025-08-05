@@ -10,7 +10,7 @@ import { useHovering } from "@/contexts/HoveringProvider";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 
 function computeBackgroundColor(boxUuid: string, interactionState: InteractionState, proofContext: ProofContextProps, hoveringState: HoveringState | null): string {
-  const highlight = getStepHighlight(boxUuid, interactionState, hoveringState, useProof());
+  const highlight = getStepHighlight(boxUuid, interactionState, hoveringState, proofContext);
   switch (highlight) {
     case StepHighlight.SELECTED: return "bg-slate-100"
     case StepHighlight.HOVERED: return "bg-slate-50"
