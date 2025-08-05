@@ -17,7 +17,7 @@ import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { BoxProofStep, LineProofStep, Rule } from "@/types/types";
+import { BoxProofStep, LineProofStep, ProofMetadata, Rule } from "@/types/types";
 import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
@@ -31,6 +31,8 @@ import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { logicNameToString } from "./GalleryItem";
+import { useHtmlContext } from "next/dist/shared/lib/html-context.shared-runtime";
+import { createSequentLaTeX } from "@/lib/sequent";
 function RuleShowPanel({
   ruleLatex
 }: {
@@ -168,12 +170,83 @@ function RulePanel() {
   </div>
 }
 
+function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
+  const { undo, redo, canUndo, canRedo } = useHistory()
+
+  const [sequentIsVisible, setSequentVisbility] = React.useState<boolean>(false)
+  const sequentLatex = createSequentLaTeX(proof.proof)
+
+  return <div
+    onMouseEnter={_ => setSequentVisbility(true)}
+    onMouseLeave={_ => setSequentVisbility(false)}
+  >
+    <Card className={cn(
+      "flex flex-col gap-0",
+      "px-2 py-0",
+      sequentIsVisible && "bg-accent"
+    )}>
+      <div className="flex items-center justify-between gap-1 py-2">
+        <div className="flex items-center gap-2 md:gap-3">
+          <Link href={"/gallery"} title="Go to your proof gallery">
+            <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
+          </Link>
+          <div className="w-[1px] self-stretch bg-gray-600 my-1"></div>
+          <div className="flex justify-between items-center overflow-scroll">
+            <div className="flex flex-col items-start">
+              <p className="text md:text-xl text-clip text-nowrap">{proof.title}</p>
+              <p className="text-xs md:text-sm font-light text-clip text-nowrap">{logicNameToString(proof.logicName)}</p>
+            </div>
+          </div>
+        </div>
+        <Toolbar.Root
+          className="flex gap-1 md:gap-3 items-center"
+          aria-label="Formatting options"
+        >
+          <Toolbar.ToolbarButton className="cursor-auto">
+            <ProofValidityIcon />
+          </Toolbar.ToolbarButton>
+          <DownloadProofButton className="hidden md:flex items-center h-full" proofId={proof.id} />
+
+          <ButtonGroup className="flex items-center">
+            <Button
+              variant={"outline"}
+              title="Undo latest action"
+              onClick={undo}
+              disabled={!canUndo}
+              className="py-0"
+            >
+              <CaretLeftIcon className="w-20 h-20" />
+            </Button>
+            <Button
+              variant={"outline"}
+              title="Redo latest action"
+              onClick={redo}
+              disabled={!canRedo}
+            >
+              <CaretRightIcon className="w-8 h-8" />
+            </Button>
+          </ButtonGroup>
+
+        </Toolbar.Root>
+      </div>
+      {sequentIsVisible && <>
+        <hr/>
+        <div className={cn(
+          !sequentIsVisible && "hidden",
+          "py-1 flex items-center justify-center text-sm"
+        )}>
+          <InlineMath math={createSequentLaTeX(proof.proof) ?? "???"}/>
+        </div>
+      </>}
+    </Card>
+  </div>
+}
+
 export default function ContextSidebar() {
   const { proof } = useProof();
   const diagnosticContext = useDiagnostics();
   const { getStep } = diagnosticContext;
   const { interactionState } = useInteractionState();
-  const historyContext = useHistory();
 
   const stepInFocus = getSelectedStep(interactionState);
 
@@ -181,13 +254,6 @@ export default function ContextSidebar() {
 
   const isEditingRule =
     interactionState.enum === InteractionStateEnum.EDITING_RULE;
-
-  const handleUndo = () => {
-    historyContext.undo();
-  };
-  const handleRedo = () => {
-    historyContext.redo();
-  };
 
   const showLineFocusPanel = !isEditingRule && stepInFocus && proofStep?.stepType === "line";
   const showBoxFocusPanel = !isEditingRule && stepInFocus && proofStep?.stepType === "box";
@@ -197,50 +263,7 @@ export default function ContextSidebar() {
   return (
     <div className="lg:h-screen p-2 overflow-auto">
       <div className="flex flex-col gap-2">
-        <Card className="flex items-center justify-between gap-1 py-2">
-          <div className="flex items-center gap-2 md:gap-3">
-            <Link href={"/gallery"} title="Go to your proof gallery">
-              <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
-            </Link>
-            <div className="w-[1px] self-stretch bg-gray-600 my-1"></div>
-            <div className="flex justify-between items-center overflow-scroll">
-              <div className="flex flex-col items-start">
-                <p className="text md:text-xl text-clip text-nowrap">{proof.title}</p>
-                <p className="text-xs md:text-sm font-light text-clip text-nowrap cursor-pointer">{logicNameToString(proof.logicName)}</p>
-              </div>
-            </div>
-          </div>
-          <Toolbar.Root
-            className="flex gap-1 md:gap-3 items-center"
-            aria-label="Formatting options"
-          >
-            <Toolbar.ToolbarButton className="cursor-auto">
-              <ProofValidityIcon />
-            </Toolbar.ToolbarButton>
-            <DownloadProofButton className="hidden md:flex items-center h-full" proofId={proof.id} />
-
-            <ButtonGroup className="flex items-center">
-              <Button
-                variant={"outline"}
-                title="Undo latest action"
-                onClick={handleUndo}
-                disabled={!historyContext.canUndo}
-                className="py-0"
-              >
-                <CaretLeftIcon className="w-20 h-20" />
-              </Button>
-              <Button
-                variant={"outline"}
-                title="Redo latest action"
-                onClick={handleRedo}
-                disabled={!historyContext.canRedo}
-              >
-                <CaretRightIcon className="w-8 h-8" />
-              </Button>
-            </ButtonGroup>
-
-          </Toolbar.Root>
-        </Card>
+        <ProofEditorToolbar proof={proof}/>
         <Card className={cn("max-h-48 md:max-h-max overflow-scroll", noPanelIsShown && "min-h-48 h-12")}>
           {showLineFocusPanel && <>
             <LineFocusPanel lineUuid={stepInFocus} lineStep={proofStep} />
