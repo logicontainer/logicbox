@@ -7,7 +7,6 @@ import logicbox.formula.ArithLogicFormula._
 import scala.compiletime.ops.boolean
 
 class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithLogicTerm, ArithLogicTerm.Var] {
-
   private def substitute(src: ArithLogicTerm, t: ArithLogicTerm, x: Var): ArithLogicTerm = src match {
     case y: Var if y == x => t
     case y: Var => y
@@ -62,20 +61,20 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     case Exists(_, phi) => hasFreeOccurance(phi, t)
   }
 
-  private type Repl = Option[ArithLogicTerm | Unit]
+  private type Repl = Option[Either[Unit, ArithLogicTerm]]
 
   private def unifyReplacements(repls: Set[Repl]): Repl = {
     if repls.contains(None) then None else {
       val ts = repls.collect { 
-        case Some(t: ArithLogicTerm) => t
+        case Some(Right(t)) => t
       }
 
       if ts.isEmpty then 
-        Some(())
+        Some(Left(()))
       else if ts.size > 1 then 
         None 
       else 
-        Some(ts.head)
+        Some(Right(ts.head))
     }
   }
 
@@ -86,10 +85,10 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
   private def findReplacement(src: ArithLogicTerm, dst: ArithLogicTerm, x: Var): Repl = {
     (src, dst) match {
       case _ if src == x => 
-        Some(dst)
+        Some(Right(dst))
 
       case (y: Var, z: Var) if y == z => 
-        Some(())
+        Some(Left(()))
 
       case (Plus(t1, t2), Plus(t3, t4)) =>
         unifyReplacements(Set(
@@ -103,8 +102,8 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
           findReplacement(t2, t4, x),
         ))
 
-      case (Zero(), Zero()) => Some(())
-      case (One(), One()) => Some(())
+      case (Zero(), Zero()) => Some(Left(()))
+      case (One(), One()) => Some(Left(()))
 
       case _ => None
     }
@@ -118,7 +117,7 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     if x != y then
       findReplacement(phi1, phi2, x)
     else if phi1 == phi2 then
-      Some(())
+      Some(Left(()))
     else None
   }
 
@@ -156,8 +155,8 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
       case (Exists(y, phi1), Exists(z, phi2)) if y == z => 
         findReplacementInsideQuantifiers(y, phi1, phi2, x)
 
-      case (Contradiction(), Contradiction()) => Some(())
-      case (Tautology(), Tautology()) => Some(())
+      case (Contradiction(), Contradiction()) => Some(Left(()))
+      case (Tautology(), Tautology()) => Some(Left(()))
 
       case _ => None
     }

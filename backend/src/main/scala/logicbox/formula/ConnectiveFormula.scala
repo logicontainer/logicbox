@@ -1,55 +1,31 @@
 package logicbox.formula
 
-trait ConnectiveFormula[F]
+trait ConnectiveFormula[F] {
+  def unapplyAnd(f: F): Option[(F, F)]
+  def unapplyOr(f: F): Option[(F, F)]
+  def unapplyImplies(f: F): Option[(F, F)]
+  def unapplyNot(f: F): Option[F]
+  def unapplyContradiction(f: F): Boolean
+}
 
 object ConnectiveFormula {
-
-  sealed trait BinaryConnective[F] extends ConnectiveFormula[F] {
-    def phi: F
-    def psi: F
+  object && {
+    infix def unapply[F](f: F)(implicit c: ConnectiveFormula[F]): Option[(F, F)] = c.unapplyAnd(f)
   }
 
-  trait And[F] extends BinaryConnective[F]
-  trait Or[F] extends BinaryConnective[F]
-  trait Implies[F] extends BinaryConnective[F]
-
-  trait Not[F] extends ConnectiveFormula[F] {
-    def phi: F
-  }
-  trait Contradiction[F]() extends ConnectiveFormula[F]
-
-  object And {
-    def unapply[F <: ConnectiveFormula[F]](formula: F): Option[(F, F)] = formula match {
-      case f: And[F] => Some((f.phi, f.psi))
-      case _ => None
-    }
+  object || {
+    infix def unapply[F](f: F)(implicit c: ConnectiveFormula[F]): Option[(F, F)] = c.unapplyOr(f)
   }
 
-  object Or {
-    def unapply[F <: ConnectiveFormula[F]](formula: F): Option[(F, F)] = formula match {
-      case f: Or[F] => Some((f.phi, f.psi))
-      case _ => None
-    }
+  object ~> {
+    infix def unapply[F](f: F)(implicit c: ConnectiveFormula[F]): Option[(F, F)] = c.unapplyImplies(f)
   }
 
-  object Implies {
-    def unapply[F <: ConnectiveFormula[F]](formula: F): Option[(F, F)] = formula match {
-      case f: Implies[F] => Some((f.phi, f.psi))
-      case _ => None
-    }
-  }
-
-  object Not {
-    def unapply[F <: ConnectiveFormula[F]](formula: F): Option[F] = formula match {
-      case f: Not[F] => Some(f.phi)
-      case _ => None
-    }
+  object ~ {
+    def unapply[F](f: F)(implicit c: ConnectiveFormula[F]): Option[F] = c.unapplyNot(f)
   }
 
   object Contradiction {
-    def unapply[F <: ConnectiveFormula[F]](formula: F): Boolean = formula match {
-      case f: Contradiction[F] => true
-      case _ => false
-    }
+    def unapply[F](f: F)(implicit c: ConnectiveFormula[F]): Boolean = c.unapplyContradiction(f)
   }
 }

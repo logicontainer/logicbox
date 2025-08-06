@@ -1,54 +1,25 @@
 package logicbox.formula
 
-trait ArithmeticTerm[T]
+trait ArithmeticTerm[T] {
+  def unapplyZero(t: T): Boolean
+  def unapplyOne(t: T): Boolean
+  def unapplyPlus(t: T): Option[(T, T)]
+  def unapplyMult(t: T): Option[(T, T)]
+}
 
 object ArithmeticTerm {
-  sealed trait BinOp[T] extends ArithmeticTerm[T] {
-    def t1: T
-    def t2: T
+  object _0 {
+    def unapply[T](t: T)(implicit a: ArithmeticTerm[T]): Boolean = a.unapplyZero(t)
   }
-
-  trait Plus[T] extends BinOp[T]
-  trait Mult[T] extends BinOp[T]
-
-  trait Zero[T] extends ArithmeticTerm[T]
-  trait One[T] extends ArithmeticTerm[T]
-
-  object Plus {
-    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = t match {
-      case p: Plus[T] @unchecked => Some(p.t1, p.t2)
-      case _ => None
-    }
+  object _1 {
+    def unapply[T](t: T)(implicit a: ArithmeticTerm[T]): Boolean = a.unapplyOne(t)
   }
 
   object + {
-    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = Plus.unapply[T](t)
+    def unapply[T](t: T)(implicit a: ArithmeticTerm[T]): Option[(T, T)] = a.unapplyPlus(t)
   }
 
-
-  object Mult {
-    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = t match {
-      case p: Mult[T] @unchecked => Some(p.t1, p.t2)
-      case _ => None
-    }
-  }
-
-  object ~* {
-    def unapply[T <: ArithmeticTerm[T]](t: T): Option[(T, T)] = Mult.unapply[T](t)
-  }
-
-  object Zero {
-    def unapply[T <: ArithmeticTerm[T]](t: T): Boolean = t match {
-      case p: Zero[T] @unchecked => true
-      case _ => false
-    }
-  }
-
-  object One {
-    def unapply[T <: ArithmeticTerm[T]](t: T): Boolean = t match {
-      case p: One[T] @unchecked => true
-      case _ => false
-    }
+  object * {
+    def unapply[T](t: T)(implicit a: ArithmeticTerm[T]): Option[(T, T)] = a.unapplyMult(t)
   }
 }
-
