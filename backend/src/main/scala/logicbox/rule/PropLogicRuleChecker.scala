@@ -13,7 +13,8 @@ import logicbox.framework.RulePart.MetaFormula
 import logicbox.framework.Location
 import logicbox.framework.RulePart.Formulas
 
-class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, PropLogicRule, Any] {
+class PropLogicRuleChecker[F](using ConnectiveFormula[F])
+extends RuleChecker[F, PropLogicRule, Any] {
   private type Ref = Reference[F, Any]
 
   import Reference._
@@ -30,7 +31,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
 
     case AndElim(side) => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
-        case And(lhs, rhs) => side match {
+        case lhs & rhs => side match {
           case Side.Left => 
             failIf(lhs != formula, Ambiguous(
               MetaFormula(Formulas.Phi), List(
@@ -54,7 +55,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
   
     case AndIntro() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => formula match {
-        case And(phi, psi) =>
+        case phi & psi =>
           failIf(phi != r0, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.lhs,
             Location.premise(0).root
@@ -70,13 +71,13 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
   
     case OrIntro(side) => extractNFormulasAndThen(refs, 1) {
       case List(ref) => (side, formula) match {
-        case (Side.Left, Or(lhs, _)) => 
+        case (Side.Left, lhs || _) => 
           failIf(lhs != ref, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.lhs,
             Location.premise(0).root
           )))
 
-        case (Side.Right, Or(_, rhs)) =>
+        case (Side.Right, _ || rhs) =>
           failIf(rhs != ref, Ambiguous(MetaFormula(Formulas.Psi), List(
             Location.conclusion.rhs,
             Location.premise(0).root
@@ -105,7 +106,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
             Location.premise(2).lastLine
           ))) ++
           { r0 match {
-            case Or(lhs, rhs) =>
+            case lhs || rhs =>
               // assumptions must match each operand of r0
               failIf(as1 != Some(lhs), Ambiguous(MetaFormula(Formulas.Phi), List(
                 Location.premise(0).lhs,
@@ -123,7 +124,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
   
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(box: Reference.Box[F, _]) => formula match {
-        case Implies(phi, psi) =>
+        case phi --> psi =>
           val (ass, concl) = (extractFirstLine(box), extractLastLine(box))
           failIf(Some(phi) != ass, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.lhs,
@@ -141,7 +142,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
 
     case ImplicationElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => r1 match {
-        case Implies(from, to) => 
+        case from --> to => 
           failIf(from != r0, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.premise(0).root,
             Location.premise(1).lhs
@@ -159,14 +160,14 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case NotIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(b: Box[F, ?]) => 
         { extractLastLine(b) match {
-          case Some(Contradiction()) => Nil
+          case Some(⊥) => Nil
 
           case _ => 
             fail(ShapeMismatch(Location.premise(0).lastLine))
 
         }} ++ { 
           formula match {
-            case Not(phi) => 
+            case ~(phi) => 
               failIf(Some(phi) != extractFirstLine(b), Ambiguous(MetaFormula(Formulas.Phi), List( // TODO: what if not some?
                 Location.conclusion.negated,
                 Location.premise(0).firstLine
@@ -181,10 +182,10 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case NotElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) =>
         { formula match {
-          case Contradiction() => Nil
+          case ⊥ => Nil
           case _ => fail(ShapeMismatch(Location.conclusion))
         }} ++ { r1 match {
-          case Not(phi) => 
+          case ~(phi) => 
             failIf(r0 != phi, Ambiguous(MetaFormula(Formulas.Phi), List(
               Location.premise(0).root,
               Location.premise(1).negated
@@ -196,12 +197,12 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     }
 
     case ContradictionElim() => extractNFormulasAndThen(refs, 1) {
-      case List(Contradiction()) => Nil
+      case List(⊥) => Nil
       case _ => fail(ShapeMismatch(Location.premise(0)))
     }
 
     case NotNotElim() => extractNFormulasAndThen(refs, 1) {
-      case List(Not(Not(phi))) => 
+      case List(~(~(phi))) => 
         failIf(formula != phi, Ambiguous(MetaFormula(Formulas.Phi), List(
           Location.conclusion.root,
           Location.premise(0).negated.negated
@@ -214,19 +215,19 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case ModusTollens() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => 
         { formula match {
-          case Not(_) => Nil
+          case ~(_) => Nil
           case _ => 
             fail(ShapeMismatch(Location.conclusion))
         }} ++ { r0 match {
-          case Implies(_, _) => Nil
+          case _ --> _ => Nil
           case _ => 
             fail(ShapeMismatch(Location.premise(0)))
         }} ++ { r1 match {
-          case Not(_) => Nil
+          case ~(_) => Nil
           case _ => 
             fail(ShapeMismatch(Location.premise(1)))
         }} ++ { (formula, r0, r1) match {
-          case (Not(phi2), Implies(phi1, psi1), Not(psi2)) =>
+          case (~(phi2), phi1 --> psi1, ~(psi2)) =>
             failIf(phi2 != phi1, Ambiguous(MetaFormula(Formulas.Phi), List(
               Location.conclusion.negated,
               Location.premise(0).lhs
@@ -242,7 +243,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
 
     case NotNotIntro() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => formula match {
-        case Not(Not(phi)) => 
+        case ~(~(phi)) => 
           failIf(phi != ref, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.negated.negated,
             Location.premise(0).root
@@ -256,7 +257,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
     case ProofByContradiction() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(Reference.Box(_, ass, concl)) => { 
         ass match {
-          case Some(Reference.Line(Not(phi))) => 
+          case Some(Reference.Line(~(phi))) => 
             failIf(formula != phi, Ambiguous(MetaFormula(Formulas.Phi), List(
               Location.conclusion.root,
               Location.premise(0).firstLine.negated
@@ -267,7 +268,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
         }
       } ++ { 
         concl match {
-          case Some(Reference.Line(Contradiction())) => Nil
+          case Some(Reference.Line(⊥)) => Nil
           case _ => 
             fail(ShapeMismatch(Location.premise(0).lastLine))
         }
@@ -276,7 +277,7 @@ class PropLogicRuleChecker[F <: ConnectiveFormula[F]] extends RuleChecker[F, Pro
 
     case LawOfExcludedMiddle() => extractNFormulasAndThen(refs, 0) {
       case _ => formula match {
-        case Or(lhs, Not(rhs)) => 
+        case lhs || ~(rhs) => 
           failIf(lhs != rhs, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.lhs,
             Location.conclusion.rhs.negated

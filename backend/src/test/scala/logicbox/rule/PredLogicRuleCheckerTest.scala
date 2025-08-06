@@ -52,6 +52,7 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       if fresh === "" then None else Some(fresh)
     )
 
+  import logicbox.formula.{predLogicFormulaAsConnectiveFormula, predLogicFormulaAsQuantifierFormula}
   private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var](
     PredLogicFormulaSubstitutor()
   )
