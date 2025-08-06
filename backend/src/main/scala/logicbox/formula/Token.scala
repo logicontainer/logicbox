@@ -5,6 +5,8 @@ object Token {
   case class LeftParen() extends Token
   case class RightParen() extends Token
 
+  case class Comma() extends Token
+
   case class And() extends Token
   case class Or() extends Token
   case class Implies() extends Token
