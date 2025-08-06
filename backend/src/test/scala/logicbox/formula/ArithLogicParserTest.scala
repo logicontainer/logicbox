@@ -6,10 +6,8 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 class ArithLogicParserTest extends AnyFunSpec {
-  import ArithLogicFormula._
   import ArithLogicToken._
-  import ArithLogicTerm._
-
+  import Term.Var
   describe("apply"){
     it("should parse exists and forall") {
       val ts1 = List(
@@ -24,10 +22,10 @@ class ArithLogicParserTest extends AnyFunSpec {
       )
 
       ArithLogicParser().parseFormula(ts3) shouldBe
-        ArithLogicFormula.ForAll(Var("x"), 
-          ArithLogicFormula.Exists(Var("y"), 
-            ArithLogicFormula.ForAll(Var("z"),
-              ArithLogicFormula.Equals(Var("x"), Var("y"))
+        Formula.ForAll(Var("x"), 
+          Formula.Exists(Var("y"), 
+            Formula.ForAll(Var("z"),
+              Formula.Equals(Var("x"), Var("y"))
             )
           )
         )
@@ -36,37 +34,37 @@ class ArithLogicParserTest extends AnyFunSpec {
     it("should parse equality of terms") {
       val ts = List(Ident("x"), ArithLogicToken.Equals(), Ident("y"))
 
-      ArithLogicParser().parseFormula(ts) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.Var("x"),
-        ArithLogicTerm.Var("y"),
+      ArithLogicParser().parseFormula(ts) shouldBe Formula.Equals(
+        Term.Var("x"),
+        Term.Var("y"),
       )
     }
 
     it("should parse zero") {
       val ts = List(ArithLogicToken.Zero(), ArithLogicToken.Equals(), ArithLogicToken.Zero())
 
-      ArithLogicParser().parseFormula(ts) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.Zero(), ArithLogicTerm.Zero()
+      ArithLogicParser().parseFormula(ts) shouldBe Formula.Equals(
+        Term.Zero(), Term.Zero()
       )
     }
 
     it("should parse one") {
       val ts = List(ArithLogicToken.One(), ArithLogicToken.Equals(), ArithLogicToken.One())
 
-      ArithLogicParser().parseFormula(ts) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.One(), ArithLogicTerm.One()
+      ArithLogicParser().parseFormula(ts) shouldBe Formula.Equals(
+        Term.One(), Term.One()
       )
     }
 
     it("should parse *") {
       val ts1 = List(ArithLogicToken.One(), ArithLogicToken.Mult(), ArithLogicToken.One(), ArithLogicToken.Equals(), ArithLogicToken.One())
 
-      ArithLogicParser().parseFormula(ts1) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.Mult(
-          ArithLogicTerm.One(), 
-          ArithLogicTerm.One(), 
+      ArithLogicParser().parseFormula(ts1) shouldBe Formula.Equals(
+        Term.Mult(
+          Term.One(), 
+          Term.One(), 
         ),
-        ArithLogicTerm.One(), 
+        Term.One(), 
       )
 
       // left ass.
@@ -76,27 +74,27 @@ class ArithLogicParserTest extends AnyFunSpec {
         ArithLogicToken.One()
       )
 
-      ArithLogicParser().parseFormula(ts2) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.Mult(
-          ArithLogicTerm.Mult(
-            ArithLogicTerm.One(), 
-            ArithLogicTerm.One(), 
+      ArithLogicParser().parseFormula(ts2) shouldBe Formula.Equals(
+        Term.Mult(
+          Term.Mult(
+            Term.One(), 
+            Term.One(), 
           ),
-          ArithLogicTerm.One(), 
+          Term.One(), 
         ),
-        ArithLogicTerm.One(), 
+        Term.One(), 
       )
     }
 
     it("should parse +") {
       val ts1 = List(ArithLogicToken.One(), ArithLogicToken.Plus(), ArithLogicToken.One(), ArithLogicToken.Equals(), ArithLogicToken.One())
 
-      ArithLogicParser().parseFormula(ts1) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.Plus(
-          ArithLogicTerm.One(), 
-          ArithLogicTerm.One(), 
+      ArithLogicParser().parseFormula(ts1) shouldBe Formula.Equals(
+        Term.Plus(
+          Term.One(), 
+          Term.One(), 
         ),
-        ArithLogicTerm.One(), 
+        Term.One(), 
       )
 
       // left ass.
@@ -106,15 +104,15 @@ class ArithLogicParserTest extends AnyFunSpec {
         ArithLogicToken.One()
       )
 
-      ArithLogicParser().parseFormula(ts2) shouldBe ArithLogicFormula.Equals(
-        ArithLogicTerm.Plus(
-          ArithLogicTerm.Plus(
-            ArithLogicTerm.One(), 
-            ArithLogicTerm.One(), 
+      ArithLogicParser().parseFormula(ts2) shouldBe Formula.Equals(
+        Term.Plus(
+          Term.Plus(
+            Term.One(), 
+            Term.One(), 
           ),
-          ArithLogicTerm.One(), 
+          Term.One(), 
         ),
-        ArithLogicTerm.One(), 
+        Term.One(), 
       )
     }
 
@@ -132,10 +130,10 @@ class ArithLogicParserTest extends AnyFunSpec {
         )
       }
 
-      import ArithLogicTerm.Plus => P
-      import ArithLogicTerm.Mult => M
+      import Term.Plus => P
+      import Term.Mult => M
       
-      ArithLogicParser().parseFormula(ts) shouldBe ArithLogicFormula.Equals(
+      ArithLogicParser().parseFormula(ts) shouldBe Formula.Equals(
         P(
           P(
             P(
@@ -146,7 +144,7 @@ class ArithLogicParserTest extends AnyFunSpec {
           ),
           Var("y")
         ),
-        ArithLogicTerm.Zero()
+        Term.Zero()
       )
     }
 
@@ -165,9 +163,9 @@ class ArithLogicParserTest extends AnyFunSpec {
         )
       }
       
-      import ArithLogicTerm.Plus => P
-      import ArithLogicTerm.Mult => M
-      ArithLogicParser().parseFormula(ts) shouldBe ArithLogicFormula.Equals(
+      import Term.Plus => P
+      import Term.Mult => M
+      ArithLogicParser().parseFormula(ts) shouldBe Formula.Equals(
         P(
           P(
             M(Var("x"), Var("y")),
@@ -178,7 +176,7 @@ class ArithLogicParserTest extends AnyFunSpec {
           ),
           Var("y")
         ),
-        ArithLogicTerm.Zero()
+        Term.Zero()
       )
     }
   }

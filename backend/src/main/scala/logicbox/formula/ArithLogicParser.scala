@@ -4,25 +4,24 @@ import scala.util.parsing.combinator.PackratParsers
 import scala.util.parsing.input.Reader
 import scala.util.parsing.input.Position
 import scala.util.parsing.input.NoPosition
-
-import ArithLogicFormula._
-import ArithLogicTerm._
+import Formula._, Term._
 
 class ArithLogicParser extends PackratParsers {
   override type Elem = ArithLogicToken
+  type Arith = FormulaKind.Arith
+  type AVar = Term.Var[Arith]
 
-
-  private def varexp: Parser[ArithLogicTerm.Var] = accept("var", { case ArithLogicToken.Ident(c) => ArithLogicTerm.Var(c) })
+  private def varexp: Parser[AVar] = accept("var", { case ArithLogicToken.Ident(c) => Var(c) })
   private def termexp: Parser[ArithLogicTerm] = {
-    def zeroexp: Parser[ArithLogicTerm.Zero] = accept("zero", { case ArithLogicToken.Zero() => ArithLogicTerm.Zero() })
-    def oneexp: Parser[ArithLogicTerm.One] = accept("one", { case ArithLogicToken.One() => ArithLogicTerm.One() })
+    def zeroexp: Parser[Term.Zero] = accept("zero", { case ArithLogicToken.Zero() => Zero() })
+    def oneexp: Parser[Term.One] = accept("one", { case ArithLogicToken.One() => One() })
     def atomictermexp: Parser[ArithLogicTerm] = varexp | zeroexp | oneexp | withParens(termexp)
 
     def multexp: Parser[ArithLogicTerm] = 
       ((atomictermexp ~ rep(ArithLogicToken.Mult() ~ atomictermexp))) ^^ {
         case t ~ ts => 
           ts.foldLeft(t) {
-            case (term, _ ~ t1) => ArithLogicTerm.Mult(term, t1)
+            case (term, _ ~ t1) => Mult(term, t1)
           }
       }
 
@@ -30,17 +29,17 @@ class ArithLogicParser extends PackratParsers {
       ((multexp ~ rep(ArithLogicToken.Plus() ~ multexp))) ^^ {
         case t ~ ts => 
           ts.foldLeft(t) {
-            case (term, _ ~ t1) => ArithLogicTerm.Plus(term, t1)
+            case (term, _ ~ t1) => Plus(term, t1)
           }
       }
 
     plusexp
   }
   
-  private def contrexp: Parser[Contradiction] = elem(ArithLogicToken.Contradiction()) ^^^ Contradiction()
-  private def tautexp: Parser[Tautology] = elem(ArithLogicToken.Tautology()) ^^^ Tautology()
-  private def equalityexp: Parser[Equals] = (termexp ~ ArithLogicToken.Equals() ~ termexp) ^^ {
-    case t1 ~ _ ~ t2 => ArithLogicFormula.Equals(t1, t2)
+  private def contrexp: Parser[Contradiction[Arith]] = elem(ArithLogicToken.Contradiction()) ^^^ Contradiction()
+  private def tautexp: Parser[Tautology[Arith]] = elem(ArithLogicToken.Tautology()) ^^^ Tautology()
+  private def equalityexp: Parser[Equals[Arith]] = (termexp ~ ArithLogicToken.Equals() ~ termexp) ^^ {
+    case t1 ~ _ ~ t2 => Equals(t1, t2)
   }
 
   private def atomicexps: Parser[ArithLogicFormula] = tautexp | contrexp | equalityexp
@@ -76,7 +75,7 @@ class ArithLogicParser extends PackratParsers {
   
   private def formula: Parser[ArithLogicFormula] = a
 
-  def parseVariable(input: List[ArithLogicToken]): ArithLogicTerm.Var = {
+  def parseVariable(input: List[ArithLogicToken]): AVar = {
     phrase(varexp)(ArithLogicTokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
         throw new RuntimeException(p.toString)

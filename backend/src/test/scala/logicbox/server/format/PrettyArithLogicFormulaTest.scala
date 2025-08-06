@@ -4,10 +4,10 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
-import logicbox.formula.ArithLogicTerm._
-import logicbox.formula.ArithLogicFormula._
+import logicbox.formula._
 
 class PrettyArithLogicFormulaTest extends AnyFunSpec {
+  import Formula._, Term._
   describe("Stringifiers::predLogicFormulaAsLaTeX") {
     import Stringifiers.arithLogicFormulaAsLaTeX => asLaTeX
     it("should do bot/top/predicates") {

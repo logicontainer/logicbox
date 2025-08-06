@@ -4,14 +4,15 @@ import scala.util.parsing.combinator.PackratParsers
 import scala.util.parsing.input.Reader
 import scala.util.parsing.input.Position
 import scala.util.parsing.input.NoPosition
-
-import PredLogicFormula._
-import PredLogicTerm._
+import Formula._, Term._
 
 class PredLogicParser extends PackratParsers {
   override type Elem = PredLogicToken
+  private type Pred = FormulaKind.Pred
+  type PVar = Term.Var[FormulaKind.Pred]
+  type PTerm = Term[FormulaKind.Pred]
 
-  private def varexp: Parser[PredLogicTerm.Var] = accept("var", { case PredLogicToken.Ident(c) => PredLogicTerm.Var(c) })
+  private def varexp: Parser[PVar] = accept("var", { case PredLogicToken.Ident(c) => Term.Var(c) })
   private def funcsymb: Parser[String] = accept("function symbol", { case PredLogicToken.Ident(c) => c })
 
   private def funcexp: Parser[PredLogicTerm] = (funcsymb ~ withParens(termlistexp)) ^^ {
@@ -27,8 +28,8 @@ class PredLogicParser extends PackratParsers {
       }
     }
 
-  private def contrexp: Parser[Contradiction] = elem(PredLogicToken.Contradiction()) ^^^ Contradiction()
-  private def tautexp: Parser[Tautology] = elem(PredLogicToken.Tautology()) ^^^ Tautology()
+  private def contrexp: Parser[Contradiction[Pred]] = elem(PredLogicToken.Contradiction()) ^^^ Contradiction()
+  private def tautexp: Parser[Formula[Pred]] = elem(PredLogicToken.Tautology()) ^^^ Tautology()
   private def predsymb: Parser[String] = accept("predicate symbol", { case PredLogicToken.Ident(c) => c })
 
   private def predexp: Parser[Predicate] = 
@@ -37,11 +38,12 @@ class PredLogicParser extends PackratParsers {
     }) | predsymb ^^ {
       case p => Predicate(p, Nil)
     }
-  private def equalityexp: Parser[Equals] = (termexp ~ PredLogicToken.Equals() ~ termexp) ^^ {
-    case t1 ~ _ ~ t2 => PredLogicFormula.Equals(t1, t2)
+
+  private def equalityexp: Parser[Equals[Pred]] = (termexp ~ PredLogicToken.Equals() ~ termexp) ^^ {
+    case t1 ~ _ ~ t2 => Equals(t1, t2)
   }
 
-  private def atomicexps: Parser[PredLogicFormula] = tautexp | contrexp | equalityexp | predexp
+  private def atomicexps: Parser[Formula[Pred]] = tautexp | contrexp | equalityexp | predexp
 
   private def c: Parser[PredLogicFormula] = 
     atomicexps |
@@ -75,7 +77,7 @@ class PredLogicParser extends PackratParsers {
   
   private def formula: Parser[PredLogicFormula] = a
 
-  def parseVariable(input: List[PredLogicToken]): PredLogicTerm.Var = {
+  def parseVariable(input: List[PredLogicToken]): PVar = {
     phrase(varexp)(PredLogicTokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
         throw new RuntimeException(p.toString)

@@ -2,14 +2,15 @@ package logicbox.formula
 
 import scala.util.parsing.combinator.PackratParsers
 
-class PropLogicParser extends PackratParsers {
-  import PropLogicFormula._
+import Formula._, Term._
 
+class PropLogicParser extends PackratParsers {
   override type Elem = PropLogicToken
+  private type Prop = FormulaKind.Prop
 
   private def atomexp: Parser[Atom] = accept("atom", { case PropLogicToken.Atom(c) => Atom(c) })
-  private def contrexp: Parser[Contradiction] = elem(PropLogicToken.Contradiction()) ^^^ Contradiction()
-  private def tautexp: Parser[Tautology] = elem(PropLogicToken.Tautology()) ^^^ Tautology()
+  private def contrexp: Parser[Contradiction[Prop]] = elem(PropLogicToken.Contradiction()) ^^^ Contradiction()
+  private def tautexp: Parser[Tautology[Prop]] = elem(PropLogicToken.Tautology()) ^^^ Tautology()
 
   private def simpleexps: Parser[PropLogicFormula] = atomexp | tautexp | contrexp
 

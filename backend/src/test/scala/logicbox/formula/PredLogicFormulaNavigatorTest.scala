@@ -8,7 +8,7 @@ import logicbox.framework.Location
 
 class PredLogicFormulaNavigatorTest extends AnyFunSpec {
   describe("get") {
-    val nav = PredLogicFormulaNavigator()
+    val nav = FormulaNavigator[FormulaKind.Pred]()
     def parse(str: String) = PredLogicParser().parseFormula(PredLogicLexer()(str))
     def tparse(str: String) = PredLogicParser().parseTerm(PredLogicLexer()(str))
 

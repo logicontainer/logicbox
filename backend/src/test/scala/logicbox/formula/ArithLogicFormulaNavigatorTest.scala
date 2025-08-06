@@ -5,10 +5,11 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 import logicbox.framework.Location
+import logicbox.framework.Navigator
 
 class ArithLogicFormulaNavigatorTest extends AnyFunSpec {
   describe("get") {
-    val nav = ArithLogicFormulaNavigator()
+    val nav: Navigator[ArithLogicFormula, ArithLogicTerm | ArithLogicFormula] = FormulaNavigator()
     def parse(str: String) = ArithLogicParser().parseFormula(ArithLogicLexer()(str))
     def tparse(str: String) = ArithLogicParser().parseTerm(ArithLogicLexer()(str))
 

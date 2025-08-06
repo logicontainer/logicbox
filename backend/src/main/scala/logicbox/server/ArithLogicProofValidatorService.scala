@@ -10,7 +10,7 @@ import logicbox.server.format._
 object ArithLogicProofValidatorService {
   private type F = ArithLogicFormula
   private type R = PropLogicRule | PredLogicRule | ArithLogicRule
-  private type B = FreshVarBoxInfo[ArithLogicTerm.Var]
+  private type B = FreshVarBoxInfo[Term.Var[FormulaKind.Arith]]
   private type Id = String
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] = {
@@ -19,11 +19,11 @@ object ArithLogicProofValidatorService {
     val boxAssumptionProofChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
     val boxContraintsProofChecker = PredLogicBoxConstraintsProofChecker[R, Id](PropLogicRule.Assumption())
 
-    val substitutor = ArithLogicFormulaSubstitutor()
+    val substitutor: Substitutor[F, ArithLogicTerm, Term.Var[FormulaKind.Arith]] = FormulaSubstitutor()
     val propLogicChecker: RuleChecker[F, PropLogicRule, B] = PropLogicRuleChecker[F]()
-    val predLogicChecker = PredLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](substitutor)
-    val arithLogicChecker = ArithLogicRuleChecker[F, ArithLogicTerm, ArithLogicTerm.Var](
-      ArithLogicFormulaSubstitutor()
+    val predLogicChecker = PredLogicRuleChecker[F, ArithLogicTerm, Term.Var[FormulaKind.Arith]](substitutor)
+    val arithLogicChecker = ArithLogicRuleChecker[F, ArithLogicTerm, Term.Var[FormulaKind.Arith]](
+      FormulaSubstitutor()
     )
 
     val optionRuleChecker: RuleChecker[Option[F], Option[R], Option[B]] = 
@@ -35,7 +35,7 @@ object ArithLogicProofValidatorService {
 
     val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise(), PropLogicRule.Assumption())
 
-    val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], ArithLogicTerm.Var](
+    val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], Term.Var[FormulaKind.Arith]](
       (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
     )
 
@@ -83,7 +83,7 @@ object ArithLogicProofValidatorService {
     } catch { case _ => None }
   }
 
-  private def parseVariable(userInput: String): Option[ArithLogicTerm.Var] = {
+  private def parseVariable(userInput: String): Option[Term.Var[FormulaKind.Arith]] = {
     try {
       Some(ArithLogicParser().parseVariable(ArithLogicLexer()(userInput)))
     } catch { case _ => None }
@@ -94,7 +94,7 @@ object ArithLogicProofValidatorService {
       .orElse(PredLogicRuleParser.parse(rule))
       .orElse(ArithLogicRuleParser.parse(rule))
 
-  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[ArithLogicTerm.Var]](
+  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[Term.Var[FormulaKind.Arith]]](
     parseFormula = parseFormula,
     parseRule = ruleParser,
     parseRawBoxInfo = {
@@ -136,8 +136,8 @@ class ArithLogicProofValidatorService extends ProofValidatorServiceImpl[
   proofChecker = proofChecker,
   createErrorConverter = pf => createErrorConverter(
     pf, 
-    ArithLogicFormulaNavigator(), 
-    FreshVarBoxInfoNavigator[ArithLogicTerm.Var](),
+    FormulaNavigator(), 
+    FreshVarBoxInfoNavigator[Term.Var[FormulaKind.Arith]](),
     getInfRule,
     formulaOrTermToLaTeX
   )

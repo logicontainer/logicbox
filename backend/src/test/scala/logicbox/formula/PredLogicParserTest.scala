@@ -7,8 +7,8 @@ import org.scalatest.Inspectors
 
 class PredLogicParserTest extends AnyFunSpec {
   import PredLogicToken._
-  import PredLogicTerm._
-  import PredLogicFormula._
+  import Formula._
+  import Term._
 
   describe("apply"){
     it("should parse predicate of variable") {
@@ -32,7 +32,7 @@ class PredLogicParserTest extends AnyFunSpec {
         Ident("P"), PredLogicToken.Implies(), Ident("Q")
       )
 
-      PredLogicParser().parseFormula(ts2) shouldBe PredLogicFormula.Implies(Predicate("P", List()), Predicate("Q", List()))
+      PredLogicParser().parseFormula(ts2) shouldBe Formula.Implies(Predicate("P", List()), Predicate("Q", List()))
     }
 
     it("should parse predicate of function vars") {
@@ -104,14 +104,14 @@ class PredLogicParserTest extends AnyFunSpec {
       )
 
       PredLogicParser().parseFormula(ts1) shouldBe 
-        PredLogicFormula.Exists(Var("x"), Predicate("P", List(Var("x"))))
+        Formula.Exists(Var("x"), Predicate("P", List(Var("x"))))
       PredLogicParser().parseFormula(ts2) shouldBe 
-        PredLogicFormula.ForAll(Var("x"), Predicate("P", List(Var("x"))))
+        Formula.ForAll(Var("x"), Predicate("P", List(Var("x"))))
 
       PredLogicParser().parseFormula(ts3) shouldBe
-        PredLogicFormula.ForAll(Var("x"), 
-          PredLogicFormula.Exists(Var("y"), 
-            PredLogicFormula.ForAll(Var("z"),
+        Formula.ForAll(Var("x"), 
+          Formula.Exists(Var("y"), 
+            Formula.ForAll(Var("z"),
               Predicate("P", List(
                 Var("x"),
                 Var("y"),
@@ -130,15 +130,15 @@ class PredLogicParserTest extends AnyFunSpec {
         Ident("g"), LeftParen(), Ident("y"), RightParen(),
       )
 
-      PredLogicParser().parseFormula(ts1) shouldBe PredLogicFormula.Equals(
-        PredLogicTerm.Var("x"),
-        PredLogicTerm.Var("y"),
+      PredLogicParser().parseFormula(ts1) shouldBe Formula.Equals(
+        Term.Var("x"),
+        Term.Var("y"),
       )
 
       PredLogicParser().parseFormula(ts2) shouldBe
-        PredLogicFormula.Equals(
-          PredLogicTerm.FunAppl("f", List(PredLogicTerm.Var("x"), PredLogicTerm.Var("y"))),
-          PredLogicTerm.FunAppl("g", List(PredLogicTerm.Var("y"))),
+        Formula.Equals(
+          Term.FunAppl("f", List(Term.Var("x"), Term.Var("y"))),
+          Term.FunAppl("g", List(Term.Var("y"))),
         )
     }
   }
