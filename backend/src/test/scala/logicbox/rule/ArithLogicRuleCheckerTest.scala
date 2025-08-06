@@ -21,6 +21,8 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
     ArithLogicParser().parseFormula(ArithLogicLexer()(str))
   }
 
+  import logicbox.formula.{arithLogicFormulaIsConnectiveFormula, arithLogicFormulaIsQuantifierFormula, arithLogicTermIsArithmeticTerm}
+
   val checker = ArithLogicRuleChecker[
     ArithLogicFormula,
     ArithLogicTerm,

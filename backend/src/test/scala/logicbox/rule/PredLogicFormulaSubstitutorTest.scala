@@ -1,4 +1,4 @@
-package logicbox.rule
+package logicbox.ruleSubstitu
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.*
@@ -8,6 +8,7 @@ import org.scalatest.Inspectors
 import logicbox.formula.{PredLogicLexer, PredLogicParser, PredLogicFormula}
 import logicbox.formula.PredLogicTerm._
 import logicbox.formula.PredLogicFormula._
+import logicbox.rule.PredLogicFormulaSubstitutor
 
 class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
   private def parse(str: String): PredLogicFormula = {
@@ -169,7 +170,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("y = y")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
 
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
@@ -179,7 +180,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("z = z")
       val x = Var("x")
 
-      val exp = Some(Var("z"))
+      val exp = Some(Right(Var("z")))
 
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
@@ -189,7 +190,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("f(y) = z")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -198,7 +199,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("f(y, z) = z")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -216,7 +217,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("a = b")
       val x = Var("x")
 
-      val exp = Some(())
+      val exp = Some(Left(()))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -242,7 +243,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val f = parse("f(g(x, x)) = f(f(g(x, x), x))")
       val x = Var("x")
 
-      val exp = Some(x) // x replaced with itself
+      val exp = Some(Right(x)) // x replaced with itself
       substitutor.findReplacement(f, f, x) shouldBe exp
     }
 
@@ -260,7 +261,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("P(y)")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -269,7 +270,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("P(y, z, y)")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -279,7 +280,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val x = Var("x")
 
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -288,7 +289,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("forall z P(y)")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -308,7 +309,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
 
       val x = Var("x")
 
-      val exp = Some(())
+      val exp = Some(Left(()))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -317,7 +318,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
       val dst = parse("exists z P(y)")
       val x = Var("x")
 
-      val exp = Some(Var("y"))
+      val exp = Some(Right(Var("y")))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -337,7 +338,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
 
       val x = Var("x")
 
-      val exp = Some(())
+      val exp = Some(Left(()))
       substitutor.findReplacement(src, dst, x) shouldBe exp
     }
 
@@ -368,7 +369,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
 
       val x = Var("x")
 
-      val exp = Some(())
+      val exp = Some(Left(()))
       substitutor.findReplacement(src1, dst1, x) shouldBe exp
       substitutor.findReplacement(src2, dst2, x) shouldBe exp
     }

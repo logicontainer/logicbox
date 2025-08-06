@@ -12,6 +12,9 @@ import {
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
+const CONTEXT_MENU_ITEM_HEIGHT = 40
+const CONTEXT_MENU_WIDTH = 192
+
 export function ProofStepContextMenu() {
   const {
     contextMenuShouldBeVisible,
@@ -81,15 +84,35 @@ export function ProofStepContextMenu() {
     return null;
   }
 
+  const numItemsShown = interactionState.isBox ? 5 : 4
+
+  const [boundedX, boundedY] = (() => {
+    let X = x;
+    let Y = y;
+
+    const rightEdge = X + CONTEXT_MENU_WIDTH
+    if (rightEdge >= window.innerWidth) {
+      X += window.innerWidth - rightEdge
+    }
+
+    const bottomEdge = Y + (numItemsShown * CONTEXT_MENU_ITEM_HEIGHT)
+    if (bottomEdge >= window.innerHeight) {
+      Y += window.innerHeight - bottomEdge
+    }
+
+    return [X, Y]
+  })()
+
   return (
     <div
       className={
-        "z-50 bg-white min-w-48 rounded-md shadow-md shadow-slate-400 overflow-hidden"
+        `z-50 bg-white rounded-md shadow-md shadow-slate-400 overflow-hidden select-none`
       }
       style={{
         position: "fixed",
-        left: x,
-        top: y,
+        left: boundedX,
+        top: boundedY,
+        width: `${CONTEXT_MENU_WIDTH}px`
       }}
     >
       {!interactionState.isBox && (
@@ -158,6 +181,7 @@ export function ProofStepContextMenu() {
   );
 }
 
+
 function Item({
   onClick,
   className,
@@ -171,7 +195,8 @@ function Item({
 }) {
   return (
     <div
-      className={cn("p-2 hover:bg-slate-200 cursor-pointer h-10", className)}
+      className={cn(`p-2 hover:bg-slate-200 cursor-pointer select-none`, className)}
+      style={{ height: `${CONTEXT_MENU_ITEM_HEIGHT}px` }}
       onClick={(e) => {
         e.stopPropagation();
         if (id) onClick?.(id);

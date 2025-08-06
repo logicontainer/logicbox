@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* ,
+.select-none .katex, .select-none .mathjax {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
 :root {
   --highlight: #00969e;
 }

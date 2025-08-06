@@ -7,6 +7,7 @@ import NewProofDialog from "@/components/NewProofButton";
 import UploadProofButton from "@/components/UploadProofButton";
 import React from "react";
 import _ from "lodash";
+import Footer from "./Footer";
 
 export default function GalleryPage() {
   const proofs = useProofStore((state) => state.proofs);
@@ -28,19 +29,22 @@ export default function GalleryPage() {
   }, []);
 
   return (
-    <div className="pt-8 lg:px-4 w-screen">
+    <div className="pt-8 lg:px-4 w-screen min-h-screen flex flex-col justify-between">
       <div className="flex gap-2 px-4">
         <p className="text text-2xl font-bold">My proofs</p>
         <NewProofDialog />
         <UploadProofButton />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 w-full p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 w-full p-4">
         {isHydrated && proofs.map((proof: ProofWithMetadata) => {
           return <GalleryItem key={proof.id} proof={proof} />;
         })}
         {!isHydrated && _.range(0, 4 * 3).map(i => { // 4 rows
-          return <GalleryItemSkeleton key={i}/>
+          return <GalleryItemSkeleton key={i} />
         })}
+      </div>
+      <div className="w-full grow flex flex-col justify-end">
+        <Footer />
       </div>
     </div>
   );

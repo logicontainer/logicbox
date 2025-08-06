@@ -11,7 +11,7 @@ export default function ProofValidityIcon() {
           className="flex items-center justify-around text-red-500 gap-1"
           title="The proof is invalid"
         >
-          <p>Invalid</p>
+          <p className="hidden md:block">Invalid</p>
           <XIcon />
         </div>
       ) : (
@@ -19,7 +19,7 @@ export default function ProofValidityIcon() {
           className="flex items-center justify-around text-green-500 gap-1"
           title="The proof is valid"
         >
-          <p>Valid</p>
+          <p className="hidden md:block">Valid</p>
           <CheckIcon />
         </div>
       )}

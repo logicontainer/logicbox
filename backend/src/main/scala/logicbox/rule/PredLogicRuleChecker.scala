@@ -24,9 +24,10 @@ import logicbox.framework.RulePart.Formulas
 import logicbox.framework.RulePart.Vars
 import logicbox.framework.RulePart.Terms
 
-class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
+class PredLogicRuleChecker[F, T, V <: T](
   substitutor: Substitutor[F, T, V]
-) extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
+)(using QuantifierFormula[F, T, V])
+extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
   private type R = PredLogicRule
   private type B = FreshVarBoxInfo[V]
 
@@ -38,7 +39,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
   override def check(rule: R, formula: F, refs: List[Reference[F, B]]): List[Error] = rule match {
     case ForAllElim() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
-        case ForAll(x, phi) => 
+        case ∀(x, phi) => 
           failIf(
             substitutor.findReplacement(phi, formula, x).isEmpty, 
             Ambiguous(MetaFormula(Formulas.Phi), List(
@@ -60,7 +61,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
         case Some(x0) => 
           val lst = extractLastLine(b)
           formula match {
-            case ForAll(x, phi) =>
+            case ∀(x, phi) =>
               failIf(
                 lst != Some(substitutor.substitute(phi, x0, x)),
                 Ambiguous(MetaFormula(Formulas.Phi), List(
@@ -76,7 +77,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
     }
 
     case ExistsElim() => extractAndThen(refs, List(BoxOrFormula.Formula, BoxOrFormula.Box)) {
-      case List(Line(Exists(x, phi)), b: Box[F, B]) => b.info.freshVar match {
+      case List(Line(∃(x, phi)), b: Box[F, B]) => b.info.freshVar match {
         case Some(x0) =>
           val (ass, concl) = (extractFirstLine(b), extractLastLine(b))
           failIf(
@@ -107,7 +108,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
 
     case ExistsIntro() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => formula match {
-        case Exists(x, phi) => 
+        case ∃(x, phi) => 
           failIf(
             substitutor.findReplacement(phi, ref, x).isEmpty,
             Ambiguous(MetaFormula(Formulas.Phi), List(
@@ -123,7 +124,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
 
     case EqualityIntro() => extractNFormulasAndThen(refs, 0) {
       case _ => formula match {
-        case Equals(t1, t2) => 
+        case t1 === t2 => 
           failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T), List(
             Location.conclusion.lhs,
             Location.conclusion.rhs
@@ -136,7 +137,7 @@ class PredLogicRuleChecker[F <: QuantifierFormula[F, T, V], T, V <: T](
 
     case EqualityElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => r0 match {
-        case Equals(t1, t2) => 
+        case t1 === t2 => 
           failIf(
             !substitutor.equalExcept(r1, formula, t1, t2),
             Ambiguous(MetaFormula(Formulas.Phi), List(

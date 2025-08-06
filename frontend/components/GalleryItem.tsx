@@ -7,8 +7,9 @@ import DeleteProofButton from "@/components/DeleteProofButton";
 import RenameProofButton from "@/components/RenameProofButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { ButtonGroup } from "./ui/button-group";
 
-function logicNameToString(name: LogicName): string {
+export function logicNameToString(name: LogicName): string {
   switch (name) {
     case 'propositionalLogic':
       return "Propositional logic"
@@ -30,7 +31,7 @@ function logicNameToIconLatex(name: LogicName, seed: string): string {
         return ["0", "1", "*", "+"]
     }
   })()
-  
+
   if (seed.length === 0) seed = "s" // must not be empty
   const number = seed.length + seed.split('').map(c => c.charCodeAt(0)).reduce((a, b) => a + b)
   return options[number % options.length]
@@ -50,27 +51,29 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
     <div onClick={_ => {
       router.push(`/proof?id=${proof.id}`)
     }}>
-    <Card 
-      className="grid grid-cols-[75px_auto_auto] h-24 gap-2 hover:brightness-95 p-0 overflow-hidden"
-    > 
+      <Card
+        className="grid grid-cols-[50px_auto_auto] sm:grid-cols-[75px_auto_auto] h-24 gap-2 hover:brightness-95 p-0 overflow-hidden cursor-pointer"
+      >
         <div className="flex items-center justify-center bg-gray-100">
-          <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)}/>
+          <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)} />
         </div>
         <div className="flex flex-col gap-2 justify-center overflow-hidden">
-          <p className="text text-lg font-bold text-nowrap overflow-scroll">{proof.title}</p>
+          <p className="text text-lg font-bold text-nowrap overflow-scroll cursor-text">{proof.title}</p>
           <p className="text-xs text-gray-500">
-            {logicNameToString(proof.logicName)}<br/>
+            {logicNameToString(proof.logicName)}<br />
             {createdAtString()}
           </p>
         </div>
-        <div 
-          className="flex items-center justify-end gap-1 pr-2" 
+        <div
+          className="flex items-center justify-end gap-1 pr-2"
           onClick={e => e.stopPropagation() /* don't let button clicks through to selecting this */}
         >
-          <DeleteProofButton proofId={proof.id}/>
-          <RenameProofButton proofId={proof.id}/>
-          <DownloadProofButton proofId={proof.id} />
+          <ButtonGroup orientation="vertical">
+            <DeleteProofButton proofId={proof.id} />
+            <DownloadProofButton proofId={proof.id} />
+          </ButtonGroup>
         </div>
+
       </Card>
     </div>
   );
@@ -78,21 +81,21 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
 
 export function GalleryItemSkeleton() {
   return (
-    <Card className="grid grid-cols-[75px_auto_auto] h-24 gap-2 p-0 overflow-hidden"> 
+    <Card className="grid grid-cols-[75px_auto_auto] h-24 gap-2 p-0 overflow-hidden">
       <div className="flex items-center justify-center bg-gray-100">
-        <Skeleton className="size-8"/>
+        <Skeleton className="size-8" />
       </div>
       <div className="flex flex-col gap-2 justify-center overflow-hidden">
-        <Skeleton className="w-24 h-4"/>
+        <Skeleton className="w-24 h-4" />
         <div className="flex flex-col gap-1">
-          <Skeleton className="w-32 h-2"/>
-          <Skeleton className="w-40 h-2"/>
+          <Skeleton className="w-32 h-2" />
+          <Skeleton className="w-40 h-2" />
         </div>
       </div>
       <div className="flex items-center justify-end gap-1 pr-2">
-        <Skeleton className="w-12 h-8"/>
-        <Skeleton className="w-12 h-8"/>
-        <Skeleton className="w-12 h-8"/>
+        <Skeleton className="w-12 h-8" />
+        <Skeleton className="w-12 h-8" />
+        <Skeleton className="w-12 h-8" />
       </div>
     </Card>
   );
