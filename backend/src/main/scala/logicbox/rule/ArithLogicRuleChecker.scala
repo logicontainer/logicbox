@@ -40,7 +40,7 @@ class ArithLogicRuleChecker[F, T, V <: T](
     rule match {
       case Peano1() => extractNFormulasAndThen(refs, 0) {
         case Nil => formula match {
-          case (t1 + _0) === t2 => 
+          case (t1 + _0()) === t2 => 
             failIf(t1 != t2, Ambiguous(MetaTerm(Terms.T), List(
               Location.conclusion.lhs.lhs,
               Location.conclusion.rhs
@@ -129,21 +129,20 @@ class ArithLogicRuleChecker[F, T, V <: T](
           case Some(n) => formula match {
             case ∀(x, phi) =>
               (substitutor.findReplacement(phi, r0, x) match {
-                case Some(()) => Nil
-                case Some(t: T) => t match {
-                  case _0() => Nil
-                  case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
-                    Location.conclusion.formulaInsideQuantifier,
-                    Location.premise(0).root,
-                    Location.premise(1).firstLine,
-                    Location.premise(1).lastLine
-                  )))
-                }
+                case Some(Left(())) => Nil
+                case Some(Right(_0())) => Nil
+                case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
+                  Location.conclusion.formulaInsideQuantifier,
+                  Location.premise(0).root,
+                  Location.premise(1).firstLine,
+                  Location.premise(1).lastLine
+                )))
 
               }) ++ (extractFirstLine(box) match {
                 case Some(ass) => 
                   substitutor.findReplacement(phi, ass, x) match {
-                    case Some(y) if y == n || y == () => Nil
+                    case Some(Right(y)) if y == n => Nil
+                    case Some(Left(())) => Nil
                     case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
                       Location.conclusion.formulaInsideQuantifier,
                       Location.premise(0).root,
@@ -158,17 +157,14 @@ class ArithLogicRuleChecker[F, T, V <: T](
               }) ++ (extractLastLine(box) match {
                 case Some(ass) => 
                   substitutor.findReplacement(phi, ass, x) match {
-                    case Some(()) => Nil
-                    // case Some(y + _1()) if y == n => Nil
-                    case Some(t: T) => t match {
-                      case y + _1() if y == n => Nil
-                      case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
-                        Location.conclusion.formulaInsideQuantifier,
-                        Location.premise(0).root,
-                        Location.premise(1).firstLine,
-                        Location.premise(1).lastLine
-                      )))
-                    }
+                    case Some(Left(())) => Nil
+                    case Some(Right(y + _1())) if y == n => Nil
+                    case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
+                      Location.conclusion.formulaInsideQuantifier,
+                      Location.premise(0).root,
+                      Location.premise(1).firstLine,
+                      Location.premise(1).lastLine
+                    )))
                   }
                   
                 case _ => 

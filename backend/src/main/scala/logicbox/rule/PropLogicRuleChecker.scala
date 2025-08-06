@@ -31,7 +31,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
 
     case AndElim(side) => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
-        case lhs & rhs => side match {
+        case lhs && rhs => side match {
           case Side.Left => 
             failIf(lhs != formula, Ambiguous(
               MetaFormula(Formulas.Phi), List(
@@ -55,7 +55,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
   
     case AndIntro() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => formula match {
-        case phi & psi =>
+        case phi && psi =>
           failIf(phi != r0, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.lhs,
             Location.premise(0).root
@@ -124,7 +124,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
   
     case ImplicationIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(box: Reference.Box[F, _]) => formula match {
-        case phi --> psi =>
+        case phi ~> psi =>
           val (ass, concl) = (extractFirstLine(box), extractLastLine(box))
           failIf(Some(phi) != ass, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.conclusion.lhs,
@@ -142,7 +142,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
 
     case ImplicationElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) => r1 match {
-        case from --> to => 
+        case from ~> to => 
           failIf(from != r0, Ambiguous(MetaFormula(Formulas.Phi), List(
             Location.premise(0).root,
             Location.premise(1).lhs
@@ -160,7 +160,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
     case NotIntro() => extractAndThen(refs, List(BoxOrFormula.Box)) {
       case List(b: Box[F, ?]) => 
         { extractLastLine(b) match {
-          case Some(⊥) => Nil
+          case Some(Contradiction()) => Nil
 
           case _ => 
             fail(ShapeMismatch(Location.premise(0).lastLine))
@@ -182,7 +182,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
     case NotElim() => extractNFormulasAndThen(refs, 2) {
       case List(r0, r1) =>
         { formula match {
-          case ⊥ => Nil
+          case Contradiction() => Nil
           case _ => fail(ShapeMismatch(Location.conclusion))
         }} ++ { r1 match {
           case ~(phi) => 
@@ -197,7 +197,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
     }
 
     case ContradictionElim() => extractNFormulasAndThen(refs, 1) {
-      case List(⊥) => Nil
+      case List(Contradiction()) => Nil
       case _ => fail(ShapeMismatch(Location.premise(0)))
     }
 
@@ -219,7 +219,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
           case _ => 
             fail(ShapeMismatch(Location.conclusion))
         }} ++ { r0 match {
-          case _ --> _ => Nil
+          case _ ~> _ => Nil
           case _ => 
             fail(ShapeMismatch(Location.premise(0)))
         }} ++ { r1 match {
@@ -227,7 +227,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
           case _ => 
             fail(ShapeMismatch(Location.premise(1)))
         }} ++ { (formula, r0, r1) match {
-          case (~(phi2), phi1 --> psi1, ~(psi2)) =>
+          case (~(phi2), phi1 ~> psi1, ~(psi2)) =>
             failIf(phi2 != phi1, Ambiguous(MetaFormula(Formulas.Phi), List(
               Location.conclusion.negated,
               Location.premise(0).lhs
@@ -268,7 +268,7 @@ extends RuleChecker[F, PropLogicRule, Any] {
         }
       } ++ { 
         concl match {
-          case Some(Reference.Line(⊥)) => Nil
+          case Some(Reference.Line(Contradiction())) => Nil
           case _ => 
             fail(ShapeMismatch(Location.premise(0).lastLine))
         }

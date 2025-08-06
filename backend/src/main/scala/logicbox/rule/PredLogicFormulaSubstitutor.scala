@@ -64,20 +64,20 @@ class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogi
     case Exists(_, phi) => hasFreeOccurance(phi, t)
   }
 
-  private type Repl = Option[PredLogicTerm | Unit]
+  private type Repl = Option[Either[Unit, PredLogicTerm]]
 
   private def unifyReplacements(repls: Set[Repl]): Repl = {
     if repls.contains(None) then None else {
       val ts = repls.collect { 
-        case Some(t: PredLogicTerm) => t
+        case Some(Right(t)) => t
       }
 
       if ts.isEmpty then 
-        Some(())
+        Some(Left(()))
       else if ts.size > 1 then 
         None 
       else 
-        Some(ts.head)
+        Some(Right(ts.head))
     }
   }
 
@@ -88,13 +88,13 @@ class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogi
   private def findReplacement(src: PredLogicTerm, dst: PredLogicTerm, x: Var): Repl = {
     (src, dst) match {
       case _ if src == x => 
-        Some(dst)
+        Some(Right(dst))
 
       case (FunAppl(f, ys), FunAppl(g, zs)) if f == g =>
         unifyReplacements(findReplacements(ys, zs, x))
 
       case (y: Var, z: Var) if y == z => 
-        Some(())
+        Some(Left(()))
 
       case _ => None
     }
@@ -108,7 +108,7 @@ class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogi
     if x != y then
       findReplacement(phi1, phi2, x)
     else if phi1 == phi2 then
-      Some(())
+      Some(Left(()))
     else None
   }
 
@@ -149,8 +149,8 @@ class PredLogicFormulaSubstitutor extends Substitutor[PredLogicFormula, PredLogi
       case (Exists(y, phi1), Exists(z, phi2)) if y == z => 
         findReplacementInsideQuantifiers(y, phi1, phi2, x)
 
-      case (Contradiction(), Contradiction()) => Some(())
-      case (Tautology(), Tautology()) => Some(())
+      case (Contradiction(), Contradiction()) => Some(Left(()))
+      case (Tautology(), Tautology()) => Some(Left(()))
 
       case _ => None
     }

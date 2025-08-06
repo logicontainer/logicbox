@@ -16,6 +16,6 @@ object QuantifierFormula {
   }
 
   object === {
-    def unapply[F, T](f: F)(implicit q: QuantifierFormula[F, T, ?]): Option[(T, T)] = q.unapplyEquals(f)
+    infix def unapply[F, T](f: F)(implicit q: QuantifierFormula[F, T, ?]): Option[(T, T)] = q.unapplyEquals(f)
   }
 }
