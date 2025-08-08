@@ -37,6 +37,21 @@ class FormulaSubstitutor[K <: (FormulaKind.Pred | FormulaKind.Arith)] extends Su
     case Exists(y, phi) => Exists(y, substitute(phi, t, x))
   }
 
+  private def freeVarsIn(t: Term[K]): Set[Var] = t match {
+    case x: Var => Set(x)
+    case _ => ???
+  }
+  
+
+  override def isFreeFor(f: Formula[K], t: Term[K], x: Var): Boolean = {
+    val freeVars = freeVarsIn(t)
+    def visit(ff: Formula[K]): Boolean = ff match {
+      case ForAll(y, phi) if freeVars contains y => hasFreeOccurance(phi, x)
+      case _ => ???
+    }
+    visit(f)
+  }
+  
   // true iff v contains occurance of t
   private def hasFreeOccurance(v: Term[K], t: Term[K]): Boolean = 
     v == t || (v match {
