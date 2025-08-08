@@ -143,6 +143,15 @@ object Parser extends PackratParsers {
     connectiveExp(atomicexps)
   }
 
+  def arithLogicFormula: Parser[Formula[Arith]] = {
+    def atomicexps: Parser[Formula[Arith]] =
+      equalityexp(arithTerm) | 
+        quantexp(varexp, arithLogicFormula) |
+        contrexp[Arith] | tautexp[Arith]
+
+    connectiveExp(atomicexps)
+  }
+
   def parse[T](input: List[Token], parser: Parser[T]): T = {
     phrase(parser)(TokenReader(input)) match {
       case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
