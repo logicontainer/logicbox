@@ -5,12 +5,13 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 import logicbox.framework.Location
+import logicbox.framework.Navigator
 
 class ArithLogicFormulaNavigatorTest extends AnyFunSpec {
   describe("get") {
-    val nav = ArithLogicFormulaNavigator()
-    def parse(str: String) = ArithLogicParser().parseFormula(ArithLogicLexer()(str))
-    def tparse(str: String) = ArithLogicParser().parseTerm(ArithLogicLexer()(str))
+    val nav: Navigator[ArithLogicFormula, ArithLogicTerm | ArithLogicFormula] = FormulaNavigator()
+    def parse(str: String) = Parser.parse(Lexer(str), Parser.arithLogicFormula)
+    def tparse(str: String) = Parser.parse(Lexer(str), Parser.arithLogicTerm)
 
     it("should properly obtain the root") {
       nav.get(parse("a = a"), Location.root) shouldBe Some(parse("a = a"))

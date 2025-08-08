@@ -7,6 +7,7 @@ import logicbox.proof._
 import logicbox.server.format._
 import logicbox.framework.RulePart.TemplateTerm
 import logicbox.framework.RulePart.TemplateFormula
+import logicbox.rule.ReferenceUtil.BoxOrFormula
 
 // 'factory'
 object PropLogicProofValidatorService {
@@ -54,7 +55,7 @@ object PropLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(PropLogicParser()(PropLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.propLogicFormula))
     } catch { case _ => None }
   }
 
@@ -88,9 +89,11 @@ class PropLogicProofValidatorService extends ProofValidatorServiceImpl[
   proofChecker = proofChecker,
   createErrorConverter = pf => createErrorConverter(
     pf,
-    PropLogicFormulaNavigator(),
+    FormulaNavigator(),
     NoBoxInfoNavigator(),
     getInfRule,
-    Stringifiers.propLogicFormulaAsLaTeX
+    f => f match {
+      case f: Formula[FormulaKind.Prop] => Stringifiers.propLogicFormulaAsLaTeX(f)
+    }
   )
 )

@@ -17,9 +17,7 @@ import logicbox.rule.PropLogicRule.Premise => PremiseRULE // rename to avoid col
 class PropLogicRuleCheckerTest extends AnyFunSpec {
   import logicbox.formula._
 
-  private val lexer = PropLogicLexer()
-  private val parser = PropLogicParser()
-  private def parse(str: String): PropLogicFormula = parser(lexer(str))
+  private def parse(str: String): PropLogicFormula = Parser.parse(Lexer(str), Parser.propLogicFormula)
 
   // fake things so tests still work (a little hacky, i admit)
   private case class Line(formula: PropLogicFormula, rule: PropLogicRule, refs: List[Reference[PropLogicFormula, PLBoxInfo]])

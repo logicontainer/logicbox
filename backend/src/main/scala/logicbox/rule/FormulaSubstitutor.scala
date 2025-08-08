@@ -1,21 +1,26 @@
 package logicbox.rule
 
-import logicbox.formula.ArithLogicTerm
-import logicbox.formula.ArithLogicFormula
-import logicbox.formula.ArithLogicTerm._
-import logicbox.formula.ArithLogicFormula._
-import scala.compiletime.ops.boolean
+import logicbox.formula._, Term._, Formula._
 
-class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithLogicTerm, ArithLogicTerm.Var] {
-  private def substitute(src: ArithLogicTerm, t: ArithLogicTerm, x: Var): ArithLogicTerm = src match {
+class FormulaSubstitutor[K <: (FormulaKind.Pred | FormulaKind.Arith)] extends Substitutor[Formula[K], Term[K], Term.Var[K]] {
+  type Var = Term.Var[K]
+
+  private def substitute(src: Term[K], t: Term[K], x: Var): Term[K] = src match {
     case y: Var if y == x => t
     case y: Var => y
+
     case Zero() | One() => src
-    case Plus(s1, s2) => Plus(substitute(s1, t, x), substitute(s2, t, x))
-    case Mult(s1, s2) => Mult(substitute(s1, t, x), substitute(s2, t, x))
+
+    case FunAppl(f, ps) => 
+      FunAppl(f, ps.map(substitute(_, t, x)))
+
+    case Plus(t1, t2) => Plus(substitute(t1, t, x), substitute(t2, t, x))
+    case Mult(t1, t2) => Mult(substitute(t1, t, x), substitute(t2, t, x))
   }
 
-  override def substitute(f: ArithLogicFormula, t: ArithLogicTerm, x: Var): ArithLogicFormula = f match {
+  override def substitute(f: Formula[K], t: Term[K], x: Var): Formula[K] = f match {
+    case Predicate(p, ps) => Predicate(p, ps.map(substitute(_, t, x)))
+
     case And(phi, psi) =>     And(substitute(phi, t, x), substitute(psi, t, x))
     case Or(phi, psi) =>      Or(substitute(phi, t, x), substitute(psi, t, x))
     case Implies(phi, psi) => Implies(substitute(phi, t, x), substitute(psi, t, x))
@@ -33,17 +38,19 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
   }
 
   // true iff v contains occurance of t
-  private def hasFreeOccurance(v: ArithLogicTerm, t: ArithLogicTerm): Boolean = 
+  private def hasFreeOccurance(v: Term[K], t: Term[K]): Boolean = 
     v == t || (v match {
-      case _: Var => false
+      case FunAppl(_, ps) => ps.exists(hasFreeOccurance(_, t))
       case Plus(t1, t2) => hasFreeOccurance(t1, t) || hasFreeOccurance(t2, t)
       case Mult(t1, t2) => hasFreeOccurance(t1, t) || hasFreeOccurance(t2, t)
-      case Zero() => false
-      case One() => false
+      case Var(_) | One() | Zero() => false
     })
 
-  override def hasFreeOccurance(f: ArithLogicFormula, t: ArithLogicTerm): Boolean = f match {
-    case f: (And | Or | Implies) => 
+  override def hasFreeOccurance(f: Formula[K], t: Term[K]): Boolean = f match {
+    case Predicate(p, ps) => 
+      ps.exists(hasFreeOccurance(_, t))
+
+    case f @ (And(_, _) | Or(_, _) | Implies(_, _)) => 
       hasFreeOccurance(f.phi, t) || hasFreeOccurance(f.psi, t)
 
     case Not(phi) => 
@@ -61,7 +68,7 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     case Exists(_, phi) => hasFreeOccurance(phi, t)
   }
 
-  private type Repl = Option[Either[Unit, ArithLogicTerm]]
+  private type Repl = Option[Either[Unit, Term[K]]]
 
   private def unifyReplacements(repls: Set[Repl]): Repl = {
     if repls.contains(None) then None else {
@@ -78,17 +85,17 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     }
   }
 
-  private def findReplacements(ts1: List[ArithLogicTerm], ts2: List[ArithLogicTerm], x: Var): Set[Repl] = {
+  private def findReplacements(ts1: List[Term[K]], ts2: List[Term[K]], x: Var): Set[Repl] = {
     ts1.zip(ts2).map((t1, t2) => findReplacement(t1, t2, x)).toSet
   }
 
-  private def findReplacement(src: ArithLogicTerm, dst: ArithLogicTerm, x: Var): Repl = {
+  private def findReplacement(src: Term[K], dst: Term[K], x: Var): Repl = {
     (src, dst) match {
       case _ if src == x => 
         Some(Right(dst))
 
-      case (y: Var, z: Var) if y == z => 
-        Some(Left(()))
+      case (FunAppl(f, ys), FunAppl(g, zs)) if f == g =>
+        unifyReplacements(findReplacements(ys, zs, x))
 
       case (Plus(t1, t2), Plus(t3, t4)) =>
         unifyReplacements(Set(
@@ -102,6 +109,9 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
           findReplacement(t2, t4, x),
         ))
 
+      case (y: Var, z: Var) if y == z => 
+        Some(Left(()))
+
       case (Zero(), Zero()) => Some(Left(()))
       case (One(), One()) => Some(Left(()))
 
@@ -111,7 +121,7 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
 
   // two quantifiers Q y phi1 and Q y phi2 (with repl. var x)
   private def findReplacementInsideQuantifiers(
-    y: Var, phi1: ArithLogicFormula, phi2: ArithLogicFormula,
+    y: Var, phi1: Formula[K], phi2: Formula[K],
     x: Var
   ): Repl = {
     if x != y then
@@ -121,13 +131,16 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     else None
   }
 
-  override def findReplacement(src: ArithLogicFormula, dst: ArithLogicFormula, x: Var): Repl = {
+  override def findReplacement(src: Formula[K], dst: Formula[K], x: Var): Repl = {
     (src, dst) match {
       case (Equals(l1, r1), Equals(l2, r2)) => 
         unifyReplacements(Set(
           findReplacement(l1, l2, x),
           findReplacement(r1, r2, x)
         ))
+
+      case (Predicate(p, ps), Predicate(q, qs)) if p == q => 
+        unifyReplacements(findReplacements(ps, qs, x))
 
       case (And(phi1, psi1), And(phi2, psi2)) => 
         unifyReplacements(Set(
@@ -162,12 +175,15 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     }
   }
 
-  private def equalExcept(vs1: List[ArithLogicTerm], vs2: List[ArithLogicTerm], t1: ArithLogicTerm, t2: ArithLogicTerm): Boolean = {
+  private def equalExcept(vs1: List[Term[K]], vs2: List[Term[K]], t1: Term[K], t2: Term[K]): Boolean = {
     vs1.zip(vs2).forall((x, y) => equalExcept(x, y, t1, t2))
   }
 
-  private def equalExcept(v1: ArithLogicTerm, v2: ArithLogicTerm, t1: ArithLogicTerm, t2: ArithLogicTerm): Boolean = {
+  private def equalExcept(v1: Term[K], v2: Term[K], t1: Term[K], t2: Term[K]): Boolean = {
     v1 == v2 || (v1 == t1 && v2 == t2) || ((v1, v2) match {
+      case (FunAppl(f, xs), FunAppl(g, ys)) if f == g =>
+        equalExcept(xs, ys, t1, t2)
+
       case (Plus(s1, s2), Plus(s3, s4)) => 
         equalExcept(s1, s3, t1, t2) && equalExcept(s2, s4, t1, t2)
 
@@ -178,8 +194,11 @@ class ArithLogicFormulaSubstitutor extends Substitutor[ArithLogicFormula, ArithL
     })
   }
 
-  override def equalExcept(f1: ArithLogicFormula, f2: ArithLogicFormula, t1: ArithLogicTerm, t2: ArithLogicTerm): Boolean = {
+  override def equalExcept(f1: Formula[K], f2: Formula[K], t1: Term[K], t2: Term[K]): Boolean = {
     (f1, f2) match {
+      case (Predicate(p, xs), Predicate(q, ys)) if p == q =>
+        equalExcept(xs, ys, t1, t2)
+
       case (Equals(l1, r1), Equals(l2, r2)) =>
         equalExcept(l1, l2, t1, t2) && equalExcept(r1, r2, t1, t2)
 

@@ -6,10 +6,8 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
-import logicbox.formula.ArithLogicTerm
-import logicbox.formula.ArithLogicFormula
-import logicbox.formula.ArithLogicParser
-import logicbox.formula.ArithLogicLexer
+import logicbox.formula._
+
 import logicbox.framework._
 import logicbox.rule.ArithLogicRule._
 import logicbox.framework.Error._
@@ -18,24 +16,26 @@ import logicbox.framework.RulePosition.Premise
 
 class ArithLogicRuleCheckerTest extends AnyFunSpec {
   def parse(str: String): ArithLogicFormula = {
-    ArithLogicParser().parseFormula(ArithLogicLexer()(str))
+    Parser.parse(Lexer(str), Parser.arithLogicFormula)
   }
 
-  import logicbox.formula.{arithLogicFormulaIsConnectiveFormula, arithLogicFormulaIsQuantifierFormula, arithLogicTermIsArithmeticTerm}
+  type Arith = FormulaKind.Arith
+
+  import logicbox.formula.{asConnectiveFormula, asQuantifierFormula, asArithmeticTerm}
 
   val checker = ArithLogicRuleChecker[
     ArithLogicFormula,
     ArithLogicTerm,
-    ArithLogicTerm.Var
-  ](ArithLogicFormulaSubstitutor())
+    Term.Var[FormulaKind.Arith]
+  ](FormulaSubstitutor())
 
-  private type BI = FreshVarBoxInfo[ArithLogicTerm.Var]
+  private type BI = FreshVarBoxInfo[Term.Var[Arith]]
 
   private case class Line(formula: ArithLogicFormula, rule: ArithLogicRule, refs: List[Reference[ArithLogicFormula, BI]])
     extends Reference.Line[ArithLogicFormula]
 
   private case class Box(fst: Option[Reference[ArithLogicFormula, BI]], lst: Option[Reference[ArithLogicFormula, BI]], freshVar: Option[String]) extends Reference.Box[ArithLogicFormula, BI] {
-    override def info = FreshVarBoxInfo(freshVar.map(ArithLogicTerm.Var(_)))
+    override def info = FreshVarBoxInfo(freshVar.map(Term.Var(_)))
     override def first = fst
     override def last = lst
   }

@@ -7,12 +7,8 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
-import logicbox.formula.{PredLogicLexer, PredLogicParser, PredLogicFormula}
 import logicbox.rule.PredLogicRuleChecker
 
-import logicbox.formula.PredLogicFormula._
-import logicbox.formula.PredLogicTerm
-import logicbox.formula.PredLogicTerm._
 import logicbox.rule.PredLogicRule._
 import org.scalactic.Equality
 import logicbox.framework.RulePosition.Premise
@@ -23,14 +19,18 @@ import logicbox.framework.RulePart.MetaTerm
 import logicbox.framework.RulePart.Formulas
 import logicbox.framework.RulePart.Terms
 import logicbox.framework.RulePart.Vars
+import logicbox.formula.Term
+import logicbox.formula.FormulaKind
+import logicbox.formula.Term.Var
+import logicbox.formula.PredLogicTerm
+import logicbox.formula.Parser
+import logicbox.formula.Lexer
+import logicbox.formula.PredLogicFormula
 
 class PredLogicRuleCheckerTest extends AnyFunSpec {
-  private val lexer = PredLogicLexer()
-  private val parser = PredLogicParser()
+  private type BI = FreshVarBoxInfo[Term.Var[FormulaKind.Pred]]
 
-  private type BI = FreshVarBoxInfo[PredLogicTerm.Var]
-
-  private def parse(str: String): PredLogicFormula = parser.parseFormula(lexer(str))
+  private def parse(str: String): PredLogicFormula = Parser.parse(Lexer(str), Parser.predLogicFormula)
 
   private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, BI]])
     extends Reference.Line[PredLogicFormula]
@@ -52,9 +52,9 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       if fresh === "" then None else Some(fresh)
     )
 
-  import logicbox.formula.{predLogicFormulaAsConnectiveFormula, predLogicFormulaAsQuantifierFormula}
-  private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, PredLogicTerm.Var](
-    PredLogicFormulaSubstitutor()
+  import logicbox.formula.{asConnectiveFormula, asQuantifierFormula}
+  private val checker = PredLogicRuleChecker[PredLogicFormula, PredLogicTerm, Term.Var[FormulaKind.Pred]](
+    FormulaSubstitutor()
   )
 
   describe("ForAllElim") {
