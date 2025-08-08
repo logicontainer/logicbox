@@ -16,7 +16,7 @@ import logicbox.framework.RulePosition.Premise
 
 class ArithLogicRuleCheckerTest extends AnyFunSpec {
   def parse(str: String): ArithLogicFormula = {
-    ArithLogicParser().parseFormula(ArithLogicLexer()(str))
+    Parser.parse(Lexer(str), Parser.arithLogicFormula)
   }
 
   type Arith = FormulaKind.Arith

@@ -5,7 +5,6 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
-import logicbox.formula.{ArithLogicLexer, ArithLogicParser, ArithLogicFormula}
 import logicbox.formula.Term._
 import logicbox.formula.Formula._
 import logicbox.formula._
@@ -14,9 +13,7 @@ class ArithLogicFormulaSubstitutorTest extends AnyFunSpec {
   private type Arith = FormulaKind.Arith
 
   private def parse(str: String): ArithLogicFormula = {
-    val lexer = ArithLogicLexer()
-    val parser = ArithLogicParser()
-    parser.parseFormula(lexer(str))
+    Parser.parse(Lexer(str), Parser.arithLogicFormula)
   }
 
   val substitutor = FormulaSubstitutor[Arith]()

@@ -79,13 +79,13 @@ object ArithLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(ArithLogicParser().parseFormula(ArithLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.arithLogicFormula))
     } catch { case _ => None }
   }
 
   private def parseVariable(userInput: String): Option[Term.Var[FormulaKind.Arith]] = {
     try {
-      Some(ArithLogicParser().parseVariable(ArithLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.variable))
     } catch { case _ => None }
   }
 

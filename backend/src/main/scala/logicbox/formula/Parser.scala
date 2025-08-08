@@ -12,7 +12,7 @@ object Parser extends PackratParsers {
 
   private def withParens[T](p: Parser[T]): Parser[T] = Token.LeftParen() ~> p <~ Token.RightParen()
 
-  def varexp[K <: (Pred | Arith)]: Parser[Term.Var[K]] = accept("variable", { case Token.Ident(c) => Var(c) })
+  def variable[K <: (Pred | Arith)]: Parser[Term.Var[K]] = accept("variable", { case Token.Ident(c) => Var(c) })
 
   def oneexp: Parser[One] = Token.One() ^^^ One()
   def zeroexp: Parser[Zero] = Token.Zero() ^^^ Zero()
@@ -52,8 +52,8 @@ object Parser extends PackratParsers {
     }
   }
 
-  def arithTerm: Parser[Term[Arith]] = {
-    def arithTerm1 = oneexp | zeroexp | varexp | withParens(arithTerm)
+  def arithLogicTerm: Parser[Term[Arith]] = {
+    def arithTerm1 = oneexp | zeroexp | variable | withParens(arithLogicTerm)
     def arithTerm2 = multexp(arithTerm1) | arithTerm1
     def arithTerm3 = plusexp(arithTerm2) | arithTerm2
 
@@ -128,16 +128,18 @@ object Parser extends PackratParsers {
     }
   }
 
-  def propLogicFormula: Parser[Formula[Prop]] = connectiveExp(atomexp)
+  def propLogicFormula: Parser[Formula[Prop]] = {
+    connectiveExp(atomexp | tautexp[Prop] | contrexp[Prop])
+  }
 
   def predLogicTerm: Parser[Term[Pred]] =
-    funcexp(termlistexp(predLogicTerm)) | varexp
+    funcexp(termlistexp(predLogicTerm)) | variable
 
   def predLogicFormula: Parser[Formula[Pred]] = {
     def atomicexps: Parser[Formula[Pred]] =
       equalityexp(predLogicTerm) | 
         predexp(termlistexp(predLogicTerm)) | 
-        quantexp(varexp, predLogicFormula) |
+        quantexp(variable, predLogicFormula) |
         contrexp[Pred] | tautexp[Pred]
 
     connectiveExp(atomicexps)
@@ -145,8 +147,8 @@ object Parser extends PackratParsers {
 
   def arithLogicFormula: Parser[Formula[Arith]] = {
     def atomicexps: Parser[Formula[Arith]] =
-      equalityexp(arithTerm) | 
-        quantexp(varexp, arithLogicFormula) |
+      equalityexp(arithLogicTerm) | 
+        quantexp(variable, arithLogicFormula) |
         contrexp[Arith] | tautexp[Arith]
 
     connectiveExp(atomicexps)

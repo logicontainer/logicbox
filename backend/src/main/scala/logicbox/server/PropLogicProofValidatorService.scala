@@ -55,7 +55,7 @@ object PropLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(PropLogicParser()(PropLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.propLogicFormula))
     } catch { case _ => None }
   }
 

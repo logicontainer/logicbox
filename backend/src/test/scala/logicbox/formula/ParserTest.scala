@@ -24,6 +24,13 @@ class ParserTest extends AnyFunSpec {
       val ts3 = List(Ident("p"), Token.Implies(), Ident("q"), Token.Implies(), Token.Not(), Ident("r"))
       parse(ts3) shouldBe Formula.Implies(Atom('p'), Formula.Implies(Atom('q'), Formula.Not(Atom('r'))))
     }
+
+    it("should parse contr/taut") {
+      val ts1 = List(Token.Contradiction())
+      val ts2 = List(Token.Tautology())
+      parse(ts1) shouldBe Formula.Contradiction()
+      parse(ts2) shouldBe Formula.Tautology()
+    }
   }
 
   describe("parse pred logic formulas") {
