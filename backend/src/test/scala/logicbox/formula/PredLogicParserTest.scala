@@ -6,9 +6,9 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
 class PredLogicParserTest extends AnyFunSpec {
-  import PredLogicToken._
   import Formula._
   import Term._
+  import Token._
 
   describe("apply"){
     it("should parse predicate of variable") {
@@ -18,7 +18,7 @@ class PredLogicParserTest extends AnyFunSpec {
         RightParen(),
       )
 
-      PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List(Var("x")))
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Predicate("P", List(Var("x")))
     }
     
     it("should parse the empty predicate") {
@@ -26,13 +26,23 @@ class PredLogicParserTest extends AnyFunSpec {
         Ident("P")
       )
 
-      PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List())
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Predicate("P", List())
 
       val ts2 = List(
-        Ident("P"), PredLogicToken.Implies(), Ident("Q")
+        Ident("P"), Token.Implies(), Ident("Q")
       )
 
-      PredLogicParser().parseFormula(ts2) shouldBe Formula.Implies(Predicate("P", List()), Predicate("Q", List()))
+      Parser.parse(ts2, Parser.predLogicFormula) shouldBe Formula.Implies(Predicate("P", List()), Predicate("Q", List()))
+    }
+
+    it("should parse function") {
+      val ts = List(Ident("f"), LeftParen(), Ident("x"), RightParen())
+      Parser.parse(ts, Parser.predLogicTerm) shouldBe Term.FunAppl("f", List(Var("x")))
+    }
+
+    it("should parse functions with multiple arguments") {
+      val ts = List(Ident("f"), LeftParen(), Ident("x"), Comma(), Ident("y"), RightParen())
+      Parser.parse(ts, Parser.predLogicTerm) shouldBe Term.FunAppl("f", List(Var("x"), Var("y")))
     }
 
     it("should parse predicate of function vars") {
@@ -47,7 +57,7 @@ class PredLogicParserTest extends AnyFunSpec {
         RightParen(),
       )
 
-      PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List(
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Predicate("P", List(
         FunAppl("f", List(Var("y"))),
         FunAppl("g", List(Var("x"))),
       ))
@@ -56,11 +66,11 @@ class PredLogicParserTest extends AnyFunSpec {
     it("should parse predicate of multiple vars") {
       val ts = List(
         Ident("P"), LeftParen(),
-          Ident("x"), Comma(), Ident("y"),
+          Ident("x"), Comma(), Ident("y"), Comma(), Ident("z"),
         RightParen(),
       )
 
-      PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List(Var("x"), Var("y")))
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Predicate("P", List(Var("x"), Var("y"), Var("z")))
     }
 
     it("should parse predicate of complicated terms") {
@@ -79,7 +89,7 @@ class PredLogicParserTest extends AnyFunSpec {
         RightParen(),
       )
 
-      PredLogicParser().parseFormula(ts) shouldBe Predicate("P", List(
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Predicate("P", List(
         FunAppl("f", List(
           Var("x"), 
           Var("y"), 
@@ -91,24 +101,24 @@ class PredLogicParserTest extends AnyFunSpec {
 
     it("should parse exists and forall") {
       val ts1 = List(
-        PredLogicToken.Exists(), Ident("x"), Ident("P"), LeftParen(), Ident("x"), RightParen(),
+        Token.Exists(), Ident("x"), Ident("P"), LeftParen(), Ident("x"), RightParen(),
       )
       val ts2 = List(
-        PredLogicToken.ForAll(), Ident("x"), Ident("P"), LeftParen(), Ident("x"), RightParen(),
+        Token.ForAll(), Ident("x"), Ident("P"), LeftParen(), Ident("x"), RightParen(),
       )
       val ts3 = List(
-        PredLogicToken.ForAll(), Ident("x"), PredLogicToken.Exists(), Ident("y"), PredLogicToken.ForAll(), Ident("z"), 
+        Token.ForAll(), Ident("x"), Token.Exists(), Ident("y"), Token.ForAll(), Ident("z"), 
           Ident("P"), LeftParen(),
             Ident("x"), Comma(), Ident("y"), Comma(), Ident("z"),
           RightParen()
       )
 
-      PredLogicParser().parseFormula(ts1) shouldBe 
+      Parser.parse(ts1, Parser.predLogicFormula) shouldBe 
         Formula.Exists(Var("x"), Predicate("P", List(Var("x"))))
-      PredLogicParser().parseFormula(ts2) shouldBe 
+      Parser.parse(ts2, Parser.predLogicFormula) shouldBe 
         Formula.ForAll(Var("x"), Predicate("P", List(Var("x"))))
 
-      PredLogicParser().parseFormula(ts3) shouldBe
+      Parser.parse(ts3, Parser.predLogicFormula) shouldBe
         Formula.ForAll(Var("x"), 
           Formula.Exists(Var("y"), 
             Formula.ForAll(Var("z"),
@@ -121,21 +131,50 @@ class PredLogicParserTest extends AnyFunSpec {
           )
         )
     }
+
+    it("should correctly parenthesize things") {
+      val ts = List(
+        Ident("P"), Token.Implies(), Ident("L"), Token.Or(), Ident("Q"), Token.And(), Token.Not(), 
+        LeftParen(), 
+          Ident("R"), Token.Implies(), Ident("Q"), Token.Implies(), Ident("S"), 
+        RightParen()
+      )
+
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Formula.Implies(
+        Predicate("P", Nil), 
+        Formula.And(
+          Formula.Or(Predicate("L", Nil), Predicate("Q", Nil)),
+          Formula.Not(
+            Formula.Implies(
+              Predicate("R", Nil),
+              Formula.Implies(Predicate("Q", Nil), Predicate("S", Nil))
+            )
+          )
+        )
+      )
+    }
+
+    it("should parse contr/taut") {
+      val ts1 = List(Token.Contradiction())
+      val ts2 = List(Token.Tautology())
+      Parser.parse(ts1, Parser.predLogicFormula) shouldBe Formula.Contradiction()
+      Parser.parse(ts2, Parser.predLogicFormula) shouldBe Formula.Tautology()
+    }
     
     it("should parse equality of terms") {
-      val ts1 = List(Ident("x"), PredLogicToken.Equals(), Ident("y"))
+      val ts1 = List(Ident("x"), Token.Equals(), Ident("y"))
       val ts2 = List(
         Ident("f"), LeftParen(), Ident("x"), Comma(), Ident("y"), RightParen(), 
-        PredLogicToken.Equals(), 
+        Token.Equals(), 
         Ident("g"), LeftParen(), Ident("y"), RightParen(),
       )
 
-      PredLogicParser().parseFormula(ts1) shouldBe Formula.Equals(
+      Parser.parse(ts1, Parser.predLogicFormula) shouldBe Formula.Equals(
         Term.Var("x"),
         Term.Var("y"),
       )
 
-      PredLogicParser().parseFormula(ts2) shouldBe
+      Parser.parse(ts2, Parser.predLogicFormula) shouldBe
         Formula.Equals(
           Term.FunAppl("f", List(Term.Var("x"), Term.Var("y"))),
           Term.FunAppl("g", List(Term.Var("y"))),

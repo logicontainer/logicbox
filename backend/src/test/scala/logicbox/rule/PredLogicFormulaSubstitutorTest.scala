@@ -13,9 +13,7 @@ class PredLogicFormulaSubstitutorTest extends AnyFunSpec {
   private type Pred = FormulaKind.Pred
 
   private def parse(str: String): PredLogicFormula = {
-    val lexer = PredLogicLexer()
-    val parser = PredLogicParser()
-    parser.parseFormula(lexer(str))
+    Parser.parse(Lexer(str), Parser.predLogicFormula)
   }
 
   val substitutor = FormulaSubstitutor[Pred]()

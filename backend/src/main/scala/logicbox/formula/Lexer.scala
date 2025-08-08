@@ -3,7 +3,7 @@ package logicbox.formula
 import scala.util.parsing.combinator.RegexParsers
 import scala.util.parsing.input.{ Reader, Position, NoPosition }
 
-class Lexer extends RegexParsers {
+object Lexer extends RegexParsers {
   import Token._
   override def skipWhitespace = true
   
@@ -21,11 +21,12 @@ class Lexer extends RegexParsers {
   def exists = ("exists" | "EXISTS" | "∃") ^^^ Exists()
   def ident = """[A-Za-z]+((_\d)|(_\{\d+\}))?""".r ^^ { str => Ident(str) }
   def equalss = "=" ^^^ Equals()
+  def comma = "," ^^^ Comma()
   
   def leftParen = "(" ^^^ LeftParen()
   def rightParen = ")" ^^^ RightParen()
 
-  def token: Parser[Token] = and | or | not | implies | plus | mult | zero | one | contradiction | tautology | leftParen | rightParen | forall | exists | ident | equalss
+  def token: Parser[Token] = and | or | not | implies | plus | mult | zero | one | contradiction | tautology | leftParen | rightParen | forall | exists | ident | equalss | comma
   def tokens: Parser[List[Token]] = rep1(token)
 
   def apply(input: String): List[Token] =

@@ -12,7 +12,6 @@ object Parser extends PackratParsers {
 
   private def withParens[T](p: Parser[T]): Parser[T] = Token.LeftParen() ~> p <~ Token.RightParen()
 
-
   def varexp[K <: (Pred | Arith)]: Parser[Term.Var[K]] = accept("variable", { case Token.Ident(c) => Var(c) })
 
   def oneexp: Parser[One] = Token.One() ^^^ One()
@@ -36,16 +35,20 @@ object Parser extends PackratParsers {
     }
   }
 
-  def funcsymb: Parser[String] = accept("predicate symbol", { case Token.Ident(p) => p })
-  def funcexp(termListParser: Parser[List[Term[Pred]]]): Parser[FunAppl] = (funcsymb ~ withParens(termListParser)) ^^ {
-    case f ~ ts => FunAppl(f, ts)
-  }
-
-  def termlistexp[K <: (Pred | Arith)](termParser: Parser[Term[Pred]]) = {
-    (rep(termParser ~ Token.Comma()) ~ termParser) ^^ {
+  def termlistexp[K <: (Arith | Pred)](termexp: Parser[Term[K]]): Parser[List[Term[K]]] = {
+    (rep(termexp ~ Token.Comma()) ~ termexp) ^^ {
       case ls ~ t => ls.foldRight(List(t)) {
         case ((term ~ _), ts) => term :: ts
       }
+    }
+  }
+
+  def funcsymb: Parser[String] = 
+    accept("function symbol", { case Token.Ident(f) => f })
+
+  def funcexp(termListParser: => Parser[List[Term[Pred]]]): Parser[FunAppl] = {
+    (funcsymb ~ withParens(termListParser)) ^^ {
+      case f ~ ts => FunAppl(f, ts)
     }
   }
 
@@ -57,14 +60,20 @@ object Parser extends PackratParsers {
     arithTerm3
   }
 
-  def predTerm: Parser[Term[Pred]] = funcexp(termlistexp(predTerm)) | varexp
-
   def contrexp[K <: FormulaKind]: Parser[Contradiction[K]] = Token.Contradiction() ^^^ Contradiction()
   def tautexp[K <: FormulaKind]: Parser[Tautology[K]] = Token.Tautology() ^^^ Tautology()
 
   def equals: Parser[Unit] = Token.Equals() ^^^ ()
   def equalityexp[K <: (Pred | Arith)](termParser: Parser[Term[K]]): Parser[Equals[K]] = (termParser ~ equals ~ termParser) ^^ {
     case t1 ~ _ ~ t2 => Equals(t1, t2)
+  }
+  
+  def predsymb: Parser[String] = accept("predicate symbol", { case Token.Ident(p) => p })
+  def predexp(termListParser: => Parser[List[Term[Pred]]]): Parser[Predicate] = {
+    (predsymb ~ withParens(termListParser) ^^ {
+      case p ~ ts => Predicate(p, ts)
+    }) |
+    predsymb ^^ { case p => Predicate(p, Nil) } 
   }
 
   def atomexp: Parser[Atom] = accept("propositional atom", { case Token.Ident(c) if c.length == 1 => Atom(c.charAt(0)) })
@@ -89,7 +98,7 @@ object Parser extends PackratParsers {
     }
   }
   
-  def connectiveExp[K <: FormulaKind](inner: Parser[Formula[K]]): Parser[Formula[K]] = {
+  def connectiveExp[K <: FormulaKind](inner: => Parser[Formula[K]]): Parser[Formula[K]] = {
     def connectiveExp1: Parser[Formula[K]] = 
         inner 
       | (Token.Not() ~ connectiveExp1) ^^ { case _ ~ phi => Not(phi) }
@@ -99,12 +108,12 @@ object Parser extends PackratParsers {
       andOrExp(connectiveExp1) | connectiveExp1
 
     def connectiveExp3: Parser[Formula[K]] = {
-      (rep1(Token.Implies() ~ connectiveExp2) ~ connectiveExp2) ^^ {
-        case (rest :+ (_ ~ phi)) ~ psi => rest.foldRight(Implies(phi, psi)) {
-          case (_ ~ phi, psi) => Implies(phi, psi)
+      (rep1(connectiveExp2 ~ Token.Implies()) ~ connectiveExp2) ^^ {
+        case (rest :+ (phi ~ _)) ~ psi => rest.foldRight(Implies(phi, psi)) {
+          case (phi ~ _, psi) => Implies(phi, psi)
         }
         case _ ~ psi => assert(false)
-      }
+      } | connectiveExp2
     }
 
     connectiveExp3
@@ -120,5 +129,25 @@ object Parser extends PackratParsers {
   }
 
   def propLogicFormula: Parser[Formula[Prop]] = connectiveExp(atomexp)
-  def predLogicFormula: Parser[Formula[Pred]] = connectiveExp(equalityexp(predTerm) | quantexp(varexp, predLogicFormula))
+
+  def predLogicTerm: Parser[Term[Pred]] =
+    funcexp(termlistexp(predLogicTerm)) | varexp
+
+  def predLogicFormula: Parser[Formula[Pred]] = {
+    def atomicexps: Parser[Formula[Pred]] =
+      equalityexp(predLogicTerm) | 
+        predexp(termlistexp(predLogicTerm)) | 
+        quantexp(varexp, predLogicFormula) |
+        contrexp[Pred] | tautexp[Pred]
+
+    connectiveExp(atomicexps)
+  }
+
+  def parse[T](input: List[Token], parser: Parser[T]): T = {
+    phrase(parser)(TokenReader(input)) match {
+      case p @ (NoSuccess(_, _) | Failure(_, _) | Error(_, _))  => 
+        throw new RuntimeException(p.toString)
+      case Success(result, _) => result
+    }
+  }
 }

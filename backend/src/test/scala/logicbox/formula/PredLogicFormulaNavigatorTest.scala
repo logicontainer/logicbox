@@ -9,8 +9,8 @@ import logicbox.framework.Location
 class PredLogicFormulaNavigatorTest extends AnyFunSpec {
   describe("get") {
     val nav = FormulaNavigator[FormulaKind.Pred]()
-    def parse(str: String) = PredLogicParser().parseFormula(PredLogicLexer()(str))
-    def tparse(str: String) = PredLogicParser().parseTerm(PredLogicLexer()(str))
+    def parse(str: String) = Parser.parse(Lexer(str), Parser.predLogicFormula)
+    def tparse(str: String) = Parser.parse(Lexer(str), Parser.predLogicTerm)
 
     it("should properly obtain the root") {
       nav.get(parse("P(a)"), Location.root) shouldBe Some(parse("P(a)"))

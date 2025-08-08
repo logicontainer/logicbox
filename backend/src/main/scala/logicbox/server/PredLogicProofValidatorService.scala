@@ -76,13 +76,13 @@ object PredLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(PredLogicParser().parseFormula(PredLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.predLogicFormula))
     } catch { case _ => None }
   }
 
   private def parseVariable(userInput: String): Option[Term.Var[FormulaKind.Pred]] = {
     try {
-      Some(PredLogicParser().parseVariable(PredLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.varexp))
     } catch { case _ => None }
   }
 

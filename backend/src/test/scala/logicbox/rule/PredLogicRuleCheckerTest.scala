@@ -7,7 +7,6 @@ import org.scalatest.matchers.should.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.Inspectors
 
-import logicbox.formula.{PredLogicLexer, PredLogicParser, PredLogicFormula}
 import logicbox.rule.PredLogicRuleChecker
 
 import logicbox.rule.PredLogicRule._
@@ -24,14 +23,14 @@ import logicbox.formula.Term
 import logicbox.formula.FormulaKind
 import logicbox.formula.Term.Var
 import logicbox.formula.PredLogicTerm
+import logicbox.formula.Parser
+import logicbox.formula.Lexer
+import logicbox.formula.PredLogicFormula
 
 class PredLogicRuleCheckerTest extends AnyFunSpec {
-  private val lexer = PredLogicLexer()
-  private val parser = PredLogicParser()
-
   private type BI = FreshVarBoxInfo[Term.Var[FormulaKind.Pred]]
 
-  private def parse(str: String): PredLogicFormula = parser.parseFormula(lexer(str))
+  private def parse(str: String): PredLogicFormula = Parser.parse(Lexer(str), Parser.predLogicFormula)
 
   private case class Line(formula: PredLogicFormula, rule: PredLogicRule, refs: List[Reference[PredLogicFormula, BI]])
     extends Reference.Line[PredLogicFormula]
