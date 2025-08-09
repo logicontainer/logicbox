@@ -8,7 +8,6 @@ import logicbox.server.format.OutputError.FreshVarEscaped
 import logicbox.server.format.OutputError.ShapeMismatch
 import logicbox.server.format.OutputError.Ambiguous
 import logicbox.server.format.OutputError.Miscellaneous
-import zio.http.Header.ContentSecurityPolicy.ReferrerPolicy.origin
 
 object JsonFormatters {
   implicit def listEncoder[T: Encoder]: Encoder[List[T]] = Encoder.encodeList[T]
