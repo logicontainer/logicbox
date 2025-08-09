@@ -10,7 +10,7 @@ import logicbox.server.format._
 object PredLogicProofValidatorService {
   private type F = PredLogicFormula
   private type R = PropLogicRule | PredLogicRule
-  private type B = FreshVarBoxInfo[PredLogicTerm.Var]
+  private type B = FreshVarBoxInfo[Term.Var[FormulaKind.Pred]]
   private type Id = String
 
   private def proofChecker: ProofChecker[IncompleteFormula[F], Option[R], Option[B], Id] = {
@@ -19,8 +19,8 @@ object PredLogicProofValidatorService {
     val boxAssumptionProofChecker = PropLogicBoxAssumptionsProofChecker[R, Id]()
     val boxContraintsProofChecker = PredLogicBoxConstraintsProofChecker[R, Id](PropLogicRule.Assumption())
 
-    val substitutor = PredLogicFormulaSubstitutor()
-    val predLogicChecker = PredLogicRuleChecker[F, PredLogicTerm, PredLogicTerm.Var](substitutor)
+    val substitutor: Substitutor[F, Term[FormulaKind.Pred], Term.Var[FormulaKind.Pred]] = FormulaSubstitutor[FormulaKind.Pred]()
+    val predLogicChecker = PredLogicRuleChecker[F, Term[FormulaKind.Pred], Term.Var[FormulaKind.Pred]](substitutor)
 
     val propLogicChecker: RuleChecker[F, PropLogicRule, B] = PropLogicRuleChecker[F]()
 
@@ -32,7 +32,7 @@ object PredLogicProofValidatorService {
 
     val structuralProofChecker = StructuralProofChecker[R, Id](PropLogicRule.Premise(), PropLogicRule.Assumption())
 
-    val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], PredLogicTerm.Var](
+    val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], Term.Var[FormulaKind.Pred]](
       (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
     )
 
@@ -76,20 +76,20 @@ object PredLogicProofValidatorService {
 
   private def parseFormula(userInput: String): Option[F] = {
     try {
-      Some(PredLogicParser().parseFormula(PredLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.predLogicFormula))
     } catch { case _ => None }
   }
 
-  private def parseVariable(userInput: String): Option[PredLogicTerm.Var] = {
+  private def parseVariable(userInput: String): Option[Term.Var[FormulaKind.Pred]] = {
     try {
-      Some(PredLogicParser().parseVariable(PredLogicLexer()(userInput)))
+      Some(Parser.parse(Lexer(userInput), Parser.variable))
     } catch { case _ => None }
   }
 
   private def ruleParser(rule: String): Option[R] = 
     PropLogicRuleParser.parse(rule).orElse(PredLogicRuleParser.parse(rule))
 
-  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[PredLogicTerm.Var]](
+  val rawProofConverter = RawProofToIncompleteProofConverter[F, R, FreshVarBoxInfo[Term.Var[FormulaKind.Pred]]](
     parseFormula = parseFormula,
     parseRule = ruleParser,
     parseRawBoxInfo = {
@@ -129,8 +129,8 @@ class PredLogicProofValidatorService extends ProofValidatorServiceImpl[
   proofChecker = proofChecker,
   createErrorConverter = pf => createErrorConverter(
     pf,
-    PredLogicFormulaNavigator(),
-    FreshVarBoxInfoNavigator[PredLogicTerm.Var](),
+    FormulaNavigator(),
+    FreshVarBoxInfoNavigator[Term.Var[FormulaKind.Pred]](),
     getInfRule,
     formulaOrTermToLaTeX
   )

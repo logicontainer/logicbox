@@ -2,7 +2,11 @@ package logicbox.rule
 
 trait Substitutor[F, T, V] {
   // substitute every free occurance of x in f with t (compute f[t/x])
+  //   NOTE: doesn't check whether t is free for x in f
   def substitute(f: F, t: T, x: V): F
+
+  // returns true iff t is free for x in f
+  def isFreeFor(f: F, t: T, x: V): Boolean
 
   // returns true iff `t` occurs in `f`
   def hasFreeOccurance(f: F, t: T): Boolean

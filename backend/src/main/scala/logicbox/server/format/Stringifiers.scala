@@ -7,13 +7,12 @@ import logicbox.rule.ArithLogicRule._
 import logicbox.rule.PropLogicRule
 import logicbox.rule.PropLogicRule._
 
-import logicbox.formula._
+import logicbox.formula._, Formula._, Term._
 import logicbox.framework.RulePart.TemplateTerm
 import logicbox.framework.RulePart.TemplateFormula
 
 object Stringifiers {
   private def propLogicFormulaWithBracks(formula: PropLogicFormula, inner: PropLogicFormula => String, l: String, r: String): String = {
-    import PropLogicFormula._
     formula match {
       // don't add brackets to atoms, simple formulas
       case Contradiction() | Tautology() | Atom(_) | Not(_) => inner(formula)
@@ -22,7 +21,6 @@ object Stringifiers {
   }
 
   def propLogicFormulaAsLaTeX(formula: PropLogicFormula): String = {
-    import PropLogicFormula._
     def b(f: PropLogicFormula) = propLogicFormulaWithBracks(f, propLogicFormulaAsLaTeX, "(", ")")
     formula match {
       case Contradiction() => "\\bot"
@@ -36,7 +34,6 @@ object Stringifiers {
   }
 
   def propLogicFormulaAsASCII(formula: PropLogicFormula): String = {
-    import PropLogicFormula._
     def b(f: PropLogicFormula) = propLogicFormulaWithBracks(f, propLogicFormulaAsASCII, "(", ")")
     formula match {
       case Contradiction() => "false"
@@ -70,7 +67,6 @@ object Stringifiers {
   }
 
   private def predLogicFormulaWithBracks(formula: PredLogicFormula, inner: PredLogicFormula => String, l: String, r: String): String = {
-    import logicbox.formula.PredLogicFormula._
     formula match {
       case Contradiction() | Tautology() | Not(_) | Predicate(_, _) | ForAll(_, _) | Exists(_, _) => inner(formula)
       case And(_, _) | Or(_, _) | Implies(_, _) | Equals(_, _) => s"$l${inner(formula)}$r"
@@ -78,7 +74,6 @@ object Stringifiers {
   }
 
   def predLogicTermAsString(term: PredLogicTerm): String = {
-    import logicbox.formula.PredLogicTerm._
     term match {
       case FunAppl(f, ps) => s"$f(${ps.map(predLogicTermAsString).mkString(", ")})"
       case Var(x) => x.toString
@@ -86,7 +81,6 @@ object Stringifiers {
   }
 
   def predLogicFormulaAsLaTeX(formula: PredLogicFormula): String = {
-    import PredLogicFormula._
     def b(f: PredLogicFormula) = predLogicFormulaWithBracks(f, predLogicFormulaAsLaTeX, "(", ")")
     formula match {
       case Contradiction() => "\\bot"
@@ -104,7 +98,6 @@ object Stringifiers {
   }
 
   def predLogicFormulaAsASCII(formula: PredLogicFormula): String = {
-    import PredLogicFormula._
     def b(f: PredLogicFormula) = predLogicFormulaWithBracks(f, predLogicFormulaAsASCII, "(", ")")
     formula match {
       case Contradiction() => "false"
@@ -130,7 +123,6 @@ object Stringifiers {
   }
   
   private def arithLogicFormulaWithBracks(formula: ArithLogicFormula, inner: ArithLogicFormula => String, l: String, r: String): String = {
-    import logicbox.formula.ArithLogicFormula._
     formula match {
       case Contradiction() | Tautology() | Not(_) | ForAll(_, _) | Exists(_, _) => inner(formula)
       case And(_, _) | Or(_, _) | Implies(_, _) | Equals(_, _) => s"$l${inner(formula)}$r"
@@ -138,7 +130,6 @@ object Stringifiers {
   }
 
   private def arithLogicTermWithBracks(term: ArithLogicTerm, inner: ArithLogicTerm => String, l: String, r: String): String = {
-    import logicbox.formula.ArithLogicTerm._
     term match {
       case Zero() | One() | Var(_) => inner(term)
       case Plus(_, _) | Mult(_, _) => s"$l${inner(term)}$r"
@@ -146,7 +137,6 @@ object Stringifiers {
   }
 
   def arithLogicTermAsString(term: ArithLogicTerm): String = {
-    import logicbox.formula.ArithLogicTerm._
     def b(f: ArithLogicTerm) = arithLogicTermWithBracks(f, arithLogicTermAsString, "(", ")")
     term match {
       case Var(x) => x.toString
@@ -159,7 +149,6 @@ object Stringifiers {
 
 
   def arithLogicFormulaAsLaTeX(formula: ArithLogicFormula): String = {
-    import ArithLogicFormula._
     def b(f: ArithLogicFormula) = arithLogicFormulaWithBracks(f, arithLogicFormulaAsLaTeX, "(", ")")
     formula match {
       case Contradiction() => "\\bot"
@@ -175,7 +164,6 @@ object Stringifiers {
   }
 
   def arithLogicFormulaAsASCII(formula: ArithLogicFormula): String = {
-    import ArithLogicFormula._
     def b(f: ArithLogicFormula) = arithLogicFormulaWithBracks(f, arithLogicFormulaAsASCII, "(", ")")
     formula match {
       case Contradiction() => "false"

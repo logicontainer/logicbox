@@ -8,8 +8,6 @@ type PLBoxInfo = Unit
 sealed trait PropLogicRule
 
 object PropLogicRule {
-  import PropLogicFormula.*
-
   enum Side { case Left; case Right }
   case class Premise() extends PropLogicRule
   case class Assumption() extends PropLogicRule 
