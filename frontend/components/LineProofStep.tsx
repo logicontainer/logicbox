@@ -155,7 +155,7 @@ export function LineProofStep({
         onDragOver={isMobile ? undefined : (e => {
           e.preventDefault()
           e.stopPropagation()
-          handleDragOver(props.uuid, isOnLowerHalf(e))
+          handleDragOver({ stepUuid: props.uuid, isOnLowerHalf: isOnLowerHalf(e) })
         })}
         onDrop={isMobile ? undefined : handleDragStop}
         onClick={isMobile ? undefined : ((e) => {

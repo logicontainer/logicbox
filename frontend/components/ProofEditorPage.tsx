@@ -2,17 +2,27 @@ import { useHovering } from "@/contexts/HoveringProvider";
 import ContextSidebar from "@/components/ContextSidebar";
 import ProofEditor from "./ProofEditor";
 import { TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
+import { useStepDrag } from "@/contexts/StepDragProvider";
 
 export default function ProofEditorPage({ proofId }: { proofId: string }) {
   const { handleHover } = useHovering()
   const { doTransition } = useInteractionState();
+  const { handleDragOver, handleDragStop } = useStepDrag()
 
   return (
     <div className="flex justify-center items-start"
-      onClick={() => doTransition({ enum: TransitionEnum.CLICK_OUTSIDE })}
+      onClick={() => doTransition({ enum: TransitionEnum.INTERACT_OUTSIDE })}
+      onMouseMove={() => handleHover(null)}
+      onDragOver={() => handleDragOver(null)}
+      onDragEnd={() => handleDragStop()}
     >
-      <div onMouseMove={_ => handleHover(null)} className="h-screen w-[min(100%,550px)] md:w-auto md:grid md:grid-cols-[550px_1fr]">
-        <div className="overflow-hidden relative">
+      <div 
+        className="h-screen w-[min(100%,550px)] md:w-auto md:grid md:grid-cols-[550px_1fr]"
+      >
+        <div 
+          className="overflow-hidden relative"
+          onClick={e => e.stopPropagation()} // don't make INTERACT_OUTSIDE event
+        >
           <ContextSidebar />
         </div>
         <div className="overflow-hidden relative">
