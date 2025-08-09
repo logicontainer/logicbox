@@ -644,6 +644,56 @@ class ErrorConverterImplTest extends AnyFunSpec with MockitoSugar {
       cvtr.convert("line", Error.FreshVarEscaped("box")) shouldBe None
     }
   }
+
+  describe("convert RedefinitionOfFreshVar") {
+    it("should convert correctly when proof nav gives a variable") {
+      val pf = StubProof(
+        Seq("box1", "box3"),
+        Map(
+          "box1" -> StubBox(StubBoxInfo(), Seq("box2")),
+          "box2" -> StubBox(),
+          "box3" -> StubBox(StubBoxInfo(), Seq("box4")),
+          "box4" -> StubBox(),
+        )
+      )
+
+      val (cvtr, pnav, _, _) = fix(pf)
+      when(pnav.get((pf, "box1"), Location.conclusion.freshVar)).thenReturn(Some(152))
+      when(pnav.get((pf, "box2"), Location.conclusion.freshVar)).thenReturn(Some(152))
+      when(pnav.get((pf, "box3"), Location.conclusion.freshVar)).thenReturn(Some(154))
+      when(pnav.get((pf, "box4"), Location.conclusion.freshVar)).thenReturn(Some(154))
+
+      // says that the fresh var is "152"
+      
+      cvtr.convert("box2", Error.RedefinitionOfFreshVar("box1")) shouldBe Some(OutputError.RedefinitionOfFreshVar(
+        uuid = "box2",
+        originalUuid = "box1",
+        freshVar = "152",
+      ))
+
+      cvtr.convert("box4", Error.RedefinitionOfFreshVar("box3")) shouldBe Some(OutputError.RedefinitionOfFreshVar(
+        uuid = "box4",
+        originalUuid = "box3",
+        freshVar = "154",
+      ))
+    } 
+
+    it("should return none when fresh var cannot be located") {
+      val pf = StubProof(
+        Seq("outer"),
+        Map(
+          "outer" -> StubBox(StubBoxInfo(), Seq("inner")),
+          "inner" -> StubBox(),
+        )
+      )
+
+      val (cvtr, pnav, _, _) = fix(pf)
+      when(pnav.get((pf, "inner"), Location.conclusion.freshVar)).thenReturn(None) // can't find fresh variable of box
+      when(pnav.get((pf, "outer"), Location.conclusion.freshVar)).thenReturn(None) // can't find fresh variable of box
+
+      cvtr.convert("inner", Error.RedefinitionOfFreshVar("outer")) shouldBe None
+    }
+  }
   
   describe("convert rest") {
     it("should convert rest fine") {
