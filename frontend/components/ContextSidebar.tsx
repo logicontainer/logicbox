@@ -17,7 +17,7 @@ import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { BoxProofStep, LineProofStep,  ProofWithMetadata, Rule } from "@/types/types";
+import { BoxProofStep, Diagnostic, LineProofStep,  ProofWithMetadata, Rule } from "@/types/types";
 import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
@@ -34,7 +34,6 @@ import { logicNameToString } from "./GalleryItem";
 import { createSequentLaTeX } from "@/lib/sequent";
 
 import { Tooltip } from 'react-tooltip'
-import { Scope_One } from "next/font/google";
 
 function RuleShowPanel({
   ruleLatex
@@ -53,6 +52,7 @@ function LineFocusPanel({
   lineUuid: string,
   lineStep: LineProofStep,
 }) {
+  const { getParentUuid } = useProof()
   const { getReferenceString } = useLines()
   const { getRuleAtStepAsLatex } = useDiagnostics()
   const { hoveringState } = useHovering()
@@ -71,7 +71,8 @@ function LineFocusPanel({
   const ruleLatex = getRuleAtStepAsLatex(lineUuid, refHighlights, formulaIsBeingHovered(lineUuid, hoveringState), "blue") ?? "???";
 
   const { proofDiagnostics } = useServer();
-  const errors = proofDiagnostics.filter((d) => d.uuid === lineUuid);
+  const parentUuid = getParentUuid(lineUuid)
+  const errors = proofDiagnostics.filter((d) => d.uuid === lineUuid || d.uuid === parentUuid);
 
   return <div className="w-full min-h-40">
     <div className="h-32 grid grid-cols-[1fr_2fr]">
