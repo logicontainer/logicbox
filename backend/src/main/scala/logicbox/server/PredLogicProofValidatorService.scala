@@ -35,6 +35,8 @@ object PredLogicProofValidatorService {
     val freshVarEscapeChecker = FreshVariableEscapeChecker[Option[F], Term.Var[FormulaKind.Pred]](
       (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
     )
+    
+    val freshVarDuplicateChecker = FreshVariableDuplicateChecker[Term.Var[FormulaKind.Pred]]()
 
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
@@ -66,6 +68,7 @@ object PredLogicProofValidatorService {
 
         ruleBasedProofChecker.check(optProofView) ++ 
         freshVarEscapeChecker.check(cleanFreshVarsProofView) ++
+        freshVarDuplicateChecker.check(cleanFreshVarsProofView) ++
         scopedChecker.check(proof) ++
         boxContraintsProofChecker.check(cleanRulesProofView) ++
         boxAssumptionProofChecker.check(cleanRulesProofView) ++

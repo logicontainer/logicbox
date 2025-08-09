@@ -39,6 +39,8 @@ object ArithLogicProofValidatorService {
       (v, f) => f.map(substitutor.hasFreeOccurance(_, v)).getOrElse(false)
     )
 
+    val freshVarDuplicateChecker = FreshVariableDuplicateChecker[Term.Var[FormulaKind.Arith]]()
+
     val ruleBasedProofChecker: ProofChecker[Option[F], Option[R], Option[B], Id] = 
       RuleBasedProofChecker(optionRuleChecker)
 
@@ -70,6 +72,7 @@ object ArithLogicProofValidatorService {
         ruleBasedProofChecker.check(optProofView) ++ 
         scopedChecker.check(proof) ++
         freshVarEscapeChecker.check(cleanFreshVarsProofView) ++
+        freshVarDuplicateChecker.check(cleanFreshVarsProofView) ++
         boxContraintsProofChecker.check(cleanRulesProofView) ++
         boxAssumptionProofChecker.check(cleanRulesProofView) ++
         structuralProofChecker.check(cleanRulesProofView)
