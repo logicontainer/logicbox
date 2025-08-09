@@ -51,8 +51,10 @@ class FormulaSubstitutor[K <: (FormulaKind.Pred | FormulaKind.Arith)] extends Su
     }
 
     def visitF(ff: Formula[K], boundVars: Set[Var] = Set()): Boolean = ff match {
-      case ForAll(y, phi) => visitF(phi, boundVars + y)
-      case Exists(y, phi) => visitF(phi, boundVars + y)
+      case ff: Quantifier[K] => 
+        // if x becomes bound, no need to look further...
+        ff.x == x || visitF(ff.phi, boundVars + ff.x)
+
       case Predicate(_, ts) => ts.forall(t => visitT(t, boundVars))
       case And(phi, psi) => visitF(phi, boundVars) && visitF(psi, boundVars)
       case Or(phi, psi) => visitF(phi, boundVars) && visitF(psi, boundVars)

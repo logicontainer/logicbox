@@ -483,5 +483,17 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
         case List(Miscellaneous(Location(Location.Step.Premise(1) :: LastLine :: Nil), _)) =>
       }
     }
+
+    it("should fail if substitution is invalid") {
+      val refs = List(
+        refLine("exists n 0 + 1 = n"),
+        refBox("exists n n + 1 = n", "exists n (n + 1) + 1 = n", "n")
+      )
+      val f = parse("forall x exists n x + 1 = n")
+      checker.check(Induction(), f, refs) shouldBe List(
+        Miscellaneous(Location.premise(1).firstLine, "invalid substitution"),
+        Miscellaneous(Location.premise(1).lastLine, "invalid substitution"),
+      )
+    }
   }
 }

@@ -23,6 +23,7 @@ import logicbox.framework.RulePart.MetaTerm
 import logicbox.framework.RulePart.Formulas
 import logicbox.framework.RulePart.Vars
 import logicbox.framework.RulePart.Terms
+import javax.sound.midi.MidiEvent
 
 class PredLogicRuleChecker[F, T, V <: T](
   substitutor: Substitutor[F, T, V]
@@ -39,14 +40,20 @@ extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
   override def check(rule: R, formula: F, refs: List[Reference[F, B]]): List[Error] = rule match {
     case ForAllElim() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => ref match {
-        case ∀(x, phi) => 
-          failIf(
-            substitutor.findReplacement(phi, formula, x).isEmpty, 
+        case ∀(x, phi) => substitutor.findReplacement(phi, formula, x) match {
+          case Some(Left(())) => Nil
+          case Some(Right(t)) => failIf(
+            !substitutor.isFreeFor(phi, t, x),
+            Miscellaneous(Location.conclusion, "invalid substitution")
+          )
+
+          case None => fail(
             Ambiguous(MetaFormula(Formulas.Phi), List(
               Location.conclusion.root,
               Location.premise(0).formulaInsideQuantifier
             ))
           )
+        }
 
         case _ => 
           fail(ShapeMismatch(Location.premise(0)))
@@ -68,6 +75,9 @@ extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
                   Location.conclusion.formulaInsideQuantifier,
                   Location.premise(0).lastLine
                 ))
+              ) ++ failIf(
+                !substitutor.isFreeFor(phi, x0, x), 
+                Miscellaneous(Location.premise(0).lastLine, "invalid substitution")
               )
 
             case _ => 
@@ -87,6 +97,10 @@ extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
               Location.premise(1).firstLine
             ))
           ) ++ 
+          failIf(
+            !substitutor.isFreeFor(phi, x0, x),
+            Miscellaneous(Location.premise(1).firstLine, "invalid substitution")
+          ) ++
           failIf(
             concl != Some(formula), 
             Ambiguous(MetaFormula(Formulas.Chi), List(
@@ -108,15 +122,20 @@ extends RuleChecker[F, PredLogicRule, FreshVarBoxInfo[V]] {
 
     case ExistsIntro() => extractNFormulasAndThen(refs, 1) {
       case List(ref) => formula match {
-        case ∃(x, phi) => 
-          failIf(
-            substitutor.findReplacement(phi, ref, x).isEmpty,
+        case ∃(x, phi) => substitutor.findReplacement(phi, ref, x) match {
+          case Some(Left(())) => Nil
+          case Some(Right(t)) => failIf(
+            !substitutor.isFreeFor(phi, t, x),
+            Miscellaneous(Location.premise(0), "invalid substitution")
+          )
+          case None => fail(
             Ambiguous(MetaFormula(Formulas.Phi), List(
               Location.conclusion.formulaInsideQuantifier,
               Location.premise(0).root
             ))
           )
-
+        }
+        
         case _ => 
           fail(ShapeMismatch(Location.conclusion))
       }

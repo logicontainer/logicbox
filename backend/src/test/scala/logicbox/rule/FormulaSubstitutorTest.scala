@@ -1374,6 +1374,13 @@ class FormulaSubstitutorTest extends AnyFunSpec {
       substitutor.isFreeFor(f, t3, x) shouldBe false
     }
 
+    it("should not react to bound x's (forall x forall y P(x) -> forall x forall y P(x)) is fine") {
+      val f = parse("forall x forall y P(x) and exists x exists y P(x)")
+      val t = tparse("y")
+      val x = Var[Pred]("x")
+      substitutor.isFreeFor(f, t, x) shouldBe true
+    }
+
     it("should handle when replacement is inside function") {
       val f = parse("forall y P(f(x))") 
       val t1 = tparse("y")

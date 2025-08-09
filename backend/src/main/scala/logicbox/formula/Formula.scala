@@ -57,8 +57,14 @@ object Formula {
 
   // predicate logic and arithmetic
   final case class Equals[K <: (Pred | Arith)](t1: Term[K], t2: Term[K]) extends Formula[K]
-  final case class ForAll[K <: (Pred | Arith)](x: Term.Var[K], phi: Formula[K]) extends Formula[K]
-  final case class Exists[K <: (Pred | Arith)](x: Term.Var[K], phi: Formula[K]) extends Formula[K]
+
+  sealed trait Quantifier[K <: (Pred | Arith)] extends Formula[K] {
+    def x: Term.Var[K]
+    def phi: Formula[K]
+  }
+
+  final case class ForAll[K <: (Pred | Arith)](x: Term.Var[K], phi: Formula[K]) extends Quantifier[K]
+  final case class Exists[K <: (Pred | Arith)](x: Term.Var[K], phi: Formula[K]) extends Quantifier[K]
 }
 
 implicit def asConnectiveFormula[K <: FormulaKind]: ConnectiveFormula[Formula[K]] = new ConnectiveFormula[Formula[K]] {
