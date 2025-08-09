@@ -70,6 +70,14 @@ class ParserTest extends AnyFunSpec {
       Parser.parse(ts, Parser.predLogicTerm) shouldBe Term.FunAppl("f", List(Var("x"), Var("y")))
     }
 
+    it("should have quantifiers bind tighter than connectives") {
+      val ts = List(Token.ForAll(), Ident("y"), Token.Contradiction(), Token.Or(), Token.Exists(), Ident("y"), Token.Contradiction())
+      Parser.parse(ts, Parser.predLogicFormula) shouldBe Formula.Or(
+        Formula.ForAll(Var("y"), Formula.Contradiction()),
+        Formula.Exists(Var("y"), Formula.Contradiction())
+      )
+    }
+
     it("should parse predicate of function vars") {
       val ts = List(
         Ident("P"), LeftParen(),

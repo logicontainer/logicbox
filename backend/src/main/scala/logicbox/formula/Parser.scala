@@ -97,61 +97,73 @@ object Parser extends PackratParsers {
       case phi ~ Nil => assert(false) // not possible (rep1)
     }
   }
-  
-  def connectiveExp[K <: FormulaKind](inner: => Parser[Formula[K]]): Parser[Formula[K]] = {
-    def connectiveExp1: Parser[Formula[K]] = 
-        inner 
-      | (Token.Not() ~ connectiveExp1) ^^ { case _ ~ phi => Not(phi) }
-      | withParens(connectiveExp(inner))
 
-    def connectiveExp2: Parser[Formula[K]] = 
-      andOrExp(connectiveExp1) | connectiveExp1
-
-    def connectiveExp3: Parser[Formula[K]] = {
-      (rep1(connectiveExp2 ~ Token.Implies()) ~ connectiveExp2) ^^ {
-        case (rest :+ (phi ~ _)) ~ psi => rest.foldRight(Implies(phi, psi)) {
-          case (phi ~ _, psi) => Implies(phi, psi)
-        }
-        case _ ~ psi => assert(false)
-      } | connectiveExp2
-    }
-
-    connectiveExp3
-  } 
-
-  def quantexp[K <: (Pred | Arith)](varParser: Parser[Var[K]], inner: Parser[Formula[K]]): Parser[Exists[K] | ForAll[K]] = {
-    (Token.ForAll() ~ varParser ~ inner) ^^ {
-      case _ ~ x ~ phi => ForAll(x, phi)
-    } | 
-    (Token.Exists() ~ varParser ~ inner) ^^ {
-      case _ ~ x ~ phi => Exists(x, phi)
+  def impliesExp[K <: FormulaKind](inner: Parser[Formula[K]]): Parser[Implies[K]] = {
+    (rep1(inner ~ Token.Implies()) ~ inner) ^^ {
+      case (rest :+ (phi ~ tok)) ~ psi => rest.foldRight(Implies(phi, psi)) {
+        case (phi ~ _, psi) => Implies(phi, psi)
+      }
+      case _ ~ psi => assert(false)
     }
   }
 
   def propLogicFormula: Parser[Formula[Prop]] = {
-    connectiveExp(atomexp | tautexp[Prop] | contrexp[Prop])
+    def a = atomexp | tautexp[Prop] | contrexp[Prop]
+    def b: Parser[Formula[Prop]] = 
+      a |
+      ((Token.Not() ~ b) ^^ { case _ ~ phi => Not(phi) }) |
+      withParens(propLogicFormula)
+
+    def c: Parser[Formula[Prop]] = andOrExp(b) | b
+    def d: Parser[Formula[Prop]] = impliesExp(c) | c
+
+    d
   }
 
   def predLogicTerm: Parser[Term[Pred]] =
     funcexp(termlistexp(predLogicTerm)) | variable
 
   def predLogicFormula: Parser[Formula[Pred]] = {
-    def atomicexps: Parser[Formula[Pred]] =
+    def a: Parser[Formula[Pred]] =
       equalityexp(predLogicTerm) | 
         predexp(termlistexp(predLogicTerm)) | 
-        quantexp(variable, predLogicFormula) |
         contrexp[Pred] | tautexp[Pred]
 
-    connectiveExp(atomicexps)
+    def b: Parser[Formula[Pred]] =
+      a
+      | ((Token.Not() ~ b) ^^ { case _ ~ phi => Not(phi) })
+      | ((Token.ForAll() ~ variable[Pred] ~ b) ^^ { case _ ~ x ~ phi => ForAll(x, phi) })
+      | ((Token.Exists() ~ variable[Pred] ~ b) ^^ { case _ ~ x ~ phi => Exists(x, phi) })
+      | withParens(predLogicFormula)
+
+    def c: Parser[Formula[Pred]] =
+      andOrExp(b) | b
+
+    def d: Parser[Formula[Pred]] =
+      impliesExp(c) | c
+
+    d
   }
 
   def arithLogicFormula: Parser[Formula[Arith]] = {
-    def atomicexps: Parser[Formula[Arith]] =
+    def a: Parser[Formula[Arith]] =
       equalityexp(arithLogicTerm) | 
-        quantexp(variable, arithLogicFormula) |
         contrexp[Arith] | tautexp[Arith]
 
-    connectiveExp(atomicexps)
+    def b: Parser[Formula[Arith]] =
+      a
+      | ((Token.Not() ~ b) ^^ { case _ ~ phi => Not(phi) })
+      | ((Token.ForAll() ~ variable[Arith] ~ b) ^^ { case _ ~ x ~ phi => ForAll(x, phi) })
+      | ((Token.Exists() ~ variable[Arith] ~ b) ^^ { case _ ~ x ~ phi => Exists(x, phi) })
+      | withParens(arithLogicFormula)
+
+    def c: Parser[Formula[Arith]] =
+      andOrExp(b) | b
+
+    def d: Parser[Formula[Arith]] =
+      impliesExp(c) | c
+
+    d
   }
 
   def parse[T](input: List[Token], parser: Parser[T]): T = {
