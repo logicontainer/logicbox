@@ -117,7 +117,7 @@ export function BoxProofStep({
         onDragOver={isMobile ? undefined : (e => {
           e.stopPropagation()
           e.preventDefault()
-          handleDragOver(props.uuid, isOnLowerHalf(e))
+          handleDragOver({ stepUuid: props.uuid, isOnLowerHalf: isOnLowerHalf(e) })
         })}
         onDrop={isMobile ? undefined : handleDragStop}
         onContextMenu={isMobile ? undefined : ((e) => {

@@ -22,6 +22,7 @@ object Error {
   case class PremiseInsideBox() extends Error
   case class InvalidAssumption() extends Error
   case class FreshVarEscaped(boxId: String) extends Error
+  case class RedefinitionOfFreshVar(originalBoxId: String) extends Error
 
   case class ShapeMismatch(loc: Location) extends Error
   case class Ambiguous(what: RulePart, entries: List[Location]) extends Error

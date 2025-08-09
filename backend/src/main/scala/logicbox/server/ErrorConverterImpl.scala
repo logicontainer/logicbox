@@ -82,6 +82,11 @@ class ErrorConverterImpl[F, R, B, O](
       freshVarStr = actualExpToString(freshVar)
     } yield OutputError.FreshVarEscaped(stepId, boxId, freshVarStr)
 
+    case RedefinitionOfFreshVar(originalBoxId) => for {
+      freshVar <- proofNavigator.get((proof, stepId), Location.conclusion.freshVar)
+      freshVarStr = actualExpToString(freshVar)
+    } yield OutputError.RedefinitionOfFreshVar(stepId, originalBoxId, freshVarStr)
+
     case Miscellaneous(loc, expl) => 
       loc.steps.headOption
         .flatMap(getRulePosition(_))

@@ -20,6 +20,10 @@ object OutputError {
     override def errorType: String = "FreshVarEscaped"
   }
 
+  case class RedefinitionOfFreshVar(uuid: String, originalUuid: String, freshVar: String) extends OutputError {
+    override def errorType: String = "RedefinitionOfFreshVar"
+  }
+
   case class ShapeMismatch(
     uuid: String, 
     rulePosition: OutputRulePos, // in which part of rule the mismatch is

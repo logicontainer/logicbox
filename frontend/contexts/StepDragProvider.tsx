@@ -4,9 +4,14 @@ import React from "react";
 import { useHovering } from "./HoveringProvider";
 import { HoveringEnum, TransitionEnum, useInteractionState } from "./InteractionStateProvider";
 
+export type DragInfo = {
+  stepUuid: string,
+  isOnLowerHalf: boolean,
+}
+
 export interface StepDragContext {
   handleDragStart: (stepUuid: string) => void;
-  handleDragOver: (stepUuid: string, isOnLowerHalf: boolean) => void;
+  handleDragOver: (dragInfo: DragInfo | null) => void;
   handleDragStop: () => void;
 }
 
@@ -37,12 +42,12 @@ export function StepDragProvider({ children }: React.PropsWithChildren<object>) 
     }
   }
 
-  const handleDragOver = (stepUuid: string, isOnLowerHalf: boolean) => {
-    handleHover({
+  const handleDragOver = (dragInfo: DragInfo | null) => {
+    handleHover(dragInfo && {
       enum: HoveringEnum.HOVERING_STEP,
-      stepUuid,
-      aboveOrBelow: isOnLowerHalf ? "below" : "above"
-    })
+      stepUuid: dragInfo.stepUuid,
+      aboveOrBelow: dragInfo.isOnLowerHalf ? "below" : "above"
+    } || null)
   }
 
   const handleDragStop = () => {

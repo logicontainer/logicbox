@@ -316,7 +316,7 @@ export const rulesets = [
           ruleName: "P_5",
 
           premises: [],
-          conclusion: "not (0 = t + 1)",
+          conclusion: "\\lnot (0 = t + 1)",
         },
         numPremises: 0,
       },

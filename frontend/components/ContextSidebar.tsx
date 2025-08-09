@@ -17,7 +17,7 @@ import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { BoxProofStep, LineProofStep, ProofMetadata, ProofWithMetadata, Rule } from "@/types/types";
+import { BoxProofStep, Diagnostic, LineProofStep,  ProofWithMetadata, Rule } from "@/types/types";
 import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
@@ -31,8 +31,10 @@ import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { logicNameToString } from "./GalleryItem";
-import { useHtmlContext } from "next/dist/shared/lib/html-context.shared-runtime";
 import { createSequentLaTeX } from "@/lib/sequent";
+
+import { Tooltip } from 'react-tooltip'
+
 function RuleShowPanel({
   ruleLatex
 }: {
@@ -50,6 +52,7 @@ function LineFocusPanel({
   lineUuid: string,
   lineStep: LineProofStep,
 }) {
+  const { getParentUuid } = useProof()
   const { getReferenceString } = useLines()
   const { getRuleAtStepAsLatex } = useDiagnostics()
   const { hoveringState } = useHovering()
@@ -68,7 +71,8 @@ function LineFocusPanel({
   const ruleLatex = getRuleAtStepAsLatex(lineUuid, refHighlights, formulaIsBeingHovered(lineUuid, hoveringState), "blue") ?? "???";
 
   const { proofDiagnostics } = useServer();
-  const errors = proofDiagnostics.filter((d) => d.uuid === lineUuid);
+  const parentUuid = getParentUuid(lineUuid)
+  const errors = proofDiagnostics.filter((d) => d.uuid === lineUuid || d.uuid === parentUuid);
 
   return <div className="w-full min-h-40">
     <div className="h-32 grid grid-cols-[1fr_2fr]">
@@ -112,7 +116,7 @@ function BoxFocusPanel({
   </div>
 }
 
-function RulePanel() {
+function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }) {
   const { rulesets } = useRuleset();
   const { doTransition } = useInteractionState();
   const [hoveredRule, setHoveredRule] = React.useState<string | null>(null);
@@ -145,7 +149,7 @@ function RulePanel() {
   const createRuleElement = (rule: Rule) => (
     <div
       key={rule.ruleName}
-      className="flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
+      className="RULE_ELEMENT flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
       onMouseOver={() => setHoveredRule(rule.ruleName)}
       onMouseLeave={() => setHoveredRule(null)}
       onClick={() => handleChangeRule(rule.ruleName)}
@@ -167,6 +171,15 @@ function RulePanel() {
       </div>
       {rest}
     </div>
+    <Tooltip 
+      anchorSelect=".RULE_ELEMENT" 
+      delayHide={0} 
+      variant="dark" 
+      place="right"
+      className={(!shouldShowRuleTooltip || hoveredRule === null) && "hidden" || undefined}
+    >
+      <InlineMath math={hoveredRuleDetailsLatex}/>
+    </Tooltip>
   </div>
 }
 
@@ -174,7 +187,6 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
   const { undo, redo, canUndo, canRedo } = useHistory()
 
   const [sequentIsVisible, setSequentVisbility] = React.useState<boolean>(false)
-  const sequentLatex = createSequentLaTeX(proof.proof)
 
   return <div
     onMouseEnter={_ => setSequentVisbility(true)}
@@ -260,18 +272,37 @@ export default function ContextSidebar() {
   const showRulePanel = isEditingRule;
   const noPanelIsShown = !(showLineFocusPanel || showBoxFocusPanel || showRulePanel)
 
+  const scrollAreaRef = React.useRef<HTMLDivElement>(null)
+  const [shouldShowRuleTooltip, setShouldShowTooltip] = React.useState<boolean>(false);
+
+  // TODO: this could probably be made better by listening to resize events or something
+  React.useEffect(() => {
+    const s = scrollAreaRef.current?.scrollHeight === undefined || scrollAreaRef.current?.clientHeight === undefined ? false : 
+      scrollAreaRef.current?.scrollHeight > scrollAreaRef.current?.clientHeight
+
+    if (shouldShowRuleTooltip !== s) {
+      setShouldShowTooltip(s)
+    }
+  }, [scrollAreaRef.current?.scrollHeight, scrollAreaRef.current?.clientHeight])
+
   return (
-    <div className="lg:h-screen p-2 overflow-auto">
-      <div className="flex flex-col gap-2">
+    <div className="md:h-screen p-2"> 
+      <div className="flex flex-col gap-2 h-full">
         <ProofEditorToolbar proof={proof}/>
-        <Card className={cn("max-h-48 md:max-h-max overflow-scroll", noPanelIsShown && "min-h-48 h-12")}>
+        <Card 
+          ref={scrollAreaRef} 
+          className={cn(
+            "max-h-48 md:max-h-max overflow-scroll", 
+            noPanelIsShown && "min-h-48 h-12"
+          )}
+        >
           {showLineFocusPanel && <>
             <LineFocusPanel lineUuid={stepInFocus} lineStep={proofStep} />
           </>}
           {showBoxFocusPanel && (
             <BoxFocusPanel boxUuid={stepInFocus} boxStep={proofStep} />
           )}
-          {showRulePanel && <RulePanel />}
+          {showRulePanel && <RulePanel shouldShowRuleTooltip={shouldShowRuleTooltip}/>}
           {noPanelIsShown && <div className="flex items-center justify-center w-full h-full">
             <p className="text-sm font-light text-gray-600">Interact with the proof to inspect context here.</p>
           </div>}

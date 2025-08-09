@@ -155,7 +155,7 @@ export function LineProofStep({
         onDragOver={isMobile ? undefined : (e => {
           e.preventDefault()
           e.stopPropagation()
-          handleDragOver(props.uuid, isOnLowerHalf(e))
+          handleDragOver({ stepUuid: props.uuid, isOnLowerHalf: isOnLowerHalf(e) })
         })}
         onDrop={isMobile ? undefined : handleDragStop}
         onClick={isMobile ? undefined : ((e) => {
@@ -311,9 +311,10 @@ function Formula({
         onKeyDown={(e) => onKeyDownAutoSizeInput(e.key)}
         placeholder="???"
         inputClassName={cn(
-          "px-1 py-2 focus:border-black focus:border outline-none rounded",
+          "px-1 py-1 focus:border-black focus:border outline-none rounded",
           "bg-transparent",
           "font-mono text-sm tracking-tighter",
+          isMobile && "text-[16px] py-0",
         )}
       />
     </div>
