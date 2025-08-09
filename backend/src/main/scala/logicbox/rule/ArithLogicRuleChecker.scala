@@ -141,7 +141,10 @@ class ArithLogicRuleChecker[F, T, V <: T](
               }) ++ (extractFirstLine(box) match {
                 case Some(ass) => 
                   substitutor.findReplacement(phi, ass, x) match {
-                    case Some(Right(y)) if y == n => Nil
+                    case Some(Right(y)) if y == n => failIf(
+                      !substitutor.isFreeFor(phi, y, x),
+                      Miscellaneous(Location.premise(1).firstLine, "invalid substitution")
+                    )
                     case Some(Left(())) => Nil
                     case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
                       Location.conclusion.formulaInsideQuantifier,
@@ -158,7 +161,10 @@ class ArithLogicRuleChecker[F, T, V <: T](
                 case Some(ass) => 
                   substitutor.findReplacement(phi, ass, x) match {
                     case Some(Left(())) => Nil
-                    case Some(Right(y + _1())) if y == n => Nil
+                    case Some(Right(t @ (y + _1()))) if y == n => failIf(
+                      !substitutor.isFreeFor(phi, t, x),
+                      Miscellaneous(Location.premise(1).lastLine, "invalid substitution")
+                    )
                     case _ => fail(Ambiguous(MetaFormula(Formulas.Phi), List(
                       Location.conclusion.formulaInsideQuantifier,
                       Location.premise(0).root,

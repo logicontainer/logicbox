@@ -26,6 +26,7 @@ import logicbox.formula.PredLogicTerm
 import logicbox.formula.Parser
 import logicbox.formula.Lexer
 import logicbox.formula.PredLogicFormula
+import org.scalatest.time.Microsecond
 
 class PredLogicRuleCheckerTest extends AnyFunSpec {
   private type BI = FreshVarBoxInfo[Term.Var[FormulaKind.Pred]]
@@ -86,6 +87,13 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val f = parse("P(f(f(a)))")
       checker.check(ForAllElim(), f, List(refLine("forall x P(f(x))"))) shouldBe Nil
     }
+
+    it("shouold reject if t is not free for x in f") {
+      val f = parse("exists y P(y)")
+      checker.check(ForAllElim(), f, List(refLine("forall x exists y P(x)"))) shouldBe List(
+        Miscellaneous(Location.conclusion, "invalid substitution")
+      )
+    }
   }
   
   describe("ForAllIntro") {
@@ -122,6 +130,19 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
           Location.conclusion.formulaInsideQuantifier,
           Location.premise(0).lastLine
         ))
+      )
+    }
+
+    it("should reject when substitution is invalid") {
+      val refs = List(refBox(
+        "true",
+        "forall x_0 P(x_0)",
+        "x_0"
+      ))
+      val f = parse("forall x forall x_0 P(x)")
+
+      checker.check(ForAllIntro(), f, refs) shouldBe List(
+        Miscellaneous(Location.premise(0).lastLine, "invalid substitution")
       )
     }
   }
@@ -187,6 +208,17 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
         ShapeMismatch(Location.premise(0))
       )
     }
+
+    it("should reject if substitution is invalid") {
+      val f = parse("true")
+      val refs = List(
+        refLine("exists x exists x_0 P(x, x_0)"),
+        refBox("exists x_0 P(x_0, x_0)", "true", "x_0")
+      )
+      checker.check(ExistsElim(), f, refs) shouldBe List(
+        Miscellaneous(Location.premise(1).firstLine, "invalid substitution"),
+      )
+    }
   }
 
   describe("ExistsIntro") {
@@ -218,6 +250,14 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
           Location.conclusion.formulaInsideQuantifier,
           Location.premise(0).root
         ))
+      )
+    }
+
+    it("should reject if substitution is invalid") {
+      val f = parse("exists x exists y P(x, y)")
+      val refs = List(refLine("exists y P(y, y)"))
+      checker.check(ExistsIntro(), f, refs) shouldBe List(
+        Miscellaneous(Location.premise(0), "invalid substitution")
       )
     }
   }
@@ -277,6 +317,18 @@ class PredLogicRuleCheckerTest extends AnyFunSpec {
       val to = parse("b = a")
 
       checker.check(EqualityElim(), to, List(eq, from)) shouldBe Nil
+    }
+
+    ignore("should reject if t1 is not free for x in phi") {
+      val eq = refLine("y = z")
+      val from = refLine("P(y) and forall y P(y)")
+      val to = parse("P(z) and forall y P(z)")
+
+      // TODO: right now this has another error to do with the 'equalExcept' algorithm
+
+      checker.check(EqualityElim(), to, List(eq, from)) shouldBe List(
+        Miscellaneous(Location.premise(1), "invalid substitution")
+      )
     }
   }
 }

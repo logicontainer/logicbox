@@ -119,7 +119,7 @@ object Parser extends PackratParsers {
     connectiveExp3
   } 
 
-  def quantexp[K <: (Pred | Arith)](varParser: Parser[Term.Var[K]], inner: Parser[Formula[K]]): Parser[Exists[K] | ForAll[K]] = {
+  def quantexp[K <: (Pred | Arith)](varParser: Parser[Var[K]], inner: Parser[Formula[K]]): Parser[Exists[K] | ForAll[K]] = {
     (Token.ForAll() ~ varParser ~ inner) ^^ {
       case _ ~ x ~ phi => ForAll(x, phi)
     } | 
