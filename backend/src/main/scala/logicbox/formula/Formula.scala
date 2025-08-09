@@ -23,10 +23,14 @@ object Term {
   final case class FunAppl(f: String, ps: List[Term[Pred]]) extends Term[Pred]
 
   // arithmetic
+  sealed trait BinOp[K <: FormulaKind] extends Term[K] {
+    def t1: Term[K]
+    def t2: Term[K]
+  }
   final case class Zero() extends Term[Arith]
   final case class One() extends Term[Arith]
-  final case class Plus(t1: Term[Arith], t2: Term[Arith]) extends Term[Arith]
-  final case class Mult(t1: Term[Arith], t2: Term[Arith]) extends Term[Arith]
+  final case class Plus(t1: Term[Arith], t2: Term[Arith]) extends BinOp[Arith]
+  final case class Mult(t1: Term[Arith], t2: Term[Arith]) extends BinOp[Arith]
 }
 
 sealed trait Formula[K <: FormulaKind]

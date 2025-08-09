@@ -37,19 +37,32 @@ class FormulaSubstitutor[K <: (FormulaKind.Pred | FormulaKind.Arith)] extends Su
     case Exists(y, phi) => Exists(y, substitute(phi, t, x))
   }
 
-  private def freeVarsIn(t: Term[K]): Set[Var] = t match {
-    case x: Var => Set(x)
-    case _ => ???
-  }
-  
-
   override def isFreeFor(f: Formula[K], t: Term[K], x: Var): Boolean = {
-    val freeVars = freeVarsIn(t)
-    def visit(ff: Formula[K]): Boolean = ff match {
-      case ForAll(y, phi) if freeVars contains y => hasFreeOccurance(phi, x)
-      case _ => ???
+    def visitT(tt: Term[K], boundVars: Set[Var]): Boolean = tt match {
+      case xx: Var if xx == x =>
+        // no bound var must occur in t
+        boundVars.forall(!hasFreeOccurance(t, _))
+
+      case FunAppl(_, ps) => ps.forall(visitT(_, boundVars))
+      case tt @ (Plus(_, _) | Mult(_, _)) => visitT(tt.t1, boundVars) && visitT(tt.t2, boundVars)
+
+      case Zero() | One() => true
+      case y: Var => true
     }
-    visit(f)
+
+    def visitF(ff: Formula[K], boundVars: Set[Var] = Set()): Boolean = ff match {
+      case ForAll(y, phi) => visitF(phi, boundVars + y)
+      case Exists(y, phi) => visitF(phi, boundVars + y)
+      case Predicate(_, ts) => ts.forall(t => visitT(t, boundVars))
+      case And(phi, psi) => visitF(phi, boundVars) && visitF(psi, boundVars)
+      case Or(phi, psi) => visitF(phi, boundVars) && visitF(psi, boundVars)
+      case Implies(phi, psi) => visitF(phi, boundVars) && visitF(psi, boundVars)
+      case Not(phi) => visitF(phi, boundVars)
+      case Contradiction() | Tautology() => true
+      case Equals(t1, t2) => visitT(t1, boundVars) && visitT(t2, boundVars)
+    }
+
+    visitF(f)
   }
   
   // true iff v contains occurance of t
