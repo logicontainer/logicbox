@@ -84,6 +84,7 @@ export type Diagnostic = { uuid: UUID } & (
   | { errorType: "PremiseInsideBox" }
   | { errorType: "InvalidAssumption" }
   | { errorType: "FreshVarEscaped", boxId: string, freshVar: string }
+  | { errorType: "RedefinitionOfFreshVar", originalUuid: string, freshVar: string }
 
   | { errorType: "ReferenceOutOfScope", refIdx: number }
   | { errorType: "ReferenceToLaterStep", refIdx: number }

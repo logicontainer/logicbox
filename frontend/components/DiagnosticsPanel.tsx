@@ -144,6 +144,10 @@ export function DiagnosticsPanel({
         // TODO: highlight the box when hovering
         return <TitleOnlyDiagnostic iconLatex={d.freshVar} title={<>Occurance of <InlineMath math={d.freshVar}/> outside the box in which it is defined</>} value={value} key={value}/>
 
+      case "RedefinitionOfFreshVar":
+        // TODO: highlight the boxes when hovering
+        return <TitleOnlyDiagnostic iconLatex={d.freshVar} title={<>Fresh variable <InlineMath math={d.freshVar}/> has already been defined</>} value={value} key={value}/>
+
       case "ShapeMismatch": {
         const icon = getRuleNameAtStepAsLatex(d.uuid) ?? "?"
 
