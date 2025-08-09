@@ -34,6 +34,7 @@ import { logicNameToString } from "./GalleryItem";
 import { createSequentLaTeX } from "@/lib/sequent";
 
 import { Tooltip } from 'react-tooltip'
+import { Scope_One } from "next/font/google";
 
 function RuleShowPanel({
   ruleLatex
@@ -275,17 +276,25 @@ export default function ContextSidebar() {
 
   // TODO: this could probably be made better by listening to resize events or something
   React.useEffect(() => {
-    const value = scrollAreaRef.current?.scrollHeight !== scrollAreaRef.current?.clientHeight
-    if (shouldShowRuleTooltip !== value) {
-      setShouldShowTooltip(value)
+    const s = scrollAreaRef.current?.scrollHeight === undefined || scrollAreaRef.current?.clientHeight === undefined ? false : 
+      scrollAreaRef.current?.scrollHeight > scrollAreaRef.current?.clientHeight
+
+    if (shouldShowRuleTooltip !== s) {
+      setShouldShowTooltip(s)
     }
   }, [scrollAreaRef.current?.scrollHeight, scrollAreaRef.current?.clientHeight])
 
   return (
-    <div className="lg:h-screen p-2"> 
-      <div className="flex flex-col gap-2">
+    <div className="md:h-screen p-2"> 
+      <div className="flex flex-col gap-2 h-full">
         <ProofEditorToolbar proof={proof}/>
-        <Card ref={scrollAreaRef} className={cn("max-h-48 md:max-h-max overflow-scroll", noPanelIsShown && "min-h-48 h-12")}>
+        <Card 
+          ref={scrollAreaRef} 
+          className={cn(
+            "max-h-48 md:max-h-max overflow-scroll", 
+            noPanelIsShown && "min-h-48 h-12"
+          )}
+        >
           {showLineFocusPanel && <>
             <LineFocusPanel lineUuid={stepInFocus} lineStep={proofStep} />
           </>}
