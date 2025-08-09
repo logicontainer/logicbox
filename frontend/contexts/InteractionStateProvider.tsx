@@ -21,7 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
 
 export enum TransitionEnum {
-  CLICK_OUTSIDE,
+  INTERACT_OUTSIDE,
   CLICK_BOX,
   RIGHT_CLICK_STEP,
 
@@ -116,7 +116,7 @@ export type Transition = { enum: TransitionEnum } & (
       proofStepUuid: string;
       isBox: boolean;
     }
-  | { enum: TransitionEnum.CLICK_OUTSIDE }
+  | { enum: TransitionEnum.INTERACT_OUTSIDE }
   | { enum: TransitionEnum.CLOSE }
   | { enum: TransitionEnum.START_DRAG_STEP; stepUuid: string }
   | { enum: TransitionEnum.STOP_DRAG_STEP }
@@ -443,7 +443,7 @@ export function InteractionStateProvider({
     REDO,
     CLOSE,
     UPDATE_CONTENT,
-    CLICK_OUTSIDE,
+    INTERACT_OUTSIDE,
     VALIDATE_PROOF,
     CLICK_CONTEXT_MENU_OPTION,
   } = TransitionEnum;
@@ -452,7 +452,7 @@ export function InteractionStateProvider({
 
   const behavior: Behavior = {
     [IDLE]: {
-      [CLICK_OUTSIDE]: fullyIdle,
+      [INTERACT_OUTSIDE]: fullyIdle,
 
       [CLICK_LINE]: (state, { lineUuid }) =>
         handleClickStepInIdle(state, lineUuid),
@@ -504,7 +504,7 @@ export function InteractionStateProvider({
     },
 
     [EDITING_FORMULA]: {
-      [CLICK_OUTSIDE]: (state, _) => {
+      [INTERACT_OUTSIDE]: (state, _) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
         return stickySelectStep(state.lineUuid)
       },
@@ -575,7 +575,7 @@ export function InteractionStateProvider({
     },
 
     [EDITING_RULE]: {
-      [CLICK_OUTSIDE]: () => fullyIdle(),
+      [INTERACT_OUTSIDE]: () => fullyIdle(),
 
       [CLICK_LINE]: (state, { lineUuid }) => {
         if (state.lineUuid === lineUuid) {
@@ -632,7 +632,7 @@ export function InteractionStateProvider({
     },
 
     [EDITING_REF]: {
-      [CLICK_OUTSIDE]: () => fullyIdle(),
+      [INTERACT_OUTSIDE]: () => fullyIdle(),
 
       [CLICK_LINE]: (
         { refIdx, lineUuid: editedLineUuid },
@@ -715,7 +715,7 @@ export function InteractionStateProvider({
     
     [EDITING_FRESH_VAR]: {
       [HOVER]: doNothing,
-      [CLICK_OUTSIDE]: (_, {}) => fullyIdle(),
+      [INTERACT_OUTSIDE]: (_, {}) => fullyIdle(),
       [CLICK_BOX]: (_, { boxUuid }) => stickySelectStep(boxUuid),
       [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => ({ enum: VIEWING_CONTEXT_MENU, proofStepUuid, isBox }),
 
@@ -799,10 +799,12 @@ export function InteractionStateProvider({
         enqueueCommand(ExtraCommands.VALIDATE)
         return fullyIdle()
       },
+
+      // [INTERACT_OUTSIDE]: fullyIdle,
     },
 
     [VIEWING_CONTEXT_MENU]: {
-      [CLICK_OUTSIDE]: () => fullyIdle(),
+      [INTERACT_OUTSIDE]: () => fullyIdle(),
 
       [DOUBLE_CLICK_LINE]: (_, { lineUuid }) => {
         return startEditingFormula(lineUuid);
@@ -947,7 +949,7 @@ export function InteractionStateProvider({
           prevState,
           transition,
         );
-        return prevState;
+        return fullyIdle();
       } else {
         return func(prevState, transition)
       }
