@@ -33,6 +33,10 @@ import { cn } from "@/lib/utils";
 import { logicNameToString } from "./GalleryItem";
 import { useHtmlContext } from "next/dist/shared/lib/html-context.shared-runtime";
 import { createSequentLaTeX } from "@/lib/sequent";
+
+import { Tooltip } from 'react-tooltip'
+
+
 function RuleShowPanel({
   ruleLatex
 }: {
@@ -145,7 +149,7 @@ function RulePanel() {
   const createRuleElement = (rule: Rule) => (
     <div
       key={rule.ruleName}
-      className="flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
+      className="RULE_ELEMENT flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
       onMouseOver={() => setHoveredRule(rule.ruleName)}
       onMouseLeave={() => setHoveredRule(null)}
       onClick={() => handleChangeRule(rule.ruleName)}
@@ -159,7 +163,11 @@ function RulePanel() {
 
   const [first, ...rest] = allRules.map(createRuleElement)
 
+  const shouldShowTooltip = !hoveredRule
   return <div className="w-full flex flex-col gap-5">
+    <Tooltip anchorSelect=".RULE_ELEMENT" delayHide={0} variant="dark" className={shouldShowTooltip && "hidden" || undefined}>
+      <InlineMath math={hoveredRuleDetailsLatex}/>
+    </Tooltip>
     <div className="grid grid-cols-3 gap-2">
       {first}
       <div className="col-span-2 row-span-3">
