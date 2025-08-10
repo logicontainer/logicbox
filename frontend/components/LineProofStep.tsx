@@ -3,7 +3,6 @@
 import "katex/dist/katex.min.css";
 
 import {
-  Diagnostic,
   TLineNumber,
   LineProofStep as TLineProofStep,
 } from "@/types/types";
@@ -39,7 +38,6 @@ export function LineProofStep({
   ...props
 }: TLineProofStep & {
   lines: TLineNumber[];
-  diagnosticsForLine: Diagnostic[];
   isOuterProofStep?: boolean;
 }) {
   const { doTransition } = useInteractionState();

@@ -4,15 +4,15 @@ import { InlineMath } from "react-katex";
 import { TLineNumber } from "@/types/types";
 import { cn } from "@/lib/utils";
 import { useServer } from "@/contexts/ServerProvider";
+import { useProof } from "@/contexts/ProofProvider";
 
 export default function LineNumber({ line }: { line: TLineNumber }) {
   const serverContext = useServer();
-  const proofDiagnostics = serverContext.proofDiagnostics;
-  const diagnosticMap = Object.fromEntries(
-    proofDiagnostics.map((d) => [d.uuid, d]),
-  );
+  const { getParentUuid } = useProof()
+  let proofDiagnostics = serverContext.proofDiagnostics;
 
-  const proofStepDiagnostics = diagnosticMap[line.uuid];
+  const parentUuid = getParentUuid(line.uuid)
+  const shouldShowTriangle = proofDiagnostics.some(d => d.uuid === line.uuid || d.uuid === parentUuid)
 
   if (!line || line.stepType !== "line") {
     return null;
@@ -26,7 +26,7 @@ export default function LineNumber({ line }: { line: TLineNumber }) {
       <div className={cn("rounded-sm flex-grow")}>
         <InlineMath math={line?.lineNumber.toString() + "."} />
       </div>
-      {proofStepDiagnostics && (
+      {shouldShowTriangle && (
         <TriangleAlert className="text-red-500"></TriangleAlert>
       )}
     </div>
