@@ -64,14 +64,15 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
             {createdAtString()}
           </p>
         </div>
-        <div
-          className="flex items-center justify-end gap-1 pr-2"
-          onClick={e => e.stopPropagation() /* don't let button clicks through to selecting this */}
-        >
-          <ButtonGroup orientation="vertical">
-            <DeleteProofButton proofId={proof.id} />
-            <DownloadProofButton proofId={proof.id} />
-          </ButtonGroup>
+        <div className="flex items-center justify-end gap-1 pr-2">
+          <div
+            onClick={e => e.stopPropagation() /* don't let button clicks through to selecting this */}
+          >
+            <ButtonGroup orientation="vertical">
+              <DeleteProofButton proofId={proof.id} />
+              <DownloadProofButton proofId={proof.id} />
+            </ButtonGroup>
+          </div>
         </div>
 
       </Card>
