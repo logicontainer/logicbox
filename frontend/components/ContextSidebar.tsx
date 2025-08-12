@@ -34,7 +34,6 @@ import { logicNameToString } from "./GalleryItem";
 import { createSequentLaTeX } from "@/lib/sequent";
 
 import { Tooltip } from 'react-tooltip'
-import { Scope_One } from "next/font/google";
 
 function RuleShowPanel({
   ruleLatex
@@ -101,6 +100,9 @@ function BoxFocusPanel({
 }) {
   const { getReferenceString } = useLines()
 
+  const { proofDiagnostics } = useServer();
+  const errors = proofDiagnostics.filter((d) => d.uuid === boxUuid);
+
   return <div className="w-full h-40">
     <div className="overflow-x-hidden flex flex-col gap-4">
       <Label className="text-lg">
@@ -112,6 +114,8 @@ function BoxFocusPanel({
         </> : null}
       </Label>
     </div>
+    {errors.length > 0 ? <hr className="mt-2" /> : null}
+    <DiagnosticsPanel diagnostics={errors} />
   </div>
 }
 

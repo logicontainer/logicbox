@@ -67,10 +67,16 @@ object JsonFormatters {
       "rulePosition" -> rulePosition.asJson,
       "explanation" -> explanation.asJson
     )
-    case obj @ logicbox.server.format.OutputError.FreshVarEscaped(uuid, boxId, freshVar) => Json.obj(
+    case obj @ OutputError.FreshVarEscaped(uuid, boxId, freshVar) => Json.obj(
       "uuid" -> uuid.asJson,
       "errorType" -> obj.errorType.asJson,
       "boxId" -> boxId.asJson,
+      "freshVar" -> freshVar.asJson
+    )
+    case obj @ OutputError.RedefinitionOfFreshVar(uuid, originalUuid, freshVar) => Json.obj(
+      "uuid" -> uuid.asJson,
+      "errorType" -> obj.errorType.asJson,
+      "originalUuid" -> originalUuid.asJson,
       "freshVar" -> freshVar.asJson
     )
   }
