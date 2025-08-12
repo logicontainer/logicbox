@@ -11,7 +11,6 @@ import { BoxProofStep } from "@/components/BoxProofStep";
 import { LineProofStep } from "@/components/LineProofStep";
 import { ProofStep } from "@/types/types";
 import { cn } from "@/lib/utils";
-import { useProof } from "@/contexts/ProofProvider";
 
 export function Proof({
   ...props
@@ -22,18 +21,14 @@ export function Proof({
   uuid?: string;
   isOuterProof?: boolean;
 }) {
-  const { getParentUuid } = useProof()
   return (
     <div className={cn("cursor-pointer text-slate-800 w-full min-w-40")}>
       {props.proof.map((proofStep) => {
         if (proofStep.stepType == "line") {
-          const parentUuid = getParentUuid(proofStep.uuid)
-          const diagnosticsForLine = props.diagnostics.filter((d) => d.uuid === proofStep.uuid || d.uuid === parentUuid);
           return (
             <LineProofStep
               key={proofStep.uuid}
               lines={props.lines}
-              diagnosticsForLine={diagnosticsForLine}
               isOuterProofStep={props.isOuterProof}
               {...proofStep}
             />
