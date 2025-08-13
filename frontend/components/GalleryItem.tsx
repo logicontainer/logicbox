@@ -8,6 +8,12 @@ import RenameProofButton from "@/components/RenameProofButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { ButtonGroup } from "./ui/button-group";
+import { Edit } from "lucide-react";
+import AutosizeInput from "react-input-autosize";
+import { cn } from "@/lib/utils";
+import React from "react";
+import { useProofStore } from "@/store/proofStore";
+import { EditableProofTitle } from "./EditableProofTitle";
 
 export function logicNameToString(name: LogicName): string {
   switch (name) {
@@ -58,11 +64,11 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
           <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)} />
         </div>
         <div className="flex flex-col gap-2 justify-center overflow-hidden">
-          <p className="text text-lg font-bold text-nowrap overflow-scroll cursor-text">{proof.title}</p>
-          <p className="text-xs text-gray-500">
+          <EditableProofTitle proofId={proof.id}/>
+          <div className="text-xs text-gray-500">
             {logicNameToString(proof.logicName)}<br />
             {createdAtString()}
-          </p>
+          </div>
         </div>
         <div className="flex items-center justify-end gap-1 pr-2">
           <div
