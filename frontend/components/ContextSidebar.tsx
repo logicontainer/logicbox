@@ -34,6 +34,7 @@ import { logicNameToString } from "./GalleryItem";
 import { createSequentLaTeX } from "@/lib/sequent";
 
 import { Tooltip } from 'react-tooltip'
+import { EditableProofTitle } from "./EditableProofTitle";
 
 function RuleShowPanel({
   ruleLatex
@@ -201,15 +202,15 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
       sequentIsVisible && "bg-accent"
     )}>
       <div className="flex items-center justify-between gap-1 py-2">
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           <Link href={"/gallery"} title="Go to your proof gallery">
-            <img className="w-12 h-12" src="/logicbox-icon.svg"></img>
+            <img className="min-w-12 w-12 h-12" src="/logicbox-icon.svg"></img>
           </Link>
-          <div className="w-[1px] self-stretch bg-gray-600 my-1"></div>
-          <div className="flex justify-between items-center overflow-scroll">
-            <div className="flex flex-col items-start">
-              <p className="text md:text-xl text-clip text-nowrap">{proof.title}</p>
-              <p className="text-xs md:text-sm font-light text-clip text-nowrap">{logicNameToString(proof.logicName)}</p>
+          <div className="min-w-[1px] w-[1px] self-stretch bg-gray-600 my-1"></div>
+          <div className="flex justify-between items-center overflow-auto">
+            <div className="flex flex-col items-start overflow-hidden">
+              <EditableProofTitle proofId={proof.id}/>
+              <div className="text-xs md:text-sm font-light text-clip text-nowrap">{logicNameToString(proof.logicName)}</div>
             </div>
           </div>
         </div>
