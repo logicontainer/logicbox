@@ -7,7 +7,7 @@ object Lexer extends RegexParsers {
   import Token._
   override def skipWhitespace = true
   
-  def and = ("A" | "∧" | "and" | "AND") ^^^ And()
+  def and = ("^" | "∧" | "and" | "AND") ^^^ And()
   def or = ("V" | "or" | "OR") ^^^ Or()
   def not = ("!" | "¬" | "not" | "NOT") ^^^ Not()
   def implies = ("->" | "=>" | "implies" | "IMPLIES") ^^^ Implies()
