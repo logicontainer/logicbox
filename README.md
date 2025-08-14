@@ -1,11 +1,13 @@
 ## How do you use LogicBox?
 ### Add a line
 Add a line to your proof by right-clicking on an existing step and clicking on ⬆️ to add a line above or on ⬇️ to add a line below.
+![01  add-line](https://github.com/user-attachments/assets/f2e5ccea-7303-4a4a-93e7-1afde748e0fc)
 
 <!-- TODO: video adding a line -->
 
 ### Enter a formula
 Modify the formula of a line by double-clicking on it, and entering the new value.
+![02  edit-formula](https://github.com/user-attachments/assets/b47c0e53-19b7-4223-b9a9-4235d89fcf4e)
 
 <!-- TODO: video of entering a formula -->
 
@@ -13,6 +15,7 @@ Modify the formula of a line by double-clicking on it, and entering the new valu
 
 ### Choose a rule
 Choose a rule by clicking on the rule and selecting a new one from the side-panel. By hovering on a rule, you may see its definition.
+![03  choose-rule](https://github.com/user-attachments/assets/1baa76b8-2d70-4c5e-932b-d697ae3a5e3c)
 
 <!-- TODO: video of choosing a rule -->
 
@@ -20,47 +23,52 @@ Choose a rule by clicking on the rule and selecting a new one from the side-pane
 
 ### Pick lines to refer to
 To refer to a line, click on a reference, then click on the line/box which you would like to refer to.
+![04  pick-refs](https://github.com/user-attachments/assets/7f1a7cec-3084-460a-ba0f-daedf22b462f)
 
 <!-- TODO: video of referring to line -->
 
-You may refer to a box by clicking close to its border.
-
-<!-- TODO: video of referring to box -->
-
 ### Inspect errors
 You may inspect the errors currently on a line/box by clicking on it, and viewing the errors in the side-panel.
+![05  inspect-single-line](https://github.com/user-attachments/assets/e101064a-a419-423c-91d4-246851378794)
 
 <!-- TODO: video of clicking on line and inspecting errors -->
 
 If no line/box is currently selected, the errors pertaining to the currently hovered element will be shown.
+![06  inspect-multiple-lines](https://github.com/user-attachments/assets/87a4ade2-0dea-4e42-a839-00eedf47bb4c)
 
 <!-- TODO: video of inspecting errors of multiple lines (by hovering) -->
 
 ### Add a box
 Add a box to the proof by right-clicking on an existing step and clicking on ⬆️ to add a box above or on ⬇️ to add a box below.
+![07  add-box](https://github.com/user-attachments/assets/cd9cfeb1-2641-4db4-9bab-6dc5a06df008)
 
 <!-- TODO: video of adding box -->
 
 ### Remove a step
 You may remove a line by right-clicking on it and selecting 'Delete'.
+![08  delete-line](https://github.com/user-attachments/assets/08d2b201-5bdd-47ea-bcd0-af56e1546a76)
 
 <!-- TODO: video of removing a line -->
 
 If you remove a box, you will remove all steps it contains.
+![09  delete-box](https://github.com/user-attachments/assets/244111bd-dfa6-4aa7-8f85-7b72d8420fc7)
 
 <!-- TODO: video of removing a box with a bunch of stuff -->
 
 ### Move a step
 You can move a line/box by dragging it to its new location
+![10  move-line](https://github.com/user-attachments/assets/d8471c62-b5ff-4191-b5e2-9346566bef4c)
 
 <!-- TODO: video of moving a line -->
 
 ### Edit fresh variable in a box (only in predicate logic/arithmetic)
 You may add/edit a fresh variable by right-clicking on a box and choosing 'Edit fresh variable'.
+![11  edit-fresh-var-ctx-menu](https://github.com/user-attachments/assets/54ff79e7-7763-4a53-aa1c-2b184fc3e16d)
 
 <!-- TODO: video of adding fresh var to box by using context menu -->
 
 (alternatively you may double-click on the box to edit its fresh variable)
+![12  edit-fresh-var-dbl-click](https://github.com/user-attachments/assets/4b5cf8a7-56fc-4dda-a414-c985fcb47b62)
 
 <!-- TODO: video of adding fresh var to box by double-clicking -->
 
