@@ -7,7 +7,7 @@ export function EditableProofTitle({
   proofId
 }: {
   proofId: string
-}) { 
+}) {
   const title = useProofStore(state => state.getProof)(proofId)?.title ?? null
   const updateProofTitle = useProofStore(state => state.updateProofTitle)
 
@@ -44,9 +44,9 @@ export function EditableProofTitle({
       }
     }}
     placeholder="Proof title..."
-    className="text-lg overflow-scroll"
+    className="text-lg overflow-auto"
     inputClassName={cn(
-      "py-[2px] rounded bg-transparent font-bold",
+      "py-[2px] rounded bg-transparent font-bold outline-none focus:underline",
       inputFieldValue && "underline",
     )}
   />

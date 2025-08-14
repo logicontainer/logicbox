@@ -8,6 +8,7 @@ import { ProofContextProps, useProof } from "@/contexts/ProofProvider";
 import { getStepHighlight, StepHighlight } from "@/lib/proof-step-highlight";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
+import { MemoizedInlineMath } from "./MemoizedInlineMath";
 
 function computeBackgroundColor(boxUuid: string, interactionState: InteractionState, proofContext: ProofContextProps, hoveringState: HoveringState | null): string {
   const highlight = getStepHighlight(boxUuid, interactionState, hoveringState, proofContext);
@@ -109,7 +110,7 @@ export default function FreshVars({
         e.stopPropagation();
       }}
     >
-      {latexFormula ? <InlineMath math={latexFormula}></InlineMath> : null}
+      {latexFormula ? <MemoizedInlineMath math={latexFormula}></MemoizedInlineMath> : null}
     </div>
   </div>
 }
