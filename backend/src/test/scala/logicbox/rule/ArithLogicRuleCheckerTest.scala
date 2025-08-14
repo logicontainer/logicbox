@@ -334,7 +334,7 @@ class ArithLogicRuleCheckerTest extends AnyFunSpec {
       checker.check(Peano6(), f, refs) shouldBe List(
         Ambiguous(MetaTerm(Terms.T2), List(
           Location.conclusion.rhs,
-          Location.premise(1).rhs.lhs
+          Location.premise(0).rhs.lhs
         ))
       )
     }
