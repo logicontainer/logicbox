@@ -7,7 +7,6 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import Card from "./Card";
-import { InlineMath } from "react-katex";
 import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
 import { useLines } from "@/contexts/LinesProvider";
 import { useServer } from "@/contexts/ServerProvider";
@@ -35,6 +34,7 @@ import { createSequentLaTeX } from "@/lib/sequent";
 
 import { Tooltip } from 'react-tooltip'
 import { EditableProofTitle } from "./EditableProofTitle";
+import { MemoizedInlineMath } from "./MemoizedInlineMath";
 
 function RuleShowPanel({
   ruleLatex
@@ -42,7 +42,7 @@ function RuleShowPanel({
   ruleLatex: string
 }) {
   return <div className="w-full h-full flex justify-center items-center text-md border border-black rounded-sm">
-    <InlineMath math={ruleLatex} />
+    <MemoizedInlineMath math={ruleLatex} />
   </div>
 }
 
@@ -77,11 +77,11 @@ function LineFocusPanel({
     <div className="h-32 grid grid-cols-[1fr_2fr]">
       <div className="overflow-x-hidden flex flex-col gap-4">
         <Label className="text-lg">
-          <InlineMath math={"\\textbf{Line }\\mathbf{" + (getReferenceString(lineUuid) ?? "???") + "}"} />
+          <MemoizedInlineMath math={"\\textbf{Line }\\mathbf{" + (getReferenceString(lineUuid) ?? "???") + "}"} />
         </Label>
         {lineStep.justification.refs.length === 0 ? [] :
           <Label>References: <span className="text-xs">
-            <InlineMath math={refLineNumbers.join(", ")} />
+            <MemoizedInlineMath math={refLineNumbers.join(", ")} />
           </span></Label>
         }
       </div>
@@ -107,11 +107,11 @@ function BoxFocusPanel({
   return <div className="w-full h-40">
     <div className="overflow-x-hidden flex flex-col gap-4">
       <Label className="text-lg">
-        <InlineMath math={"\\textbf{Box " + (getReferenceString(boxUuid) ?? "???") + "}"} />
+        <MemoizedInlineMath math={"\\textbf{Box " + (getReferenceString(boxUuid) ?? "???") + "}"} />
       </Label>
       <Label>
         {boxStep.boxInfo.freshVar ? <>
-          Fresh variable: <InlineMath math={boxStep.boxInfo.freshVar} />
+          Fresh variable: <MemoizedInlineMath math={boxStep.boxInfo.freshVar} />
         </> : null}
       </Label>
     </div>
@@ -159,7 +159,7 @@ function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }
       onClick={() => handleChangeRule(rule.ruleName)}
     >
       <h3 className="text">
-        <InlineMath math={rule.latex.ruleName}></InlineMath>
+        <MemoizedInlineMath math={rule.latex.ruleName}></MemoizedInlineMath>
       </h3>
       <p className="text-sm text-gray-600"></p>
     </div>
@@ -182,7 +182,7 @@ function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }
       place="right"
       className={(!shouldShowRuleTooltip || hoveredRule === null) && "hidden" || undefined}
     >
-      <InlineMath math={hoveredRuleDetailsLatex} />
+      <MemoizedInlineMath math={hoveredRuleDetailsLatex}/>
     </Tooltip>
   </div>
 }
@@ -252,7 +252,7 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
           !sequentIsVisible && "hidden",
           "py-1 flex items-center justify-center text-sm"
         )}>
-          <InlineMath math={createSequentLaTeX(proof.proof) ?? "???"} />
+          <MemoizedInlineMath math={createSequentLaTeX(proof.proof) ?? "???"}/>
         </div>
       </>}
     </Card>
