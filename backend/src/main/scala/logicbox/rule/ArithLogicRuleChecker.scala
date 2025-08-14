@@ -113,7 +113,7 @@ class ArithLogicRuleChecker[F, T, V <: T](
             ))) ++
             failIf(t4 != t2, Ambiguous(MetaTerm(Terms.T2), List(
               Location.conclusion.rhs,
-              Location.premise(1).rhs.lhs
+              Location.premise(0).rhs.lhs
             )))
 
           case _ => 
