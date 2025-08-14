@@ -5,7 +5,7 @@
 ||| Syntax |
 |-|-|-|
 | Propositional atoms | $a$, $b$, $p$, $q$, ... | `a`, `b`, `p`, `q`, ... |
-| Conjunction (and) | $p \\land q$ | `p and q`, `p A q`, `p ∧ q` |
+| Conjunction (and) | $p \\land q$ | `p and q`, `p ^ q`, `p ∧ q` |
 | Disjunction (or) | $a \\lor b$ | `a or b`, `a V b` |
 | Implication (if ... then) | $q \\rightarrow r$ | `q implies r`, `q -> r`, `q => r` |
 | Negation (not) | $\\lnot s$ | `not s`, `!s`, `¬s` |
