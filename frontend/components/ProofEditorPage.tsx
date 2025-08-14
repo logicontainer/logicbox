@@ -16,16 +16,16 @@ export default function ProofEditorPage({ proofId }: { proofId: string }) {
       onDragOver={() => handleDragOver(null)}
       onDragEnd={() => handleDragStop()}
     >
-      <div 
-        className="h-screen w-[min(100%,550px)] md:w-auto md:grid md:grid-cols-[550px_1fr]"
+      <div
+        className="h-screen w-[min(100%,550px)] md:w-auto md:grid md:grid-cols-[1fr_550px]"
       >
-        <div 
-          className="overflow-hidden relative"
+        <div
+          className="overflow-hidden relative md:order-2"
           onClick={e => e.stopPropagation()} // don't make INTERACT_OUTSIDE event
         >
           <ContextSidebar />
         </div>
-        <div className="overflow-hidden relative">
+        <div className="overflow-hidden relative md:order-1 ">
           <ProofEditor proofId={proofId} />
         </div>
       </div>

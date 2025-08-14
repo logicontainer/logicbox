@@ -8,6 +8,7 @@ import UploadProofButton from "@/components/UploadProofButton";
 import React from "react";
 import _ from "lodash";
 import Footer from "./Footer";
+import Link from "next/link";
 
 export default function GalleryPage() {
   const proofs = useProofStore((state) => state.proofs);
@@ -30,10 +31,16 @@ export default function GalleryPage() {
 
   return (
     <div className="pt-8 lg:px-4 w-screen min-h-screen flex flex-col justify-between">
-      <div className="flex gap-2 px-4">
-        <p className="text text-2xl font-bold">My proofs</p>
-        <NewProofDialog />
-        <UploadProofButton />
+      <div className="flex w-full items-center justify-between gap-2 px-4">
+        <Link href={"/gallery"} title="Go to your proof gallery" className="flex items-center justify-end gap-1">
+          <img className="min-w-16 w-16 h-16" src="/logicbox-icon.svg"></img>
+          <p className="text text-3xl font-bold">LogicBox</p>
+        </Link>
+        <div className="flex gap-2 items-center justify-start">
+          <p className="text text-2xl font-bold">My proofs</p>
+          <NewProofDialog />
+          <UploadProofButton />
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 w-full p-4">
         {isHydrated && proofs.map((proof: ProofWithMetadata) => {
