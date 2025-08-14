@@ -13,6 +13,7 @@ import React from "react";
 
 import _ from "lodash";
 import { useProofStore } from "@/store/proofStore";
+import { getPossibleMiddlewareFilenames } from "next/dist/build/utils";
 
 export interface ProofContextProps {
   proof: ProofWithMetadata;
@@ -61,6 +62,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   const { updateProofContent, getProof } = useProofStore();
   const proof = (proofId !== null && getProof(proofId)) || FALLBACK_PROOF;
 
+
   const setProofContent = (updater: (_: Proof) => Proof) => {
     if (!proofId) {
       console.warn("Can't update proof content, as proofId is null");
@@ -86,21 +88,72 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
       actionAtIndex(proof, indexInCurrentLayer, parentBox);
       return true;
     }
-    const boxProofSteps: BoxProofStep[] = proof.filter(
-      (proofStep) => proofStep.stepType == "box",
-    ) as unknown as BoxProofStep[];
+    const boxProofSteps = proof.filter((proofStep) => proofStep.stepType == "box");
+
     for (const boxProofStep of boxProofSteps) {
-      if (
-        interactWithProofNearUuid(
-          boxProofStep.proof,
-          uuid,
-          boxProofStep,
-          actionAtIndex,
-        )
-      )
+      if (interactWithProofNearUuid(boxProofStep.proof, uuid, boxProofStep, actionAtIndex))
         return true;
     }
     return false;
+  };
+
+  const extractProofStepDetails = (
+    proof: ProofStep[],
+    indexInCurrLayer: number,
+    parentBox: BoxProofStep | null,
+  ): ProofStepDetails & { isOnlyChildInBox: boolean } => {
+    const isOnlyChildInBox = proof ? proof.length == 1 : false;
+    if (isOnlyChildInBox) {
+      return {
+        proofStep: proof[0],
+        parentBoxUuid: parentBox ? parentBox.uuid : "",
+        isOnlyChildInBox: true,
+        position: {
+          prepend: false,
+          nearProofStepWithUuid: "",
+        },
+      };
+    } else {
+      return {
+        proofStep: proof[indexInCurrLayer],
+        parentBoxUuid: parentBox ? parentBox.uuid : "",
+        isOnlyChildInBox: false,
+        position: {
+          prepend: indexInCurrLayer == 0,
+          nearProofStepWithUuid:
+            indexInCurrLayer == 0
+              ? proof[1].uuid
+              : proof[indexInCurrLayer - 1].uuid,
+        },
+      };
+    }
+  };
+
+
+  function createHashMap(proof: Proof): Map<string, ProofStepDetails & { isOnlyChildInBox: boolean }> {
+    function visit(map: Map<string, ProofStepDetails & { isOnlyChildInBox: boolean }>, steps: ProofStep[], parent: BoxProofStep | null = null) {
+      let i = 0
+      for (const step of steps) {
+        map.set(step.uuid, extractProofStepDetails(steps, i, parent))
+        if (step.stepType === "box") {
+          visit(map, step.proof, step)
+        }
+        ++i
+      }
+    }
+    
+    const map = new Map<string, ProofStepDetails & { isOnlyChildInBox: boolean }>()
+    visit(map, proof)
+    return map
+  }
+
+  const stepDetailsMap = createHashMap(proof.proof)
+  console.log(stepDetailsMap)
+
+  const getProofStepDetails = (
+    uuid: string,
+  ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
+    return stepDetailsMap.get(uuid) ?? null
   };
 
   const addStep = (proofStep: ProofStep, position: ProofStepPosition) => {
@@ -158,29 +211,11 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
   };
 
   const isOnlyChild = (stepUuid: string): boolean => {
-    let result = true
-    const visit = (
-      proof: ProofStep[],
-      indexInCurrLayer: number,
-      parentBox: BoxProofStep | null,
-    ) => {
-      result = proof.length === 1
-    };
-    interactWithProofNearUuid(proof.proof, stepUuid, null, visit)
-    return result;
+    return getProofStepDetails(stepUuid)?.isOnlyChildInBox ?? false;
   }
 
   const getParentUuid = (stepUuid: string): string | null => {
-    let result: string | null = null
-    const visit = (
-      proof: ProofStep[],
-      indexInCurrLayer: number,
-      parentBox: BoxProofStep | null,
-    ) => {
-      result = parentBox?.uuid ?? null
-    };
-    interactWithProofNearUuid(proof.proof, stepUuid, null, visit)
-    return result
+    return getProofStepDetails(stepUuid)?.parentBoxUuid ?? null
   }
 
   const isDescendant = (parentUuid: string, targetUuid: string): boolean => {
@@ -233,45 +268,6 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
     });
   };
 
-  const getProofStepDetails = (
-    uuid: string,
-  ): (ProofStepDetails & { isOnlyChildInBox: boolean }) | null => {
-    let proofStepDetails: (ProofStepDetails & { isOnlyChildInBox: boolean }) | null = null
-    const extractProofStepDetails = (
-      proof: ProofStep[],
-      indexInCurrLayer: number,
-      parentBox: BoxProofStep | null,
-    ) => {
-      const isOnlyChildInBox = proof ? proof.length == 1 : false;
-      if (isOnlyChildInBox) {
-        proofStepDetails = {
-          proofStep: proof[0],
-          parentBoxUuid: parentBox ? parentBox.uuid : "",
-          isOnlyChildInBox: true,
-          position: {
-            prepend: false,
-            nearProofStepWithUuid: "",
-          },
-        };
-      } else {
-        proofStepDetails = {
-          proofStep: proof[indexInCurrLayer],
-          parentBoxUuid: parentBox ? parentBox.uuid : "",
-          isOnlyChildInBox: false,
-          position: {
-            prepend: indexInCurrLayer == 0,
-            nearProofStepWithUuid:
-              indexInCurrLayer == 0
-                ? proof[1].uuid
-                : proof[indexInCurrLayer - 1].uuid,
-          },
-        };
-      }
-      return proof;
-    };
-    interactWithProofNearUuid(proof.proof, uuid, null, extractProofStepDetails);
-    return proofStepDetails;
-  };
 
   const getNearestDeletableProofStep = (
     uuid: string,
