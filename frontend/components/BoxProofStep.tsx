@@ -35,12 +35,13 @@ export function BoxProofStep({
   const { setContextMenuPosition } = useContextMenu();
   const { handleHover, hoveringState } = useHovering();
   const { handleDragStart, handleDragOver, handleDragStop } = useStepDrag()
+  const proofContext = useProof()
 
   const highlight = getStepHighlight(
     props.uuid,
     interactionState,
     hoveringState,
-    useProof(),
+    proofContext
   );
 
   const freshVar = props.boxInfo?.freshVar;
@@ -112,7 +113,7 @@ export function BoxProofStep({
           highlight === StepHighlight.HOVERED_AND_OTHER_IS_SELECTING_REF && "bg-blue-200",
           highlight === StepHighlight.REFERRED && "bg-blue-200",
         )}
-        draggable={stepIsDraggable(props.uuid, interactionState)}
+        draggable={stepIsDraggable(props.uuid, interactionState, proofContext)}
         onDragStart={isMobile ? undefined : (_ => handleDragStart(props.uuid))}
         onDragOver={isMobile ? undefined : (e => {
           e.stopPropagation()

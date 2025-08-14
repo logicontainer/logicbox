@@ -148,7 +148,7 @@ export function LineProofStep({
         onTouchMove={isMobile ? handleTouchMove : undefined}
         onTouchEnd={isMobile ? handleTouchEnd : undefined}
 
-        draggable={!isMobile && stepIsDraggable(props.uuid, interactionState)}
+        draggable={!isMobile && stepIsDraggable(props.uuid, interactionState, proofContext)}
         onDragStart={isMobile ? undefined : (_ => handleDragStart(props.uuid))}
         onDragOver={isMobile ? undefined : (e => {
           e.preventDefault()
