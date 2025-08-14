@@ -17,7 +17,7 @@ import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { useHovering } from "@/contexts/HoveringProvider";
-import { BoxProofStep, LineProofStep,  ProofWithMetadata, Rule } from "@/types/types";
+import { BoxProofStep, LineProofStep, ProofWithMetadata, Rule } from "@/types/types";
 import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
@@ -175,14 +175,14 @@ function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }
       </div>
       {rest}
     </div>
-    <Tooltip 
-      anchorSelect=".RULE_ELEMENT" 
-      delayHide={0} 
-      variant="dark" 
+    <Tooltip
+      anchorSelect=".RULE_ELEMENT"
+      delayHide={0}
+      variant="dark"
       place="right"
       className={(!shouldShowRuleTooltip || hoveredRule === null) && "hidden" || undefined}
     >
-      <InlineMath math={hoveredRuleDetailsLatex}/>
+      <InlineMath math={hoveredRuleDetailsLatex} />
     </Tooltip>
   </div>
 }
@@ -197,22 +197,23 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
     onMouseLeave={_ => setSequentVisbility(false)}
   >
     <Card className={cn(
-      "flex flex-col gap-0",
       "px-2 py-0",
       sequentIsVisible && "bg-accent"
     )}>
-      <div className="flex items-center justify-between gap-1 py-2">
-        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+      <div className="flex items-center justify-between gap-1 py-2 w-full">
+        <div className="grid grid-cols-[48px_1px_auto] items-center gap-2 md:gap-3 flex-1 min-w-0">
           <Link href={"/gallery"} title="Go to your proof gallery">
             <img className="min-w-12 w-12 h-12" src="/logicbox-icon.svg"></img>
           </Link>
           <div className="min-w-[1px] w-[1px] self-stretch bg-gray-600 my-1"></div>
-          <div className="flex justify-between items-center overflow-auto">
-            <div className="flex flex-col items-start overflow-hidden">
-              <EditableProofTitle proofId={proof.id}/>
-              <div className="text-xs md:text-sm font-light text-clip text-nowrap">{logicNameToString(proof.logicName)}</div>
+          {/* <div className="flex justify-between items-center overflow-hidden"> */}
+          <div className="flex flex-col items-start justify-between h-12 overflow-hidden flex-shrink">
+            <div className="overflow-x-hidden overflow-y-visible w-full grow-0 h-auto">
+              <EditableProofTitle proofId={proof.id} />
             </div>
+            <div className="text-xs md:text-sm font-light text-clip text-nowrap grow-0">{logicNameToString(proof.logicName)}</div>
           </div>
+          {/* </div> */}
         </div>
         <Toolbar.Root
           className="flex gap-1 md:gap-3 items-center"
@@ -246,12 +247,12 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
         </Toolbar.Root>
       </div>
       {sequentIsVisible && <>
-        <hr/>
+        <hr />
         <div className={cn(
           !sequentIsVisible && "hidden",
           "py-1 flex items-center justify-center text-sm"
         )}>
-          <InlineMath math={createSequentLaTeX(proof.proof) ?? "???"}/>
+          <InlineMath math={createSequentLaTeX(proof.proof) ?? "???"} />
         </div>
       </>}
     </Card>
@@ -281,7 +282,7 @@ export default function ContextSidebar() {
 
   // TODO: this could probably be made better by listening to resize events or something
   React.useEffect(() => {
-    const s = scrollAreaRef.current?.scrollHeight === undefined || scrollAreaRef.current?.clientHeight === undefined ? false : 
+    const s = scrollAreaRef.current?.scrollHeight === undefined || scrollAreaRef.current?.clientHeight === undefined ? false :
       scrollAreaRef.current?.scrollHeight > scrollAreaRef.current?.clientHeight
 
     if (shouldShowRuleTooltip !== s) {
@@ -290,13 +291,13 @@ export default function ContextSidebar() {
   }, [scrollAreaRef.current?.scrollHeight, scrollAreaRef.current?.clientHeight])
 
   return (
-    <div className="md:h-screen p-2"> 
+    <div className="md:h-screen p-2">
       <div className="flex flex-col gap-2 h-full">
-        <ProofEditorToolbar proof={proof}/>
-        <Card 
-          ref={scrollAreaRef} 
+        <ProofEditorToolbar proof={proof} />
+        <Card
+          ref={scrollAreaRef}
           className={cn(
-            "max-h-48 md:max-h-max overflow-scroll", 
+            "max-h-48 md:max-h-max overflow-auto",
             noPanelIsShown && "min-h-48 h-12"
           )}
         >
@@ -306,7 +307,7 @@ export default function ContextSidebar() {
           {showBoxFocusPanel && (
             <BoxFocusPanel boxUuid={stepInFocus} boxStep={proofStep} />
           )}
-          {showRulePanel && <RulePanel shouldShowRuleTooltip={shouldShowRuleTooltip}/>}
+          {showRulePanel && <RulePanel shouldShowRuleTooltip={shouldShowRuleTooltip} />}
           {noPanelIsShown && <div className="flex items-center justify-center w-full h-full">
             <p className="text-sm font-light text-gray-600">Interact with the proof to inspect context here.</p>
           </div>}
