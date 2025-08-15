@@ -35,7 +35,6 @@ import { createSequentLaTeX } from "@/lib/sequent";
 import { Tooltip } from 'react-tooltip'
 import { EditableProofTitle } from "./EditableProofTitle";
 import { MemoizedInlineMath } from "./MemoizedInlineMath";
-import LogicBoxLogo from '@/public/logicbox-icon.svg';
 import { HelpDialogButton } from "./HelpDialogButton";
 
 function RuleShowPanel({
@@ -205,7 +204,7 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
       <div className="flex items-center justify-between gap-1 py-2 w-full">
         <div className="grid grid-cols-[48px_1px_auto] items-center gap-2 md:gap-3 flex-1 min-w-0">
           <Link href={"/gallery"} title="Go to your proof gallery">
-            <LogicBoxLogo width={48} height={48} quality={100} src="/logicbox-icon.svg" alt={"LogicBox logo"} />
+            <img src={"logicbox-icon.svg"} width={48} height={48} alt="LogicBox logo" />
           </Link>
           <div className="min-w-[1px] w-[1px] self-stretch bg-gray-600 my-1"></div>
           <div className="flex flex-col items-start justify-center h-10 overflow-x-hidden overflow-y-clip flex-shrink">
