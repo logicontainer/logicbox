@@ -63,8 +63,8 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
         <div className="flex items-center justify-center bg-gray-100">
           <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)} />
         </div>
-        <div className="flex flex-col gap-2 justify-center overflow-hidden">
-          <EditableProofTitle proofId={proof.id}/>
+        <div className="flex flex-col gap-1 justify-center overflow-hidden">
+          <EditableProofTitle proofId={proof.id} />
           <div className="text-xs text-gray-500">
             {logicNameToString(proof.logicName)}<br />
             {createdAtString()}
