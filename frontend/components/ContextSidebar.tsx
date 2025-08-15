@@ -226,7 +226,7 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
           </Toolbar.ToolbarButton>
 
           <ButtonGroup className="flex items-center">
-            <DownloadProofButton className="hidden md:flex items-center h-full" proofId={proof.id} />
+            <DownloadProofButton className="hidden md:flex" proofId={proof.id} />
             <HelpButton />
           </ButtonGroup>
 

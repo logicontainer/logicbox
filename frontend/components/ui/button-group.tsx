@@ -1,12 +1,12 @@
-import { Children, ReactElement, cloneElement } from 'react';
-
-import { ButtonProps } from '@/components/ui/button';
+import { Children, cloneElement, isValidElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { ButtonProps } from './button';
 
 interface ButtonGroupProps {
   className?: string;
   orientation?: 'horizontal' | 'vertical';
-  children: ReactElement<ButtonProps>[];
+  children: ReactNode;
 }
 
 export const ButtonGroup = ({
@@ -14,37 +14,46 @@ export const ButtonGroup = ({
   orientation = 'horizontal',
   children,
 }: ButtonGroupProps) => {
-  const totalButtons = Children.count(children);
   const isHorizontal = orientation === 'horizontal';
-  const isVertical = orientation === 'vertical';
 
   return (
     <div
       className={cn(
-        'flex',
+        'inline-flex',
         {
-          'flex-col': isVertical,
-          'w-fit': isVertical,
+          'flex-col': !isHorizontal,
         },
         className
       )}
     >
-      {Children.map(children, (child, index) => {
-        const isFirst = index === 0;
-        const isLast = index === totalButtons - 1;
+      {Children.map(children, (child) => {
+        if (!isValidElement(child)) {
+          return child;
+        }
 
-        return cloneElement(child, {
+        const childElement = child as ReactElement<ButtonProps>;
+
+        return cloneElement(childElement, {
           className: cn(
-            {
-              'rounded-l-none': isHorizontal && !isFirst,
-              'rounded-r-none': isHorizontal && !isLast,
-              'border-l-0': isHorizontal && !isFirst,
+            // Apply the button's original classes FIRST
+            childElement.props.className,
 
-              'rounded-t-none': isVertical && !isFirst,
-              'rounded-b-none': isVertical && !isLast,
-              'border-t-0': isVertical && !isFirst,
+            // Apply all of our group-specific overrides LAST
+            'rounded-none focus:z-10',
+            {
+              '-ml-px': isHorizontal,
+              '-mt-px': !isHorizontal,
             },
-            child.props.className
+            'first:ml-0 first:mt-0',
+            
+            // --- THIS IS THE FIX ---
+            // Be explicit about first/last element rounding instead of combining them
+            {
+              'first:rounded-l-md': isHorizontal,
+              'last:rounded-r-md': isHorizontal,
+              'first:rounded-t-md': !isHorizontal,
+              'last:rounded-b-md': !isHorizontal,
+            }
           ),
         });
       })}

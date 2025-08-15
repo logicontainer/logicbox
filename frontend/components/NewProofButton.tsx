@@ -63,7 +63,7 @@ function LogicOption({
 
 
 
-export default function NewProofButton() {
+export default function NewProofButton({ className }: { className?: string }) {
   const addProof = useProofStore((state) => state.addProof);
   const router = useRouter();
   
@@ -100,7 +100,7 @@ export default function NewProofButton() {
 
   return <Dialog>
     <DialogTrigger asChild>
-      <Button variant="outline" onClick={_ => {
+      <Button className={className} variant="outline" onClick={_ => {
         setProofName("")
         setChosenLogic(null)
       }}>
