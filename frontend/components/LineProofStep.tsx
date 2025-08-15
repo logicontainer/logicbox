@@ -1,7 +1,5 @@
 "use client";
 
-import "katex/dist/katex.min.css";
-
 import {
   TLineNumber,
   LineProofStep as TLineProofStep,
@@ -14,7 +12,6 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import AutosizeInput from "react-input-autosize";
-import { InlineMath } from "react-katex";
 import { Justification } from "./Justification";
 import LineNumber from "./LineNumber";
 import { ProofStepWrapper } from "./ProofStepWrapper";
@@ -33,6 +30,7 @@ import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
 
 import { isMobile } from 'react-device-detect'
+import { MemoizedInlineMath } from "./MemoizedInlineMath";
 
 export function LineProofStep({
   ...props
@@ -148,7 +146,7 @@ export function LineProofStep({
         onTouchMove={isMobile ? handleTouchMove : undefined}
         onTouchEnd={isMobile ? handleTouchEnd : undefined}
 
-        draggable={!isMobile && stepIsDraggable(props.uuid, interactionState)}
+        draggable={!isMobile && stepIsDraggable(props.uuid, interactionState, proofContext)}
         onDragStart={isMobile ? undefined : (_ => handleDragStart(props.uuid))}
         onDragOver={isMobile ? undefined : (e => {
           e.preventDefault()
@@ -297,7 +295,7 @@ function Formula({
       )}
       style={isEditingFormula ? {} : { display: "none" }}
     >
-      <AutosizeInput
+      {isEditingFormula && <AutosizeInput
         inputRef={handleInputRefChange}
         value={currentFormulaValue}
         onClickCapture={(e) => e.stopPropagation()}
@@ -314,7 +312,7 @@ function Formula({
           "font-mono text-sm tracking-tighter",
           isMobile && "text-[16px] py-0",
         )}
-      />
+      />}
     </div>
     <div
       className={cn(
@@ -332,8 +330,9 @@ function Formula({
       {!isSyncedWithServer || !latexFormula || latexFormula === "" ? (
         <div className="h-full font-mono text-sm tracking-tighter flex items-center">{userInput === "" ? "???" : userInput}</div>
       ) : (
-        <InlineMath math={formulaLatexContentWithUnderline}></InlineMath>
+        <MemoizedInlineMath math={formulaLatexContentWithUnderline}></MemoizedInlineMath>
       )}
     </div>
   </div>
 }
+

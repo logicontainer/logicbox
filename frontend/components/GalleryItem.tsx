@@ -4,10 +4,11 @@ import { LogicName, ProofWithMetadata } from "@/types/types";
 import DownloadProofButton from "@/components/DownloadProofButton";
 import { InlineMath } from "react-katex";
 import DeleteProofButton from "@/components/DeleteProofButton";
-import RenameProofButton from "@/components/RenameProofButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { ButtonGroup } from "./ui/button-group";
+import React from "react";
+import { EditableProofTitle } from "./EditableProofTitle";
 
 export function logicNameToString(name: LogicName): string {
   switch (name) {
@@ -57,21 +58,22 @@ export function GalleryItem({ proof }: { proof: ProofWithMetadata }) {
         <div className="flex items-center justify-center bg-gray-100">
           <InlineMath math={logicNameToIconLatex(proof.logicName, proof.id)} />
         </div>
-        <div className="flex flex-col gap-2 justify-center overflow-hidden">
-          <p className="text text-lg font-bold text-nowrap overflow-scroll cursor-text">{proof.title}</p>
-          <p className="text-xs text-gray-500">
+        <div className="flex flex-col gap-1 justify-center overflow-hidden">
+          <EditableProofTitle proofId={proof.id} />
+          <div className="text-xs text-gray-500">
             {logicNameToString(proof.logicName)}<br />
             {createdAtString()}
-          </p>
+          </div>
         </div>
-        <div
-          className="flex items-center justify-end gap-1 pr-2"
-          onClick={e => e.stopPropagation() /* don't let button clicks through to selecting this */}
-        >
-          <ButtonGroup orientation="vertical">
-            <DeleteProofButton proofId={proof.id} />
-            <DownloadProofButton proofId={proof.id} />
-          </ButtonGroup>
+        <div className="flex items-center justify-end gap-1 pr-2">
+          <div
+            onClick={e => e.stopPropagation() /* don't let button clicks through to selecting this */}
+          >
+            <ButtonGroup orientation="vertical">
+              <DeleteProofButton proofId={proof.id} />
+              <DownloadProofButton proofId={proof.id} />
+            </ButtonGroup>
+          </div>
         </div>
 
       </Card>

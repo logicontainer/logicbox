@@ -3,17 +3,14 @@ import { Button } from "./ui/button";
 import { useProofStore } from "@/store/proofStore";
 import React from "react";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Train_One } from "next/font/google";
 
-export default function DeleteProofButton({ proofId }: { proofId: string }) {
+export default function DeleteProofButton({ proofId, className }: { proofId: string, className?: string }) {
   const getProof = useProofStore(state => state.getProof)
   const deleteProof = useProofStore((state) => state.deleteProof);
 
   return <Dialog>
     <DialogTrigger asChild>
-      <Button variant="outline">
+      <Button variant="outline" className={className}>
         <TrashIcon className="h-4 w-4"></TrashIcon>
       </Button>
     </DialogTrigger>

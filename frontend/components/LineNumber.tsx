@@ -9,7 +9,7 @@ import { useProof } from "@/contexts/ProofProvider";
 export default function LineNumber({ line }: { line: TLineNumber }) {
   const serverContext = useServer();
   const { getParentUuid } = useProof()
-  let proofDiagnostics = serverContext.proofDiagnostics;
+  const proofDiagnostics = serverContext.proofDiagnostics;
 
   const parentUuid = getParentUuid(line.uuid)
   const shouldShowTriangle = proofDiagnostics.some(d => d.uuid === line.uuid || d.uuid === parentUuid)

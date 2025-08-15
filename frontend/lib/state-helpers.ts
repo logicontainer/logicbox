@@ -5,7 +5,6 @@ import {
   InteractionStateEnum,
 } from "@/contexts/InteractionStateProvider";
 import { ProofContextProps } from "@/contexts/ProofProvider";
-import { Inter } from "next/font/google";
 
 export function getLineBeingEdited(state: InteractionState): string | null {
   if (
@@ -107,14 +106,16 @@ export function stepIsReferee(
   return stepUuid === referredStepUuid;
 }
 
-export function stepIsDraggable(stepUuid: string, state: InteractionState) {
+export function stepIsDraggable(stepUuid: string, state: InteractionState, proofContext: ProofContextProps) {
+  const { isDescendant } = proofContext
   return [ 
     InteractionStateEnum.IDLE,
     InteractionStateEnum.EDITING_RULE,
-    InteractionStateEnum.EDITING_FORMULA,
     InteractionStateEnum.EDITING_FRESH_VAR,
     InteractionStateEnum.VIEWING_CONTEXT_MENU,
     InteractionStateEnum.MOVING_STEP, // TODO: really?
-    // note: EDITING_REF is not here
-  ].includes(state.enum)
+    // note: EDITING_REF is not here, EDITING_FORMULA also not here
+  ].includes(state.enum) 
+    // also okay if we are editing a formula which is not this one (or this is a parent of that)
+    || (state.enum === InteractionStateEnum.EDITING_FORMULA && stepUuid !== state.lineUuid && !isDescendant(stepUuid, state.lineUuid))
 }
