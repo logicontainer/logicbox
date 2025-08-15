@@ -35,6 +35,8 @@ import { createSequentLaTeX } from "@/lib/sequent";
 import { Tooltip } from 'react-tooltip'
 import { EditableProofTitle } from "./EditableProofTitle";
 import { MemoizedInlineMath } from "./MemoizedInlineMath";
+import LogicBoxLogo from '@/public/logicbox-icon.svg';
+import HelpButton from "./help-button";
 
 function RuleShowPanel({
   ruleLatex
@@ -182,7 +184,7 @@ function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }
       place="right"
       className={(!shouldShowRuleTooltip || hoveredRule === null) && "hidden" || undefined}
     >
-      <MemoizedInlineMath math={hoveredRuleDetailsLatex}/>
+      <MemoizedInlineMath math={hoveredRuleDetailsLatex} />
     </Tooltip>
   </div>
 }
@@ -203,12 +205,12 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
       <div className="flex items-center justify-between gap-1 py-2 w-full">
         <div className="grid grid-cols-[48px_1px_auto] items-center gap-2 md:gap-3 flex-1 min-w-0">
           <Link href={"/gallery"} title="Go to your proof gallery">
-            <img className="min-w-12 w-12 h-12" src="/logicbox-icon.svg"></img>
+            <LogicBoxLogo width={48} height={48} quality={100} src="/logicbox-icon.svg" alt={"LogicBox logo"} />
           </Link>
           <div className="min-w-[1px] w-[1px] self-stretch bg-gray-600 my-1"></div>
           {/* <div className="flex justify-between items-center overflow-hidden"> */}
-          <div className="flex flex-col items-start justify-between h-12 overflow-hidden flex-shrink">
-            <div className="overflow-x-hidden overflow-y-visible w-full grow-0 h-auto">
+          <div className="flex flex-col items-start justify-center h-10 overflow-x-hidden overflow-y-clip flex-shrink">
+            <div className="overflow-x-hidden overflow-y-clip w-full grow-0 shrink self-start">
               <EditableProofTitle proofId={proof.id} />
             </div>
             <div className="text-xs md:text-sm font-light text-clip text-nowrap grow-0">{logicNameToString(proof.logicName)}</div>
@@ -222,7 +224,11 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
           <Toolbar.ToolbarButton className="cursor-auto">
             <ProofValidityIcon />
           </Toolbar.ToolbarButton>
-          <DownloadProofButton className="hidden md:flex items-center h-full" proofId={proof.id} />
+
+          <ButtonGroup className="flex items-center">
+            <DownloadProofButton className="hidden md:flex" proofId={proof.id} />
+            <HelpButton />
+          </ButtonGroup>
 
           <ButtonGroup className="flex items-center">
             <Button
@@ -252,7 +258,7 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
           !sequentIsVisible && "hidden",
           "py-1 flex items-center justify-center text-sm"
         )}>
-          <MemoizedInlineMath math={createSequentLaTeX(proof.proof) ?? "???"}/>
+          <MemoizedInlineMath math={createSequentLaTeX(proof.proof) ?? "???"} />
         </div>
       </>}
     </Card>

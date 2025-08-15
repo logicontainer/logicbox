@@ -44,7 +44,7 @@ export function EditableProofTitle({
       }
     }}
     placeholder="Proof title..."
-    className="text-lg overflow-auto"
+    className="text-lg/5 overflow-auto min-h-5"
     inputClassName={cn(
       "py-[2px] rounded bg-transparent font-bold outline-none focus:underline",
       inputFieldValue && "underline",
