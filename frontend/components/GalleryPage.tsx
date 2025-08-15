@@ -11,7 +11,7 @@ import Footer from "./Footer";
 import Link from "next/link";
 import LogicBoxLogo from '@/public/logicbox-icon.svg';
 import { isMobile } from 'react-device-detect'
-import HelpButton from "./help-button";
+import { HelpDialogButton } from "./HelpDialogButton";
 
 export default function GalleryPage() {
   const proofs = useProofStore((state) => state.proofs);
@@ -43,7 +43,7 @@ export default function GalleryPage() {
           <p className="hidden sm:block text text-xl sm:text-xl font-bold">My proofs</p>
           <NewProofDialog />
           <UploadProofButton />
-          <HelpButton />
+          <HelpDialogButton />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 w-full p-2 sm:p-4">

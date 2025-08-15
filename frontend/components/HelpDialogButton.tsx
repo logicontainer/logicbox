@@ -1,7 +1,6 @@
 import React from "react"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationEllipsis, PaginationPrevious, PaginationNext } from "./ui/pagination"
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "./ui/carousel"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { HelpCircleIcon } from "lucide-react"
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet"
@@ -169,7 +168,7 @@ const HELP_PAGES = [
     <HelpTitle>Remove a step</HelpTitle>
     <HelpVideo src="assets/videos/08. delete-line.mp4"/>
     <HelpDescription>
-      You may remove a line by right-clicking on it and selecting 'Delete'.
+      You may remove a line by right-clicking on it and selecting {"'"}Delete{"'"}.
       If you remove a box, you will remove all steps it contains.
     </HelpDescription>
     <HelpVideo src="assets/videos/09. delete-box.mp4"/>
@@ -185,14 +184,14 @@ const HELP_PAGES = [
     <HelpTitle>Edit fresh variable in a box (only in predicate logic/arithmetic)</HelpTitle>
     <HelpVideo src="assets/videos/11. edit-fresh-var-ctx-menu.mp4"/>
     <HelpDescription>
-      You may add/edit a fresh variable by right-clicking on a box and choosing 'Edit fresh variable'.
+      You may add/edit a fresh variable by right-clicking on a box and choosing {"'"}Edit fresh variable{"'"}.
       Alternatively, you can double-click on the box.
     </HelpDescription>
     <HelpVideo src="assets/videos/12. edit-fresh-var-dbl-click.mp4"/>
   </>,
 ]
 
-export function HelpDialogButton() {
+export function HelpDialogButton({ className }: { className?: string }) {
   const [selectedPage, setSelectedPage] = React.useState(0)
 
   const scrollTo = (idx: number) => {
@@ -201,40 +200,37 @@ export function HelpDialogButton() {
   }
 
   return (
-    <div
-      onKeyDown={e => {
-        switch (e.key) {
-          case "ArrowLeft": scrollTo(selectedPage - 1); break
-          case "ArrowRight": scrollTo(selectedPage + 1); break
-        }
-      }}
-    >
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline">
-            <HelpCircleIcon className="h-4 w-4" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent 
-          className="min-w-[calc(min(650px,100vw))] flex flex-col"
-        >
-          <SheetHeader>
-            <SheetTitle>How to use LogicBox</SheetTitle>
-          </SheetHeader>
-          
-          <div className="flex-1 overflow-auto">
-            <HelpCarousel pages={HELP_PAGES} selectedPage={selectedPage}/>
-          </div>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" className={className}>
+          <HelpCircleIcon className="h-4 w-4" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent 
+        className="min-w-[calc(min(650px,100vw))] flex flex-col"
+        onKeyDown={e => {
+          switch (e.key) {
+            case "ArrowLeft": scrollTo(selectedPage - 1); break
+            case "ArrowRight": scrollTo(selectedPage + 1); break
+          }
+        }}
+      >
+        <SheetHeader>
+          <SheetTitle>How to use LogicBox</SheetTitle>
+        </SheetHeader>
+        
+        <div className="flex-1 overflow-auto">
+          <HelpCarousel pages={HELP_PAGES} selectedPage={selectedPage}/>
+        </div>
 
-          <SheetFooter className="flex justify-center pt-4">
-            <HelpPagination
-              current={selectedPage}
-              count={HELP_PAGES.length}
-              scrollTo={scrollTo}
-            />
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    </div>
+        <SheetFooter className="flex justify-center pt-4">
+          <HelpPagination
+            current={selectedPage}
+            count={HELP_PAGES.length}
+            scrollTo={scrollTo}
+          />
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }

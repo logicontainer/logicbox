@@ -31,7 +31,6 @@ export default function ProofEditorPage({ proofId }: { proofId: string }) {
           <ProofEditor proofId={proofId} />
         </div>
       </div>
-      <HelpDialogButton/>
     </div>
   );
 }
