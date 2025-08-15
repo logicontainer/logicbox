@@ -9,7 +9,7 @@ import React from "react";
 import _ from "lodash";
 import Footer from "./Footer";
 import Link from "next/link";
-import LogicBoxLogo from '@/public/logicbox-icon.svg';
+
 import { isMobile } from 'react-device-detect'
 import { HelpDialogButton } from "./HelpDialogButton";
 
@@ -35,7 +35,7 @@ export default function GalleryPage() {
     <div className="pt-2 sm:pt-4 w-screen min-h-screen flex flex-col justify-between">
       <div className="flex w-full items-center justify-between gap-1 sm:gap-2 px-2 sm:px-4">
         <Link href={"/gallery"} title="Go to your proof gallery" className="flex items-center justify-end gap-1">
-          <LogicBoxLogo width={isMobile ? 40 : 48} height={isMobile ? 40 : 48} src="/logicbox-icon.svg" alt={"LogicBox logo"} />
+          <img src={"logicbox-icon.svg"} width={isMobile ? 40 : 48} height={isMobile ? 40 : 48} alt="LogicBox logo" />
           <p className="text text-xl sm:text-3xl font-bold">LogicBox</p>
         </Link>
         <div className="flex gap-1 sm:gap-2 items-center justify-start">
