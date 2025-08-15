@@ -14,9 +14,8 @@ import { isMobile } from 'react-device-detect'
 import { HelpDialogButton } from "./HelpDialogButton";
 
 export default function GalleryPage() {
-  const proofs = useProofStore((state) => state.proofs);
-
   const [isHydrated, setIsHydrated] = React.useState<boolean>(false)
+  const proofs = useProofStore((state) => state.proofs);
 
   React.useEffect(() => {
     // if we are already hydrated

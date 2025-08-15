@@ -1,4 +1,3 @@
-import { InlineMath } from "react-katex";
 import { cn } from "@/lib/utils";
 import AutosizeInput from "react-input-autosize";
 import React from "react";

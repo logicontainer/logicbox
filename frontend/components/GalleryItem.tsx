@@ -4,15 +4,10 @@ import { LogicName, ProofWithMetadata } from "@/types/types";
 import DownloadProofButton from "@/components/DownloadProofButton";
 import { InlineMath } from "react-katex";
 import DeleteProofButton from "@/components/DeleteProofButton";
-import RenameProofButton from "@/components/RenameProofButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { ButtonGroup } from "./ui/button-group";
-import { Edit } from "lucide-react";
-import AutosizeInput from "react-input-autosize";
-import { cn } from "@/lib/utils";
 import React from "react";
-import { useProofStore } from "@/store/proofStore";
 import { EditableProofTitle } from "./EditableProofTitle";
 
 export function logicNameToString(name: LogicName): string {
