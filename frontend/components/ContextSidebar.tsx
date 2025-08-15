@@ -36,7 +36,7 @@ import { Tooltip } from 'react-tooltip'
 import { EditableProofTitle } from "./EditableProofTitle";
 import { MemoizedInlineMath } from "./MemoizedInlineMath";
 import LogicBoxLogo from '@/public/logicbox-icon.svg';
-import HelpButton from "./help-button";
+import { HelpDialogButton } from "./HelpDialogButton";
 
 function RuleShowPanel({
   ruleLatex
@@ -208,14 +208,12 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
             <LogicBoxLogo width={48} height={48} quality={100} src="/logicbox-icon.svg" alt={"LogicBox logo"} />
           </Link>
           <div className="min-w-[1px] w-[1px] self-stretch bg-gray-600 my-1"></div>
-          {/* <div className="flex justify-between items-center overflow-hidden"> */}
           <div className="flex flex-col items-start justify-center h-10 overflow-x-hidden overflow-y-clip flex-shrink">
-            <div className="overflow-x-hidden overflow-y-clip w-full grow-0 shrink self-start">
+            <div className="overflow-x-scroll overflow-y-clip w-full grow-0 shrink self-start">
               <EditableProofTitle proofId={proof.id} />
             </div>
             <div className="text-xs md:text-sm font-light text-clip text-nowrap grow-0">{logicNameToString(proof.logicName)}</div>
           </div>
-          {/* </div> */}
         </div>
         <Toolbar.Root
           className="flex gap-1 md:gap-3 items-center"
@@ -225,9 +223,9 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
             <ProofValidityIcon />
           </Toolbar.ToolbarButton>
 
-          <ButtonGroup className="flex items-center">
+          <ButtonGroup>
             <DownloadProofButton className="hidden md:flex" proofId={proof.id} />
-            <HelpButton />
+            <HelpDialogButton/>
           </ButtonGroup>
 
           <ButtonGroup className="flex items-center">

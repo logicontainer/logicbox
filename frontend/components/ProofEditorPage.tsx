@@ -3,6 +3,8 @@ import ContextSidebar from "@/components/ContextSidebar";
 import ProofEditor from "./ProofEditor";
 import { TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
 import { useStepDrag } from "@/contexts/StepDragProvider";
+import React from "react";
+import { HelpDialogButton } from "@/components/HelpDialogButton"
 
 export default function ProofEditorPage({ proofId }: { proofId: string }) {
   const { handleHover } = useHovering()
