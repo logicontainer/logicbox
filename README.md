@@ -116,7 +116,7 @@ As examples, this means that
 - `P(a) and Q(b) or R(c)` is parsed as $(P(a) \land Q(b)) \land R(c)$
 - `P(a) -> Q(b) -> R(c)` is parsed as $P(a) \rightarrow (Q(b) \rightarrow R(c))$
 
-Note: nullary predicates are also supported. As an example, this means that that the formula `forall x S -> Q(x)` ( $\forall x (S \rightarrow Q(x))$ ) consists of two predicate symbols $P, Q$, where $P$ takes $0$ arguments and $Q$ takes $1$.
+Note: nullary predicates are also supported. As an example, this means that that the formula `forall x S -> Q(x)` ( $\forall x (S \rightarrow Q(x))$ ) consists of two predicate symbols $S, Q$, where $S$ takes $0$ arguments and $Q$ takes $1$.
 
 ### Arithmetic
 ||| Syntax |
