@@ -97,6 +97,38 @@ function HelpCarousel({ selectedPage, pages }: { selectedPage: number, pages: Re
 
 const HELP_PAGES = [
   <>
+    <HelpTitle>Create a new proof</HelpTitle>
+    <HelpVideo src="assets/videos/13. create-proof.mp4"/>
+    <HelpDescription>
+      Create a new proof by clicking on the ➕ icon on the front page. Then enter the name of the proof, and the type of logic the proof is in.
+
+      <table className="table-auto text-xs mt-4">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">Type of logic</th>
+            <th className="border px-4 py-2">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="border px-4 py-2">Propositional logic</td>
+            <td className="border px-4 py-2">with atomic formulas <InlineMath math="p, q, r, \dots"/> and the logical connectives <InlineMath math="\land, \lor"/> and <InlineMath math="\rightarrow"/></td>
+          </tr>
+          <tr>
+            <td className="border px-4 py-2">Propositional logic</td>
+            <td className="border px-4 py-2">with quantifiers <InlineMath math="\forall, \exists"/>, predicates <InlineMath math="P, Q, \dots"/>, functions <InlineMath math="f(x, y), g(z)"/> and equality <InlineMath math="x_0 = y"/></td>
+          </tr>
+          <tr>
+            <td className="border px-4 py-2">Arithmetic</td>
+            <td className="border px-4 py-2">with addition <InlineMath math="+"/>, multiplication <InlineMath math="*"/>, <InlineMath math="0"/> and <InlineMath math="1"/></td>
+          </tr>
+        </tbody>
+      </table>
+
+      Note: when a proof is created, it contains a single line with no formula or rule specified
+    </HelpDescription>
+  </>,
+  <>
     <HelpTitle>Add a line</HelpTitle>
     <HelpVideo src="assets/videos/01. add-line.mp4"/>
     <HelpDescription>
