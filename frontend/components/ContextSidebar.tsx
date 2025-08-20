@@ -21,7 +21,7 @@ import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import React from "react";
-import { CaretLeftIcon, CaretRightIcon } from "@radix-ui/react-icons";
+import { CaretLeftIcon, CaretRightIcon, DotsVerticalIcon } from "@radix-ui/react-icons";
 
 import { Toolbar } from "radix-ui";
 import { useHistory } from "@/contexts/HistoryProvider";
@@ -266,7 +266,7 @@ export default function ContextSidebar() {
   const { proof } = useProof();
   const diagnosticContext = useDiagnostics();
   const { getStep } = diagnosticContext;
-  const { interactionState } = useInteractionState();
+  const { interactionState, doTransition } = useInteractionState();
 
   const stepInFocus = getSelectedStep(interactionState);
 
@@ -294,7 +294,9 @@ export default function ContextSidebar() {
   }, [scrollAreaRef.current?.scrollHeight, scrollAreaRef.current?.clientHeight])
 
   return (
-    <div className="md:h-screen p-2">
+    <div className="md:h-screen p-2"
+      onClick={_ => doTransition({ enum: TransitionEnum.INTERACT_OUTSIDE })}
+    >
       <div className="flex flex-col gap-2 h-full">
         <ProofEditorToolbar proof={proof} />
         <Card
