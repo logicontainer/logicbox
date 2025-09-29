@@ -141,7 +141,7 @@ const HELP_PAGES = [
     <HelpDescription>
       Modify the formula of a line by double-clicking on it, and entering the new value.
       <br/><br/>
-      The full syntax is described <a className="underline text-blue-950" href="help-page.html#Syntax_0">here</a>. Some examples are
+      The full syntax is described <a className="underline text-blue-950" href="https://github.com/logicontainer/logicbox-howto#syntax" target="_blank">here</a>. Some examples are
       <table className="table-auto text-xs mt-4">
         <thead>
           <tr>
