@@ -1,117 +1,256 @@
-export type Ruleset = {
-  rulesetName: string;
-  rules: Rule[];
-};
-export type Rule = {
-  ruleName: string;
-  numPremises: number;
-  latex: {
-    ruleName: string;
-    premises: string[];
-    conclusion: string;
-  };
-};
+import { z } from "zod";
 
-export type Justification = {
-  rule: string | null;
-  refs: string[];
-};
+// ---------- Core ----------
 
-export type LineProofStep = {
-  uuid: string;
-  stepType: 'line';
-  formula: {
-    userInput: string;
-    unsynced?: boolean;
-    ascii: string | null;
-    latex: string | null;
-  };
-  justification: Justification;
-};
+export const UUIDSchema = z.string();
 
-export type BoxProofStep = {
-  uuid: string;
-  stepType: 'box';
-  boxInfo: {
-    freshVar: string | null;
-  };
-  proof: Proof;
-};
+// ---------- Rule & Ruleset ----------
 
-export type ProofStep = LineProofStep | BoxProofStep;
+export const LatexSchema = z.object({
+  ruleName: z.string(),
+  premises: z.array(z.string()),
+  conclusion: z.string(),
+});
 
-export type Proof = ProofStep[];
+export const RuleSchema = z.object({
+  ruleName: z.string(),
+  numPremises: z.number(),
+  latex: LatexSchema,
+});
 
-export type ProofMetadata = {
-  id: string;
-  title: string;
-  createdAt: string;
-  logicName: LogicName;
-};
+export const RulesetSchema = z.object({
+  rulesetName: z.string(),
+  rules: z.array(RuleSchema),
+});
 
-export type ProofWithMetadata = {
-  proof: Proof;
-} & ProofMetadata;
+// ---------- Justification ----------
 
-export type TLineNumber = {
-  uuid: string;
-  stepType: "line" | "box";
-} & (
-  | { stepType: "line"; lineNumber: number }
-  | { stepType: "box"; boxStartLine: number; boxEndLine: number }
+export const JustificationSchema = z.object({
+  rule: z.string().nullable(),
+  refs: z.array(z.string()),
+});
+
+// ---------- Formula ----------
+
+export const FormulaSchema = z.object({
+  userInput: z.string(),
+  unsynced: z.boolean().optional(),
+  ascii: z.string().nullable(),
+  latex: z.string().nullable(),
+});
+
+// ---------- Proof Steps ----------
+
+export const LineProofStepSchema = z.object({
+  uuid: UUIDSchema,
+  stepType: z.literal("line"),
+  formula: FormulaSchema,
+  justification: JustificationSchema,
+});
+
+// Recursive schemas: Proof <-> ProofStep
+export type ProofStep = z.infer<typeof LineProofStepSchema> | z.infer<typeof BoxProofStepSchema>;
+
+// Lazy declarations
+export const ProofStepSchema: z.ZodType<ProofStep> = z.lazy(() =>
+  z.union([LineProofStepSchema, BoxProofStepSchema])
 );
 
-export type ProofStepDetails = {
-  proofStep: ProofStep;
-  parentBoxUuid: string | null;
-  position: ProofStepPosition;
-};
+export type Proof = ProofStep[];
+export const ProofSchema: z.ZodType<Proof> = z.lazy(() => z.array(ProofStepSchema));
 
-export type ProofStepPosition = {
-  nearProofStepWithUuid: string;
-  prepend: boolean;
-};
-
-type UUID = string;
-
-export type RulePosition = "conclusion" | "premise 0" | "premise 1" | "premise 2" | "premise 3" | "premise 4" | "premise 5"
-
-export type Diagnostic = { uuid: UUID } & (
-  | { errorType: "MissingFormula" }
-  | { errorType: "MissingRule" }
-  | { errorType: "MissingRef", refIdx: number }
-
-  | { errorType: "PremiseInsideBox" }
-  | { errorType: "InvalidAssumption" }
-  | { errorType: "FreshVarEscaped", boxId: string, freshVar: string }
-  | { errorType: "RedefinitionOfFreshVar", originalUuid: string, freshVar: string }
-
-  | { errorType: "ReferenceOutOfScope", refIdx: number }
-  | { errorType: "ReferenceToLaterStep", refIdx: number }
-  | { errorType: "ReferenceToUnclosedBox", refIdx: number  }
-  | { errorType: "ReferenceBoxMissingFreshVar", refIdx: number  }
-  | { errorType: "ReferenceShouldBeBox", refIdx: number  }
-  | { errorType: "ReferenceShouldBeLine", refIdx: number  }
-
-  | { errorType: "WrongNumberOfReferences", expected: number, actual: number }
-  | { errorType: "ShapeMismatch", rulePosition: RulePosition, expected: string, actual: string }
-  | { errorType: "Ambiguous", subject: string, entries: { rulePosition: RulePosition, meta: string, actual: string }[] }
-  | { errorType: "Miscellaneous", rulePosition: RulePosition, explanation: string }
-)
-
-export type ErrorType = Diagnostic["errorType"]
-
-export type LogicName = 'propositionalLogic' | 'predicateLogic' | 'arithmetic'
-
-export type ValidationRequest = {
-  proof: Proof
-  logicName: LogicName
-}
-
-export type ValidationResponse = {
+export const BoxProofStepSchema: z.ZodType<{
+  uuid: string;
+  stepType: "box";
+  boxInfo: { freshVar: string | null };
   proof: Proof;
-  diagnostics: Diagnostic[];
-};
+}> = z.lazy(() =>
+  z.object({
+    uuid: UUIDSchema,
+    stepType: z.literal("box"),
+    boxInfo: z.object({
+      freshVar: z.string().nullable(),
+    }),
+    proof: ProofSchema,
+  })
+);
 
-// Enum for placement options
-export type Placement = "before" | "after";
+// ---------- Metadata ----------
+
+export const LogicNameSchema = z.enum([
+  "propositionalLogic",
+  "predicateLogic",
+  "arithmetic",
+]);
+
+export const ProofMetadataSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  createdAt: z.string(),
+  logicName: LogicNameSchema,
+});
+
+export const ProofWithMetadataSchema = ProofMetadataSchema.extend({
+  proof: ProofSchema,
+});
+
+// ---------- Line Numbers ----------
+
+export const TLineNumberSchema = z.union([
+  z.object({
+    uuid: UUIDSchema,
+    stepType: z.literal("line"),
+    lineNumber: z.number(),
+  }),
+  z.object({
+    uuid: UUIDSchema,
+    stepType: z.literal("box"),
+    boxStartLine: z.number(),
+    boxEndLine: z.number(),
+  }),
+]);
+
+// ---------- Proof Step Details ----------
+
+export const ProofStepPositionSchema = z.object({
+  nearProofStepWithUuid: UUIDSchema,
+  prepend: z.boolean(),
+});
+
+export const ProofStepDetailsSchema = z.object({
+  proofStep: ProofStepSchema,
+  parentBoxUuid: UUIDSchema.nullable(),
+  position: ProofStepPositionSchema,
+});
+
+// ---------- Rule Position ----------
+
+export const RulePositionSchema = z.enum([
+  "conclusion",
+  "premise 0",
+  "premise 1",
+  "premise 2",
+  "premise 3",
+  "premise 4",
+  "premise 5",
+]);
+
+// ---------- Diagnostics ----------
+
+export const DiagnosticSchema = z.union([
+  z.object({ uuid: UUIDSchema, errorType: z.literal("MissingFormula") }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("MissingRule") }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("MissingRef"), refIdx: z.number() }),
+
+  z.object({ uuid: UUIDSchema, errorType: z.literal("PremiseInsideBox") }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("InvalidAssumption") }),
+  z.object({
+    uuid: UUIDSchema,
+    errorType: z.literal("FreshVarEscaped"),
+    boxId: z.string(),
+    freshVar: z.string(),
+  }),
+  z.object({
+    uuid: UUIDSchema,
+    errorType: z.literal("RedefinitionOfFreshVar"),
+    originalUuid: z.string(),
+    freshVar: z.string(),
+  }),
+
+  z.object({ uuid: UUIDSchema, errorType: z.literal("ReferenceOutOfScope"), refIdx: z.number() }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("ReferenceToLaterStep"), refIdx: z.number() }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("ReferenceToUnclosedBox"), refIdx: z.number() }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("ReferenceBoxMissingFreshVar"), refIdx: z.number() }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("ReferenceShouldBeBox"), refIdx: z.number() }),
+  z.object({ uuid: UUIDSchema, errorType: z.literal("ReferenceShouldBeLine"), refIdx: z.number() }),
+
+  z.object({
+    uuid: UUIDSchema,
+    errorType: z.literal("WrongNumberOfReferences"),
+    expected: z.number(),
+    actual: z.number(),
+  }),
+  z.object({
+    uuid: UUIDSchema,
+    errorType: z.literal("ShapeMismatch"),
+    rulePosition: RulePositionSchema,
+    expected: z.string(),
+    actual: z.string(),
+  }),
+  z.object({
+    uuid: UUIDSchema,
+    errorType: z.literal("Ambiguous"),
+    subject: z.string(),
+    entries: z.array(
+      z.object({
+        rulePosition: RulePositionSchema,
+        meta: z.string(),
+        actual: z.string(),
+      })
+    ),
+  }),
+  z.object({
+    uuid: UUIDSchema,
+    errorType: z.literal("Miscellaneous"),
+    rulePosition: RulePositionSchema,
+    explanation: z.string(),
+  }),
+]);
+
+export const ErrorTypeSchema = z.enum([
+  "MissingFormula",
+  "MissingRule",
+  "MissingRef",
+
+  "PremiseInsideBox",
+  "InvalidAssumption",
+  "FreshVarEscaped",
+  "RedefinitionOfFreshVar",
+
+  "ReferenceOutOfScope",
+  "ReferenceToLaterStep",
+  "ReferenceToUnclosedBox",
+  "ReferenceBoxMissingFreshVar",
+  "ReferenceShouldBeBox",
+  "ReferenceShouldBeLine",
+
+  "WrongNumberOfReferences",
+  "ShapeMismatch",
+  "Ambiguous",
+  "Miscellaneous",
+]);
+
+// ---------- Validation ----------
+
+export const ValidationRequestSchema = z.object({
+  proof: ProofSchema,
+  logicName: LogicNameSchema,
+});
+
+export const ValidationResponseSchema = z.object({
+  proof: ProofSchema,
+  diagnostics: z.array(DiagnosticSchema),
+});
+
+// ---------- Placement ----------
+
+export const PlacementSchema = z.enum(["before", "after"]);
+
+// ---------- Types inferred from schemas ----------
+
+export type Rule = z.infer<typeof RuleSchema>;
+export type Ruleset = z.infer<typeof RulesetSchema>;
+export type Justification = z.infer<typeof JustificationSchema>;
+export type LineProofStep = z.infer<typeof LineProofStepSchema>;
+export type BoxProofStep = z.infer<typeof BoxProofStepSchema>;
+export type ProofStepDetails = z.infer<typeof ProofStepDetailsSchema>;
+export type ProofStepPosition = z.infer<typeof ProofStepPositionSchema>;
+export type RulePosition = z.infer<typeof RulePositionSchema>;
+export type Diagnostic = z.infer<typeof DiagnosticSchema>;
+export type ErrorType = z.infer<typeof ErrorTypeSchema>;
+export type LogicName = z.infer<typeof LogicNameSchema>;
+export type ValidationRequest = z.infer<typeof ValidationRequestSchema>;
+export type ValidationResponse = z.infer<typeof ValidationResponseSchema>;
+export type Placement = z.infer<typeof PlacementSchema>;
+export type ProofWithMetadata = z.infer<typeof ProofWithMetadataSchema>;
+export type TLineNumber = z.infer<typeof TLineNumberSchema>;
