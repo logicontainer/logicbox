@@ -185,7 +185,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
 
   const isDescendant = (parentUuid: string, targetUuid: string): boolean => {
     const parent = getProofStepDetails(parentUuid)?.proofStep
-    if (parent?.stepType !== "box") 
+    if (parent?.stepType !== "box")
       return false
 
     return parent.proof.some(
@@ -204,7 +204,7 @@ export function ProofProvider({ children }: React.PropsWithChildren<object>) {
         return;
 
       if (indexInCurrLayer === proof.length - 1)
-        result = { nearProofStepWithUuid: proof[proof.length - 2].uuid, prepend: false }  satisfies ProofStepPosition
+        result = { nearProofStepWithUuid: proof[proof.length - 2].uuid, prepend: false } satisfies ProofStepPosition
       else result = {
         nearProofStepWithUuid: proof[indexInCurrLayer + 1].uuid, prepend: true
       }

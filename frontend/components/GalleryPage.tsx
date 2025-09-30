@@ -4,7 +4,7 @@ import { useProofStore } from "@/store/proofStore";
 import { GalleryItemSkeleton, GalleryItem } from "@/components/GalleryItem";
 import { ProofWithMetadata } from "@/types/types";
 import NewProofDialog from "@/components/NewProofButton";
-import UploadProofButton from "@/components/UploadProofButton";
+import UploadProofsButton from "@/components/UploadProofsButton";
 import React from "react";
 import _ from "lodash";
 import Footer from "./Footer";
@@ -41,7 +41,7 @@ export default function GalleryPage() {
         <div className="flex gap-1 sm:gap-2 items-center justify-start">
           <p className="hidden sm:block text text-xl sm:text-xl font-bold">My proofs</p>
           <NewProofDialog />
-          <UploadProofButton />
+          <UploadProofsButton />
           <HelpDialogButton />
         </div>
       </div>
