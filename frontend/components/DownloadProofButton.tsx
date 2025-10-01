@@ -12,7 +12,7 @@ export default function DownloadProofButton({ proofId, className }: { proofId: s
     const proof = proofs.find((proof) => proof.id == proofId);
     download(
       JSON.stringify(proof, null, 2),
-      `${proof?.title}.json`,
+      `${proof?.title}.lgbx`,
       "text/plain",
     );
   }

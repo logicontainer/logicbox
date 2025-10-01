@@ -17,38 +17,43 @@ import { ProofWithMetadata, ProofWithMetadataSchema } from "@/types/types";
 
 export default function UploadProofsButton() {
   const [open, setOpen] = useState(false);
-  const [jsonContent, setJsonContent] = useState<JSON[] | null>(null);
+  const [uploadedProofs, setUploadedProofs] = useState<ProofWithMetadata[] | null>(null);
   const [error, setError] = useState("");
   const addProofToStore = useProofStore((state) => state.addProof);
   const proofs = useProofStore((state) => state.proofs);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    setError("");
-    setJsonContent(null)
-    const newJsonContent: JSON[] = []
-    if (!e?.target?.files || e.target.files.length <= 0) return;
-    for (let i = 0; i < e.target.files.length; i++) {
-      const file = e.target.files[i];
+    const newErrors: string[] = []
+    setUploadedProofs(null)
+    const newProofs: ProofWithMetadata[] = []
+    if (!e?.target?.files || e.target.files.length <= 0) { newErrors.push("No files"); }
+    else {
+      for (let i = 0; i < e.target.files.length; i++) {
+        const file = e.target.files[i];
+        if (!file) { newErrors.push("No files"); continue };
+        if (file && !file.name.endsWith('.lgbx')) {
+          newErrors.push(`File: "${file.name}" must be of type '.lgbx'.`);
+          continue;
+        }
 
-      if (!file) return;
-      if (file.type !== "application/json") {
-        setError(`Please upload a valid JSON file (${i}).`);
-        return;
-      }
-
-      try {
-        const text = await file.text();
-        const parsed = JSON.parse(text); // will throw if invalid JSON
-        newJsonContent.push(parsed);
-      } catch {
-        setError(`Invalid JSON file (${i}).`);
+        try {
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+          const proof = ProofWithMetadataSchema.parse(parsed)
+          newProofs.push(proof);
+        } catch (e) {
+          newErrors.push(`File: "${file.name}" contains invalid LogicBox syntax.`);
+        }
       }
     }
-    setJsonContent(newJsonContent)
+    setError(newErrors.join("\n"));
+    if (newErrors.length == 0) {
+      setUploadedProofs(newProofs)
+    }
   };
 
   function addProof(proofJsonContent: ProofWithMetadata): void {
-    if (jsonContent == null) {
+    if (uploadedProofs == null) {
       window.alert("No proof provided");
       return;
     }
@@ -68,7 +73,7 @@ export default function UploadProofsButton() {
 
   function addProofs(): void {
     try {
-      jsonContent?.forEach((proof) => {
+      uploadedProofs?.forEach((proof) => {
         const parsedProofWithMetadata = ProofWithMetadataSchema.parse(proof)
         addProof(parsedProofWithMetadata);
       })
@@ -96,13 +101,13 @@ export default function UploadProofsButton() {
               <Input
                 id="proof-files"
                 type="file"
-                accept=".json,application/json"
+                accept=".lgbx"
                 onChange={(e) => handleFileChange(e)}
                 className="w-full hover:bg-accent cursor-pointer"
                 multiple
               />
             </div>
-            {error && <p className="text-red-600">{error}</p>}
+            {error && <p className="text-red-600 whitespace-pre-line">{error}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -110,7 +115,7 @@ export default function UploadProofsButton() {
             </DialogClose>
             <Button
               type="submit"
-              disabled={!!error || jsonContent == null}
+              disabled={!!error || uploadedProofs == null}
               onClick={() => addProofs()}
             >
               Upload proof(s)
