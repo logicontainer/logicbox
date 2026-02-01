@@ -4,6 +4,7 @@ import {
   InteractionStateEnum,
   TransitionEnum,
   useInteractionState,
+  
 } from "@/contexts/InteractionStateProvider";
 
 import Card from "./Card";
@@ -189,7 +190,12 @@ function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }
 }
 
 function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
-  const { undo, redo, canUndo, canRedo } = useHistory()
+  const { canUndo, canRedo } = useHistory()
+
+  const { doTransition } = useInteractionState();
+
+  const undo = () => { doTransition({ enum: TransitionEnum.UNDO }) }
+  const redo = () => { doTransition({ enum: TransitionEnum.REDO }) }
 
   const [sequentIsVisible, setSequentVisbility] = React.useState<boolean>(false)
 
