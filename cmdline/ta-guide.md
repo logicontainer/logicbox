@@ -15,7 +15,6 @@ Make sure you have node.js installed. Instructions on how to do so are here:
 #### Locate the files
 Open a terminal, go to the folder containing `.lgbx` files and run the script on the files.
 
-You should see output as below
 ```shell
 > node path/to/bulk_verify.js path/to/proofs/*.lgbx
 ┌─────────┬──────────────────────┬────────────┬─────────────┬───────────────────────┐
@@ -27,6 +26,8 @@ You should see output as below
 │ 3       │ 'proofs/group4.lgbx' │ 6          │ 0           │ 'p ∧ q |- ¬(¬p ∧ ¬q)' │
 └─────────┴──────────────────────┴────────────┴─────────────┴───────────────────────┘
 ```
+
+You should see output similar to that above.
 
 Here we can see that 
 - ✅ group 1 correctly solved the exercise
