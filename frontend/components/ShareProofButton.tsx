@@ -1,4 +1,4 @@
-import { ShareIcon } from "lucide-react";
+import { LinkIcon, ShareIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { useProofStore } from "@/store/proofStore";
 import React from "react";
@@ -47,7 +47,7 @@ export default function DownloadProofButton({ proofId, className }: { proofId: s
 
   return <>
       <Button variant="outline" onClick={() => setOpen(true)} className={className}>
-        <ShareIcon />
+        <LinkIcon />
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
