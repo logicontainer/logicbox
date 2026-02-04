@@ -1466,15 +1466,32 @@ function readFile(filename) {
 }
 
 function createSequentString(proof) {
+  const makeUnicode = ascii => ascii
+      .replaceAll("forall ", "∀")
+      .replaceAll("exists ", "∃")
+      .replaceAll("and", "∧")
+      .replaceAll("or", "∨")
+      .replaceAll("not ", "¬")
+  
   const premises = proof
   .filter(step => step.stepType === "line")
   .filter(step => step.justification.rule === "premise" && step.formula.ascii !== null)
   .map(step => step.formula.ascii)
+  .map(makeUnicode)
 
   const conclusion = proof.findLast(step => step.stepType === "line")
 
   return conclusion === undefined ? null : 
-    `${premises.join(", ")} |- ${conclusion.formula.ascii ?? "???"}`
+    `${premises.join(", ")} |- ${makeUnicode(conclusion.formula.ascii) ?? "???"}`
+}
+
+function proofLength(proof) {
+  return proof.map(step => {
+    switch (step.stepType) {
+      case "line": return 1;
+      case "box": return proofLength(step.proof)
+    }
+  }).reduce((len, a) => len + a, 0)
 }
 
 function verifyFile(filename, inVerboseMode) {
@@ -1492,23 +1509,14 @@ function verifyFile(filename, inVerboseMode) {
     return;
   }
 
-  const isValid = result.diagnostics.length === 0
-  const statusColor = isValid ? colors.green : colors.red
-  const statusText = isValid ? "VALID" : "INVALID"
-  
-  console.log(`${colors.cyan}"${filename}"${colors.reset} contains ${statusColor}${statusText}${colors.reset} proof of:`)
-  console.log(`    ${colors.yellow}${createSequentString(result.proof)}${colors.reset}`)
-  
-  if (!isValid) {
-    console.log(`    ${colors.red}${colors.bright}Errors (${result.diagnostics.length})${colors.reset}`)
-    if (inVerboseMode) {
-      for (const d of result.diagnostics) {
-        delete d.uuid;
-        console.log(`    ${colors.red}  • ${JSON.stringify(d)}${colors.reset}`)
-      }
-    } else {
-    }
+  return {
+    filename: filename,//((filename.length > 0) ? "..." : "") + filename.substring(Math.max(0, filename.length - 50), filename.length),
+    "# of lines": proofLength(result.proof),
+    "# of errors": result.diagnostics.length,
+    sequent: createSequentString(result.proof)
   }
+  
+  return table
 }
 
 const filenames = process.argv.slice(2).filter(arg => !(["-v", "--verbose"].includes(arg)))
@@ -1517,7 +1525,7 @@ const inVerboseMode = process.argv.some(arg => ["-v", "--verbose"].includes(arg)
 if (filenames.length === 0) {
   console.log(`${colors.yellow}Usage: node ${process.argv[1]} <file1> [file2] ...${colors.reset}`)
 } else {
-  for (const filename of filenames) {
-    verifyFile(filename, inVerboseMode)
-  }
+  const results = 
+    filenames.map(f => verifyFile(f, inVerboseMode))
+  console.table(results)
 }
