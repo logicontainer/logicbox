@@ -37,6 +37,7 @@ import { Tooltip } from 'react-tooltip'
 import { EditableProofTitle } from "./EditableProofTitle";
 import { MemoizedInlineMath } from "./MemoizedInlineMath";
 import { HelpDialogButton } from "./HelpDialogButton";
+import ShareProofButton from "./ShareProofButton";
 
 function RuleShowPanel({
   ruleLatex
@@ -230,6 +231,7 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
 
           <ButtonGroup>
             <DownloadProofButton className="hidden md:flex" proofId={proof.id} />
+            <ShareProofButton className="hidden md:flex" proofId={proof.id} />
             <HelpDialogButton/>
           </ButtonGroup>
 

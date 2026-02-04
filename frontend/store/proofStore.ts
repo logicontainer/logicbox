@@ -12,6 +12,7 @@ const proofExamples: ProofWithMetadata[] = jsonExamples as ProofWithMetadata[]
 type ProofStore = {
   proofs: ProofWithMetadata[];
   addProof: (proof: ProofWithMetadata) => void;
+  addProofWithFreshId: (proof: Omit<ProofWithMetadata, "id">) => void;
   updateProofContent: (id: string, updater: (_: Proof) => Proof) => void;
   updateProofTitle: (id: string, title: string) => void;
   deleteProof: (id: string) => void;
@@ -25,9 +26,18 @@ export const useProofStore = create<ProofStore>()(
       proofs: proofExamples.map(proof => ({ ...proof, id: uuidv4() })),
 
       addProof: (proof) =>
-        set((state) => ({
-          proofs: [...state.proofs, proof],
-        })),
+        set((state) => {
+          if (state.proofs.some(p => p.id == proof.id)) {
+            throw new Error("Attempting to add proof with existing id")
+          }
+          return { proofs: [...state.proofs, proof], }
+        }),
+
+      addProofWithFreshId: (proof) => {
+        set((state) => {
+          return { proofs: [...state.proofs, { ... proof, id: uuidv4() }], }
+        })
+      },
 
       updateProofContent: (id, updater) =>
         set((state) => {
