@@ -129,4 +129,4 @@ Note: nullary predicates are also supported. As an example, this means that that
 | Multiplication (times) | $x * y$ | `x * y` |
 | Zero, One | $0$, $1$ | `0`, `1` |
 
-As arithmetic is just an instance of predicate logic with no predicate symbols, the constants (or nullary functions) $0, 1$ and functions $+, *$ (infix), the precedence rules described above still apply.
+As arithmetic is just an instance of predicate logic with no predicate symbols, the constants (or nullary functions) $0, 1$ and functions $+, *$ (infix), the precedence rules described above still apply. 
