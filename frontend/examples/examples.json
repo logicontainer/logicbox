@@ -1,1406 +1,37 @@
 [
   {
-    "id": "63396d68-d877-44b0-ad29-ccfe1b80f886",
-    "createdAt": "2025-07-29T18:29:03.370Z",
-    "title": "Exercise 1.7.2(e)",
+    "id": "1ed3bbc4-8baf-4e28-bfac-a905669a6dc6",
+    "createdAt": "2026-02-04T10:54:16.673Z",
+    "title": "Example 1",
     "logicName": "propositionalLogic",
     "proof": [
       {
-        "formula": {
-          "ascii": "q -> (p -> r)",
-          "latex": "q \\rightarrow (p \\rightarrow r)",
-          "userInput": "q -> (p -> r)"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
+        "uuid": "629611a8-1e8e-4b17-8f92-673a8c131068",
         "stepType": "line",
-        "uuid": "25404471-cb77-4c92-8e41-10dcdf44b18c"
-      },
-      {
         "formula": {
-          "ascii": "not r",
-          "latex": "\\lnot r",
-          "userInput": "not r"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "3bec1c10-03f7-4d33-8e0e-692f61134c92"
-      },
-      {
-        "formula": {
-          "ascii": "q",
-          "latex": "q",
-          "userInput": "q"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "3f6728db-fac3-474a-a577-80bc743088d6"
-      },
-      {
-        "formula": {
-          "ascii": "p -> r",
-          "latex": "p \\rightarrow r",
-          "userInput": "p -> r"
-        },
-        "justification": {
-          "refs": [
-            "3f6728db-fac3-474a-a577-80bc743088d6",
-            "25404471-cb77-4c92-8e41-10dcdf44b18c"
-          ],
-          "rule": "implies_elim"
-        },
-        "stepType": "line",
-        "uuid": "41ba0a2e-aea3-4e2b-b6c6-c925c82f7033"
-      },
-      {
-        "formula": {
-          "ascii": "not p",
-          "latex": "\\lnot p",
-          "userInput": "not p"
-        },
-        "justification": {
-          "refs": [
-            "41ba0a2e-aea3-4e2b-b6c6-c925c82f7033",
-            "3bec1c10-03f7-4d33-8e0e-692f61134c92"
-          ],
-          "rule": "modus_tollens"
-        },
-        "stepType": "line",
-        "uuid": "b8231492-a14a-4210-8c56-5c085062d745"
-      }
-    ]
-  },
-  {
-    "id": "cf6aa2a4-fc2b-4cc2-b235-6f37cf28707d",
-    "createdAt": "2025-07-29T18:32:04.034Z",
-    "title": "Exercise 1.7.3(i)",
-    "logicName": "propositionalLogic",
-    "proof": [
-      {
-        "formula": {
-          "ascii": "(c and n) -> t",
-          "latex": "(c \\land n) \\rightarrow t",
-          "userInput": "c and n -> t"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "25404471-cb77-4c92-8e41-10dcdf44b18c"
-      },
-      {
-        "formula": {
-          "ascii": "h and not s",
-          "latex": "h \\land \\lnot s",
-          "userInput": "h and not s"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "98b1b879-6322-4e03-96fc-789e52185cc0"
-      },
-      {
-        "formula": {
-          "ascii": "(h and not (s or c)) -> p",
-          "latex": "(h \\land \\lnot (s \\lor c)) \\rightarrow p",
-          "userInput": "h and not (s or c) -> p"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "e69820f2-0447-43d5-9043-9d3d9d9bdef3"
-      },
-      {
-        "boxInfo": {},
-        "proof": [
-          {
-            "formula": {
-              "ascii": "n and not t",
-              "latex": "n \\land \\lnot t",
-              "userInput": "n and not t"
-            },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
-            },
-            "stepType": "line",
-            "uuid": "afb5537a-8254-4dd2-a711-96c1f607a501"
-          },
-          {
-            "formula": {
-              "ascii": "h",
-              "latex": "h",
-              "userInput": "h"
-            },
-            "justification": {
-              "refs": [
-                "98b1b879-6322-4e03-96fc-789e52185cc0"
-              ],
-              "rule": "and_elim_1"
-            },
-            "stepType": "line",
-            "uuid": "493054f4-d16c-406e-996b-526cd50950bc"
-          },
-          {
-            "boxInfo": {},
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "s or c",
-                  "latex": "s \\lor c",
-                  "userInput": "s or c"
-                },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
-                },
-                "stepType": "line",
-                "uuid": "6075df06-dc93-4be7-b338-c41ddfb7b23b"
-              },
-              {
-                "boxInfo": {},
-                "proof": [
-                  {
-                    "formula": {
-                      "ascii": "s",
-                      "latex": "s",
-                      "userInput": "s "
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
-                    },
-                    "stepType": "line",
-                    "uuid": "653347e5-ba4a-42f0-965d-df7e18d7ab33"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "not s",
-                      "latex": "\\lnot s",
-                      "userInput": "not s"
-                    },
-                    "justification": {
-                      "refs": [
-                        "98b1b879-6322-4e03-96fc-789e52185cc0"
-                      ],
-                      "rule": "and_elim_2"
-                    },
-                    "stepType": "line",
-                    "uuid": "1e979afe-ab02-4b9d-963d-31d7255ea8ec"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "false",
-                      "latex": "\\bot",
-                      "userInput": "false"
-                    },
-                    "justification": {
-                      "refs": [
-                        "653347e5-ba4a-42f0-965d-df7e18d7ab33",
-                        "1e979afe-ab02-4b9d-963d-31d7255ea8ec"
-                      ],
-                      "rule": "not_elim"
-                    },
-                    "stepType": "line",
-                    "uuid": "92ae7650-d484-44d0-9207-0143e6f277ee"
-                  }
-                ],
-                "stepType": "box",
-                "uuid": "82919858-8d52-46f4-bd51-9b546b30b0e1"
-              },
-              {
-                "boxInfo": {},
-                "proof": [
-                  {
-                    "formula": {
-                      "ascii": "c",
-                      "latex": "c",
-                      "userInput": "c"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
-                    },
-                    "stepType": "line",
-                    "uuid": "3c32a0d2-4b32-41d4-a95c-4e4a7e9b3a11"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "n",
-                      "latex": "n",
-                      "userInput": "n"
-                    },
-                    "justification": {
-                      "refs": [
-                        "afb5537a-8254-4dd2-a711-96c1f607a501"
-                      ],
-                      "rule": "and_elim_1"
-                    },
-                    "stepType": "line",
-                    "uuid": "d3b3053d-f638-4e18-8829-f7dabf51d3b4"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "c and n",
-                      "latex": "c \\land n",
-                      "userInput": "c and n"
-                    },
-                    "justification": {
-                      "refs": [
-                        "3c32a0d2-4b32-41d4-a95c-4e4a7e9b3a11",
-                        "d3b3053d-f638-4e18-8829-f7dabf51d3b4"
-                      ],
-                      "rule": "and_intro"
-                    },
-                    "stepType": "line",
-                    "uuid": "a5373c51-8c0a-43d6-b51b-6ed8b1f8af60"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "not t",
-                      "latex": "\\lnot t",
-                      "userInput": "not t"
-                    },
-                    "justification": {
-                      "refs": [
-                        "afb5537a-8254-4dd2-a711-96c1f607a501"
-                      ],
-                      "rule": "and_elim_2"
-                    },
-                    "stepType": "line",
-                    "uuid": "a0efccd2-d9e6-4951-be10-ad156202bbca"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "not (c and n)",
-                      "latex": "\\lnot (c \\land n)",
-                      "userInput": "not (c and n)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "25404471-cb77-4c92-8e41-10dcdf44b18c",
-                        "a0efccd2-d9e6-4951-be10-ad156202bbca"
-                      ],
-                      "rule": "modus_tollens"
-                    },
-                    "stepType": "line",
-                    "uuid": "24a0c374-83fd-47f3-bfcc-fc384c932dce"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "false",
-                      "latex": "\\bot",
-                      "userInput": "false"
-                    },
-                    "justification": {
-                      "refs": [
-                        "a5373c51-8c0a-43d6-b51b-6ed8b1f8af60",
-                        "24a0c374-83fd-47f3-bfcc-fc384c932dce"
-                      ],
-                      "rule": "not_elim"
-                    },
-                    "stepType": "line",
-                    "uuid": "16e45a17-93a2-4a3b-b477-79c573d0df9a"
-                  }
-                ],
-                "stepType": "box",
-                "uuid": "7f099b3e-8beb-4255-9dc5-16bf8955c079"
-              },
-              {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
-                },
-                "justification": {
-                  "refs": [
-                    "6075df06-dc93-4be7-b338-c41ddfb7b23b",
-                    "82919858-8d52-46f4-bd51-9b546b30b0e1",
-                    "7f099b3e-8beb-4255-9dc5-16bf8955c079"
-                  ],
-                  "rule": "or_elim"
-                },
-                "stepType": "line",
-                "uuid": "96cfc1ee-a100-4ed2-8e0d-3d535d07cc19"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "400a9136-9a3b-4b3a-832b-4edeef69d8e8"
-          },
-          {
-            "formula": {
-              "ascii": "not (s or c)",
-              "latex": "\\lnot (s \\lor c)",
-              "userInput": "not (s or c)"
-            },
-            "justification": {
-              "refs": [
-                "400a9136-9a3b-4b3a-832b-4edeef69d8e8"
-              ],
-              "rule": "not_intro"
-            },
-            "stepType": "line",
-            "uuid": "19618043-060b-4d24-84a2-1cd1723ba0bd"
-          },
-          {
-            "formula": {
-              "ascii": "h and not (s or c)",
-              "latex": "h \\land \\lnot (s \\lor c)",
-              "userInput": "h and not (s or c)"
-            },
-            "justification": {
-              "refs": [
-                "493054f4-d16c-406e-996b-526cd50950bc",
-                "19618043-060b-4d24-84a2-1cd1723ba0bd"
-              ],
-              "rule": "and_intro"
-            },
-            "stepType": "line",
-            "uuid": "e2cec2d9-e2e4-4d55-b691-5abd3f28fe71"
-          },
-          {
-            "formula": {
-              "ascii": "p",
-              "latex": "p",
-              "userInput": "p"
-            },
-            "justification": {
-              "refs": [
-                "e2cec2d9-e2e4-4d55-b691-5abd3f28fe71",
-                "e69820f2-0447-43d5-9043-9d3d9d9bdef3"
-              ],
-              "rule": "implies_elim"
-            },
-            "stepType": "line",
-            "uuid": "db79fe95-b317-46f2-942b-f5459caed74d"
-          }
-        ],
-        "stepType": "box",
-        "uuid": "f048e655-73bb-4177-bf28-c963fd4cdcf2"
-      },
-      {
-        "formula": {
-          "ascii": "(n and not t) -> p",
-          "latex": "(n \\land \\lnot t) \\rightarrow p",
-          "userInput": "n and not t -> p"
-        },
-        "justification": {
-          "refs": [
-            "f048e655-73bb-4177-bf28-c963fd4cdcf2"
-          ],
-          "rule": "implies_intro"
-        },
-        "stepType": "line",
-        "uuid": "93f7004c-dafc-4619-9a92-99ea06f8145e"
-      }
-    ]
-  },
-  {
-    "id": "68e4070d-c0fe-4f2e-a4f6-e2596f238d3b",
-    "createdAt": "2025-07-29T18:38:36.001Z",
-    "title": "Exercise 1.7.3(n)",
-    "logicName": "propositionalLogic",
-    "proof": [
-      {
-        "formula": {
+          "userInput": "p and q",
           "ascii": "p and q",
-          "latex": "p \\land q",
-          "userInput": "p and q"
+          "latex": "p \\land q"
         },
         "justification": {
           "refs": [],
           "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-      },
-      {
-        "boxInfo": {},
-        "proof": [
-          {
-            "formula": {
-              "ascii": "not p or not q",
-              "latex": "\\lnot p \\lor \\lnot q",
-              "userInput": "not p or not q"
-            },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
-            },
-            "stepType": "line",
-            "uuid": "76ad9009-cec2-46f3-b46d-e9c54abc1470"
-          },
-          {
-            "boxInfo": {},
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "not p",
-                  "latex": "\\lnot p",
-                  "userInput": "not p"
-                },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
-                },
-                "stepType": "line",
-                "uuid": "c0a6094f-9bf9-4ee2-a80f-7321942e794c"
-              },
-              {
-                "formula": {
-                  "ascii": "p",
-                  "latex": "p",
-                  "userInput": "p"
-                },
-                "justification": {
-                  "refs": [
-                    "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-                  ],
-                  "rule": "and_elim_1"
-                },
-                "stepType": "line",
-                "uuid": "c706ca9b-2a58-4b80-b648-93955ca32674"
-              },
-              {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
-                },
-                "justification": {
-                  "refs": [
-                    "c706ca9b-2a58-4b80-b648-93955ca32674",
-                    "c0a6094f-9bf9-4ee2-a80f-7321942e794c"
-                  ],
-                  "rule": "not_elim"
-                },
-                "stepType": "line",
-                "uuid": "09f52c83-9735-4583-b028-e71b62cce37f"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "387c2604-8add-4e69-b72b-9025647d0cca"
-          },
-          {
-            "boxInfo": {},
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "not q",
-                  "latex": "\\lnot q",
-                  "userInput": "not q"
-                },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
-                },
-                "stepType": "line",
-                "uuid": "05c1c04f-0803-49d8-8cc3-305d34afbb5c"
-              },
-              {
-                "formula": {
-                  "ascii": "q",
-                  "latex": "q",
-                  "userInput": "q"
-                },
-                "justification": {
-                  "refs": [
-                    "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-                  ],
-                  "rule": "and_elim_2"
-                },
-                "stepType": "line",
-                "uuid": "9c9ea09f-d8ac-4d9a-8afc-163b37c8d34c"
-              },
-              {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
-                },
-                "justification": {
-                  "refs": [
-                    "9c9ea09f-d8ac-4d9a-8afc-163b37c8d34c",
-                    "05c1c04f-0803-49d8-8cc3-305d34afbb5c"
-                  ],
-                  "rule": "not_elim"
-                },
-                "stepType": "line",
-                "uuid": "a0b7782c-4f5e-436f-8e05-87c3deaf78a5"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "fb155ae2-8939-46fd-8b53-32b12425d8ed"
-          },
-          {
-            "formula": {
-              "ascii": "false",
-              "latex": "\\bot",
-              "userInput": "false"
-            },
-            "justification": {
-              "refs": [
-                "76ad9009-cec2-46f3-b46d-e9c54abc1470",
-                "387c2604-8add-4e69-b72b-9025647d0cca",
-                "fb155ae2-8939-46fd-8b53-32b12425d8ed"
-              ],
-              "rule": "or_elim"
-            },
-            "stepType": "line",
-            "uuid": "7c3fab18-258f-4d19-93b7-78f2ce0cab21"
-          }
-        ],
-        "stepType": "box",
-        "uuid": "965dda36-eea3-42c9-ae9d-9a2e772c3b58"
-      },
-      {
-        "formula": {
-          "ascii": "not (not p or not q)",
-          "latex": "\\lnot (\\lnot p \\lor \\lnot q)",
-          "userInput": "not (not p or not q)"
-        },
-        "justification": {
-          "refs": [
-            "965dda36-eea3-42c9-ae9d-9a2e772c3b58"
-          ],
-          "rule": "not_intro"
-        },
-        "stepType": "line",
-        "uuid": "0eaeaa8d-5649-4020-8860-85afed72adca"
-      }
-    ]
-  },
-  {
-    "id": "a725299f-f1fb-42a9-81b5-2e817c822b9c",
-    "createdAt": "2025-07-29T18:41:38.379Z",
-    "title": "Exercise 2.3.4(c)",
-    "logicName": "predicateLogic",
-    "proof": [
-      {
-        "formula": {
-          "ascii": "forall x (P(x) -> Q(x))",
-          "latex": "\\forall x (P(x) \\rightarrow Q(x))",
-          "userInput": "forall x (P(x) -> Q(x))"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-      },
-      {
-        "boxInfo": {},
-        "proof": [
-          {
-            "formula": {
-              "ascii": "forall x P(x)",
-              "latex": "\\forall x P(x)",
-              "userInput": "forall x P(x)"
-            },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
-            },
-            "stepType": "line",
-            "uuid": "721f1124-31a9-47e9-a800-94d774660cb5"
-          },
-          {
-            "boxInfo": {
-              "freshVar": "x_0"
-            },
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "P(x_0)",
-                  "latex": "P(x_0)",
-                  "userInput": "P(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "721f1124-31a9-47e9-a800-94d774660cb5"
-                  ],
-                  "rule": "forall_elim"
-                },
-                "stepType": "line",
-                "uuid": "cea224e3-5c88-46b8-80ea-6a0acb9bebd9"
-              },
-              {
-                "formula": {
-                  "ascii": "P(x_0) -> Q(x_0)",
-                  "latex": "P(x_0) \\rightarrow Q(x_0)",
-                  "userInput": "P(x_0) -> Q(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-                  ],
-                  "rule": "forall_elim"
-                },
-                "stepType": "line",
-                "uuid": "3c7c1a4f-a42e-47e9-ac5f-553cc7350b30"
-              },
-              {
-                "formula": {
-                  "ascii": "Q(x_0)",
-                  "latex": "Q(x_0)",
-                  "userInput": "Q(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "cea224e3-5c88-46b8-80ea-6a0acb9bebd9",
-                    "3c7c1a4f-a42e-47e9-ac5f-553cc7350b30"
-                  ],
-                  "rule": "implies_elim"
-                },
-                "stepType": "line",
-                "uuid": "7f0005e7-b2e3-4f71-9c2b-aed776f4b915"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "7de40589-6d02-446c-a7a6-ca1adac9a2ce"
-          },
-          {
-            "formula": {
-              "ascii": "forall x Q(x)",
-              "latex": "\\forall x Q(x)",
-              "userInput": "forall x Q(x)"
-            },
-            "justification": {
-              "refs": [
-                "7de40589-6d02-446c-a7a6-ca1adac9a2ce"
-              ],
-              "rule": "forall_intro"
-            },
-            "stepType": "line",
-            "uuid": "0ea15597-2279-4cba-9458-8e00553a1266"
-          }
-        ],
-        "stepType": "box",
-        "uuid": "8b7b12d0-ec56-4949-94b2-238b44dd0692"
-      },
-      {
-        "formula": {
-          "ascii": "forall x P(x) -> forall x Q(x)",
-          "latex": "\\forall x P(x) \\rightarrow \\forall x Q(x)",
-          "userInput": "forall x P(x) -> forall x Q(x)"
-        },
-        "justification": {
-          "refs": [
-            "8b7b12d0-ec56-4949-94b2-238b44dd0692"
-          ],
-          "rule": "implies_intro"
-        },
-        "stepType": "line",
-        "uuid": "f40eafe8-f114-46c9-a335-03c784fd8250"
-      }
-    ]
-  },
-  {
-    "id": "e3b785c1-79f3-441d-838b-fb91d3afda11",
-    "createdAt": "2025-07-29T18:43:07.593Z",
-    "title": "Exercise 2.3.6(c)",
-    "logicName": "predicateLogic",
-    "proof": [
-      {
-        "formula": {
-          "ascii": "forall x (P(x) -> not Q(x))",
-          "latex": "\\forall x (P(x) \\rightarrow \\lnot Q(x))",
-          "userInput": "forall x (P(x) -> not Q(x))"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "premise"
-        },
-        "stepType": "line",
-        "uuid": "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-      },
-      {
-        "boxInfo": {},
-        "proof": [
-          {
-            "formula": {
-              "ascii": "exists x (P(x) and Q(x))",
-              "latex": "\\exists x (P(x) \\land Q(x))",
-              "userInput": "exists x (P(x) and Q(x))"
-            },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
-            },
-            "stepType": "line",
-            "uuid": "840f1c7c-5b68-451f-8201-8f4b1f90628e"
-          },
-          {
-            "boxInfo": {
-              "freshVar": "x_0"
-            },
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "P(x_0) and Q(x_0)",
-                  "latex": "P(x_0) \\land Q(x_0)",
-                  "userInput": "P(x_0) and Q(x_0)"
-                },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
-                },
-                "stepType": "line",
-                "uuid": "e7f38910-3305-43d9-ab9b-c42b5bec55c2"
-              },
-              {
-                "formula": {
-                  "ascii": "P(x_0)",
-                  "latex": "P(x_0)",
-                  "userInput": "P(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "e7f38910-3305-43d9-ab9b-c42b5bec55c2"
-                  ],
-                  "rule": "and_elim_1"
-                },
-                "stepType": "line",
-                "uuid": "6729b0e3-3204-4ccf-a3c0-e05334806b85"
-              },
-              {
-                "formula": {
-                  "ascii": "Q(x_0)",
-                  "latex": "Q(x_0)",
-                  "userInput": "Q(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "e7f38910-3305-43d9-ab9b-c42b5bec55c2"
-                  ],
-                  "rule": "and_elim_2"
-                },
-                "stepType": "line",
-                "uuid": "abcb419d-ccee-4de1-b75a-561edba17064"
-              },
-              {
-                "formula": {
-                  "ascii": "P(x_0) -> not Q(x_0)",
-                  "latex": "P(x_0) \\rightarrow \\lnot Q(x_0)",
-                  "userInput": "P(x_0) -> not Q(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "9cfac313-3f5f-4d73-87bd-cf22820b4978"
-                  ],
-                  "rule": "forall_elim"
-                },
-                "stepType": "line",
-                "uuid": "807cd900-4cff-4eb9-a42d-00507ff654d7"
-              },
-              {
-                "formula": {
-                  "ascii": "not Q(x_0)",
-                  "latex": "\\lnot Q(x_0)",
-                  "userInput": "not Q(x_0)"
-                },
-                "justification": {
-                  "refs": [
-                    "6729b0e3-3204-4ccf-a3c0-e05334806b85",
-                    "807cd900-4cff-4eb9-a42d-00507ff654d7"
-                  ],
-                  "rule": "implies_elim"
-                },
-                "stepType": "line",
-                "uuid": "1d6e3067-888d-4ada-89eb-55d6b7d864ce"
-              },
-              {
-                "formula": {
-                  "ascii": "false",
-                  "latex": "\\bot",
-                  "userInput": "false"
-                },
-                "justification": {
-                  "refs": [
-                    "abcb419d-ccee-4de1-b75a-561edba17064",
-                    "1d6e3067-888d-4ada-89eb-55d6b7d864ce"
-                  ],
-                  "rule": "not_elim"
-                },
-                "stepType": "line",
-                "uuid": "4c2b2e0b-7747-49fa-8fdf-1d2b3502381b"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "7c5e82c9-8335-406d-85ab-ecc43e8cf3cb"
-          },
-          {
-            "formula": {
-              "ascii": "false",
-              "latex": "\\bot",
-              "userInput": "false"
-            },
-            "justification": {
-              "refs": [
-                "840f1c7c-5b68-451f-8201-8f4b1f90628e",
-                "7c5e82c9-8335-406d-85ab-ecc43e8cf3cb"
-              ],
-              "rule": "exists_elim"
-            },
-            "stepType": "line",
-            "uuid": "81d23ac7-df99-471b-9568-53d3c4d186bc"
-          }
-        ],
-        "stepType": "box",
-        "uuid": "d5728006-38fa-4e69-8337-4a58b8c24090"
-      },
-      {
-        "formula": {
-          "ascii": "not exists x (P(x) and Q(x))",
-          "latex": "\\lnot \\exists x (P(x) \\land Q(x))",
-          "userInput": "not (exists x (P(x) and Q(x)))"
-        },
-        "justification": {
-          "refs": [
-            "d5728006-38fa-4e69-8337-4a58b8c24090"
-          ],
-          "rule": "not_intro"
-        },
-        "stepType": "line",
-        "uuid": "43dd1557-7d78-41a6-b104-64bba34a3406"
-      }
-    ]
-  },
-  {
-    "id": "b901be59-10fc-4bdd-bcf7-08245e4b3b35",
-    "createdAt": "2025-07-29T18:46:54.553Z",
-    "title": "Exercise 2.4.12(k)",
-    "logicName": "predicateLogic",
-    "proof": [
-      {
-        "boxInfo": {},
-        "proof": [
-          {
-            "formula": {
-              "ascii": "forall x exists y (P(x) -> Q(y))",
-              "latex": "\\forall x \\exists y (P(x) \\rightarrow Q(y))",
-              "userInput": "forall x exists y (P(x) -> Q(y))"
-            },
-            "justification": {
-              "refs": [],
-              "rule": "assumption"
-            },
-            "stepType": "line",
-            "uuid": "23020362-bb3e-4d27-96e3-dd66a51975b0"
-          },
-          {
-            "formula": {
-              "ascii": "exists y Q(y) or not exists y Q(y)",
-              "latex": "\\exists y Q(y) \\lor \\lnot \\exists y Q(y)",
-              "userInput": "exists y Q(y) or not exists y Q(y)"
-            },
-            "justification": {
-              "refs": [],
-              "rule": "law_of_excluded_middle"
-            },
-            "stepType": "line",
-            "uuid": "c2b6cf1a-8eb3-4d65-bbf0-d846d63436e3"
-          },
-          {
-            "boxInfo": {},
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "exists y Q(y)",
-                  "latex": "\\exists y Q(y)",
-                  "userInput": "exists y Q(y)"
-                },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
-                },
-                "stepType": "line",
-                "uuid": "f75c2060-46d9-418d-906c-3d2ee055c554"
-              },
-              {
-                "boxInfo": {
-                  "freshVar": "y_0"
-                },
-                "proof": [
-                  {
-                    "formula": {
-                      "ascii": "Q(y_0)",
-                      "latex": "Q(y_0)",
-                      "userInput": "Q(y_0)"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
-                    },
-                    "stepType": "line",
-                    "uuid": "91ce8f8a-ff1e-40de-9fdc-e6dcb869c963"
-                  },
-                  {
-                    "boxInfo": {
-                      "freshVar": "x_0"
-                    },
-                    "proof": [
-                      {
-                        "boxInfo": {},
-                        "proof": [
-                          {
-                            "formula": {
-                              "ascii": "P(x_0)",
-                              "latex": "P(x_0)",
-                              "userInput": "P(x_0)"
-                            },
-                            "justification": {
-                              "refs": [],
-                              "rule": "assumption"
-                            },
-                            "stepType": "line",
-                            "uuid": "133592aa-65de-4cf9-b43c-b5b121585d13"
-                          },
-                          {
-                            "formula": {
-                              "ascii": "Q(y_0)",
-                              "latex": "Q(y_0)",
-                              "userInput": "Q(y_0)"
-                            },
-                            "justification": {
-                              "refs": [
-                                "91ce8f8a-ff1e-40de-9fdc-e6dcb869c963"
-                              ],
-                              "rule": "copy"
-                            },
-                            "stepType": "line",
-                            "uuid": "a48e299d-714b-495a-aa46-56a753127f5f"
-                          }
-                        ],
-                        "stepType": "box",
-                        "uuid": "fb7dfd00-564c-42e9-908d-08a952ec1aef"
-                      },
-                      {
-                        "formula": {
-                          "ascii": "P(x_0) -> Q(y_0)",
-                          "latex": "P(x_0) \\rightarrow Q(y_0)",
-                          "userInput": "P(x_0) -> Q(y_0)"
-                        },
-                        "justification": {
-                          "refs": [
-                            "fb7dfd00-564c-42e9-908d-08a952ec1aef"
-                          ],
-                          "rule": "implies_intro"
-                        },
-                        "stepType": "line",
-                        "uuid": "a11e69dd-4b4e-4b77-989c-411569f09e8b"
-                      }
-                    ],
-                    "stepType": "box",
-                    "uuid": "e7c63a47-61a4-419f-8852-a0024a1454a3"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "forall x (P(x) -> Q(y_0))",
-                      "latex": "\\forall x (P(x) \\rightarrow Q(y_0))",
-                      "userInput": "forall x (P(x) -> Q(y_0))"
-                    },
-                    "justification": {
-                      "refs": [
-                        "e7c63a47-61a4-419f-8852-a0024a1454a3"
-                      ],
-                      "rule": "forall_intro"
-                    },
-                    "stepType": "line",
-                    "uuid": "7576e844-35ed-4df4-9326-65c2bce1b4dc"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "exists y forall x (P(x) -> Q(y))",
-                      "latex": "\\exists y \\forall x (P(x) \\rightarrow Q(y))",
-                      "userInput": "exists y forall x (P(x) -> Q(y))"
-                    },
-                    "justification": {
-                      "refs": [
-                        "7576e844-35ed-4df4-9326-65c2bce1b4dc"
-                      ],
-                      "rule": "exists_intro"
-                    },
-                    "stepType": "line",
-                    "uuid": "49cbf75d-397d-409a-8a7e-e2cc63fad9b1"
-                  }
-                ],
-                "stepType": "box",
-                "uuid": "c683c239-57b1-4877-b992-08d52aa39ee4"
-              },
-              {
-                "formula": {
-                  "ascii": "exists y forall x (P(x) -> Q(y))",
-                  "latex": "\\exists y \\forall x (P(x) \\rightarrow Q(y))",
-                  "userInput": "exists y forall x (P(x) -> Q(y))"
-                },
-                "justification": {
-                  "refs": [
-                    "f75c2060-46d9-418d-906c-3d2ee055c554",
-                    "c683c239-57b1-4877-b992-08d52aa39ee4"
-                  ],
-                  "rule": "exists_elim"
-                },
-                "stepType": "line",
-                "uuid": "750d69ef-223d-47c5-a0dd-a3312b49a13d"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "730a1cdd-3506-47b1-ab33-34277f548f08"
-          },
-          {
-            "boxInfo": {},
-            "proof": [
-              {
-                "formula": {
-                  "ascii": "not exists y Q(y)",
-                  "latex": "\\lnot \\exists y Q(y)",
-                  "userInput": "not exists y Q(y)"
-                },
-                "justification": {
-                  "refs": [],
-                  "rule": "assumption"
-                },
-                "stepType": "line",
-                "uuid": "d1a143e5-d0f8-441b-be5f-03294a01178d"
-              },
-              {
-                "boxInfo": {
-                  "freshVar": "x_0"
-                },
-                "proof": [
-                  {
-                    "boxInfo": {},
-                    "proof": [
-                      {
-                        "formula": {
-                          "ascii": "P(x_0)",
-                          "latex": "P(x_0)",
-                          "userInput": "P(x_0)"
-                        },
-                        "justification": {
-                          "refs": [],
-                          "rule": "assumption"
-                        },
-                        "stepType": "line",
-                        "uuid": "c10e0680-fe52-459a-8698-cbe0e80ea9b5"
-                      },
-                      {
-                        "formula": {
-                          "ascii": "exists y (P(x_0) -> Q(y))",
-                          "latex": "\\exists y (P(x_0) \\rightarrow Q(y))",
-                          "userInput": "exists y (P(x_0) -> Q(y))"
-                        },
-                        "justification": {
-                          "refs": [
-                            "23020362-bb3e-4d27-96e3-dd66a51975b0"
-                          ],
-                          "rule": "forall_elim"
-                        },
-                        "stepType": "line",
-                        "uuid": "ec72d403-7797-45cb-bc34-44cd0e4641f4"
-                      },
-                      {
-                        "boxInfo": {
-                          "freshVar": "y_0"
-                        },
-                        "proof": [
-                          {
-                            "formula": {
-                              "ascii": "P(x_0) -> Q(y_0)",
-                              "latex": "P(x_0) \\rightarrow Q(y_0)",
-                              "userInput": "P(x_0) -> Q(y_0)"
-                            },
-                            "justification": {
-                              "refs": [],
-                              "rule": "assumption"
-                            },
-                            "stepType": "line",
-                            "uuid": "a162d78a-9662-4e3f-b92e-7cd1027a7f9c"
-                          },
-                          {
-                            "formula": {
-                              "ascii": "Q(y_0)",
-                              "latex": "Q(y_0)",
-                              "userInput": "Q(y_0)"
-                            },
-                            "justification": {
-                              "refs": [
-                                "c10e0680-fe52-459a-8698-cbe0e80ea9b5",
-                                "a162d78a-9662-4e3f-b92e-7cd1027a7f9c"
-                              ],
-                              "rule": "implies_elim"
-                            },
-                            "stepType": "line",
-                            "uuid": "f4266093-0074-4223-af08-7425d761e606"
-                          },
-                          {
-                            "formula": {
-                              "ascii": "exists y Q(y)",
-                              "latex": "\\exists y Q(y)",
-                              "userInput": "exists y Q(y)"
-                            },
-                            "justification": {
-                              "refs": [
-                                "f4266093-0074-4223-af08-7425d761e606"
-                              ],
-                              "rule": "exists_intro"
-                            },
-                            "stepType": "line",
-                            "uuid": "f9ad78a4-3403-464a-b415-8cb06dfd68a6"
-                          },
-                          {
-                            "formula": {
-                              "ascii": "false",
-                              "latex": "\\bot",
-                              "userInput": "false"
-                            },
-                            "justification": {
-                              "refs": [
-                                "f9ad78a4-3403-464a-b415-8cb06dfd68a6",
-                                "d1a143e5-d0f8-441b-be5f-03294a01178d"
-                              ],
-                              "rule": "not_elim"
-                            },
-                            "stepType": "line",
-                            "uuid": "b11e7990-cafe-4a5f-9b55-2146bd4232bc"
-                          }
-                        ],
-                        "stepType": "box",
-                        "uuid": "5192763e-e9e0-42cd-9d4c-84d52acdd972"
-                      },
-                      {
-                        "formula": {
-                          "ascii": "false",
-                          "latex": "\\bot",
-                          "userInput": "false"
-                        },
-                        "justification": {
-                          "refs": [
-                            "ec72d403-7797-45cb-bc34-44cd0e4641f4",
-                            "5192763e-e9e0-42cd-9d4c-84d52acdd972"
-                          ],
-                          "rule": "exists_elim"
-                        },
-                        "stepType": "line",
-                        "uuid": "351d1505-f626-4393-bf89-1f8f8617f669"
-                      },
-                      {
-                        "formula": {
-                          "ascii": "Q(a)",
-                          "latex": "Q(a)",
-                          "userInput": "Q(a)"
-                        },
-                        "justification": {
-                          "refs": [
-                            "351d1505-f626-4393-bf89-1f8f8617f669"
-                          ],
-                          "rule": "bot_elim"
-                        },
-                        "stepType": "line",
-                        "uuid": "ef2daec4-ec3f-41f2-9066-8ef9934fa6d0"
-                      }
-                    ],
-                    "stepType": "box",
-                    "uuid": "89ee53dc-2882-4856-a26e-7f4afe11bb50"
-                  },
-                  {
-                    "formula": {
-                      "ascii": "P(x_0) -> Q(a)",
-                      "latex": "P(x_0) \\rightarrow Q(a)",
-                      "userInput": "P(x_0) -> Q(a)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "89ee53dc-2882-4856-a26e-7f4afe11bb50"
-                      ],
-                      "rule": "implies_intro"
-                    },
-                    "stepType": "line",
-                    "uuid": "0b47113c-fa5a-447d-a51a-c7e28b813890"
-                  }
-                ],
-                "stepType": "box",
-                "uuid": "0492d250-8d44-4f05-8e7d-7d517abd7398"
-              },
-              {
-                "formula": {
-                  "ascii": "forall x (P(x) -> Q(a))",
-                  "latex": "\\forall x (P(x) \\rightarrow Q(a))",
-                  "userInput": "forall x (P(x) -> Q(a))"
-                },
-                "justification": {
-                  "refs": [
-                    "0492d250-8d44-4f05-8e7d-7d517abd7398"
-                  ],
-                  "rule": "forall_intro"
-                },
-                "stepType": "line",
-                "uuid": "9e944a93-901b-4e27-b02f-a3643d88b9d2"
-              },
-              {
-                "formula": {
-                  "ascii": "exists y forall x (P(x) -> Q(y))",
-                  "latex": "\\exists y \\forall x (P(x) \\rightarrow Q(y))",
-                  "userInput": "exists y forall x (P(x) -> Q(y))"
-                },
-                "justification": {
-                  "refs": [
-                    "9e944a93-901b-4e27-b02f-a3643d88b9d2"
-                  ],
-                  "rule": "exists_intro"
-                },
-                "stepType": "line",
-                "uuid": "b0712e13-7879-4c98-b017-f88ed32a4b62"
-              }
-            ],
-            "stepType": "box",
-            "uuid": "72658f23-45f8-4037-8207-b49838a28581"
-          },
-          {
-            "formula": {
-              "ascii": "exists y forall x (P(x) -> Q(y))",
-              "latex": "\\exists y \\forall x (P(x) \\rightarrow Q(y))",
-              "userInput": "exists y forall x (P(x) -> Q(y))"
-            },
-            "justification": {
-              "refs": [
-                "c2b6cf1a-8eb3-4d65-bbf0-d846d63436e3",
-                "730a1cdd-3506-47b1-ab33-34277f548f08",
-                "72658f23-45f8-4037-8207-b49838a28581"
-              ],
-              "rule": "or_elim"
-            },
-            "stepType": "line",
-            "uuid": "88ce5171-04dc-416a-a854-de915c37364a"
-          }
-        ],
-        "stepType": "box",
-        "uuid": "8e7f7bea-6816-42f7-a3d8-84df9b760054"
-      },
-      {
-        "formula": {
-          "ascii": "forall x exists y (P(x) -> Q(y)) -> exists y forall x (P(x) -> Q(y))",
-          "latex": "\\forall x \\exists y (P(x) \\rightarrow Q(y)) \\rightarrow \\exists y \\forall x (P(x) \\rightarrow Q(y))",
-          "userInput": "(forall x exists y (P(x) -> Q(y))) -> (exists y forall x (P(x) -> Q(y)))"
-        },
-        "justification": {
-          "refs": [
-            "8e7f7bea-6816-42f7-a3d8-84df9b760054"
-          ],
-          "rule": "implies_intro"
-        },
-        "stepType": "line",
-        "uuid": "999c2e18-4114-4fd9-bd5b-f3daf4a011cc"
-      }
-    ]
-  },
-  {
-    "id": "61019a34-1950-44dd-845e-aae4afcf0620",
-    "createdAt": "2025-08-13T13:40:47.792Z",
-    "title": "Every number is even or odd",
-    "logicName": "arithmetic",
-    "proof": [
-      {
-        "uuid": "54f60576-d846-4876-a8a3-10c528dd4e4f",
-        "stepType": "line",
-        "formula": {
-          "userInput": "(1 + 1) * 0 = 0",
-          "ascii": "(1 + 1) * 0 = 0",
-          "latex": "(1 + 1) * 0 = 0"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "peano_3"
         }
       },
       {
-        "uuid": "f4448c96-a409-4c9a-8554-a30216c34672",
-        "stepType": "line",
-        "formula": {
-          "userInput": "(1 + 1) * 0 = (1 + 1) * 0",
-          "ascii": "(1 + 1) * 0 = (1 + 1) * 0",
-          "latex": "(1 + 1) * 0 = (1 + 1) * 0"
-        },
-        "justification": {
-          "refs": [],
-          "rule": "equality_intro"
-        }
-      },
-      {
-        "uuid": "095b9ac7-c7b8-49cc-8ec8-be2506497170",
-        "stepType": "line",
-        "formula": {
-          "userInput": "0 = (1 + 1) * 0",
-          "ascii": "0 = (1 + 1) * 0",
-          "latex": "0 = (1 + 1) * 0"
-        },
-        "justification": {
-          "refs": [
-            "54f60576-d846-4876-a8a3-10c528dd4e4f",
-            "f4448c96-a409-4c9a-8554-a30216c34672"
-          ],
-          "rule": "equality_elim"
-        }
-      },
-      {
-        "uuid": "6b020d98-b476-4a83-a4b5-908df2267f30",
-        "stepType": "line",
-        "formula": {
-          "userInput": "exists k (0 = (1 + 1) * k)",
-          "ascii": "exists k (0 = (1 + 1) * k)",
-          "latex": "\\exists k (0 = (1 + 1) * k)"
-        },
-        "justification": {
-          "refs": [
-            "095b9ac7-c7b8-49cc-8ec8-be2506497170"
-          ],
-          "rule": "exists_intro"
-        }
-      },
-      {
-        "uuid": "2f361001-515a-4af4-8761-a5f94db3ff0b",
-        "stepType": "line",
-        "formula": {
-          "userInput": "exists k (0 = (1 + 1) * k) or exists k (0 = ((1 + 1) * k) + 1)",
-          "ascii": "exists k (0 = (1 + 1) * k) or exists k (0 = ((1 + 1) * k) + 1)",
-          "latex": "\\exists k (0 = (1 + 1) * k) \\lor \\exists k (0 = ((1 + 1) * k) + 1)"
-        },
-        "justification": {
-          "refs": [
-            "6b020d98-b476-4a83-a4b5-908df2267f30"
-          ],
-          "rule": "or_intro_1"
-        }
-      },
-      {
-        "uuid": "a462b4b3-86b7-4c2a-9a68-e3d8d44f25a8",
+        "uuid": "29510bb7-bf0a-4eba-a26f-ab96ae8b3026",
         "stepType": "box",
         "boxInfo": {
-          "freshVar": "n"
+          "freshVar": null
         },
         "proof": [
           {
-            "uuid": "b492091a-f05b-4916-9438-98ae8f0a5fa5",
+            "uuid": "4aa8a1ed-2e10-48f3-b5f5-147aa76e2d9a",
             "stepType": "line",
             "formula": {
-              "userInput": "exists k (n = (1 + 1) * k) or exists k (n = (1 + 1) * k + 1)",
-              "ascii": "exists k (n = (1 + 1) * k) or exists k (n = ((1 + 1) * k) + 1)",
-              "latex": "\\exists k (n = (1 + 1) * k) \\lor \\exists k (n = ((1 + 1) * k) + 1)"
+              "userInput": "not p or not q",
+              "ascii": "not p or not q",
+              "latex": "\\lnot p \\lor \\lnot q"
             },
             "justification": {
               "refs": [],
@@ -1408,19 +39,19 @@
             }
           },
           {
-            "uuid": "a8c6629f-7c22-4ded-b1ca-a4c86e01fa72",
+            "uuid": "606eeaa6-4cd1-48f7-a71e-4a4995b85166",
             "stepType": "box",
             "boxInfo": {
               "freshVar": null
             },
             "proof": [
               {
-                "uuid": "44d0ac4e-02d4-445a-8f79-02f1715ff864",
+                "uuid": "5e4a9726-c750-4f80-b6f3-68cedb191105",
                 "stepType": "line",
                 "formula": {
-                  "userInput": "exists k (n = (1 + 1) * k)",
-                  "ascii": "exists k (n = (1 + 1) * k)",
-                  "latex": "\\exists k (n = (1 + 1) * k)"
+                  "userInput": "not p",
+                  "ascii": "not p",
+                  "latex": "\\lnot p"
                 },
                 "justification": {
                   "refs": [],
@@ -1428,118 +59,52 @@
                 }
               },
               {
-                "uuid": "49901c13-9ae5-4dfb-9889-eab15ac9b8c4",
-                "stepType": "box",
-                "boxInfo": {
-                  "freshVar": "k_0"
-                },
-                "proof": [
-                  {
-                    "uuid": "feebff58-d98a-47d4-80ba-33ee502586b7",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n = (1 + 1) * k_0",
-                      "ascii": "n = (1 + 1) * k_0",
-                      "latex": "n = (1 + 1) * k_0"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
-                    }
-                  },
-                  {
-                    "uuid": "ff0c7233-04a5-43be-984d-ca7136fe38bc",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n + 1 = n + 1",
-                      "ascii": "n + 1 = n + 1",
-                      "latex": "n + 1 = n + 1"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "equality_intro"
-                    }
-                  },
-                  {
-                    "uuid": "4986bb13-3665-4eae-981f-dacd78f8a837",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n + 1 = (1 + 1) * k_0 + 1",
-                      "ascii": "n + 1 = ((1 + 1) * k_0) + 1",
-                      "latex": "n + 1 = ((1 + 1) * k_0) + 1"
-                    },
-                    "justification": {
-                      "refs": [
-                        "feebff58-d98a-47d4-80ba-33ee502586b7",
-                        "ff0c7233-04a5-43be-984d-ca7136fe38bc"
-                      ],
-                      "rule": "equality_elim"
-                    }
-                  },
-                  {
-                    "uuid": "c3432c7f-425a-4f3b-84a5-95609eb717a4",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "exists k (n + 1 = (1 + 1) * k + 1)",
-                      "ascii": "exists k (n + 1 = ((1 + 1) * k) + 1)",
-                      "latex": "\\exists k (n + 1 = ((1 + 1) * k) + 1)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "4986bb13-3665-4eae-981f-dacd78f8a837"
-                      ],
-                      "rule": "exists_intro"
-                    }
-                  }
-                ]
-              },
-              {
-                "uuid": "2a3f40fe-0fe4-4ecd-b3f3-fc5b7eecf1fc",
+                "uuid": "d9968d8e-64e2-497a-9603-3beae64ef6fc",
                 "stepType": "line",
                 "formula": {
-                  "userInput": "exists k (n + 1 = ((1 + 1) * k) + 1)",
-                  "ascii": "exists k (n + 1 = ((1 + 1) * k) + 1)",
-                  "latex": "\\exists k (n + 1 = ((1 + 1) * k) + 1)"
+                  "userInput": "p",
+                  "ascii": "p",
+                  "latex": "p"
                 },
                 "justification": {
                   "refs": [
-                    "44d0ac4e-02d4-445a-8f79-02f1715ff864",
-                    "49901c13-9ae5-4dfb-9889-eab15ac9b8c4"
+                    "629611a8-1e8e-4b17-8f92-673a8c131068"
                   ],
-                  "rule": "exists_elim"
+                  "rule": "and_elim_1"
                 }
               },
               {
-                "uuid": "d3d98e84-fb58-4a1a-8a63-108b7c7ad3cd",
+                "uuid": "b0249cde-b94e-4740-81d6-fe415217bca8",
                 "stepType": "line",
                 "formula": {
-                  "userInput": "exists k (n + 1 = (1 + 1) * k) or exists k (n + 1 = ((1 + 1) * k) + 1)",
-                  "ascii": "exists k (n + 1 = (1 + 1) * k) or exists k (n + 1 = ((1 + 1) * k) + 1)",
-                  "latex": "\\exists k (n + 1 = (1 + 1) * k) \\lor \\exists k (n + 1 = ((1 + 1) * k) + 1)"
+                  "userInput": "false",
+                  "ascii": "false",
+                  "latex": "\\bot"
                 },
                 "justification": {
                   "refs": [
-                    "2a3f40fe-0fe4-4ecd-b3f3-fc5b7eecf1fc"
+                    "d9968d8e-64e2-497a-9603-3beae64ef6fc",
+                    "5e4a9726-c750-4f80-b6f3-68cedb191105"
                   ],
-                  "rule": "or_intro_2"
+                  "rule": "not_elim"
                 }
               }
             ]
           },
           {
-            "uuid": "06c15154-4844-45a9-8b0d-e20163ec02c4",
+            "uuid": "363063dd-0f74-4ab7-b4ce-5fd96ce62d67",
             "stepType": "box",
             "boxInfo": {
               "freshVar": null
             },
             "proof": [
               {
-                "uuid": "94ce9195-1f10-4add-9ae9-f4d19a1e9a35",
+                "uuid": "73f410c0-2a5a-4030-8a52-7a67f2246d3d",
                 "stepType": "line",
                 "formula": {
-                  "userInput": "exists k (n = ((1 + 1) * k) + 1)",
-                  "ascii": "exists k (n = ((1 + 1) * k) + 1)",
-                  "latex": "\\exists k (n = ((1 + 1) * k) + 1)"
+                  "userInput": "not q",
+                  "ascii": "not q",
+                  "latex": "\\lnot q"
                 },
                 "justification": {
                   "refs": [],
@@ -1547,233 +112,51 @@
                 }
               },
               {
-                "uuid": "39fd6247-f98d-4218-9389-eeba5cd95ac2",
-                "stepType": "box",
-                "boxInfo": {
-                  "freshVar": "k_0"
-                },
-                "proof": [
-                  {
-                    "uuid": "6c1639c0-9500-48e5-8465-dcca5622eb65",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n = (1 + 1) * k_0 + 1",
-                      "ascii": "n = ((1 + 1) * k_0) + 1",
-                      "latex": "n = ((1 + 1) * k_0) + 1"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "assumption"
-                    }
-                  },
-                  {
-                    "uuid": "5d8fc541-a0c7-4335-8591-1e720f2471e9",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n + 1 = n + 1",
-                      "ascii": "n + 1 = n + 1",
-                      "latex": "n + 1 = n + 1"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "equality_intro"
-                    }
-                  },
-                  {
-                    "uuid": "86fb4e77-e5b7-4b3e-8636-980d2aa91643",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n + 1 = (1 + 1) * k_0 + 1 + 1",
-                      "ascii": "n + 1 = (((1 + 1) * k_0) + 1) + 1",
-                      "latex": "n + 1 = (((1 + 1) * k_0) + 1) + 1"
-                    },
-                    "justification": {
-                      "refs": [
-                        "6c1639c0-9500-48e5-8465-dcca5622eb65",
-                        "5d8fc541-a0c7-4335-8591-1e720f2471e9"
-                      ],
-                      "rule": "equality_elim"
-                    }
-                  },
-                  {
-                    "uuid": "7072c2ff-22dd-44f6-a7f0-05d3a0537988",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "((1 + 1) * k_0) + (1 + 1) = (1 + 1) * k_0 + 1 + 1",
-                      "ascii": "((1 + 1) * k_0) + (1 + 1) = (((1 + 1) * k_0) + 1) + 1",
-                      "latex": "((1 + 1) * k_0) + (1 + 1) = (((1 + 1) * k_0) + 1) + 1"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "peano_2"
-                    }
-                  },
-                  {
-                    "uuid": "baf56270-0165-4e33-a878-5c96470fa3a0",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "((1 + 1) * k_0) + (1 + 1) = ((1 + 1) * k_0) + (1 + 1)",
-                      "ascii": "((1 + 1) * k_0) + (1 + 1) = ((1 + 1) * k_0) + (1 + 1)",
-                      "latex": "((1 + 1) * k_0) + (1 + 1) = ((1 + 1) * k_0) + (1 + 1)"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "equality_intro"
-                    }
-                  },
-                  {
-                    "uuid": "5da6e630-4cc5-4f34-bcee-7b4cff401f08",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "((1 + 1) * k_0 + 1) + 1 = ((1 + 1) * k_0) + (1 + 1)",
-                      "ascii": "(((1 + 1) * k_0) + 1) + 1 = ((1 + 1) * k_0) + (1 + 1)",
-                      "latex": "(((1 + 1) * k_0) + 1) + 1 = ((1 + 1) * k_0) + (1 + 1)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "7072c2ff-22dd-44f6-a7f0-05d3a0537988",
-                        "baf56270-0165-4e33-a878-5c96470fa3a0"
-                      ],
-                      "rule": "equality_elim"
-                    }
-                  },
-                  {
-                    "uuid": "abab7d04-25e4-48a3-9123-0ed6b756df5c",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n + 1 = ((1 + 1) * k_0) + (1 + 1)",
-                      "ascii": "n + 1 = ((1 + 1) * k_0) + (1 + 1)",
-                      "latex": "n + 1 = ((1 + 1) * k_0) + (1 + 1)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "5da6e630-4cc5-4f34-bcee-7b4cff401f08",
-                        "86fb4e77-e5b7-4b3e-8636-980d2aa91643"
-                      ],
-                      "rule": "equality_elim"
-                    }
-                  },
-                  {
-                    "uuid": "f7f6fd0e-94c7-4a5a-8109-32e62e0e0d84",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "((1 + 1) * (k_0 + 1)) = ((1 + 1) * k_0) + (1 + 1)",
-                      "ascii": "(1 + 1) * (k_0 + 1) = ((1 + 1) * k_0) + (1 + 1)",
-                      "latex": "(1 + 1) * (k_0 + 1) = ((1 + 1) * k_0) + (1 + 1)"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "peano_4"
-                    }
-                  },
-                  {
-                    "uuid": "0182679a-48ef-48a5-925c-af263e2a3316",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "(1 + 1) * (k_0 + 1) = (1 + 1) * (k_0 + 1)",
-                      "ascii": "(1 + 1) * (k_0 + 1) = (1 + 1) * (k_0 + 1)",
-                      "latex": "(1 + 1) * (k_0 + 1) = (1 + 1) * (k_0 + 1)"
-                    },
-                    "justification": {
-                      "refs": [],
-                      "rule": "equality_intro"
-                    }
-                  },
-                  {
-                    "uuid": "2a95a9de-42a7-4d2a-92ee-ca20715e5ae1",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "((1 + 1) * k_0) + (1 + 1) = (1 + 1) * (k_0 + 1)",
-                      "ascii": "((1 + 1) * k_0) + (1 + 1) = (1 + 1) * (k_0 + 1)",
-                      "latex": "((1 + 1) * k_0) + (1 + 1) = (1 + 1) * (k_0 + 1)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "f7f6fd0e-94c7-4a5a-8109-32e62e0e0d84",
-                        "0182679a-48ef-48a5-925c-af263e2a3316"
-                      ],
-                      "rule": "equality_elim"
-                    }
-                  },
-                  {
-                    "uuid": "cc039d51-ebc9-4ccb-9d23-aec2e3c6ce9b",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "n + 1 = (1 + 1) * (k_0 + 1)",
-                      "ascii": "n + 1 = (1 + 1) * (k_0 + 1)",
-                      "latex": "n + 1 = (1 + 1) * (k_0 + 1)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "2a95a9de-42a7-4d2a-92ee-ca20715e5ae1",
-                        "abab7d04-25e4-48a3-9123-0ed6b756df5c"
-                      ],
-                      "rule": "equality_elim"
-                    }
-                  },
-                  {
-                    "uuid": "ce51894d-ea35-4d14-b724-7b63abc46096",
-                    "stepType": "line",
-                    "formula": {
-                      "userInput": "exists k (n + 1 = (1 + 1) * k)",
-                      "ascii": "exists k (n + 1 = (1 + 1) * k)",
-                      "latex": "\\exists k (n + 1 = (1 + 1) * k)"
-                    },
-                    "justification": {
-                      "refs": [
-                        "cc039d51-ebc9-4ccb-9d23-aec2e3c6ce9b"
-                      ],
-                      "rule": "exists_intro"
-                    }
-                  }
-                ]
-              },
-              {
-                "uuid": "1020661b-410b-4061-8e73-1f04e4c76bcb",
+                "uuid": "ebfcae34-14e8-43b7-9e56-45539e3f0805",
                 "stepType": "line",
                 "formula": {
-                  "userInput": "exists k (n + 1 = (1 + 1) * k)",
-                  "ascii": "exists k (n + 1 = (1 + 1) * k)",
-                  "latex": "\\exists k (n + 1 = (1 + 1) * k)"
+                  "userInput": "q",
+                  "ascii": "q",
+                  "latex": "q"
                 },
                 "justification": {
                   "refs": [
-                    "94ce9195-1f10-4add-9ae9-f4d19a1e9a35",
-                    "39fd6247-f98d-4218-9389-eeba5cd95ac2"
+                    "629611a8-1e8e-4b17-8f92-673a8c131068"
                   ],
-                  "rule": "exists_elim"
+                  "rule": "and_elim_2"
                 }
               },
               {
-                "uuid": "558e9f93-0d6a-4483-bb8f-6ad4fc1012e0",
+                "uuid": "d0a0d8bd-71cc-4662-8dc2-b8143f81fc3b",
                 "stepType": "line",
                 "formula": {
-                  "userInput": "exists k (n + 1 = (1 + 1) * k) or exists k (n + 1 = ((1 + 1) * k) + 1)",
-                  "ascii": "exists k (n + 1 = (1 + 1) * k) or exists k (n + 1 = ((1 + 1) * k) + 1)",
-                  "latex": "\\exists k (n + 1 = (1 + 1) * k) \\lor \\exists k (n + 1 = ((1 + 1) * k) + 1)"
+                  "userInput": "false",
+                  "ascii": "false",
+                  "latex": "\\bot"
                 },
                 "justification": {
                   "refs": [
-                    "1020661b-410b-4061-8e73-1f04e4c76bcb"
+                    "ebfcae34-14e8-43b7-9e56-45539e3f0805",
+                    "73f410c0-2a5a-4030-8a52-7a67f2246d3d"
                   ],
-                  "rule": "or_intro_1"
+                  "rule": "not_elim"
                 }
               }
             ]
           },
           {
-            "uuid": "02228034-5d70-4593-ab39-684c20b71b72",
+            "uuid": "2a889235-cd49-4688-8298-084d690d30b7",
             "stepType": "line",
             "formula": {
-              "userInput": "exists k (n + 1 = (1 + 1) * k) or exists k (n + 1 = ((1 + 1) * k) + 1)",
-              "ascii": "exists k (n + 1 = (1 + 1) * k) or exists k (n + 1 = ((1 + 1) * k) + 1)",
-              "latex": "\\exists k (n + 1 = (1 + 1) * k) \\lor \\exists k (n + 1 = ((1 + 1) * k) + 1)"
+              "userInput": "false",
+              "ascii": "false",
+              "latex": "\\bot"
             },
             "justification": {
               "refs": [
-                "b492091a-f05b-4916-9438-98ae8f0a5fa5",
-                "a8c6629f-7c22-4ded-b1ca-a4c86e01fa72",
-                "06c15154-4844-45a9-8b0d-e20163ec02c4"
+                "4aa8a1ed-2e10-48f3-b5f5-147aa76e2d9a",
+                "606eeaa6-4cd1-48f7-a71e-4a4995b85166",
+                "363063dd-0f74-4ab7-b4ce-5fd96ce62d67"
               ],
               "rule": "or_elim"
             }
@@ -1781,19 +164,191 @@
         ]
       },
       {
-        "uuid": "9faab25c-6572-4db2-b31d-4d890b2776b4",
+        "uuid": "788ad01b-bc1b-495e-9525-724e1b7d1fc1",
         "stepType": "line",
         "formula": {
-          "userInput": "forall x (exists k (x = (1 + 1) * k) or exists k (x = (1 + 1) * k + 1))",
-          "ascii": "forall x (exists k (x = (1 + 1) * k) or exists k (x = ((1 + 1) * k) + 1))",
-          "latex": "\\forall x (\\exists k (x = (1 + 1) * k) \\lor \\exists k (x = ((1 + 1) * k) + 1))"
+          "userInput": "not (not p or not q)",
+          "ascii": "not (not p or not q)",
+          "latex": "\\lnot (\\lnot p \\lor \\lnot q)"
         },
         "justification": {
           "refs": [
-            "2f361001-515a-4af4-8761-a5f94db3ff0b",
-            "a462b4b3-86b7-4c2a-9a68-e3d8d44f25a8"
+            "29510bb7-bf0a-4eba-a26f-ab96ae8b3026"
           ],
-          "rule": "induction"
+          "rule": "not_intro"
+        }
+      }
+    ]
+  },
+  {
+    "id": "3910de9e-cfc7-45f1-8f50-8f0ecd9802d2",
+    "createdAt": "2026-02-04T10:55:59.672Z",
+    "title": "Example 2",
+    "logicName": "predicateLogic",
+    "proof": [
+      {
+        "uuid": "629611a8-1e8e-4b17-8f92-673a8c131068",
+        "stepType": "line",
+        "formula": {
+          "userInput": "forall x (P(x) -> not Q(x))",
+          "ascii": "forall x (P(x) -> not Q(x))",
+          "latex": "\\forall x (P(x) \\rightarrow \\lnot Q(x))"
+        },
+        "justification": {
+          "refs": [],
+          "rule": "premise"
+        }
+      },
+      {
+        "uuid": "93d67b77-968f-45b9-9349-28db784a6263",
+        "stepType": "box",
+        "boxInfo": {
+          "freshVar": null
+        },
+        "proof": [
+          {
+            "uuid": "3bb5b099-ac7b-4c9d-bea4-999986d4ee47",
+            "stepType": "line",
+            "formula": {
+              "userInput": "exists x (P(x) and Q(x))",
+              "ascii": "exists x (P(x) and Q(x))",
+              "latex": "\\exists x (P(x) \\land Q(x))"
+            },
+            "justification": {
+              "refs": [],
+              "rule": "assumption"
+            }
+          },
+          {
+            "uuid": "b5ecc288-c2ef-4dd0-90d0-c45f96e94bfa",
+            "stepType": "box",
+            "boxInfo": {
+              "freshVar": "x_0"
+            },
+            "proof": [
+              {
+                "uuid": "335348ca-5cba-4b9a-8369-f44b5f844fc4",
+                "stepType": "line",
+                "formula": {
+                  "userInput": "P(x_0) and Q(x_0)",
+                  "ascii": "P(x_0) and Q(x_0)",
+                  "latex": "P(x_0) \\land Q(x_0)"
+                },
+                "justification": {
+                  "refs": [],
+                  "rule": "assumption"
+                }
+              },
+              {
+                "uuid": "a35abace-94d7-44bf-bbc2-0aae9a985612",
+                "stepType": "line",
+                "formula": {
+                  "userInput": "P(x_0)",
+                  "ascii": "P(x_0)",
+                  "latex": "P(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "335348ca-5cba-4b9a-8369-f44b5f844fc4"
+                  ],
+                  "rule": "and_elim_1"
+                }
+              },
+              {
+                "uuid": "3d1db759-610d-4ba7-86bb-c2f200f48e4e",
+                "stepType": "line",
+                "formula": {
+                  "userInput": "Q(x_0)",
+                  "ascii": "Q(x_0)",
+                  "latex": "Q(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "335348ca-5cba-4b9a-8369-f44b5f844fc4"
+                  ],
+                  "rule": "and_elim_2"
+                }
+              },
+              {
+                "uuid": "1298b6f4-5c80-4afa-abd6-d7c4813676ab",
+                "stepType": "line",
+                "formula": {
+                  "userInput": "P(x_0) -> not Q(x_0)",
+                  "ascii": "P(x_0) -> not Q(x_0)",
+                  "latex": "P(x_0) \\rightarrow \\lnot Q(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "629611a8-1e8e-4b17-8f92-673a8c131068"
+                  ],
+                  "rule": "forall_elim"
+                }
+              },
+              {
+                "uuid": "c7d8822c-929f-4337-80ca-08e860aef946",
+                "stepType": "line",
+                "formula": {
+                  "userInput": "not Q(x_0)",
+                  "ascii": "not Q(x_0)",
+                  "latex": "\\lnot Q(x_0)"
+                },
+                "justification": {
+                  "refs": [
+                    "a35abace-94d7-44bf-bbc2-0aae9a985612",
+                    "1298b6f4-5c80-4afa-abd6-d7c4813676ab"
+                  ],
+                  "rule": "implies_elim"
+                }
+              },
+              {
+                "uuid": "e44f3c2d-87d6-4ec8-b563-dd41e05ee0b3",
+                "stepType": "line",
+                "formula": {
+                  "userInput": "false",
+                  "ascii": "false",
+                  "latex": "\\bot"
+                },
+                "justification": {
+                  "refs": [
+                    "3d1db759-610d-4ba7-86bb-c2f200f48e4e",
+                    "c7d8822c-929f-4337-80ca-08e860aef946"
+                  ],
+                  "rule": "not_elim"
+                }
+              }
+            ]
+          },
+          {
+            "uuid": "09182827-8fc8-47cf-9650-87b22f723131",
+            "stepType": "line",
+            "formula": {
+              "userInput": "false",
+              "ascii": "false",
+              "latex": "\\bot"
+            },
+            "justification": {
+              "refs": [
+                "3bb5b099-ac7b-4c9d-bea4-999986d4ee47",
+                "b5ecc288-c2ef-4dd0-90d0-c45f96e94bfa"
+              ],
+              "rule": "exists_elim"
+            }
+          }
+        ]
+      },
+      {
+        "uuid": "8d602173-63fb-473a-9bea-a096c28a1876",
+        "stepType": "line",
+        "formula": {
+          "userInput": "not exists x (P(x) and Q(x))",
+          "ascii": "not exists x (P(x) and Q(x))",
+          "latex": "\\lnot \\exists x (P(x) \\land Q(x))"
+        },
+        "justification": {
+          "refs": [
+            "93d67b77-968f-45b9-9349-28db784a6263"
+          ],
+          "rule": "not_intro"
         }
       }
     ]
