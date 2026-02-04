@@ -19,17 +19,6 @@ function Page() {
   React.useEffect(() => {
     if (!data) return;
 
-    const identifier = data.substring(0, 16)
-    let shouldOverwrite = false
-
-    const proofAlreadyThere = proofs.find(proof => proof.id.startsWith(identifier))
-    if (proofAlreadyThere) {
-      shouldOverwrite = confirm("You already have a proof created from this link. Do you wish to overwrite it?\n\n(If not, you will be redirected to the existing proof)");
-      if (!shouldOverwrite) {
-        router.push(`/proof?id=${proofAlreadyThere.id}`)
-        return;
-      }
-    }
 
     const output = decompressFromEncodedURIComponent(data)
     const obj = JSON.parse(output)
@@ -39,18 +28,30 @@ function Page() {
     }
 
     const parseResult = ProofWithMetadataSchema.safeParse(obj)
-    if (parseResult.success) {
-      const proof = parseResult.data
-      proof.id = shouldOverwrite ? (proofAlreadyThere!.id) : identifier + uuidv4()
-      if (shouldOverwrite) {
-        deleteProof(proof.id)
-      }
-
-      addProof(proof)
-      router.push(`/proof?id=${proof.id}`)
-    } else {
+    if (!parseResult.success) {
       throw new Error("not a valid Logicbox proof")
     }
+
+    const parsedProof = parseResult.data
+
+    const identifier = data.substring(0, 16)
+    const proofAlreadyThere = proofs.find(p => p.id.startsWith(identifier) || p.id === parsedProof.id)
+    if (proofAlreadyThere) {
+      const shouldOverwrite = confirm("You already have a proof created from this link. Do you wish to overwrite it?\n\n(If not, you will be redirected to the existing proof)");
+      if (!shouldOverwrite) {
+        router.push(`/proof?id=${proofAlreadyThere.id}`)
+        return;
+      }
+    }
+    
+    // overwrite
+    parsedProof.id = identifier + uuidv4()
+
+    if (proofAlreadyThere) {
+      deleteProof(proofAlreadyThere!.id)
+    }
+    addProof(parsedProof)
+    router.push(`/proof?id=${parsedProof.id}`)
   }, [])
 
   return ""
