@@ -64,7 +64,12 @@ export function LineProofStep({
   const line = props.lines.find(
     (l) => l.uuid === props.uuid && l.stepType == "line",
   );
-  if (line?.stepType !== "line") {
+
+  if (!line) {
+    return <></>;
+  }
+
+  if (line.stepType !== "line") {
     console.error(
       `LineProofStep: Expected line with uuid ${props.uuid} to be of type 'line', but found ${line?.stepType}`,
     );
@@ -76,7 +81,6 @@ export function LineProofStep({
     hoveringState,
     proofContext,
   );
-
 
   const TOUCH_RIGHT_CLICK_MS = 400
 
