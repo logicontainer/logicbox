@@ -29,6 +29,6 @@ You should see output as below
 ```
 
 Here we can see that 
-- group 1 correctly solved the exercise
-- group 2 and 3 have errors in their proofs
-- group 4 proved a different sequent that the question required (assuming the question is $p \land q \vdash \lnot (\lnot p \lor \lnot q)$)
+- ✅ group 1 correctly solved the exercise
+- ❌ group 2 and 3 have errors in their proofs
+- ❌ group 4 proved a different sequent that the question required (assuming the question is p ∧ q |- ¬(¬p ∨ ¬q))
