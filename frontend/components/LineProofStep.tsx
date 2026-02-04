@@ -59,7 +59,7 @@ export function LineProofStep({
         lineNumberRef.current.style.height = `${parentHeight}px`;
       }
     }
-  }, [parentRef, lineNumberRef]);
+  }, [parentRef.current, lineNumberRef.current]);
 
   const line = props.lines.find(
     (l) => l.uuid === props.uuid && l.stepType == "line",

@@ -2,7 +2,7 @@ import type { Proof, ProofWithMetadata } from "../types/types";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { create } from "zustand";
-import jsonExamples from "@/examples/examples.json"
+import jsonExamples from "@/public/examples.json"
 
 import { v4 as uuidv4 } from "uuid";
 
