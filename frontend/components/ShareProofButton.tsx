@@ -5,6 +5,7 @@ import React from "react";
 import { Dialog,  DialogContent,  DialogHeader, DialogTitle } from "./ui/dialog";
 import { compressToEncodedURIComponent } from "lz-string";
 import { Proof } from "@/types/types";
+import _ from "lodash";
 
 const minifyProof = (proof: Proof) => {
   let counter = 0;
@@ -39,8 +40,7 @@ export default function DownloadProofButton({ proofId, className }: { proofId: s
   const proofs = useProofStore((state) => state.proofs);
   const [open, setOpen] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
-
-  const proof = proofs.find(p => p.id === proofId) ?? null
+  const proof = _.cloneDeep(proofs.find(p => p.id === proofId) ?? null)
   if (proof) minifyProof(proof.proof)
   const input = JSON.stringify(proof)
   const compressed = compressToEncodedURIComponent(input)
