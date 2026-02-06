@@ -1494,7 +1494,7 @@ function proofLength(proof) {
   }).reduce((len, a) => len + a, 0)
 }
 
-function verifyFile(filename, inVerboseMode) {
+function verifyFile(filename) {
   const readResult = readFile(filename)
   if (!readResult.success) {
     console.error(`${colors.red}Error: Failed to read file ${colors.bright}"${filename}"${colors.reset}`);
@@ -1513,19 +1513,14 @@ function verifyFile(filename, inVerboseMode) {
     filename: filename,//((filename.length > 0) ? "..." : "") + filename.substring(Math.max(0, filename.length - 50), filename.length),
     "# of lines": proofLength(result.proof),
     "# of errors": result.diagnostics.length,
-    sequent: createSequentString(result.proof)
+    sequent: createSequentString(result.proof),
   }
-  
-  return table
 }
-
-const filenames = process.argv.slice(2).filter(arg => !(["-v", "--verbose"].includes(arg)))
-const inVerboseMode = process.argv.some(arg => ["-v", "--verbose"].includes(arg))
 
 if (filenames.length === 0) {
   console.log(`${colors.yellow}Usage: node ${process.argv[1]} <file1> [file2] ...${colors.reset}`)
 } else {
   const results = 
-    filenames.map(f => verifyFile(f, inVerboseMode))
+    filenames.map(f => verifyFile(f))
   console.table(results)
 }
