@@ -1517,6 +1517,8 @@ function verifyFile(filename) {
   }
 }
 
+const filenames = process.argv.slice(2)
+
 if (filenames.length === 0) {
   console.log(`${colors.yellow}Usage: node ${process.argv[1]} <file1> [file2] ...${colors.reset}`)
 } else {
