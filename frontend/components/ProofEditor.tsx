@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  InteractionStateEnum,
-  Transition,
-  TransitionEnum,
-  useInteractionState,
-} from "@/contexts/InteractionStateProvider";
 
 import { Proof } from "@/components/Proof";
 import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
@@ -17,28 +11,11 @@ import { useServer } from "@/contexts/ServerProvider";
 export default function ProofEditor({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
   const { proofDiagnostics } = useServer();
-  const { interactionState, doTransition } = useInteractionState();
   const { lines } = useLines();
 
   React.useEffect(() => {
     if (proofId) proofContext.loadProofFromId(proofId);
   }, [proofId, proofContext]);
-
-  const [keybindTransition, setKeybindTransition] =
-    React.useState<Transition | null>();
-
-  React.useEffect(() => {
-    const listener = (e: KeyboardEvent) => {
-      if (e.key === "r" && interactionState.enum === InteractionStateEnum.IDLE)
-        setKeybindTransition({ enum: TransitionEnum.VALIDATE_PROOF });
-    };
-    window.addEventListener("keydown", listener);
-    return () => window.removeEventListener("keydown", listener);
-  }, [interactionState, doTransition]);
-
-  React.useEffect(() => {
-    if (keybindTransition) doTransition(keybindTransition);
-  }, [keybindTransition]);
 
   return (
     <div>
