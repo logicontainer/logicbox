@@ -21,6 +21,7 @@ import {
   getDiagnosticHighlightForReference,
   getDiagnosticHighlightForRule,
 } from "@/lib/proof-step-highlight";
+import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
 export function Justification({
   uuid,

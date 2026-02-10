@@ -77,7 +77,7 @@ function HelpCarousel({ selectedPage, pages }: { selectedPage: number, pages: Re
     api.on("select", () => {
       setCurrentlyShownPage(api.selectedScrollSnap())
     })
-  }, [api, selectedPage])
+  }, [api, selectedPage, currentlyShownPage])
 
   return <Carousel 
     setApi={setApi} 

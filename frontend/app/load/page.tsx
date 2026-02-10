@@ -19,7 +19,6 @@ function Page() {
   React.useEffect(() => {
     if (!data) return;
 
-
     const output = decompressFromEncodedURIComponent(data)
     const obj = JSON.parse(output)
     console.log(obj)
