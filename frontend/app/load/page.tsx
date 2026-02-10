@@ -21,7 +21,6 @@ function Page() {
 
     const output = decompressFromEncodedURIComponent(data)
     const obj = JSON.parse(output)
-    console.log(obj)
     if (!obj) {
       throw new Error("not a valid JSON object")
     }

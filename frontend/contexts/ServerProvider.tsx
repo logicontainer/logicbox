@@ -70,8 +70,6 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         if (!JSLogicboxVerifier)
           console.error("Backend didn't load correctly")
 
-        console.log("Loaded backend")
-
         verifyFunction.current = JSLogicboxVerifier.verify
       }}
     />

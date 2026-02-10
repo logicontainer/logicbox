@@ -30,10 +30,6 @@ export class AddLineCommand extends Command {
   }
 
   execute(proofContext: ProofContextProps): void {
-    console.log(
-      "Execute AddLineCommand near line with uuid " +
-        this.position.nearProofStepWithUuid,
-    );
     proofContext.addStep(
       {
         stepType: "line",
@@ -53,9 +49,6 @@ export class AddLineCommand extends Command {
   }
 
   undo(proofContext: ProofContextProps): void {
-    console.log(
-      "Undoing AddLineCommand near line with uuid " + this.newLineUuid,
-    );
     proofContext.removeStep(this.newLineUuid);
   }
 
@@ -86,10 +79,6 @@ export class AddBoxedLineCommand extends Command {
   }
 
   execute(proofContext: ProofContextProps): void {
-    console.log(
-      "Execute AddBoxLineCommand near line with uuid " +
-        this.position.nearProofStepWithUuid,
-    );
     proofContext.addStep(
       {
         stepType: "box",
@@ -118,9 +107,6 @@ export class AddBoxedLineCommand extends Command {
   }
 
   undo(proofContext: ProofContextProps): void {
-    console.log(
-      "Undoing AddBoxLineCommand near line with uuid " + this.newBoxUuid,
-    );
     proofContext.removeStep(this.newBoxUuid);
   }
   getDescription(): string {
@@ -169,10 +155,6 @@ export class RemoveProofStepCommand extends Command {
   }
 
   undo(proofContext: ProofContextProps): void {
-    console.log(
-      "Undoing RemoveProofStepCommand for line " + this.proofStepUuid,
-    );
-
     if (this.proofStep == null) {
       throw new Error("Cannot undo RemoveProofStepCommand without proofStep");
     }
@@ -196,10 +178,6 @@ export class UpdateLineProofStepCommand extends Command {
   }
 
   execute(proofContext: ProofContextProps): void {
-    console.log(
-      "Execute UpdateProofStepCommand for line " + this.proofStepUuid,
-    );
-
     const proofStepDetails = proofContext.getProofStepDetails(
       this.proofStepUuid,
     );
@@ -218,10 +196,6 @@ export class UpdateLineProofStepCommand extends Command {
   }
 
   undo(proofContext: ProofContextProps): void {
-    console.log(
-      "Undoing UpdateProofStepCommand for line " + this.proofStepUuid,
-    );
-
     if (this.prevProofStep == null) {
       throw new Error(
         "Cannot undo UpdateProofStepCommand without prevProofStep",
