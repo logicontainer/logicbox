@@ -956,7 +956,6 @@ export function InteractionStateProvider({
   };
 
   const doTransition = (transition: Transition) => {
-    console.log({ ...transition, enum: TransitionEnum[transition.enum] })
     setInteractionStateValue((prevState) => {
       const func = behavior[prevState.enum]?.[transition.enum] as
         | FuncForStateAndTransition<
