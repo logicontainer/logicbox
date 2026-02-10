@@ -287,6 +287,8 @@ export function InteractionStateProvider({
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
     enqueueCommand(ExtraCommands.VALIDATE);
+
+    return updatedLineProofStep
   };
 
   const getNumberOfRefs = (lineUuid: string) => {
@@ -321,6 +323,8 @@ export function InteractionStateProvider({
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
     enqueueCommand(ExtraCommands.VALIDATE);
+
+    return updatedLineProofStep
   };
 
   const updateFormulaInProofAndValidate = (
@@ -346,6 +350,8 @@ export function InteractionStateProvider({
       new UpdateLineProofStepCommand(lineUuid, updatedLineProofStep),
     );
     enqueueCommand(ExtraCommands.VALIDATE);
+
+    return updatedLineProofStep
   };
 
   const updateFreshVarInProofAndValidate = (
@@ -425,8 +431,8 @@ export function InteractionStateProvider({
 
   const chooseReferencedStep = (editedLineUuid: string, refIdx: number, clickedStepUuid: string): InteractionState => {
     if (editedLineUuid !== clickedStepUuid) {
-      updateRefAndValidate(editedLineUuid, refIdx, clickedStepUuid);
-      const numRefs = getNumberOfRefs(editedLineUuid);
+      const newLine = updateRefAndValidate(editedLineUuid, refIdx, clickedStepUuid);
+      const numRefs = newLine.justification.refs.length
       if (refIdx + 1 < numRefs) {
         return { enum: EDITING_REF, refIdx: refIdx + 1, lineUuid: editedLineUuid }
       }
@@ -614,14 +620,13 @@ export function InteractionStateProvider({
       [CLICK_BOX]: (_, { boxUuid }) => stickySelectStep(boxUuid),
 
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
-        updateRuleAndValidate(lineUuid, ruleName);
-        const numRefs = getNumberOfRefs(lineUuid)
+        const newLine = updateRuleAndValidate(lineUuid, ruleName);
+        const numRefs = newLine.justification.refs.length
         if (numRefs > 0) {
           return { enum: EDITING_REF, lineUuid, refIdx: 0 }
         } else {
           return stickySelectStep(lineUuid)
         }
-        // return stickySelectStep(lineUuid);
       },
 
       [VALIDATE_PROOF]: (state, _) => {
