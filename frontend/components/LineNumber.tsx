@@ -5,10 +5,15 @@ import { TLineNumber } from "@/types/types";
 import { cn } from "@/lib/utils";
 import { useServer } from "@/contexts/ServerProvider";
 import { useProof } from "@/contexts/ProofProvider";
+import { MemoizedInlineMath } from "./MemoizedInlineMath";
+import { useHovering } from "@/contexts/HoveringProvider";
+import { formulaIsBeingHovered, getSelectedStep, stepIsSelected } from "@/lib/state-helpers";
+import { useInteractionState } from "@/contexts/InteractionStateProvider";
 
 export default function LineNumber({ line }: { line: TLineNumber }) {
   const serverContext = useServer();
-  const { getParentUuid } = useProof()
+  const { getParentUuid, isDescendant } = useProof()
+  const { interactionState } = useInteractionState()
   const proofDiagnostics = serverContext.proofDiagnostics;
 
   const parentUuid = getParentUuid(line.uuid)
@@ -17,6 +22,13 @@ export default function LineNumber({ line }: { line: TLineNumber }) {
   if (!line || line.stepType !== "line") {
     return null;
   }
+
+  const selectedStep = getSelectedStep(interactionState)
+  let latexString = line?.lineNumber.toString() + "."
+  if (selectedStep !== null && (selectedStep === line.uuid || isDescendant(selectedStep, line.uuid))) {
+    latexString = `\\mathbf{${latexString}}`
+  }
+
   return (
     <div
       className={cn(
@@ -24,7 +36,7 @@ export default function LineNumber({ line }: { line: TLineNumber }) {
       )}
     >
       <div className={cn("rounded-sm flex-grow")}>
-        <InlineMath math={line?.lineNumber.toString() + "."} />
+        <MemoizedInlineMath math={latexString} />
       </div>
       {shouldShowTriangle && (
         <TriangleAlert className="text-red-500"></TriangleAlert>

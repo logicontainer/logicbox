@@ -117,5 +117,5 @@ export function stepIsDraggable(stepUuid: string, state: InteractionState, proof
     // note: EDITING_REF is not here, EDITING_FORMULA also not here
   ].includes(state.enum) 
     // also okay if we are editing a formula which is not this one (or this is a parent of that)
-    || (state.enum === InteractionStateEnum.EDITING_FORMULA && stepUuid !== state.lineUuid && !isDescendant(stepUuid, state.lineUuid))
+    || (state.enum === InteractionStateEnum.EDITING_FORMULA && !isDescendant(stepUuid, state.lineUuid))
 }
