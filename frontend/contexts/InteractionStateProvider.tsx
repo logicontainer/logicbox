@@ -289,6 +289,11 @@ export function InteractionStateProvider({
     enqueueCommand(ExtraCommands.VALIDATE);
   };
 
+  const getNumberOfRefs = (lineUuid: string) => {
+    const currLineProofStep = getLineProofStep(lineUuid);
+    return currLineProofStep.justification.refs.length
+  }
+
   const updateRefAndValidate = (
     lineUuid: string,
     refIdx: number,
@@ -416,6 +421,17 @@ export function InteractionStateProvider({
       selectedProofStepUuid: step,
       sticky: true,
     }
+  }
+
+  const chooseReferencedStep = (editedLineUuid: string, refIdx: number, clickedStepUuid: string): InteractionState => {
+    if (editedLineUuid !== clickedStepUuid) {
+      updateRefAndValidate(editedLineUuid, refIdx, clickedStepUuid);
+      const numRefs = getNumberOfRefs(editedLineUuid);
+      if (refIdx + 1 < numRefs) {
+        return { enum: EDITING_REF, refIdx: refIdx + 1, lineUuid: editedLineUuid }
+      }
+    }
+    return stickySelectStep(editedLineUuid);
   }
 
   const {
@@ -599,7 +615,13 @@ export function InteractionStateProvider({
 
       [UPDATE_RULE]: ({ lineUuid }, { ruleName }) => {
         updateRuleAndValidate(lineUuid, ruleName);
-        return stickySelectStep(lineUuid);
+        const numRefs = getNumberOfRefs(lineUuid)
+        if (numRefs > 0) {
+          return { enum: EDITING_REF, lineUuid, refIdx: 0 }
+        } else {
+          return stickySelectStep(lineUuid)
+        }
+        // return stickySelectStep(lineUuid);
       },
 
       [VALIDATE_PROOF]: (state, _) => {
@@ -638,10 +660,7 @@ export function InteractionStateProvider({
         { refIdx, lineUuid: editedLineUuid },
         { lineUuid: clickedLineUuid },
       ) => {
-        if (editedLineUuid !== clickedLineUuid) {
-          updateRefAndValidate(editedLineUuid, refIdx, clickedLineUuid);
-        }
-        return stickySelectStep(editedLineUuid);
+        return chooseReferencedStep(editedLineUuid, refIdx, clickedLineUuid)
       },
 
       [HOVER]: doNothing,
@@ -651,8 +670,7 @@ export function InteractionStateProvider({
         { refIdx, lineUuid: editedLineUuid },
         { boxUuid: clickedBoxUuid },
       ) => {
-        updateRefAndValidate(editedLineUuid, refIdx, clickedBoxUuid);
-        return stickySelectStep(editedLineUuid)
+        return chooseReferencedStep(editedLineUuid, refIdx, clickedBoxUuid)
       },
 
       [CLICK_RULE]: (
