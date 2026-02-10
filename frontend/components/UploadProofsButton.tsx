@@ -19,6 +19,7 @@ export default function UploadProofsButton() {
   const [open, setOpen] = useState(false);
   const [uploadedProofs, setUploadedProofs] = useState<ProofWithMetadata[] | null>(null);
   const [error, setError] = useState("");
+  const proofs = useProofStore(state => state.proofs)
   const addProofWithFreshIdToStore = useProofStore((state) => state.addProofWithFreshId);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +56,12 @@ export default function UploadProofsButton() {
     if (uploadedProofs == null) {
       window.alert("No proof provided");
       return;
+    }
+    const originalTitle = proofJsonContent.title
+    let counter = 1
+    while (proofs.some(p => p.title === proofJsonContent.title)) {
+      proofJsonContent.title = `${originalTitle} (${counter})`
+      counter++;
     }
     addProofWithFreshIdToStore(proofJsonContent);
     setOpen(false);
