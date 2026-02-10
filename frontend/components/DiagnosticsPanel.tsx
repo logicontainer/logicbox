@@ -110,6 +110,7 @@ export function DiagnosticsPanel({
   return <Accordion
     type="single"
     defaultValue="diag-0"
+    onClick={e => e.stopPropagation()} // don't trigger INTERACT_OUTSIDE when clicking diagnostics
   >{diagnostics.map((d, idx) => {
     const value = `diag-${idx}`
     switch (d.errorType) {
