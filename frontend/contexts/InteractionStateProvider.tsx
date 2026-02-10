@@ -88,7 +88,12 @@ export type InteractionState = { enum: InteractionStateEnum } & (
       lineUuid: string;
       currentFormula: string;
     }
-  | { enum: InteractionStateEnum.EDITING_REF; lineUuid: string; refIdx: number }
+  | { 
+    enum: InteractionStateEnum.EDITING_REF; 
+    lineUuid: string; 
+    refIdx: number;
+    sweeping: boolean;
+  }
   | { enum: InteractionStateEnum.EDITING_FRESH_VAR; boxUuid: string; freshVar: string | null; }
   | {
       enum: InteractionStateEnum.VIEWING_CONTEXT_MENU;
@@ -291,11 +296,6 @@ export function InteractionStateProvider({
     return updatedLineProofStep
   };
 
-  const getNumberOfRefs = (lineUuid: string) => {
-    const currLineProofStep = getLineProofStep(lineUuid);
-    return currLineProofStep.justification.refs.length
-  }
-
   const updateRefAndValidate = (
     lineUuid: string,
     refIdx: number,
@@ -429,15 +429,20 @@ export function InteractionStateProvider({
     }
   }
 
-  const chooseReferencedStep = (editedLineUuid: string, refIdx: number, clickedStepUuid: string): InteractionState => {
-    if (editedLineUuid !== clickedStepUuid) {
-      const newLine = updateRefAndValidate(editedLineUuid, refIdx, clickedStepUuid);
+  const chooseReferencedStep = (
+    state: InteractionState & { enum: InteractionStateEnum.EDITING_REF }, 
+    clickedStepUuid: string,
+  ): InteractionState => {
+    if (state.lineUuid !== clickedStepUuid) {
+      const newLine = updateRefAndValidate(state.lineUuid, state.refIdx, clickedStepUuid);
       const numRefs = newLine.justification.refs.length
-      if (refIdx + 1 < numRefs) {
-        return { enum: EDITING_REF, refIdx: refIdx + 1, lineUuid: editedLineUuid }
+      
+      // if we are sweeping, continue to next reference
+      if (state.sweeping && state.refIdx + 1 < numRefs) {
+        return { ...state, refIdx: state.refIdx + 1 }
       }
     }
-    return stickySelectStep(editedLineUuid);
+    return stickySelectStep(state.lineUuid);
   }
 
   const {
@@ -492,6 +497,7 @@ export function InteractionStateProvider({
         enum: EDITING_REF,
         lineUuid,
         refIdx,
+        sweeping: false,
       }),
 
       [CLICK_BOX]: (state, { boxUuid }) =>
@@ -549,7 +555,7 @@ export function InteractionStateProvider({
 
       [CLICK_REF]: (state, { lineUuid: clickedLineUuid, refIdx }) => {
         updateFormulaInProofAndValidate(state.lineUuid, state.currentFormula);
-        return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx };
+        return { enum: EDITING_REF, lineUuid: clickedLineUuid, refIdx, sweeping: false };
       },
 
       [CLICK_BOX]: (state, { boxUuid }) => {
@@ -615,6 +621,7 @@ export function InteractionStateProvider({
         enum: EDITING_REF,
         lineUuid,
         refIdx,
+        sweeping: false
       }),
 
       [CLICK_BOX]: (_, { boxUuid }) => stickySelectStep(boxUuid),
@@ -623,7 +630,7 @@ export function InteractionStateProvider({
         const newLine = updateRuleAndValidate(lineUuid, ruleName);
         const numRefs = newLine.justification.refs.length
         if (numRefs > 0) {
-          return { enum: EDITING_REF, lineUuid, refIdx: 0 }
+          return { enum: EDITING_REF, lineUuid, refIdx: 0, sweeping: true }
         } else {
           return stickySelectStep(lineUuid)
         }
@@ -661,21 +668,15 @@ export function InteractionStateProvider({
     [EDITING_REF]: {
       [INTERACT_OUTSIDE]: () => fullyIdle(),
 
-      [CLICK_LINE]: (
-        { refIdx, lineUuid: editedLineUuid },
-        { lineUuid: clickedLineUuid },
-      ) => {
-        return chooseReferencedStep(editedLineUuid, refIdx, clickedLineUuid)
+      [CLICK_LINE]: (state, { lineUuid: clickedLineUuid }) => {
+        return chooseReferencedStep(state, clickedLineUuid)
       },
 
       [HOVER]: doNothing,
       [DOUBLE_CLICK_LINE]: doNothing,
 
-      [CLICK_BOX]: (
-        { refIdx, lineUuid: editedLineUuid },
-        { boxUuid: clickedBoxUuid },
-      ) => {
-        return chooseReferencedStep(editedLineUuid, refIdx, clickedBoxUuid)
+      [CLICK_BOX]: (state, { boxUuid: clickedBoxUuid }) => {
+        return chooseReferencedStep(state, clickedBoxUuid)
       },
 
       [CLICK_RULE]: (
@@ -704,6 +705,7 @@ export function InteractionStateProvider({
           enum: EDITING_REF,
           lineUuid: state.lineUuid,
           refIdx: trans.refIdx,
+          sweeping: state.sweeping,
         };
       },
 
@@ -767,7 +769,7 @@ export function InteractionStateProvider({
 
       [CLICK_REF]: (state, { lineUuid, refIdx }) => {
         updateFreshVarInProofAndValidate(state.boxUuid, state.freshVar)
-        return { enum: EDITING_REF, lineUuid, refIdx }
+        return { enum: EDITING_REF, lineUuid, refIdx, sweeping: false }
       },
 
 
@@ -852,6 +854,7 @@ export function InteractionStateProvider({
         enum: EDITING_REF,
         lineUuid,
         refIdx,
+        sweeping: false,
       }),
 
       [RIGHT_CLICK_STEP]: (_, { proofStepUuid, isBox }) => {
