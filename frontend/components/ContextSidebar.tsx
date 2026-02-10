@@ -159,7 +159,10 @@ function RulePanel({ shouldShowRuleTooltip }: { shouldShowRuleTooltip: boolean }
       className="RULE_ELEMENT flex items-center justify-center gap-1 p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100"
       onMouseOver={() => setHoveredRule(rule.ruleName)}
       onMouseLeave={() => setHoveredRule(null)}
-      onClick={() => handleChangeRule(rule.ruleName)}
+      onClickCapture={e => {
+        e.stopPropagation()
+        handleChangeRule(rule.ruleName)
+      }}
     >
       <h3 className="text">
         <MemoizedInlineMath math={rule.latex.ruleName}></MemoizedInlineMath>
