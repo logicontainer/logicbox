@@ -26,13 +26,15 @@ export default function Page() {
       } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "z") {
         e.preventDefault()
         doTransition({ enum: TransitionEnum.REDO })
+      } else if (e.key === "Escape") {
+        doTransition({ enum: TransitionEnum.CLOSE })
       }
     }
 
     document.addEventListener('keydown', listener, { capture: true })
 
     return () => document.removeEventListener('keydown', listener, { capture: true })
-  }, [])
+  }, [doTransition])
 
   return <Suspense> {/* needed so next doesn't just fucking ignore "use client" */}
     <PageImpl />

@@ -226,12 +226,12 @@ export function InteractionStateProvider({
     const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
     if (!currLineProofStepDetails)
       throw new Error(
-        `Updating ref, but the line we are editing ${uuid} doesn't have step details`,
+        `Getting details of line ${uuid} failed`,
       );
 
     if (currLineProofStepDetails.proofStep.stepType !== "line")
       throw new Error(
-        `Updating ref, but the line we are editing doesn't have stepType 'line', has ${currLineProofStepDetails.proofStep.stepType}`,
+        `Getting details of line ${uuid} failed: ${uuid} is of type ${currLineProofStepDetails.proofStep.stepType}`,
       );
 
     const currLineProofStep = currLineProofStepDetails.proofStep as LineProofStep;
@@ -951,6 +951,7 @@ export function InteractionStateProvider({
   };
 
   const doTransition = (transition: Transition) => {
+    console.log({ ...transition, enum: TransitionEnum[transition.enum] })
     setInteractionStateValue((prevState) => {
       const func = behavior[prevState.enum]?.[transition.enum] as
         | FuncForStateAndTransition<
