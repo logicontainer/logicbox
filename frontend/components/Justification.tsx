@@ -60,7 +60,7 @@ export function Justification({
     interactionState.lineUuid === uuid;
 
   if (isEditingRule) {
-    ruleNameLatex = `\\boxed{${ruleNameLatex}}`
+    ruleNameLatex = `\\boxed{\\mathtt{${ruleNameLatex}}}`
   }
   else if (ruleNameHighlight === DiagnosticHighlight.YES) {
     ruleNameLatex = `\\underline{${ruleNameLatex}}`;
@@ -108,7 +108,7 @@ export function Justification({
                 interactionState.lineUuid === uuid &&
                 interactionState.refIdx === i;
               if (isCurrentlyBeingChanged) {
-                refLatex = `\\boxed{${refLatex}}`
+                refLatex = `\\boxed{\\mathtt{${refLatex}}}`
               } else if (diagnosticHighlight === DiagnosticHighlight.YES) {
                 refLatex = `\\textbf{\\underline{${refLatex}}}`;
               }
