@@ -31,6 +31,7 @@ class PredLogicLexerTest extends AnyFunSpec {
       Lexer("P_{43} f_{41} x_0") shouldBe List(
         Ident("P_{43}"), Ident("f_{41}"), Ident("x_0")
       )
+      Lexer("\\//\\") shouldBe List(Or(), And())
       assertThrows[RuntimeException] {
         Lexer("P_{}")
       }
