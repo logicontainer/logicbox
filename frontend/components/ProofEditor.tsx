@@ -6,11 +6,11 @@ import { ProofStepContextMenu } from "@/components/ProofStepContextMenu";
 import React from "react";
 import { useLines } from "@/contexts/LinesProvider";
 import { useProof } from "@/contexts/ProofProvider";
-import { useServer } from "@/contexts/ServerProvider";
+import { useBackend } from "@/contexts/BackendProvider";
 
 export default function ProofEditor({ proofId }: { proofId: string | null }) {
   const proofContext = useProof();
-  const { proofDiagnostics } = useServer();
+  const { proofDiagnostics } = useBackend();
   const { lines } = useLines();
 
   React.useEffect(() => {

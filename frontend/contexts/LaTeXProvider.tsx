@@ -1,6 +1,6 @@
 "use client";
 
-import { Diagnostic, ProofStep } from "@/types/types";
+import { ProofStep } from "@/types/types";
 import React from "react";
 
 import _ from "lodash";
@@ -8,17 +8,15 @@ import { useLines } from "./LinesProvider";
 import { useProof } from "./ProofProvider";
 import { useRuleset } from "./RulesetProvider";
 import { createHighlightedLatexRule } from "@/lib/rules";
-import { useServer } from "./ServerProvider";
 
-export interface DiagnosticsContextProps {
-  diagnostics: Diagnostic[];
-
+export interface LaTeXContextProps {
   getStep: (uuid: string) => ProofStep | null;
   getStepAsLatex: (uuid: string) => string | null;
   getStepAsLatexWithTag: (uuid: string) => string | null;
   getRefLatex: (stepUuid: string, refIdx: number) => string | null;
   getRefString: (stepUuid: string, refIdx: number) => string | null;
   getRefLatexWithTag: (stepUuid: string, refIdx: number) => string | null;
+  getReferenceString: (uuid: string) => string;
   getRuleAtStepAsLatex: (
     rule: string,
     highlightedPremises: number[],
@@ -29,21 +27,20 @@ export interface DiagnosticsContextProps {
 }
 
 // Context Setup
-const DiagnosticsContext = React.createContext<DiagnosticsContextProps | null>(
+const LaTeXContext = React.createContext<LaTeXContextProps | null>(
   null,
 );
 
-export function useDiagnostics() {
-  const context = React.useContext(DiagnosticsContext);
+export function useLaTeX() {
+  const context = React.useContext(LaTeXContext);
   if (!context) {
     throw new Error("useLines must be used within a DiagnosticsProvider");
   }
   return context;
 }
 
-export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
-  const { proofDiagnostics: diagnostics } = useServer();
-  const { getReferenceString } = useLines();
+export function LaTeXProvider({ children }: React.PropsWithChildren<{}>) {
+  const { lines } = useLines();
   const { getProofStepDetails } = useProof();
   const { rulesets } = useRuleset();
   const allRules = rulesets.map((s) => s.rules).flat();
@@ -90,6 +87,19 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
 
     return step.justification.refs.at(refIdx) ?? null;
   };
+
+  const getReferenceString = (uuid: string) => {
+    const line = lines.find((line) => line.uuid === uuid);
+    if (line) {
+      if (line.stepType === "box") {
+        return `${line.boxStartLine}-${line.boxEndLine}`;
+      } else {
+        return JSON.stringify(line.lineNumber);
+      }
+    }
+    return "?";
+  };
+
 
   const getRefLatex = (stepUuid: string, refIdx: number) => {
     const refId = getRefId(stepUuid, refIdx);
@@ -154,12 +164,12 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
   };
 
   return (
-    <DiagnosticsContext.Provider
+    <LaTeXContext.Provider
       value={{
-        diagnostics,
         getStep,
         getRefString,
         getRefLatex,
+        getReferenceString,
         getStepAsLatex,
         getStepAsLatexWithTag,
         getRefLatexWithTag,
@@ -168,6 +178,6 @@ export function DiagnosticsProvider({ children }: React.PropsWithChildren<{}>) {
       }}
     >
       {children}
-    </DiagnosticsContext.Provider>
+    </LaTeXContext.Provider>
   );
 }

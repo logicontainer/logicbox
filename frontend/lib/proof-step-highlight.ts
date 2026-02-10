@@ -1,7 +1,7 @@
 import { HoveringState, InteractionState, InteractionStateEnum } from "@/contexts/InteractionStateProvider";
 import { getSelectedStep, stepIsReferee } from "./state-helpers";
 import { ProofContextProps } from "@/contexts/ProofProvider";
-import { DiagnosticsContextProps } from "@/contexts/DiagnosticsProvider";
+import { LaTeXContextProps } from "@/contexts/LaTeXProvider";
 import { Diagnostic, ErrorType } from "@/types/types";
 
 export enum StepHighlight {
@@ -38,9 +38,7 @@ export enum DiagnosticHighlight {
   YES,
 }
 
-export function getDiagnosticHighlightForFormula(stepUuid: string, diagnosticContext: DiagnosticsContextProps) {
-  const { diagnostics } = diagnosticContext
-
+export function getDiagnosticHighlightForFormula(stepUuid: string, diagnostics: Diagnostic[]) {
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
     .filter(d => {
@@ -82,9 +80,7 @@ function referenceIdxIsInDiagnostic(d: Diagnostic, refIdx: number): boolean {
   }
 }
 
-export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: number, diagnosticContext: DiagnosticsContextProps) {
-  const { diagnostics } = diagnosticContext
-
+export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: number, diagnostics: Diagnostic[]) {
   const ds = diagnostics
     .filter(d => d.uuid === stepUuid)
     .filter(d => referenceIdxIsInDiagnostic(d, refIdx))
@@ -94,9 +90,7 @@ export function getDiagnosticHighlightForReference(stepUuid: string, refIdx: num
     DiagnosticHighlight.NO
 }
 
-export function getDiagnosticHighlightForRule(stepUuid: string, diagnosticContext: DiagnosticsContextProps) {
-  const { diagnostics } = diagnosticContext
-
+export function getDiagnosticHighlightForRule(stepUuid: string, diagnostics: Diagnostic[]) {
   const ruleViolationTypes: ErrorType[] = [
     "MissingRule"
   ] as const

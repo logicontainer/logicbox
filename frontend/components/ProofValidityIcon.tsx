@@ -1,9 +1,11 @@
-import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
+import { useBackend } from "@/contexts/BackendProvider";
+import { useLaTeX } from "@/contexts/LaTeXProvider";
+import { useProof } from "@/contexts/ProofProvider";
 import { CheckIcon, XIcon } from "lucide-react";
 
 export default function ProofValidityIcon() {
-  const { diagnostics } = useDiagnostics();
-  const hasErrors = diagnostics.length != 0;
+  const { proofDiagnostics } = useBackend();
+  const hasErrors = proofDiagnostics.length != 0;
   return (
     <div className="flex items-center justify-center self-stretch min-w-8 p-2 h-full">
       {hasErrors ? (

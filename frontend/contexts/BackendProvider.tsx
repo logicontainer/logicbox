@@ -1,13 +1,13 @@
 "use client";
 
-import { Diagnostic, ValidationRequest, ValidationResponse } from "@/types/types";
-import React, { useEffect, useState } from "react";
+import { Diagnostic, ValidationRequest } from "@/types/types";
+import React, { useState } from "react";
 
 import _ from "lodash";
 import { FALLBACK_PROOF, useProof } from "./ProofProvider";
 import Script from "next/script";
 
-export interface ServerContextProps {
+export interface BackendContextProps {
   proofDiagnostics: Diagnostic[];
   validateProof: (proof: ValidationRequest) => void;
 }
@@ -16,17 +16,17 @@ declare const JSLogicboxVerifier: {
   verify: (req: string) => string
 }
 
-const ServerContext = React.createContext<ServerContextProps | null>(null);
+const BackendContext = React.createContext<BackendContextProps | null>(null);
 
-export function useServer() {
-  const context = React.useContext(ServerContext);
+export function useBackend() {
+  const context = React.useContext(BackendContext);
   if (!context) {
-    throw new Error("useServer must be used within a ServerProvider");
+    throw new Error("useBackend must be used within a BackendProvider");
   }
   return context;
 }
 
-export function ServerProvider({ children }: React.PropsWithChildren<object>) {
+export function BackendProvider({ children }: React.PropsWithChildren<object>) {
   const [proofDiagnostics, setProofDiagnostics] = useState<Diagnostic[]>([]);
   const verifyFunction = React.useRef<((req: string) => string) | null>(null)
 
@@ -73,13 +73,13 @@ export function ServerProvider({ children }: React.PropsWithChildren<object>) {
         verifyFunction.current = JSLogicboxVerifier.verify
       }}
     />
-    <ServerContext.Provider
+    <BackendContext.Provider
       value={{
         proofDiagnostics,
         validateProof,
       }}
     >
       {children}
-    </ServerContext.Provider>
+    </BackendContext.Provider>
   </>
 }

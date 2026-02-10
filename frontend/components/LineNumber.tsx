@@ -3,18 +3,16 @@ import { Lightbulb, TriangleAlert } from "lucide-react";
 import { InlineMath } from "react-katex";
 import { TLineNumber } from "@/types/types";
 import { cn } from "@/lib/utils";
-import { useServer } from "@/contexts/ServerProvider";
+import { useBackend } from "@/contexts/BackendProvider";
 import { useProof } from "@/contexts/ProofProvider";
 import { MemoizedInlineMath } from "./MemoizedInlineMath";
-import { useHovering } from "@/contexts/HoveringProvider";
-import { formulaIsBeingHovered, getSelectedStep, stepIsSelected } from "@/lib/state-helpers";
 import { useInteractionState } from "@/contexts/InteractionStateProvider";
+import { getSelectedStep } from "@/lib/state-helpers";
 
 export default function LineNumber({ line }: { line: TLineNumber }) {
-  const serverContext = useServer();
-  const { getParentUuid, isDescendant } = useProof()
+  const { proofDiagnostics } = useBackend();
   const { interactionState } = useInteractionState()
-  const proofDiagnostics = serverContext.proofDiagnostics;
+  const { getParentUuid, isDescendant } = useProof()
 
   const parentUuid = getParentUuid(line.uuid)
   const shouldShowTriangle = proofDiagnostics.some(d => d.uuid === line.uuid || d.uuid === parentUuid)

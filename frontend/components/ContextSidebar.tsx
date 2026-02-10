@@ -8,9 +8,8 @@ import {
 } from "@/contexts/InteractionStateProvider";
 
 import Card from "./Card";
-import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
-import { useLines } from "@/contexts/LinesProvider";
-import { useServer } from "@/contexts/ServerProvider";
+import { useLaTeX } from "@/contexts/LaTeXProvider";
+import { useBackend } from "@/contexts/BackendProvider";
 import { formulaIsBeingHovered, getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
 import Link from "next/link";
 import { useProof } from "@/contexts/ProofProvider";
@@ -22,7 +21,7 @@ import { Label } from "./ui/label";
 import { createHighlightedLatexRule } from "@/lib/rules";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import React from "react";
-import { CaretLeftIcon, CaretRightIcon, DotsVerticalIcon } from "@radix-ui/react-icons";
+import { CaretLeftIcon, CaretRightIcon } from "@radix-ui/react-icons";
 
 import { Toolbar } from "radix-ui";
 import { useHistory } from "@/contexts/HistoryProvider";
@@ -56,8 +55,7 @@ function LineFocusPanel({
   lineUuid: string,
   lineStep: LineProofStep,
 }) {
-  const { getReferenceString } = useLines()
-  const { getRuleAtStepAsLatex } = useDiagnostics()
+  const { getRuleAtStepAsLatex, getReferenceString } = useLaTeX()
   const { hoveringState } = useHovering()
 
   const refHighlights = lineStep.justification.refs
@@ -73,7 +71,7 @@ function LineFocusPanel({
 
   const ruleLatex = getRuleAtStepAsLatex(lineUuid, refHighlights, formulaIsBeingHovered(lineUuid, hoveringState), "blue") ?? "???";
 
-  const { proofDiagnostics } = useServer();
+  const { proofDiagnostics } = useBackend();
   const errors = proofDiagnostics.filter((d) => d.uuid === lineUuid);
 
   return <div className="w-full min-h-40">
@@ -102,9 +100,9 @@ function BoxFocusPanel({
   boxUuid: string,
   boxStep: BoxProofStep
 }) {
-  const { getReferenceString } = useLines()
+  const { getReferenceString } = useLaTeX()
 
-  const { proofDiagnostics } = useServer();
+  const { proofDiagnostics } = useBackend();
   const errors = proofDiagnostics.filter((d) => d.uuid === boxUuid);
 
   return <div className="w-full h-40">
@@ -275,7 +273,7 @@ function ProofEditorToolbar({ proof }: { proof: ProofWithMetadata }) {
 
 export default function ContextSidebar() {
   const { proof } = useProof();
-  const diagnosticContext = useDiagnostics();
+  const diagnosticContext = useLaTeX();
   const { getStep } = diagnosticContext;
   const { interactionState, doTransition } = useInteractionState();
 
