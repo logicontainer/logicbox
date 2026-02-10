@@ -25,12 +25,13 @@ import {
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
-import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
+import { useLaTeX } from "@/contexts/LaTeXProvider";
 import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
 
 import { isMobile } from 'react-device-detect'
 import { MemoizedInlineMath } from "./MemoizedInlineMath";
+import { useBackend } from "@/contexts/BackendProvider";
 
 export function LineProofStep({
   ...props
@@ -241,7 +242,7 @@ function Formula({
 }) {
   const { interactionState, doTransition } = useInteractionState();
   const { handleHover, hoveringState } = useHovering();
-  const diagnosticContext = useDiagnostics();
+  const { proofDiagnostics } = useBackend();
 
   const isEditingFormula =
     interactionState.enum === InteractionStateEnum.EDITING_FORMULA &&
@@ -255,7 +256,7 @@ function Formula({
 
   const formulaDsHighlight = getDiagnosticHighlightForFormula(
     lineUuid,
-    diagnosticContext,
+    proofDiagnostics,
   );
 
   const handleInputRefChange = (ref: HTMLInputElement | null) => {

@@ -15,7 +15,7 @@ import {
 } from "@/lib/commands";
 import { useHistory } from "./HistoryProvider";
 import { useRuleset } from "./RulesetProvider";
-import { useServer } from "./ServerProvider";
+import { useBackend } from "./BackendProvider";
 import { ContextMenuOptions } from "./ContextMenuProvider";
 import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
@@ -181,7 +181,7 @@ export function InteractionStateProvider({
       sticky: false,
     });
 
-  const serverContext = useServer();
+  const backendContext = useBackend();
   const proofContext = useProof();
   const { rulesets } = useRuleset();
   const historyContext = useHistory();
@@ -207,7 +207,7 @@ export function InteractionStateProvider({
     const cmd = commandQueue.current.shift()!;
     switch (cmd) {
       case ExtraCommands.VALIDATE:
-        serverContext.validateProof(proofContext.proof)
+        backendContext.validateProof(proofContext.proof)
         break;
       case ExtraCommands.UNDO:
         historyContext.undo();

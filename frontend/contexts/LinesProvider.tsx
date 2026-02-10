@@ -8,12 +8,10 @@ import { useProof } from "./ProofProvider";
 
 export interface LinesContextProps {
   lines: TLineNumber[];
-  getReferenceString: (uuid: string) => string | null;
 }
 // Context Setup
 const LinesContext = React.createContext<LinesContextProps>({
   lines: [],
-  getReferenceString: () => null,
 });
 
 export function useLines() {
@@ -27,23 +25,11 @@ export function useLines() {
 export function LinesProvider({ children }: React.PropsWithChildren<object>) {
   const { proof } = useProof();
   const lines = parseLinesFromProof(proof.proof);
-  const getReferenceString = (uuid: string) => {
-    const line = lines.find((line) => line.uuid === uuid);
-    if (line) {
-      if (line.stepType === "box") {
-        return `${line.boxStartLine}-${line.boxEndLine}`;
-      } else {
-        return JSON.stringify(line.lineNumber);
-      }
-    }
-    return "?";
-  };
 
   return (
     <LinesContext.Provider
       value={{
         lines,
-        getReferenceString,
       }}
     >
       {children}

@@ -15,13 +15,14 @@ import { useProof } from "@/contexts/ProofProvider";
 import { useRuleset } from "@/contexts/RulesetProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { refIsBeingHovered, ruleIsBeingHovered } from "@/lib/state-helpers";
-import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
+import { useLaTeX } from "@/contexts/LaTeXProvider";
 import {
   DiagnosticHighlight,
   getDiagnosticHighlightForReference,
   getDiagnosticHighlightForRule,
 } from "@/lib/proof-step-highlight";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
+import { useBackend } from "@/contexts/BackendProvider";
 
 export function Justification({
   uuid,
@@ -38,7 +39,7 @@ export function Justification({
 }) {
   const { rulesets } = useRuleset();
   const { hoveringState, handleHover } = useHovering();
-  const diagnosticsContext = useDiagnostics();
+  const { proofDiagnostics } = useBackend();
 
   const proofContext = useProof();
   const currLineProofStepDetails = proofContext.getProofStepDetails(uuid);
@@ -52,7 +53,7 @@ export function Justification({
   let ruleNameLatex = rule?.latex.ruleName ?? "???";
   const ruleNameHighlight = getDiagnosticHighlightForRule(
     uuid,
-    diagnosticsContext,
+    proofDiagnostics,
   );
 
   const isEditingRule =
@@ -102,7 +103,7 @@ export function Justification({
                 refLatex = "?";
               }
 
-              const diagnosticHighlight = getDiagnosticHighlightForReference(uuid, i, diagnosticsContext);
+              const diagnosticHighlight = getDiagnosticHighlightForReference(uuid, i, proofDiagnostics);
               const isCurrentlyBeingChanged =
                 interactionState.enum === InteractionStateEnum.EDITING_REF &&
                 interactionState.lineUuid === uuid &&

@@ -1,13 +1,12 @@
 import { Diagnostic, RulePosition } from "@/types/types";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
-import { useDiagnostics } from "@/contexts/DiagnosticsProvider";
-import { HoveringEnum, TransitionEnum, useInteractionState } from "@/contexts/InteractionStateProvider";
+import { LaTeXContextProps, useLaTeX } from "@/contexts/LaTeXProvider";
+import { HoveringEnum } from "@/contexts/InteractionStateProvider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableRow } from "./ui/table";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { toInteger } from "lodash";
-import { Title } from "@radix-ui/react-dialog";
 import { LinesContextProps, useLines } from "@/contexts/LinesProvider";
 import { ProofContextProps, useProof } from "@/contexts/ProofProvider";
 
@@ -23,10 +22,10 @@ function refIdxToString(refIdx: number, capital: boolean = true): string {
   }
 }
 
-function rulePositionToLineNumber(rulePos: RulePosition, stepUuid: string, proofContext: ProofContextProps, linesContext: LinesContextProps): string | null {
+function rulePositionToLineNumber(rulePos: RulePosition, stepUuid: string, proofContext: ProofContextProps, latexContext: LaTeXContextProps): string | null {
   switch (rulePos) {
     case "conclusion":
-      return linesContext.getReferenceString(stepUuid)
+      return latexContext.getReferenceString(stepUuid)
 
     case "premise 0": case "premise 1": case "premise 2": case "premise 3": case "premise 4": case "premise 5":
       const step = proofContext.getProofStepDetails(stepUuid)?.proofStep
@@ -36,7 +35,7 @@ function rulePositionToLineNumber(rulePos: RulePosition, stepUuid: string, proof
 
       const idx = toInteger(rulePos[rulePos.length - 1])
       if (idx >= step.justification.refs.length) return null
-      return linesContext.getReferenceString(step.justification.refs[idx])
+      return latexContext.getReferenceString(step.justification.refs[idx])
   }
 }
 
@@ -101,10 +100,7 @@ export function DiagnosticsPanel({
     }
   }
 
-  const proofContext = useProof()
-  const linesContext = useLines()
-
-  const { getRuleNameAtStepAsLatex } = useDiagnostics()
+  const { getRuleNameAtStepAsLatex } = useLaTeX()
   const { handleHover } = useHovering()
 
   return <Accordion

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useLines } from "@/contexts/LinesProvider";
+import { useLaTeX } from "@/contexts/LaTeXProvider";
 
 type RefSelectProps = {
   value: string | null;
@@ -12,7 +12,7 @@ export function RefSelect({
   onClick,
   isCurrentlyBeingChanged,
 }: RefSelectProps) {
-  const { getReferenceString } = useLines();
+  const { getReferenceString } = useLaTeX();
 
   const bg = isCurrentlyBeingChanged
     ? "bg-blue-400 text-white"

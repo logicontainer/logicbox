@@ -1,14 +1,14 @@
 "use client";
 
 import { ContextMenuProvider } from "@/contexts/ContextMenuProvider";
-import { DiagnosticsProvider } from "@/contexts/DiagnosticsProvider";
+import { LaTeXProvider } from "@/contexts/LaTeXProvider";
 import { HistoryProvider } from "@/contexts/HistoryProvider";
 import { HoveringProvider } from "@/contexts/HoveringProvider";
 import { InteractionStateProvider } from "@/contexts/InteractionStateProvider";
 import { LinesProvider } from "@/contexts/LinesProvider";
 import { ProofProvider } from "@/contexts/ProofProvider";
 import { RulesetProvider } from "@/contexts/RulesetProvider";
-import { ServerProvider } from "@/contexts/ServerProvider";
+import { BackendProvider } from "@/contexts/BackendProvider";
 import { StepDragProvider } from "@/contexts/StepDragProvider";
 
 type ProviderProps = {
@@ -18,10 +18,10 @@ type ProviderProps = {
 export function Providers({ children }: ProviderProps) {
   return (
     <ProofProvider>
-      <ServerProvider>
+      <BackendProvider>
         <LinesProvider>
           <RulesetProvider>
-            <DiagnosticsProvider>
+            <LaTeXProvider>
               <HistoryProvider>
                 <InteractionStateProvider>
                   <ContextMenuProvider>
@@ -33,10 +33,10 @@ export function Providers({ children }: ProviderProps) {
                   </ContextMenuProvider>
                 </InteractionStateProvider>
               </HistoryProvider>
-            </DiagnosticsProvider>
+            </LaTeXProvider>
           </RulesetProvider>
         </LinesProvider>
-      </ServerProvider>
+      </BackendProvider>
     </ProofProvider>
   );
 }
