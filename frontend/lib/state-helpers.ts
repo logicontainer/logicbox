@@ -88,6 +88,16 @@ export function ruleIsBeingHovered(
   );
 }
 
+export function refIsBeingSelected(
+  stepUuid: string,
+  refIdx: number,
+  state: InteractionState | null
+): boolean {
+  return state?.enum === InteractionStateEnum.EDITING_REF &&
+         state.refIdx === refIdx &&
+         state.lineUuid === stepUuid
+}
+
 export function stepIsReferee(
   stepUuid: string,
   hoveringState: HoveringState | null,
