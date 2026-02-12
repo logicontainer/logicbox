@@ -3,7 +3,9 @@ import React from "react";
 import { InlineMath, MathComponentPropsWithMath } from "react-katex";
 
 declare global {
-  var toggleFishMode: () => void;
+  interface Window {
+    toggleFishMode: () => void;
+  }
 }
 
 const IN_FISH_MODE = (localStorage.getItem("mode") === "FISH");
