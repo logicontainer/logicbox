@@ -10,7 +10,7 @@ import {
 import Card from "./Card";
 import { useLaTeX } from "@/contexts/LaTeXProvider";
 import { useBackend } from "@/contexts/BackendProvider";
-import { formulaIsBeingHovered, getSelectedStep, refIsBeingHovered } from "@/lib/state-helpers";
+import { formulaIsBeingHovered, getSelectedStep, refIsBeingHovered, refIsBeingSelected } from "@/lib/state-helpers";
 import Link from "next/link";
 import { useProof } from "@/contexts/ProofProvider";
 import DownloadProofButton from "./DownloadProofButton";
@@ -57,11 +57,12 @@ function LineFocusPanel({
 }) {
   const { getRuleAtStepAsLatex, getReferenceString } = useLaTeX()
   const { hoveringState } = useHovering()
+  const { interactionState } = useInteractionState()
 
   const refHighlights = lineStep.justification.refs
     .map((_, idx) => idx)
     .filter((idx) =>
-      refIsBeingHovered(lineUuid, idx, hoveringState),
+      refIsBeingHovered(lineUuid, idx, hoveringState) || refIsBeingSelected(lineUuid, idx, interactionState),
     )
 
   const refLineNumbers = lineStep.justification.refs
