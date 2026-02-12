@@ -1,16 +1,23 @@
-import { useProof } from "@/contexts/ProofProvider";
 import "katex/dist/katex.min.css";
 import React from "react";
 import { InlineMath, MathComponentPropsWithMath } from "react-katex";
 
-const IN_FISH_MODE = (localStorage.getItem("mode") === "FISH");
-(window as any).toggleFishMode = () => {
-  if (IN_FISH_MODE) {
-    localStorage.removeItem("mode")
-  } else {
-    localStorage.setItem("mode", "FISH")
+declare global {
+  interface Window {
+    toggleFishMode: () => void;
   }
-  window.location.href = window.location.href
+}
+
+const IN_FISH_MODE = typeof window !== 'undefined' && globalThis.localStorage?.getItem("mode") === "FISH";
+if (typeof window !== 'undefined') {
+  window.toggleFishMode = () => {
+    if (IN_FISH_MODE) {
+      localStorage.removeItem("mode")
+    } else {
+      localStorage.setItem("mode", "FISH")
+    }
+    window.location.href = window.location.href
+  }
 }
 
 const MyInlineMath = (props: MathComponentPropsWithMath) => {
