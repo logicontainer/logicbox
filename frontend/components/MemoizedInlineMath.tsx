@@ -1,10 +1,13 @@
-import { useProof } from "@/contexts/ProofProvider";
 import "katex/dist/katex.min.css";
 import React from "react";
 import { InlineMath, MathComponentPropsWithMath } from "react-katex";
 
+declare global {
+  var toggleFishMode: () => void;
+}
+
 const IN_FISH_MODE = (localStorage.getItem("mode") === "FISH");
-(window as any).toggleFishMode = () => {
+window.toggleFishMode = () => {
   if (IN_FISH_MODE) {
     localStorage.removeItem("mode")
   } else {
