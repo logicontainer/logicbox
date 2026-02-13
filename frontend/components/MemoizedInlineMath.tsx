@@ -25,6 +25,7 @@ const MyInlineMath = (props: MathComponentPropsWithMath) => {
     const math = props.math
       .replaceAll("x_0", "🐟")
       .replaceAll("y_0", "🐠")
+      .replaceAll("z_0", "🐡")
     return <InlineMath {...props} math={math}/>
   } else return <InlineMath {...props}/>
 }
