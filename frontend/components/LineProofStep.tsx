@@ -25,7 +25,6 @@ import {
 import { useContextMenu } from "@/contexts/ContextMenuProvider";
 import { useHovering } from "@/contexts/HoveringProvider";
 import { useProof } from "@/contexts/ProofProvider";
-import { useLaTeX } from "@/contexts/LaTeXProvider";
 import { formulaIsBeingHovered, stepIsDraggable } from "@/lib/state-helpers";
 import { useStepDrag } from "@/contexts/StepDragProvider";
 
@@ -201,7 +200,6 @@ export function LineProofStep({
           userInput={props.formula.userInput}
           lineUuid={props.uuid}
         />
-
         <div
           className="flex items-center gap-2 whitespace-nowrap"
         >
