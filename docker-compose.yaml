@@ -3,7 +3,7 @@ services:
     container_name: logicbox
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${PORT}:3000"
     environment:
       - NODE_ENV=production
     build:
