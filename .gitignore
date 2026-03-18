@@ -1,4 +1,5 @@
 *.class
+.env
 *.log
 *.iml
 *.ipr
