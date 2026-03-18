@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = { 
   reactStrictMode: false,
-  output: process.env.NEXT_OUTPUT_MODE === 'export' ? 'export' : undefined,
+  output: 'standalone',
   /* config options here */
   experimental: {
     turbo: {

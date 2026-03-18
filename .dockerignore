@@ -1,0 +1,268 @@
+# ============================================================================
+# Created by https://dockerignore.com/
+# FRAMEWORK TEMPLATE for Next.js
+# Website: https://nextjs.org/
+# Repository: https://github.com/vercel/next.js
+# ============================================================================
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TEMPLATE OVERVIEW & USAGE NOTES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# • TEMPLATE TYPE: Framework Template
+# • PURPOSE: Next.js React framework specific ignore patterns
+# • DESIGN PHILOSOPHY: Self-contained with all necessary patterns including security
+# • COMBINATION GUIDANCE: Use standalone - no need to combine with other templates
+# • SECURITY CONSIDERATIONS: Includes security patterns for .env files and credentials
+# • BEST PRACTICES: Review before use, test with your specific Next.js setup
+# • OFFICIAL SOURCES: Next.js community patterns and best practices
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# SECURITY & SENSITIVE DATA PROTECTION (ALWAYS FIRST!)
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# CRITICAL: Prevent sensitive data from being included in Docker images
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# ENVIRONMENT VARIABLES & CONFIGURATION FILES
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Environment files contain sensitive API keys, database credentials,
+# and other secrets that must not be included in Docker images
+
+.env
+.env.*
+.env.*.local
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# APPLICATION SECRETS & CREDENTIALS
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+
+# Application secrets, credentials, and sensitive configuration files
+**/config/credentials.*
+**/config/secrets.*
+**/keys/
+**/passwords/
+**/private/
+**/secrets/
+*.auth
+*.authz
+*.password
+*.secret
+*.secrets
+*.token
+*_tokens
+*password*
+apikeys.*
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Staging.json
+connectionstrings.config
+credentials
+database.ini
+database.yml
+dbconfig.xml
+secrets.json
+secrets.yaml
+secrets.yml
+tokens.*
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# DEPENDENCY MANAGEMENT & PACKAGE CACHE
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# for reproducible builds. Only exclude them if you have specific reasons.
+# IMPORTANT: Lock files (package-lock.json, yarn.lock, etc.) should generally be tracked
+**/.bun/
+**/.npm/
+**/.npm/_logs/
+**/.pnpm-store/
+**/.pnpm/
+**/.yarn/
+**/.yarn/cache/
+**/.yarn/install-state.gz
+**/.yarn/releases/
+**/.yarn/unplugged/
+**/.yarn/versions/
+**/bower_components/
+**/node_modules/
+.npmignore
+.npmrc
+.npmrc.*
+.yarnrc
+.yarnrc.yml
+npm-debug.log*
+pnpm-debug.log*
+pnpm-workspace.yaml
+yarn-error.log
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# BUILD ARTIFACTS & DISTRIBUTION PACKAGES
+**/.astro/
+**/.build/
+**/.gatsby/
+**/.nuxt/
+**/.nuxt/components/
+**/.nuxt/dist/
+**/.output/
+**/.svelte-kit/
+**/_build/
+**/_site/
+**/build/
+**/dist/
+# **/lib/
+**/libs/
+**/out/
+**/public/static/chunks/
+**/public/static/css/
+**/public/static/media/
+**/storybook-static/
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# NEXT.JS SPECIFIC PATTERNS
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# DEVELOPMENT & RUNTIME ARTIFACTS
+**/.cache/
+**/.eslintcache
+**/.idea/
+**/.static/
+**/.storybook/
+**/.stylelintcache
+**/.tmp/
+**/.turbo/
+**/.vs/
+**/.vscode/
+**/temp/
+**/tmp/
+*.log
+*.pid
+*.sock
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# TESTING & QUALITY ASSURANCE ARTIFACTS
+**/.coverage_html/
+**/.nyc_output/
+**/.pytest_cache/
+**/.spec/
+**/.ssg/
+**/.ssr/
+**/.tests/
+**/coverage/
+**/coverage_html/
+**/test-reports/
+**/test-results/
+.coverage
+.coverage.*
+junit.xml
+test-results.xml
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# CONFIGURATION & CUSTOMIZATION
+**/config/development.*
+**/config/local.*
+**/config/production.*
+**/config/staging.*
+**/config/test.*
+**/settings/development.*
+**/settings/local.*
+**/settings/production.*
+**/settings/staging.*
+**/settings/test.*
+
+vite.config.local.*
+webpack.config.local.*
+
+**/migrations/local/
+**/seeds/local/
+database.local.*
+db.local.*
+redis.local.*
+
+**/.terraform/local/
+docker-compose.dev.*
+docker-compose.local.*
+docker-compose.override.*
+docker-compose.test.*
+terraform.auto.tfvars.local
+terraform.tfvars.local
+
+.eslintrc.local.*
+.prettierrc.local.*
+.stylelintrc.local.*
+cypress.config.local.*
+jest.config.local.*
+tsconfig.local.*
+vitest.config.local.*
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# MODERN DEVELOPMENT TOOLS & FRAMEWORKS
+**/.esbuild/
+**/.parcel-cache/
+**/.rollup.cache/
+**/.swc/
+**/.webpack/
+**/bazel-*
+**/bazel-bin/
+**/bazel-out/
+**/bazel-testlogs/
+**/buck-out/
+**/dist-newstyle/
+**/elm-stuff/
+**/pkg/
+
+**/.blitz/
+**/.docusaurus/
+**/.expo/
+**/.hydrogen/
+**/.keystone/
+**/.qwik/
+**/.redwood/
+**/.remix/
+**/.sanity/
+**/.sapper/
+**/.solid-start/
+**/.tina/
+
+**/.devcontainer/
+**/.devpod/
+**/.firebase/
+**/.functions/
+**/.netlify/
+**/.serverless/
+**/.vercel/
+**/.wrangler/
+**/functions/
+
+**/.allure/
+**/.cypress/
+**/.jest/
+**/.playwright/
+**/.puppeteer/
+**/.testcontainers/
+**/.vitest/
+**/allure-results/
+**/cypress/screenshots/
+**/cypress/videos/
+**/playwright-report/
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# OPERATING SYSTEM SPECIFIC FILES
+# Windows
+**/$RECYCLE.BIN/
+*.lnk
+*.msm
+*.msp
+*.scc
+Desktop.ini
+ehthumbs.db
+Thumbs.db
+thumbs.db
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trash-*/
+.Trashes
+
+# Linux
+*~
+.directory
