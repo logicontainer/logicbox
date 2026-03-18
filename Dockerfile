@@ -17,9 +17,14 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 FROM node-base AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/next.config.ts ./
 COPY frontend/ .
 
+ENV NEXT_TELEMETRY_DISABLED 1
+
 RUN pnpm run build
+RUN ls -la .
+RUN ls -la .next
 RUN pnpm prune --prod
 
 FROM node-base AS runtime

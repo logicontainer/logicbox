@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "test -e frontend/public/logicbox_backend.js && pnpm dev --turbopack || echo \"Missing logicbox_backend.js file. Compile it first or use the docker image.\"",
-    "build": "test -e frontend/public/logicbox_backend.js && pnpm build --turbopack || echo \"Missing logicbox_backend.js file. Compile it first or use the docker image.\"",
+    "dev": "test -e frontend/public/logicbox_backend.js && next dev --turbopack || echo \"Missing logicbox_backend.js file. Compile it first or use the docker image.\"",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "cloc": "cloc --exclude-dir=node_modules,.next --exclude-ext=yaml,svg .",
